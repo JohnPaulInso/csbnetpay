@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Employee Salary Search</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1f1f1f;
+            color: white;
+        }
+        #searchButton {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #6f42c1; /* Purple */
+            border-color: #6f42c1; /* Purple */
+            color: white;
+        }
+        #searchButton:hover {
+            background-color: #5a35a1;
+            border-color: #5a35a1;
+        }
+        .results {
+            margin: 20px;
+            color: white;
+        }
+        .employee-header {
+            font-weight: bold;
+            color: rgb(255, 219, 75);
+        }
+        .rounded-top {
+            border-radius: 50px 50px 20px 20px;
+        }
+        .rounded-bottom {
+            border-radius: 20px 20px 50px 50px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="searchSection" class="container">
+    <h1 class="text-center">Search</h1>
+    <div class="row col-lg-12 col-sm-2">
+        <div class="d-flex">
+            <input type="text" id="searchInput" class="form-control" placeholder="Enter employee number..." style="width: 80%;">
+            <button id="searchButton" class="btn btn-primary">Search</button>
+        </div>
+    </div>
+</div>
+
+<br/>
+
+<!-- Section to display employee details -->
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h3 id="employeeInfo" class="text-white"></h3>
+        </div>
+    </div>
+    <div class="row results rounded-bottom rounded-top" id="results">
+        <!-- Table will be dynamically inserted here -->
+    </div>
+</div>
+
+<script>
+    const csvFiles = [
+        'jun24.csv', 'may24.csv', 'apr24.csv', 'mar24.csv', 'feb24.csv', 'jan24.csv',
+        'dec23.csv', 'nov23.csv', 'oct23.csv', 'sep23.csv', 'aug23.csv'
+    ];
+    document.getElementById('searchButton').addEventListener('click', searchEmployee);
+
+    function searchEmployee() {
+        const searchInput = document.getElementById('searchInput').value.trim();
+        if (!searchInput) {
+            alert('Please enter an employee number.');
+            return;
+        }
+
+        const resultsSection = document.getElementById('results');
+        const employeeInfoSection = document.getElementById('employeeInfo');
+        resultsSection.innerHTML = ''; // Clear previous results
+
+        // Automatically limit to the last 12 months (latest first)
+        const last12MonthsFiles = csvFiles.slice(0, 12);
+
+        let fetchedData = [];
+        let latestCsvData = null;
+
+        Promise.all(last12MonthsFiles.map(csvFile => fetchCSV(csvFile)))
+            .then(allData => {
+                fetchedData = allData;
+                fetchedData.sort((a, b) => b.date - a.date);
+                latestCsvData = fetchedData[0].csvData;
+                displayEmployeeInfo(fetchedData[0].monthName, latestCsvData);
+
+                displayResultsTable(fetchedData);
+            })
+            .catch(error => {
+                console.error('Error fetching CSV data:', error);
+            });
+    }
+
+    function fetchCSV(csvFile) {
+        return new Promise((resolve, reject) => {
+            const monthName = getMonthNameFromCsv(csvFile);
+            const date = getDateFromCsv(csvFile);
+
+            fetch(csvFile)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Unable to fetch ${csvFile}`);
+                    }
+                    return response.text();
+                })
+                .then(text => {
+                    const csvData = parseCSV(text);
+                    resolve({ monthName, csvData, date });
+                })
+                .catch(error => {
+                    console.error(`Error fetching data for ${monthName}:`, error);
+                    reject(error);
+                });
+        });
+    }
+
+    function getDateFromCsv(csvFile) {
+        const monthMap = {
+            'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'may': 4, 'jun': 5,
+            'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11
+        };
+        const monthPart = csvFile.slice(0, 3);
+        const yearPart = '20' + csvFile.slice(3, 5);
+        const monthIndex = monthMap[monthPart];
+        return new Date(yearPart, monthIndex);
+    }
+
+    function getMonthNameFromCsv(csvFile) {
+        const monthMap = {
+            'jan': 'January', 'feb': 'February', 'mar': 'March', 'apr': 'April', 'may': 'May', 'jun': 'June',
+            'jul': 'July', 'aug': 'August', 'sep': 'September', 'oct': 'October', 'nov': 'November', 'dec': 'December'
+        };
+        const monthPart = csvFile.slice(0, 3);
+        const yearPart = '20' + csvFile.slice(3, 5);
+        return `${monthMap[monthPart]} ${yearPart}`;
+    }
+
+    function parseCSV(data) {
+        const rows = data.trim().split('\n');
+        return rows.map(row => row.split(','));
+    }
+
+    function displayEmployeeInfo(monthName, csvData) {
+        const employeeInfoSection = document.getElementById('employeeInfo');
+        let employeeFound = false;
+
+        for (let i = 1; i < csvData.length; i++) {
+            const row = csvData[i];
+            if (row.length < 4) continue;
+            const empno = row[3];
+            if (empno === document.getElementById('searchInput').value.trim()) {
+                employeeFound = true;
+
+                const div = row[1];
+                const sta = row[2];
+                const empno = row[3];
+                const fname = row[4];
+                const mi = row[5];
+                const lname = row[6];
+                const account = row[8];
+
+                employeeInfoSection.innerHTML = `
+                    <strong>Name:</strong><b style="color:orange"> ${fname} ${mi} ${lname}</b><br/>
+                    <strong>Account:</strong><b style="color:orange">  DIV ${div} - STA ${sta} - EMPNO ${empno} </b><br/>
+                    <strong>Account:</strong><b style="color:orange">  ${account}</b>
+                `;
+                break;
+            }
+        }
+
+        if (!employeeFound) {
+            employeeInfoSection.innerHTML = 'No employee found in the latest data.';
+        }
+    }
+
+    function displayResultsTable(fetchedData) {
+        const resultsSection = document.getElementById('results');
+        
+        // Create a table with a single header row
+        const table = document.createElement('table');
+        table.classList.add('table', 'table-borderless', 'text-white');
+
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+        headerRow.innerHTML = `
+            <th class="font-weight-bold">MONTH</th>
+            <th class="font-weight-bold">TAKEHOME</th>
+        `;
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        const tbody = document.createElement('tbody');
+
+        // Iterate over the fetched data and add rows to the table body
+        fetchedData.forEach(data => {
+            data.csvData.forEach((row, index) => {
+                if (index === 0) return; // Skip header row
+                if (row.length < 4) return; // Skip malformed rows
+
+                const empno = row[3];
+                if (empno === document.getElementById('searchInput').value.trim()) {
+                    const monthName = data.monthName;
+                    const takehome = parseFloat(row[7]).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
+
+                    const rowElement = document.createElement('tr');
+                    rowElement.innerHTML = `
+                        <td>${monthName}</td>
+                        <td><b>${takehome}</b></td>
+                    `;
+                    tbody.appendChild(rowElement);
+                }
+            });
+        });
+
+        if (tbody.children.length > 0) {
+            table.appendChild(tbody);
+            resultsSection.appendChild(table);
+        }
+    }
+</script>
+</body>
+</html>
