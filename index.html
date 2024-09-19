@@ -157,11 +157,11 @@
             const row = csvData[i];
             if (row.length < 4) continue;
             const empno = row[3];
-            if (empno === document.getElementById('searchInput').value.trim()) {
+            if (empno === document.getElementById('searchInput').value.trim()) { 
                 employeeFound = true;
 
                 const div = row[1];
-                const sta = row[2];
+                const sta = row[2]; 
                 const empno = row[3];
                 const fname = row[4];
                 const mi = row[5];
