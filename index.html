@@ -8,7 +8,6 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- Add this line to make sure it adapts to mobile -->
         <title>Employee Salary Search</title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -28,7 +27,7 @@
             font-size: 1.2em; /* Make the input text larger on mobile */
             padding: 25px;    /* Increase padding for a larger input box */
             }
-            
+
             #searchButton:hover {
                 background-color: #5a35a1;
                 border-color: #5a35a1;
@@ -51,11 +50,22 @@
             .rounded-bottom {
                 border-radius: 20px 20px 50px 50px;
             }
+            
+            #loadingIndicator {
+    display: none;
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+}
+
     
             /* Responsive styling for mobile */
             @media (max-width: 768px) {
                 body {
-                    font-size: 1.15em; /* Make the body text bigger on mobile */
+                    font-size: 1em; /* Make the body text bigger on mobile */
                 }
     
                 #searchButton {
@@ -87,10 +97,17 @@
     <h1 class="text-center  mb-2">Search</h1>
     <div class="row">
         <div class="col-12 d-flex">
-            <input type="text" id="searchInput" class="form-control" placeholder="" style="flex-grow: 1;">
+            <input type="text" id="searchInput" class="form-control" placeholder="Employee Number..." style="flex-grow: 1;">
             <button id="searchButton" class="btn btn-primary ml-2">Search</button>
         </div>
-        <div id="loadingIndicator" class="text-white" style="display: none;">Loading...</div>
+
+        
+
+
+        <!-- Loading GIF -->
+<div id="loadingIndicator" style="display: none; text-align: center;">
+    <img src="loading.gif" alt="Loading..." style="max-width: 100px;">
+</div>
 
     </div>
 </div>
@@ -224,7 +241,8 @@
 
                 employeeInfoSection.innerHTML = `
                     <strong>Name:</strong><b style="color:orange"> ${fname} ${mi} ${lname}</b><br/>
-                    <strong>Account:</strong><b style="color:orange">  DIV ${div} - STA ${sta} - EMPNO ${empno} </b><br/>
+                    <strong>EMPNO:</strong><b style="color:orange">   ${empno} </b><br/>
+                    <strong>Account:</strong><b style="color:orange">  DIV ${div} - STA ${sta}</b><br/>
                     <strong>Account:</strong><b style="color:orange">  ${account}</b>
                 `;
                 break;
