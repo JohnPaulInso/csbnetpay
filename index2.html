@@ -242,7 +242,7 @@ function displayResultsTable(fetchedData) {
             <td>${monthName}</td>
             <td>
                 <div class="position-relative">
-                    <b class="sum-amount" style="cursor: pointer;">${totalDedAmt}</b>
+                    <u><b class="sum-amount" style="cursor: pointer;">${totalDedAmt}</b></u>
                     <div class="dropdown-menu" style="display: none; position: absolute; z-index: 1;">
                         ${value.details.map(detail => `<div class="dropdown-item">${detail}</div>`).join('')}
                     </div>
