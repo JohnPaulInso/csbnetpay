@@ -3,47 +3,87 @@
 <head>
     <title>Employee Salary Search</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #1f1f1f;
-            color: white;
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- Add this line to make sure it adapts to mobile -->
+        <title>Employee Salary Search</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #1f1f1f;
+                color: white;
+            }
+    
+            #searchButton {
+                padding: 10px 15px;
+                font-size: 16px;
+                background-color: #6f42c1; /* Purple */
+                border-color: #6f42c1; /* Purple */
+                color: white;
+            }
+    
+            #searchButton:hover {
+                background-color: #5a35a1;
+                border-color: #5a35a1;
+            }
+    
+            .results {
+                margin: 20px;
+                color: white;
+            }
+    
+            .employee-header {
+                font-weight: bold;
+                color: rgb(255, 219, 75);
+            }
+    
+            .rounded-top {
+                border-radius: 50px 50px 20px 20px;
+            }
+    
+            .rounded-bottom {
+                border-radius: 20px 20px 50px 50px;
+            }
+    
+            /* Responsive styling for mobile */
+            @media (max-width: 768px) {
+                body {
+                    font-size: 1.15em; /* Make the body text bigger on mobile */
+                }
+    
+                #searchButton {
+                    font-size: 1.1em; /* Increase button text size on mobile */
+                }
+    
+                #employeeInfo {
+                    font-size: 1.3em; /* Increase employee info text size */
+                }
+    
+                .table {
+                    font-size: 1.15em; /* Increase table text size */
+                }
+                   /* Adjust input field size on mobile */
+        #searchInput {
+            font-size: 1.2em; /* Make the input text larger on mobile */
+            padding: 15px;    /* Increase padding for a larger input box */
         }
-        #searchButton {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #6f42c1; /* Purple */
-            border-color: #6f42c1; /* Purple */
-            color: white;
-        }
-        #searchButton:hover {
-            background-color: #5a35a1;
-            border-color: #5a35a1;
-        }
-        .results {
-            margin: 20px;
-            color: white;
-        }
-        .employee-header {
-            font-weight: bold;
-            color: rgb(255, 219, 75);
-        }
-        .rounded-top {
-            border-radius: 50px 50px 20px 20px;
-        }
-        .rounded-bottom {
-            border-radius: 20px 20px 50px 50px;
-        }
-    </style>
+
+      
+            }
+        </style>
+    </head>
+    
 </head>
 <body>
 
-<div id="searchSection" class="container">
-    <h1 class="text-center">Search</h1>
-    <div class="row col-lg-12 col-sm-2">
-        <div class="d-flex">
-            <input type="text" id="searchInput" class="form-control" placeholder="Enter employee number..." style="width: 1200px;">
-            <button id="searchButton" class="btn btn-primary">Search</button>
+<div id="searchSection" class="container  mt-5">
+    <h1 class="text-center  mb-2">Search</h1>
+    <div class="row">
+        <div class="col-12 d-flex">
+            <input type="text" id="searchInput" class="form-control" placeholder="Enter employee number..." style="flex-grow: 1;">
+            <button id="searchButton" class="btn btn-primary ml-2">Search</button>
         </div>
     </div>
 </div>
@@ -64,9 +104,10 @@
 
 <script>
     const csvFiles = [
-        'jun24.csv', 'may24.csv', 'apr24.csv', 'mar24.csv', 'feb24.csv', 'jan24.csv',
-        'dec23.csv', 'nov23.csv', 'oct23.csv', 'sep23.csv', 'aug23.csv'
+        'aug24.csv', 'jul24.csv', 'jun24.csv', 'may24.csv', 'apr24.csv', 'mar24.csv',
+        'feb24.csv', 'jan24.csv', 'dec23.csv', 'nov23.csv', 'oct23.csv', 'sep23.csv'
     ];
+    
     document.getElementById('searchButton').addEventListener('click', searchEmployee);
 
     function searchEmployee() {
@@ -80,7 +121,7 @@
         const employeeInfoSection = document.getElementById('employeeInfo');
         resultsSection.innerHTML = ''; // Clear previous results
 
-        // Automatically limit to the last 12 months (latest first)
+        // Automatically limit to the latest 12 months
         const last12MonthsFiles = csvFiles.slice(0, 12);
 
         let fetchedData = [];
@@ -157,12 +198,11 @@
             const row = csvData[i];
             if (row.length < 4) continue;
             const empno = row[3];
-            if (empno === document.getElementById('searchInput').value.trim()) { 
+            if (empno === document.getElementById('searchInput').value.trim()) {
                 employeeFound = true;
 
                 const div = row[1];
-                const sta = row[2]; 
-                const empno = row[3];
+                const sta = row[2];
                 const fname = row[4];
                 const mi = row[5];
                 const lname = row[6];
