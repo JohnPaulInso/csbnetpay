@@ -85,6 +85,8 @@
             <input type="text" id="searchInput" class="form-control" placeholder="Enter employee number..." style="flex-grow: 1;">
             <button id="searchButton" class="btn btn-primary ml-2">Search</button>
         </div>
+        <div id="loadingIndicator" class="text-white" style="display: none;">Loading...</div>
+
     </div>
 </div>
 
@@ -111,35 +113,42 @@
     document.getElementById('searchButton').addEventListener('click', searchEmployee);
 
     function searchEmployee() {
-        const searchInput = document.getElementById('searchInput').value.trim();
-        if (!searchInput) {
-            alert('Please enter an employee number.');
-            return;
-        }
+    const searchInput = document.getElementById('searchInput').value.trim();
+    const loadingIndicator = document.getElementById('loadingIndicator');
 
-        const resultsSection = document.getElementById('results');
-        const employeeInfoSection = document.getElementById('employeeInfo');
-        resultsSection.innerHTML = ''; // Clear previous results
-
-        // Automatically limit to the latest 12 months
-        const last12MonthsFiles = csvFiles.slice(0, 12);
-
-        let fetchedData = [];
-        let latestCsvData = null;
-
-        Promise.all(last12MonthsFiles.map(csvFile => fetchCSV(csvFile)))
-            .then(allData => {
-                fetchedData = allData;
-                fetchedData.sort((a, b) => b.date - a.date);
-                latestCsvData = fetchedData[0].csvData;
-                displayEmployeeInfo(fetchedData[0].monthName, latestCsvData);
-
-                displayResultsTable(fetchedData);
-            })
-            .catch(error => {
-                console.error('Error fetching CSV data:', error);
-            });
+    if (!searchInput) {
+        alert('Please enter an employee number.');
+        return;
     }
+
+    const resultsSection = document.getElementById('results');
+    const employeeInfoSection = document.getElementById('employeeInfo');
+    resultsSection.innerHTML = ''; // Clear previous results
+    employeeInfoSection.innerHTML = ''; // Clear previous employee info
+    loadingIndicator.style.display = 'block'; // Show loading indicator
+
+    // Automatically limit to the last 12 months (latest first)
+    const last12MonthsFiles = csvFiles.slice(0, 12);
+
+    let fetchedData = [];
+    let latestCsvData = null;
+
+    Promise.all(last12MonthsFiles.map(csvFile => fetchCSV(csvFile)))
+        .then(allData => {
+            fetchedData = allData;
+            fetchedData.sort((a, b) => b.date - a.date);
+            latestCsvData = fetchedData[0].csvData;
+            displayEmployeeInfo(fetchedData[0].monthName, latestCsvData);
+            displayResultsTable(fetchedData);
+        })
+        .catch(error => {
+            console.error('Error fetching CSV data:', error);
+        })
+        .finally(() => {
+            loadingIndicator.style.display = 'none'; // Hide loading indicator
+        });
+}
+
 
     function fetchCSV(csvFile) {
         return new Promise((resolve, reject) => {
