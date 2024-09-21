@@ -6,7 +6,9 @@
     <link rel="stylesheet" href="styles.css">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="manifest" href="manifest.json">
-
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon.ico" type="favicon.ico">
+    
 
 </head>
 
@@ -83,29 +85,34 @@
 
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    openFullscreen();
-});
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        const prompt = document.getElementById('fullscreenPrompt');
 
-window.addEventListener('pageshow', (event) => {
-    // Check if the page is being loaded from the cache
-    if (event.persisted) {
-        openFullscreen();
-    }
-});
+        // Show the prompt when the mouse moves
+        document.addEventListener('mousemove', () => {
+            prompt.style.display = 'block';
+        });
 
-function openFullscreen() {
-    const elem = document.documentElement;
-    if (elem.requestFullscreen) {
-        elem.requestFullscreen();
-    } else if (elem.mozRequestFullScreen) { // Firefox
-        elem.mozRequestFullScreen();
-    } else if (elem.webkitRequestFullscreen) { // Chrome, Safari and Opera
-        elem.webkitRequestFullscreen();
-    } else if (elem.msRequestFullscreen) { // IE/Edge
-        elem.msRequestFullscreen();
+        // Enter fullscreen when the prompt is clicked
+        prompt.addEventListener('click', () => {
+            openFullscreen();
+            prompt.style.display = 'none'; // Hide prompt after entering full-screen
+        });
+    });
+
+    function openFullscreen() {
+        const elem = document.documentElement;
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+        } else if (elem.mozRequestFullScreen) {
+            elem.mozRequestFullScreen();
+        } else if (elem.webkitRequestFullscreen) {
+            elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) {
+            elem.msRequestFullscreen();
+        }
     }
-}
 
 
 
