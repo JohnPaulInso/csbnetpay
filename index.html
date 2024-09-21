@@ -8,15 +8,17 @@
     <!DOCTYPE html>
     <html lang="en">
     <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- Add this line to make sure it adapts to mobile -->
-        <title>Employee Salary Search</title>
-       
+     
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+          <title>Employee Salary Search</title>
+          <link rel="manifest" href="manifest.json">
+
 
     </head>
     
 </head>
 
-<nav style="background-color: hsl(269, 100%, 21%); position: sticky; top: 0; z-index: 1000; padding: 0.5rem 1rem;">
+<nav style="background-color: #34006b; position: sticky; top: 0; z-index: 1000; padding: 0.5rem 1rem;">
     <div class="navbar-nav" style="color:#ddd;display: flex; justify-content: center;">
         <div style="color:#ddd;display: flex; align-items: center;">
             <a class="text-white nav-item nav-link p-2" href="index.html"><b>NETPAY</b></a>
@@ -85,6 +87,30 @@
 
 
 <script>
+    
+
+    function openFullscreen() {
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+    } else if (elem.mozRequestFullScreen) { // Firefox
+        elem.mozRequestFullScreen();
+    } else if (elem.webkitRequestFullscreen) { // Chrome, Safari and Opera
+        elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) { // IE/Edge
+        elem.msRequestFullscreen();
+    }
+}
+
+document.getElementById('searchButton').addEventListener('click', () => {
+    openFullscreen();
+    searchEmployee();
+});
+
+
+
+
+
         const csvFiles = [
             'aug24.csv', 'jul24.csv', 'jun24.csv', 'may24.csv', 'apr24.csv', 'mar24.csv',
             'feb24.csv', 'jan24.csv', 'dec23.csv', 'nov23.csv', 'oct23.csv', 'sep23.csv'

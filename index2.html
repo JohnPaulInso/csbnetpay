@@ -8,9 +8,10 @@
     <!DOCTYPE html>
     <html lang="en">
     <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- Add this line to make sure it adapts to mobile -->
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <title>Employee Salary Search</title>
-       
+        <link rel="manifest" href="manifest.json">
+
 
     </head>
     
@@ -87,7 +88,39 @@
 
 
 
-<script>const csvFiles = [
+<script>
+
+
+
+function openFullscreen() {
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+    } else if (elem.mozRequestFullScreen) { // Firefox
+        elem.mozRequestFullScreen();
+    } else if (elem.webkitRequestFullscreen) { // Chrome, Safari and Opera
+        elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) { // IE/Edge
+        elem.msRequestFullscreen();
+    }
+}
+
+document.getElementById('searchButton').addEventListener('click', () => {
+    openFullscreen();
+    searchEmployee();
+});
+
+
+
+
+
+
+
+
+
+
+
+const csvFiles = [
     'pos_aug24.csv', 'pos_jul24.csv', 'pos_jun24.csv', 'pos_may24.csv', 'pos_apr24.csv', 'pos_mar24.csv',
     'pos_feb24.csv', 'pos_jan24.csv', 'pos_dec23.csv', 'pos_nov23.csv', 'pos_oct23.csv', 'pos_sep23.csv'
 ];
