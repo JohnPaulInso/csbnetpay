@@ -79,9 +79,15 @@
 
 
 <script>
-    
     document.addEventListener('DOMContentLoaded', () => {
     openFullscreen();
+});
+
+window.addEventListener('pageshow', (event) => {
+    // Check if the page is being loaded from the cache
+    if (event.persisted) {
+        openFullscreen();
+    }
 });
 
 function openFullscreen() {
@@ -96,9 +102,6 @@ function openFullscreen() {
         elem.msRequestFullscreen();
     }
 }
-
-
-
 
 
     
