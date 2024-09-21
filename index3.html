@@ -70,25 +70,26 @@
 
 
 
-
 document.addEventListener('DOMContentLoaded', () => {
     openFullscreen();
 });
 
 function openFullscreen() {
     const elem = document.documentElement;
-    if (!document.fullscreenElement) {
-        if (elem.requestFullscreen) {
-            elem.requestFullscreen();
-        } else if (elem.mozRequestFullScreen) { // Firefox
-            elem.mozRequestFullScreen();
-        } else if (elem.webkitRequestFullscreen) { // Chrome, Safari and Opera
-            elem.webkitRequestFullscreen();
-        } else if (elem.msRequestFullscreen) { // IE/Edge
-            elem.msRequestFullscreen();
-        }
+    if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+    } else if (elem.mozRequestFullScreen) { // Firefox
+        elem.mozRequestFullScreen();
+    } else if (elem.webkitRequestFullscreen) { // Chrome, Safari and Opera
+        elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) { // IE/Edge
+        elem.msRequestFullscreen();
     }
 }
+
+
+
+
 
 
 
@@ -102,7 +103,6 @@ const csvFiles = [
     'onq_aug24.csv'
 ];
 
-document.getElementById('searchButton').addEventListener('click', searchEmployee);
 document.getElementById('searchButton').addEventListener('click', searchEmployee);
 
 function searchEmployee() {
@@ -120,46 +120,28 @@ function searchEmployee() {
     employeeInfoSection.innerHTML = ''; // Clear previous employee info
     loadingIndicator.style.display = 'block'; // Show loading indicator
 
-    // Enter fullscreen mode when the search starts
-    setTimeout(() => {
-        openFullscreen();
-    }, 100); // A short delay to ensure the loading indicator is displayed
-
-    // Automatically limit to the last 12 months (latest first)
     const last12MonthsFiles = csvFiles.slice(0, 12);
 
     let fetchedData = [];
-    let latestCsvData = null;
 
     Promise.all(last12MonthsFiles.map(csvFile => fetchCSV(csvFile)))
         .then(allData => {
-            fetchedData = allData;
+            fetchedData = allData.filter(data => data !== null);
+            if (fetchedData.length === 0) {
+                alert('No valid data found in the provided files.');
+                return;
+            }
             fetchedData.sort((a, b) => b.date - a.date);
-            latestCsvData = fetchedData[0].csvData;
-            displayEmployeeInfo(fetchedData[0].monthName, latestCsvData);
+            displayEmployeeInfo(fetchedData[0].monthName, fetchedData[0].csvData);
             displayResultsTable(fetchedData);
         })
         .catch(error => {
             console.error('Error fetching CSV data:', error);
+            alert('Error fetching data. Check the console for more details.');
         })
         .finally(() => {
             loadingIndicator.style.display = 'none'; // Hide loading indicator
         });
-}
-
-function openFullscreen() {
-    const elem = document.documentElement;
-    if (!document.fullscreenElement) {
-        if (elem.requestFullscreen) {
-            elem.requestFullscreen();
-        } else if (elem.mozRequestFullScreen) { // Firefox
-            elem.mozRequestFullScreen();
-        } else if (elem.webkitRequestFullscreen) { // Chrome, Safari, and Opera
-            elem.webkitRequestFullscreen();
-        } else if (elem.msRequestFullscreen) { // IE/Edge
-            elem.msRequestFullscreen();
-        }
-    }
 }
 
 function fetchCSV(csvFile) {

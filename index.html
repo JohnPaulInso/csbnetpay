@@ -88,17 +88,36 @@
 
 <script>
     
+    document.addEventListener('DOMContentLoaded', () => {
+    openFullscreen();
+});
+
+function openFullscreen() {
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+    } else if (elem.mozRequestFullScreen) { // Firefox
+        elem.mozRequestFullScreen();
+    } else if (elem.webkitRequestFullscreen) { // Chrome, Safari and Opera
+        elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) { // IE/Edge
+        elem.msRequestFullscreen();
+    }
+}
 
 
+
+
+
+    
         const csvFiles = [
             'aug24.csv', 'jul24.csv', 'jun24.csv', 'may24.csv', 'apr24.csv', 'mar24.csv',
             'feb24.csv', 'jan24.csv', 'dec23.csv', 'nov23.csv', 'oct23.csv', 'sep23.csv'
         ];
         
     document.getElementById('searchButton').addEventListener('click', searchEmployee);
-    document.getElementById('searchButton').addEventListener('click', searchEmployee);
 
-function searchEmployee() {
+    function searchEmployee() {
     const searchInput = document.getElementById('searchInput').value.trim();
     const loadingIndicator = document.getElementById('loadingIndicator');
 
@@ -112,11 +131,6 @@ function searchEmployee() {
     resultsSection.innerHTML = ''; // Clear previous results
     employeeInfoSection.innerHTML = ''; // Clear previous employee info
     loadingIndicator.style.display = 'block'; // Show loading indicator
-
-    // Enter fullscreen mode when the search starts
-    setTimeout(() => {
-        openFullscreen();
-    }, 100); // A short delay to ensure the loading indicator is displayed
 
     // Automatically limit to the last 12 months (latest first)
     const last12MonthsFiles = csvFiles.slice(0, 12);
@@ -139,22 +153,6 @@ function searchEmployee() {
             loadingIndicator.style.display = 'none'; // Hide loading indicator
         });
 }
-
-function openFullscreen() {
-    const elem = document.documentElement;
-    if (!document.fullscreenElement) {
-        if (elem.requestFullscreen) {
-            elem.requestFullscreen();
-        } else if (elem.mozRequestFullScreen) { // Firefox
-            elem.mozRequestFullScreen();
-        } else if (elem.webkitRequestFullscreen) { // Chrome, Safari, and Opera
-            elem.webkitRequestFullscreen();
-        } else if (elem.msRequestFullscreen) { // IE/Edge
-            elem.msRequestFullscreen();
-        }
-    }
-}
-
 
 
     function fetchCSV(csvFile) {
