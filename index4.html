@@ -3,73 +3,52 @@
 <head>
     <title>Employee Salary Search</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    
     <link rel="stylesheet" href="styles.css">
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- Add this line to make sure it adapts to mobile -->
-        <title>Employee Salary Search</title>
-       
-
-    </head>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
+<body>
 
-<nav style="background-color: hsl(39, 100%, 21%); position: sticky; top: 0; z-index: 1000; padding: 0.5rem 1rem;">
+<nav style="background-color: hsl(0, 100%, 9%); position: sticky; top: 0; z-index: 1000; padding: 0.5rem 1rem;">
     <div class="navbar-nav" style="color:#ddd;display: flex; justify-content: center;">
         <div style="color:#ddd;display: flex; align-items: center;">
             <a style="color:#aaa;" class="nav-item nav-link p-2" href="index.html"><b>NETPAY</b></a>
-            <a class="text-white nav-item text-white nav-link p-2" href="index2.html"><b>DEDAMT</b></a>
-            <a style="color:#aaa;" class="nav-item nav-link p-2" href="index3.html"><b>ONQUEUE</b></a>
-            <a style="color:#aaa;" class="nav-item nav-link p-2" href="index4.html"><b>PLI</b></a>
+            <a style="color:#aaa;"class="nav-item nav-link p-2" href="index2.html"><b>DEDAMT</b></a>
+            <a style="color:#aaa;"class="nav-item nav-link p-2" href="index3.html"><b>ONQUEUE</b></a>
+            <a class="nav-item text-white nav-link p-2" href="index3.html"><b>PLI</b></a>
         </div>
     </div>
 </nav>
 
+    
 
-
-<body>
-
-<div id="searchSection" class="container  mt-5">
-    <h1 class="text-center pt-5 pb-3 mb-2">DEDAMT</h1>
+<div id="searchSection" class="container mt-5">
+    <h1 class="text-center pt-5 pb-3 mb-2">PLI DEDUCTION</h1>
     <div class="row pt-2">
         <div class="col-12 d-flex">
             <input type="text" id="searchInput" class="form-control" placeholder="Employee Number..." style="flex-grow: 1;">
             <button id="searchButton" class="btn btn-primary ml-2">Search</button>
         </div>
-
-        
-
-
         <!-- Loading GIF -->
-<div id="loadingIndicator" style="display: none; text-align: center;">
-    <img src="loading.gif" alt="Loading..." style="max-width: 100px;">
-</div>
-
+        <div id="loadingIndicator" style="display: none; text-align: center;">
+            <img src="loading.gif" alt="Loading..." style="max-width: 100px;">
+        </div>
     </div>
 </div>
 
 <br/>
 
 <!-- Section to display employee details -->
-<div class="container">
+<div class="container pb-5 mb-5">
     <div class="row">
         <div class="col-md-12">
             <h3 id="employeeInfo" class="text-white"></h3>
         </div>
     </div>
-    <div class="row results rounded-bottom rounded-top" id="results">
+    <div class="row results rounded-bottom rounded-top pb-5 mb-5" id="results">
         <!-- Table will be dynamically inserted here -->
     </div>
 </div>
-
-
-
-
-
-
 
 
 <footer style="background-color: hsl(45, 100%, 1%);bottom:0;padding: 0.5rem 1rem;margin-top:500px;">
@@ -86,10 +65,9 @@
 
 
 
-
-<script>const csvFiles = [
-    'pos_aug24.csv', 'pos_jul24.csv', 'pos_jun24.csv', 'pos_may24.csv', 'pos_apr24.csv', 'pos_mar24.csv',
-    'pos_feb24.csv', 'pos_jan24.csv', 'pos_dec23.csv', 'pos_nov23.csv', 'pos_oct23.csv', 'pos_sep23.csv'
+<script>
+const csvFiles = [
+    'pli_aug24.csv'
 ];
 
 document.getElementById('searchButton').addEventListener('click', searchEmployee);
@@ -109,14 +87,13 @@ function searchEmployee() {
     employeeInfoSection.innerHTML = ''; // Clear previous employee info
     loadingIndicator.style.display = 'block'; // Show loading indicator
 
-    // Automatically limit to the last 12 months (latest first)
     const last12MonthsFiles = csvFiles.slice(0, 12);
 
     let fetchedData = [];
 
     Promise.all(last12MonthsFiles.map(csvFile => fetchCSV(csvFile)))
         .then(allData => {
-            fetchedData = allData.filter(data => data !== null); // Filter out failed fetches
+            fetchedData = allData.filter(data => data !== null);
             if (fetchedData.length === 0) {
                 alert('No valid data found in the provided files.');
                 return;
@@ -139,8 +116,6 @@ function fetchCSV(csvFile) {
         const monthName = getMonthNameFromCsv(csvFile);
         const date = getDateFromCsv(csvFile);
 
-        console.log(`Fetching data from file: ${csvFile}`);
-
         fetch(csvFile)
             .then(response => {
                 if (!response.ok) {
@@ -149,19 +124,18 @@ function fetchCSV(csvFile) {
                 return response.text();
             })
             .then(text => {
-                console.log(`Successfully fetched data from ${csvFile}`);
                 const csvData = parseCSV(text);
                 resolve({ monthName, csvData, date });
             })
             .catch(error => {
                 console.error(`Error fetching data for ${monthName}:`, error);
-                resolve(null); // Return null for failed fetches, don't reject to allow Promise.all to proceed
+                resolve(null);
             });
     });
 }
 
 function getDateFromCsv(csvFile) {
-    const fileName = csvFile.replace('pos_', ''); // Remove 'pos_' prefix
+    const fileName = csvFile.replace('pli_', '');
     const monthMap = {
         'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'may': 4, 'jun': 5,
         'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11
@@ -173,7 +147,7 @@ function getDateFromCsv(csvFile) {
 }
 
 function getMonthNameFromCsv(csvFile) {
-    const fileName = csvFile.replace('pos_', ''); // Remove 'pos_' prefix
+    const fileName = csvFile.replace('pli_', '');
     const monthMap = {
         'jan': 'January', 'feb': 'February', 'mar': 'March', 'apr': 'April', 'may': 'May', 'jun': 'June',
         'jul': 'July', 'aug': 'August', 'sep': 'September', 'oct': 'October', 'nov': 'November', 'dec': 'December'
@@ -201,9 +175,9 @@ function displayEmployeeInfo(monthName, csvData) {
 
             const div = row[1];
             const sta = row[2];
-            const fname = row[4];
-            const mi = row[5];
-            const lname = row[6];
+            const fname = row[5];
+            const mi = row[6];
+            const lname = row[7];
 
             employeeInfoSection.innerHTML = `
                 <strong>NAME:</strong><b style="color:orange"> ${fname} ${mi} ${lname}</b><br/>
@@ -219,11 +193,9 @@ function displayEmployeeInfo(monthName, csvData) {
     }
 }
 
-
 function displayResultsTable(fetchedData) {
     const resultsSection = document.getElementById('results');
     
-    // Create a table with a single header row
     const table = document.createElement('table');
     table.classList.add('table', 'table-borderless', 'text-white');
 
@@ -237,68 +209,87 @@ function displayResultsTable(fetchedData) {
     table.appendChild(thead);
 
     const tbody = document.createElement('tbody');
-    const resultsMap = new Map(); // To store sums and details for dropdown
+    const resultsMap = new Map();
 
     fetchedData.forEach(data => {
         data.csvData.forEach((row, index) => {
-            if (index === 0) return; // Skip header row
-            if (row.length < 4) return; // Skip malformed rows
+            if (index === 0) return;
 
             const empno = row[3];
             if (empno === document.getElementById('searchInput').value.trim()) {
                 const monthName = data.monthName;
                 const dedamt = parseFloat(row[13]);
                 
-                // Accumulate amounts
                 if (!resultsMap.has(monthName)) {
                     resultsMap.set(monthName, { sum: 0, details: [] });
                 }
+
+                const dedcode = row[9];
+                const effyy = row[11];
+                const effmm = convertMonth(row[12]); // Convert month number
+                const termyy = row[13];
+                const termmm = convertMonth(row[14]); // Convert month number
+                const policyno = row[16];
+
                 const entry = resultsMap.get(monthName);
                 entry.sum += dedamt;
-                entry.details.push(dedamt.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' }));
+                entry.details.push({ dedcode, policyno, effyy, effmm, termyy, termmm, dedamt });
             }
         });
     });
 
-    // Add aggregated results to the table
-    resultsMap.forEach((value, monthName) => {
-        const totalDedAmt = value.sum.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
-        
-        const rowElement = document.createElement('tr');
-        rowElement.innerHTML = `
+    resultsMap.forEach((data, monthName) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
             <td>${monthName}</td>
-            <td>
-                <div class="position-relative">
-                    <u><b class="sum-amount" style="cursor: pointer;">${totalDedAmt}</b></u>
-                    <div class="dropdown-menu" style="display: none; position: absolute; z-index: 1;">
-                        ${value.details.map(detail => `<div class="dropdown-item">${detail}</div>`).join('')}
-                    </div>
-                </div>
-            </td>
+            <td>₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
+
         `;
-        
-        // Add hover event listeners
-        const sumAmount = rowElement.querySelector('.sum-amount');
-        const dropdownMenu = rowElement.querySelector('.dropdown-menu');
+        tbody.appendChild(row);
+        const detailRow = document.createElement('tr');
+const detailCell = document.createElement('td');
+detailCell.setAttribute('colspan', 2);
+detailCell.innerHTML = `
+    <table class="table table-sm text-white" style="font-size:11px">
+        <thead>
+            <tr>
+                <th>PLI</th>
+                <th>EFFECTIVE</th>
+                <th>TERMINATE</th>
+                <th>DEDAMT</th>
+                <th>POLICYNO</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${data.details.map(d => `
+                <tr>
+                   <td>${d.dedcode.toString().padStart(5, '0')}</td>
 
-        sumAmount.addEventListener('mouseenter', () => {
-            dropdownMenu.style.display = 'block';
-        });
+                   <td>${d.effmm.toString().padStart(2, '0')}/${d.effyy}</td>
+                   <td>${d.termmm.toString().padStart(2, '0')}/${d.termyy}</td>
+                   
+                    <td><b>₱${d.dedamt.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                    <td>${d.policyno}</td>
+                </tr>
+            `).join('')}
+        </tbody>
+    </table>
+`;
+detailRow.appendChild(detailCell);
+tbody.appendChild(detailRow);
 
-        sumAmount.addEventListener('mouseleave', () => {
-            dropdownMenu.style.display = 'none';
-        });
-
-        tbody.appendChild(rowElement);
     });
 
-    if (tbody.children.length > 0) {
-        table.appendChild(tbody);
-        resultsSection.appendChild(table);
-    }
+    table.appendChild(tbody);
+    resultsSection.appendChild(table);
 }
 
+function convertMonth(monthNumber) {
+    const monthNames = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
+    return monthNames[parseInt(monthNumber, 10) - 1];
+}
 
 </script>
+
 </body>
 </html>
