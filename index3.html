@@ -226,36 +226,38 @@ function displayResultsTable(fetchedData) {
 
         `;
         tbody.appendChild(row);
-
         const detailRow = document.createElement('tr');
-        const detailCell = document.createElement('td');
-        detailCell.setAttribute('colspan', 2);
-        detailCell.innerHTML = `
-            <table class="table table-sm text-white" style="font-size:11px">
-                <thead>
-                    <tr>
-                        <th>PLI</th>
-                        <th>EFFECTIVE</th>
-                        <th>TERMINATE</th>
-                        <th>DEDAMT</th>
-                        <th>POLICYNO</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${data.details.map(d => `
-                        <tr>
-                           <td>${d.dedcode.toString().padStart(5, '0')}</td>
-                            <td>${d.effmm} ${d.effyy}</td>
-                            <td>${d.termmm} ${d.termyy}</td>
-                            <td>₱${d.dedamt.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
-                            <td>${d.policyno}</td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        `;
-        detailRow.appendChild(detailCell);
-        tbody.appendChild(detailRow);
+const detailCell = document.createElement('td');
+detailCell.setAttribute('colspan', 2);
+detailCell.innerHTML = `
+    <table class="table table-sm text-white" style="font-size:11px">
+        <thead>
+            <tr>
+                <th>PLI</th>
+                <th>EFFECTIVE</th>
+                <th>TERMINATE</th>
+                <th>DEDAMT</th>
+                <th>POLICYNO</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${data.details.map(d => `
+                <tr>
+                   <td>${d.dedcode.toString().padStart(5, '0')}</td>
+
+                   <td>${d.effmm.toString().padStart(2, '0')}/${d.effyy}</td>
+                   <td>${d.termmm.toString().padStart(2, '0')}/${d.termyy}</td>
+                   
+                    <td>₱${d.dedamt.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
+                    <td>${d.policyno}</td>
+                </tr>
+            `).join('')}
+        </tbody>
+    </table>
+`;
+detailRow.appendChild(detailCell);
+tbody.appendChild(detailRow);
+
     });
 
     table.appendChild(tbody);
@@ -263,7 +265,7 @@ function displayResultsTable(fetchedData) {
 }
 
 function convertMonth(monthNumber) {
-    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
+    const monthNames = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
     return monthNames[parseInt(monthNumber, 10) - 1];
 }
 
