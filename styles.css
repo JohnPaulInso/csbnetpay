@@ -3,6 +3,13 @@ body {
     background-color: #1f1f1f;
     color: white;
 }
+.table {
+    border: 1px solid #ffffff4a;
+}
+
+.table th, .table td {
+    border: 1px solid #ffffff4a;
+}
 
 #searchButton {
     padding: 10px 15px;
@@ -66,7 +73,7 @@ z-index: 1000;
     }
 
     .table {
-        font-size: 1.15em; /* Increase table text size */
+        font-size: 1em; /* Increase table text size */
     }
        /* Adjust input field size on mobile */
 #searchInput {
