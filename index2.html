@@ -117,34 +117,6 @@
 
 
 
-
-
-
-    let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e; // Save the event
-    // Show your custom install button here
-});
-
-// When the user clicks the button
-installButton.addEventListener('click', () => {
-    if (deferredPrompt) {
-        deferredPrompt.prompt(); // Show the prompt
-        deferredPrompt.userChoice.then((choiceResult) => {
-            if (choiceResult.outcome === 'accepted') {
-                console.log('User accepted the A2HS prompt');
-            } else {
-                console.log('User dismissed the A2HS prompt');
-            }
-            deferredPrompt = null; // Clear the deferredPrompt variable
-        });
-    }
-});
-
-
-
-
 const csvFiles = [
     'pos_aug24.csv', 'pos_jul24.csv', 'pos_jun24.csv', 'pos_may24.csv', 'pos_apr24.csv', 'pos_mar24.csv',
     'pos_feb24.csv', 'pos_jan24.csv', 'pos_dec23.csv', 'pos_nov23.csv', 'pos_oct23.csv', 'pos_sep23.csv'
