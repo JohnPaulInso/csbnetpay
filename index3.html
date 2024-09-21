@@ -18,7 +18,7 @@
 </nav>
 
 <div id="searchSection" class="container mt-5">
-    <h1 class="text-center pt-5 pb-3 mb-2">ONQUEUE SEARCH</h1>
+    <h1 class="text-center pt-5 pb-3 mb-2">ONQUEUE</h1>
     <div class="row pt-2">
         <div class="col-12 d-flex">
             <input type="text" id="searchInput" class="form-control" placeholder="Employee Number..." style="flex-grow: 1;">
@@ -248,7 +248,7 @@ detailCell.innerHTML = `
                    <td>${d.effmm.toString().padStart(2, '0')}/${d.effyy}</td>
                    <td>${d.termmm.toString().padStart(2, '0')}/${d.termyy}</td>
                    
-                    <td>₱${d.dedamt.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
+                    <td><b>₱${d.dedamt.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                     <td>${d.policyno}</td>
                 </tr>
             `).join('')}
