@@ -1,10 +1,10 @@
 {
-  "short_name": "Employee Salary Search",
-  "name": "Employee Salary Search App",
+  "short_name": "Historical Netpay Search",
+  "name": "Historical Netpay Search",
   "icons": [
     {
-      "src": "icon.png",
-      "sizes": "192x192",
+      "src": "favicon.ico",
+      "sizes": "128x128",
       "type": "image/png"
     }
   ],
