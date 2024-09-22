@@ -345,9 +345,16 @@ function calculateTotal() {
 // Event listener for checkbox changes
 document.addEventListener('change', (event) => {
     if (event.target.classList.contains('dedamt-checkbox')) {
-        calculateTotal();
+        const checkboxes = document.querySelectorAll('.dedamt-checkbox');
+        checkboxes.forEach(checkbox => {
+            if (checkbox !== event.target) {
+                checkbox.checked = false; // Uncheck other checkboxes
+            }
+        });
+        calculateTotal(); // Recalculate total after changing checkboxes
     }
 });
+
 
 // Initial calculation on page load
 document.addEventListener('DOMContentLoaded', calculateTotal);
