@@ -93,3 +93,22 @@ padding: 25px;    /* Increase padding for a larger input box */
 
 
 }
+
+
+
+
+.calculator {
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #e3e3e3;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.result {
+    font-size: 1.5rem;
+    margin-top: 20px;
+}
+.result span {
+    color: #28a745;
+}

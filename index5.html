@@ -14,35 +14,235 @@
 
 </head>
 
+
+
+
+
+
+
+
+
+
 <body>
 
-<nav style="background-color: hsl(0, 100%, 9%); position: sticky; top: 0; z-index: 1000; padding: 0.5rem 1rem;">
+<nav style="background-color: #008aad; position: sticky; top: 0; z-index: 1000; padding: 0.5rem 1rem;">
     <div class="navbar-nav" style="color:#ddd;display: flex; justify-content: center;">
         <div style="color:#ddd;display: flex; align-items: center;">
             <a style="color:#aaa;" class="nav-item nav-link p-2" href="index.html"><b>NETPAY</b></a>
-            <a style="color:#aaa;" class="nav-item nav-link p-2" href="index2.html"><b>DEDAMT</b></a>
-            <a style="color:#aaa;" class="nav-item nav-link p-2" href="index3.html"><b>ONQUEUE</b></a>
-            <a class="nav-item text-white nav-link p-2" href="index4.html"><b>PLI</b></a>
-            <a  style="color:#aaa;"  class="nav-item nav-link p-2" href="index5.html"><b>LE</b></a>
+            <a style="color:#aaa;"class="nav-item nav-link p-2" href="index2.html"><b>DEDAMT</b></a>
+            <a style="color:#aaa;"class="nav-item nav-link p-2" href="index3.html"><b>ONQUEUE</b></a>
+            <a  style="color:#aaa;" class="nav-item nav-link p-2" href="index4.html"><b>PLI</b></a>
+            <a class="nav-item text-white nav-link p-2" href="index5.html"><b>LE</b></a>
         </div>
     </div>
 </nav>
 
     
+<div class="container mt-5">
+    <h class="text-center pt-5 pb-3 mb-2">AUG 2024</h>
+    <h class="text-center pt-5 pb-3 mb-2">4694264</h>
 
-<div id="searchSection" class="container mt-5">
-    <h1 class="text-center pt-5 pb-3 mb-2">PLI DEDUCTION</h1>
+    <h1 class="text-center pt-5 pb-3 mb-2">LOAN EVALUATION</h1>
     <div class="row pt-2">
-        <div class="col-12 d-flex">
+        <div id="searchSection" class="col-md-8 d-flex">
             <input type="text" id="searchInput" class="form-control" placeholder="Employee Number..." style="flex-grow: 1;">
-            <button id="searchButton" class="btn btn-primary ml-2">Search</button>
+            <button id="searchButton" class="btn btn-primary" style="height:50px;">Search</button>
+            <!-- Loading GIF -->
+            <div id="loadingIndicator" style="display: none; text-align: center;">
+                <img src="loading.gif" alt="Loading..." style="max-width: 100px;">
+            </div>
         </div>
-        <!-- Loading GIF -->
-        <div id="loadingIndicator" style="display: none; text-align: center;">
-            <img src="loading.gif" alt="Loading..." style="max-width: 100px;">
+
+
+
+
+
+
+
+        <div style="margin-top: 20px;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;">NETPAY:</td>
+                    <td style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;">5,473.48</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;">ADD OLD CSB:</td>
+                    <td style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;">8,326.65</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">NETPAY & OLD CSB SUB TOTAL:</td>
+                    <td style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">Total of NETPAY: + ADD OLD CSB:</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 8px;">ADD: ABSENCES/PVP</td>
+                    <td style="border: 1px solid #ccc; padding: 8px;"><input type="text" value="0" /></td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 8px;">ADD: REDEMPTION PLI 1 STOPPAGE</td>
+                    <td style="border: 1px solid #ccc; padding: 8px;"><input type="text" value="0" /></td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 8px;">ADD: REDEMPTION PLI 2</td>
+                    <td style="border: 1px solid #ccc; padding: 8px;"><input type="text" value="0" /></td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 8px;">ADD: REDEMPTION PLI 3</td>
+                    <td style="border: 1px solid #ccc; padding: 8px;"><input type="text" value="0" /></td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 8px;">ADD: REDEMPTION PLI 4</td>
+                    <td style="border: 1px solid #ccc; padding: 8px;"><input type="text" value="0" /></td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 8px;">ADD: ANTICIPATION:</td>
+                    <td style="border: 1px solid #ccc; padding: 8px;"><input type="text" /></td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 8px;">ADD: PROMOTION:</td>
+                    <td style="border: 1px solid #ccc; padding: 8px;"><input type="text" /></td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">PLI TOTAL:</td>
+                    <td style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">Total of NETPAY: and ADD OLD CSB: + ADD: ABSENCES/PVP + 4  PLIS + ANTICIPATION + PROMOTION</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;">LESS: ONQUEUE:</td>
+                    <td style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;">3,541.46</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">SEMI TOTAL:</td>
+                    <td style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">PLI TOTAL - LESS: ONQUEUE:</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 8px;">LESS: NEW CSB DED:</td>
+                    <td style="border: 1px solid #ccc; padding: 8px;">MONTHLY PAYMENT FROM CALCULATOR RESULT </td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">NEW NETPAY:</td>
+                    <td style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">Formula: SEMI TOTAL - MONTHLY PAYMENT FROM CALCULATOR RESULT
+                    </td>
+                </tr>
+            </table>
+        </div>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <div class="col-md-4">
+            <div class="calculator bg-dark text-light border border-light p-4 rounded shadow-lg ">
+                <h2 class="text-center">Loan Payment Calculator</h2>
+
+                <!-- Loan Amount -->
+                <div class="mb-3">
+                    <label for="loanAmount" class="form-label">Loan Amount (Php)</label>
+                    <input type="text" class="form-control bg-dark text-light border-light" id="loanAmount" value="50,000" onblur="formatLoanAmount()" />
+                </div>
+
+                <!-- Rate -->
+                <div class="mb-3">
+                    <label for="rate" class="form-label">Interest Rate (%)</label>
+                    <input type="text" class="form-control bg-dark text-light border-light" id="rate" value="9.66" readonly />
+                </div>
+
+                <!-- Terms Dropdown -->
+                <div class="mb-3">
+                    <label for="terms" class="form-label">Terms (months)</label>
+                    <select id="terms" class="form-select bg-dark text-light border-light form-control" onchange="updateInterestRate()">
+                        <script>
+                            for (let i = 6; i <= 60; i++) {
+                                if (i === 24) {
+                                    document.write('<option value="' + i + '" selected>' + i + '</option>');
+                                } else {
+                                    document.write('<option value="' + i + '">' + i + '</option>');
+                                }
+                            }
+                        </script>
+                    </select>
+                </div>
+
+                <!-- Calculate Button -->
+                <button class="btn btn-light w-100" onclick="calculatePayment()">Calculate Payment</button>
+
+                <!-- Result Display -->
+                <div class="result text-center mt-4">
+                    Monthly Payment: Php <span id="monthlyPayment">0.00</span>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+
+
+
+
+
+    <script>
+        // Function to add thousand separators to loan amount
+        function formatLoanAmount() {
+    let input = document.getElementById("loanAmount");
+    let value = input.value.replace(/,/g, ''); // Remove commas for calculation
+    let formattedValue = parseFloat(value).toLocaleString('en', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    input.value = formattedValue;
+}
+
+        // Update interest rate based on terms
+        function updateInterestRate() {
+            let terms = parseInt(document.getElementById("terms").value);
+            let rateInput = document.getElementById("rate");
+
+            if (terms >= 6 && terms <= 12) {
+                rateInput.value = "7.50";
+            } else if (terms >= 13 && terms <= 24) {
+                rateInput.value = "9.00";
+            } else {
+                rateInput.value = "9.66";
+            }
+        }
+
+        // Calculate payment using the PMT formula
+        function calculatePayment() {
+            let loanAmount = parseFloat(document.getElementById("loanAmount").value.replace(/,/g, '')); // Remove commas
+            let rate = parseFloat(document.getElementById("rate").value);
+            let terms = parseInt(document.getElementById("terms").value);
+
+            // Convert rate to a monthly interest rate
+            let monthlyRate = rate / 100 / 12;
+
+            // Excel PMT formula equivalent in JavaScript
+            let monthlyPayment = -loanAmount * (monthlyRate * Math.pow(1 + monthlyRate, terms)) / (Math.pow(1 + monthlyRate, terms) - 1);
+
+            // Ensure payment is always positive
+            monthlyPayment = Math.abs(monthlyPayment);
+            monthlyPayment = Math.ceil(monthlyPayment * 100) / 100;
+
+            // Display the result
+            document.getElementById("monthlyPayment").textContent = monthlyPayment.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+    </script>
+
+    
+
+
+
+
+
+
+
+
+
+
 
 <br/>
 
@@ -280,9 +480,8 @@ function displayResultsTable(fetchedData) {
     resultsMap.forEach((data, monthName) => {
         const row = document.createElement('tr');
         row.innerHTML = `
-         <td>${monthName}</td>
-                    <!-- <td>₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td> -->
-                <td id="totalAmount">₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td> <!-- Start with ₱0.00 -->
+            <td>${monthName}</td>
+            <td>₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
 
         `;
         tbody.appendChild(row);
@@ -293,7 +492,6 @@ detailCell.innerHTML = `
     <table class="table table-sm text-white" style="font-size:11px">
         <thead>
             <tr>
-                <th>/</th>
                 <th>PLI</th>
                 <th>EFFECTIVE</th>
                 <th>TERMINATE</th>
@@ -304,7 +502,6 @@ detailCell.innerHTML = `
         <tbody>
             ${data.details.map(d => `
                 <tr>
-                    <td><input type="checkbox" class="dedamt-checkbox" data-dedamt="${d.dedamt}" checked /></td>
                    <td>${d.dedcode.toString().padStart(5, '0')}</td>
 
                    <td>${d.effmm.toString().padStart(2, '0')}/${d.effyy}</td>
@@ -317,55 +514,6 @@ detailCell.innerHTML = `
         </tbody>
     </table>
 `;
-
-
-
-
-
-
-
-
-
-
-function calculateTotal() {
-    const checkboxes = document.querySelectorAll('.dedamt-checkbox');
-    let total = 0;
-
-    checkboxes.forEach(checkbox => {
-        if (checkbox.checked) {
-            total += parseFloat(checkbox.dataset.dedamt);
-        }
-    });
-
-    // Update the total display
-    const totalDisplay = document.querySelector('#totalAmount');
-    totalDisplay.innerText = `₱${total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
-}
-
-// Event listener for checkbox changes
-document.addEventListener('change', (event) => {
-    if (event.target.classList.contains('dedamt-checkbox')) {
-        calculateTotal();
-    }
-});
-
-// Initial calculation on page load
-document.addEventListener('DOMContentLoaded', calculateTotal);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 detailRow.appendChild(detailCell);
 tbody.appendChild(detailRow);
 
