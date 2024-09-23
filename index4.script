@@ -1,0 +1,309 @@
+
+// =====================================================================================================
+// INDEX 4 =============================================================================================
+// =====================================================================================================
+
+
+
+
+
+  document.addEventListener('DOMContentLoaded', () => {
+        const prompt = document.getElementById('fullscreenPrompt');
+
+        // Show the prompt when the mouse moves
+        document.addEventListener('mousemove', () => {
+            prompt.style.display = 'block';
+        });
+
+        // Enter fullscreen when the prompt is clicked
+        prompt.addEventListener('click', () => {
+            openFullscreen();
+            prompt.style.display = 'none'; // Hide prompt after entering full-screen
+        });
+    });
+
+    function openFullscreen() {
+        const elem = document.documentElement;
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+        } else if (elem.mozRequestFullScreen) {
+            elem.mozRequestFullScreen();
+        } else if (elem.webkitRequestFullscreen) {
+            elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) {
+            elem.msRequestFullscreen();
+        }
+    }
+
+
+
+
+const csvFilesPLI = [
+    'pli_aug24.csv'
+];
+
+document.getElementById('searchButtonPLI').addEventListener('click', searchEmployeePLI);
+
+function searchEmployeePLI() {
+    const searchInputPLI = document.getElementById('searchInputPLI').value.trim();
+    const loadingIndicatorPLI = document.getElementById('loadingIndicatorPLI');
+
+    if (!searchInputPLI) {
+        alert('Please enter an employee number.');
+        return;
+    }
+
+    const resultsSectionPLI = document.getElementById('resultsPLI');
+    const employeeInfoSectionPLI = document.getElementById('employeeInfoPLI');
+    resultsSectionPLI.innerHTML = ''; // Clear previous results
+    employeeInfoSectionPLI.innerHTML = ''; // Clear previous employee info
+    loadingIndicatorPLI.style.display = 'block'; // Show loading indicator
+
+    const last12MonthsFilesPLI = csvFilesPLI.slice(0, 12);
+
+    let fetchedDataPLI = [];
+
+    Promise.all(last12MonthsFilesPLI.map(csvFile => fetchCSVPLI(csvFile)))
+        .then(allData => {
+            fetchedDataPLI = allData.filter(data => data !== null);
+            if (fetchedDataPLI.length === 0) {
+                alert('No valid data found in the provided files.');
+                return;
+            }
+            fetchedDataPLI.sort((a, b) => b.date - a.date);
+            displayEmployeeInfoPLI(fetchedDataPLI[0].monthName, fetchedDataPLI[0].csvData);
+            displayResultsTablePLI(fetchedDataPLI);
+        })
+        .catch(error => {
+            console.error('Error fetching CSV data:', error);
+            alert('Error fetching data. Check the console for more details.');
+        })
+        .finally(() => {
+            loadingIndicatorPLI.style.display = 'none'; // Hide loading indicator
+        });
+}
+
+function fetchCSVPLI(csvFile) {
+    return new Promise((resolve, reject) => {
+        const monthName = getMonthNameFromCsvPLI(csvFile);
+        const date = getDateFromCsvPLI(csvFile);
+
+        fetch(csvFile)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Unable to fetch ${csvFile}. Status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(text => {
+                const csvData = parseCSVPLI(text);
+                resolve({ monthName, csvData, date });
+            })
+            .catch(error => {
+                console.error(`Error fetching data for ${monthName}:`, error);
+                resolve(null);
+            });
+    });
+}
+
+function getDateFromCsvPLI(csvFile) {
+    const fileName = csvFile.replace('pli_', '');
+    const monthMap = {
+        'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'may': 4, 'jun': 5,
+        'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11
+    };
+    const monthPart = fileName.slice(0, 3);
+    const yearPart = '20' + fileName.slice(3, 5);
+    const monthIndex = monthMap[monthPart];
+    return new Date(yearPart, monthIndex);
+}
+
+function getMonthNameFromCsvPLI(csvFile) {
+    const fileName = csvFile.replace('pli_', '');
+    const monthMap = {
+        'jan': 'January', 'feb': 'February', 'mar': 'March', 'apr': 'April', 'may': 'May', 'jun': 'June',
+        'jul': 'July', 'aug': 'August', 'sep': 'September', 'oct': 'October', 'nov': 'November', 'dec': 'December'
+    };
+    const monthPart = fileName.slice(0, 3);
+    const yearPart = '20' + fileName.slice(3, 5);
+    return `${monthMap[monthPart]} ${yearPart}`;
+}
+
+function parseCSVPLI(data) {
+    const rows = data.trim().split('\n');
+    return rows.map(row => row.split(','));
+}
+
+function displayEmployeeInfoPLI(monthName, csvData) {
+    const employeeInfoSectionPLI = document.getElementById('employeeInfoPLI');
+    let employeeFound = false;
+
+    for (let i = 1; i < csvData.length; i++) {
+        const row = csvData[i];
+        if (row.length < 4) continue;
+        const empno = row[3];
+        if (empno === document.getElementById('searchInputPLI').value.trim()) {
+            employeeFound = true;
+
+            const div = row[1];
+            const sta = row[2];
+            const fname = row[5];
+            const mi = row[6];
+            const lname = row[7];
+
+            employeeInfoSectionPLI.innerHTML = `
+                <strong>NAME:</strong><b style="color:orange"> ${fname} ${mi} ${lname}</b><br/>
+                <strong>EMPNO:</strong><b style="color:orange">   ${empno} </b><br/>
+                <strong>DIV / STA:</strong><b style="color:orange"> ${div} / ${sta}</b><br/>
+            `;
+            break;
+        }
+    }
+
+    if (!employeeFound) {
+        employeeInfoSectionPLI.innerHTML = 'No employee found in the latest data.';
+    }
+}
+
+function displayResultsTablePLI(fetchedDataPLI) {
+    const resultsSectionPLI = document.getElementById('resultsPLI');
+    
+    const table = document.createElement('table');
+    table.classList.add('table', 'table-borderless', 'text-white');
+
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    headerRow.innerHTML = `
+        <th class="font-weight-bold">MONTH</th>
+        <th class="font-weight-bold">DEDAMTPLI</th>
+    `;
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+    const resultsMap = new Map();
+
+    fetchedDataPLI.forEach(data => {
+        data.csvData.forEach((row, index) => {
+            if (index === 0) return;
+
+            const empno = row[3];
+            if (empno === document.getElementById('searchInputPLI').value.trim()) {
+                const monthName = data.monthName;
+                const dedamtpli = parseFloat(row[13]);
+                
+                if (!resultsMap.has(monthName)) {
+                    resultsMap.set(monthName, { sum: 0, details: [] });
+                }
+
+                const dedcode = row[9];
+                const effyy = row[11];
+                const effmm = convertMonth(row[12]); // Convert month number
+                const termyy = row[13];
+                const termmm = convertMonth(row[14]); // Convert month number
+                const policyno = row[16];
+
+                const entry = resultsMap.get(monthName);
+                entry.sum += dedamtpli;
+                entry.details.push({ dedcode, policyno, effyy, effmm, termyy, termmm, dedamtpli });
+            }
+        });
+    });
+
+    resultsMap.forEach((data, monthName) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+         <td>${monthName}</td>
+                    <!-- <td>₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td> -->
+                <td id="totalAmountPLI">₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td> <!-- Start with ₱0.00 -->
+
+        `;
+        tbody.appendChild(row);
+        const detailRow = document.createElement('tr');
+const detailCell = document.createElement('td');
+detailCell.setAttribute('colspan', 2);
+detailCell.innerHTML = `
+    <table class="table table-sm text-white" style="font-size:11px">
+        <thead>
+            <tr>
+                <th>/</th>
+                <th>PLI</th>
+                <th>EFFECTIVE</th>
+                <th>TERMINATE</th>
+                <th>DEDAMTPLI</th>
+                <th>POLICYNO</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${data.details.map(d => `
+                <tr>
+                    <td><input type="checkbox" class="dedamtpli-checkbox" data-dedamtpli="${d.dedamtpli}" checked /></td>
+                   <td>${d.dedcode.toString().padStart(5, '0')}</td>
+
+                   <td>${d.effmm.toString().padStart(2, '0')}/${d.effyy}</td>
+                   <td>${d.termmm.toString().padStart(2, '0')}/${d.termyy}</td>
+                   
+                    <td><b>₱${d.dedamtpli.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                    <td>${d.policyno}</td>
+                </tr>
+            `).join('')}
+        </tbody>
+    </table>
+`;
+
+
+
+
+
+
+
+
+
+
+function calculateTotalPLI() {
+    const checkboxesPLI = document.querySelectorAll('.dedamtpli-checkbox');
+    let total = 0;
+
+    checkboxesPLI.forEach(checkbox => {
+        if (checkbox.checked) {
+            total += parseFloat(checkbox.dataset.dedamtpli);
+        }
+    });
+
+    // Update the total display
+    const totalDisplayPLI = document.querySelector('#totalAmountPLI');
+    totalDisplayPLI.innerText = `₱${total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+}
+
+// Event listener for checkbox changes
+document.addEventListener('change', (event) => {
+    if (event.target.classList.contains('dedamtpli-checkbox')) {
+        const checkboxesPLI = document.querySelectorAll('.dedamtpli-checkbox');
+        checkboxesPLI.forEach(checkbox => {
+            if (checkbox !== event.target) {
+                checkbox.checked = false; // Uncheck other checkboxesPLI
+            }
+        });
+        calculateTotalPLI(); // Recalculate total after changing checkboxesPLI
+    }
+});
+
+
+// Initial calculation on page load
+document.addEventListener('DOMContentLoaded', calculateTotalPLI);
+
+
+
+detailRow.appendChild(detailCell);
+tbody.appendChild(detailRow);
+
+    });
+
+    table.appendChild(tbody);
+    resultsSectionPLI.appendChild(table);
+}
+
+function convertMonth(monthNumber) {
+    const monthNames = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
+    return monthNames[parseInt(monthNumber, 10) - 1];
+}

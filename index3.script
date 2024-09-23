@@ -1,0 +1,312 @@
+
+
+// =====================================================================================================
+// INDEX 3 =============================================================================================
+// =====================================================================================================
+
+
+
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+            const prompt = document.getElementById('fullscreenPrompt');
+
+            // Show the prompt when the mouse moves
+            document.addEventListener('mousemove', () => {
+                prompt.style.display = 'block';
+            });
+
+            // Enter fullscreen when the prompt is clicked
+            prompt.addEventListener('click', () => {
+                openFullscreen();
+                prompt.style.display = 'none'; // Hide prompt after entering full-screen
+            });
+        });
+
+        function openFullscreen() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.mozRequestFullScreen) {
+                elem.mozRequestFullScreen();
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+    const csvFilesOnq = [
+        'onq_aug24.csv'
+    ];
+
+    document.getElementById('searchButtonOnq').addEventListener('click', searchEmployeeOnq);
+
+    function searchEmployeeOnq() {
+        const searchInputOnq = document.getElementById('searchInputOnq').value.trim();
+        const loadingIndicatorOnq = document.getElementById('loadingIndicatorOnq');
+
+        if (!searchInputOnq) {
+            alert('Please enter an employee number.');
+            return;
+        }
+
+        const resultsSectionOnq = document.getElementById('resultsonq');
+        const employeeInfoSectionOnq = document.getElementById('employeeInfoOnq');
+        resultsSectionOnq.innerHTML = ''; // Clear previous results
+        employeeInfoSectionOnq.innerHTML = ''; // Clear previous employee info
+        loadingIndicatorOnq.style.display = 'block'; // Show loading indicator
+
+        const last12MonthsFilesOnq = csvFilesOnq.slice(0, 12);
+
+        let fetchedDataOnq = [];
+
+        Promise.all(last12MonthsFilesOnq.map(csvFile => fetchCSVOnq(csvFile)))
+            .then(allData => {
+                fetchedDataOnq = allData.filter(data => data !== null);
+                if (fetchedDataOnq.length === 0) {
+                    alert('No valid data found in the provided files.');
+                    return;
+                }
+                fetchedDataOnq.sort((a, b) => b.date - a.date);
+                displayEmployeeInfoOnq(fetchedDataOnq[0].monthName, fetchedDataOnq[0].csvData);
+                displayResultsTableOnq(fetchedDataOnq);
+            })
+            .catch(error => {
+                console.error('Error fetching CSV data:', error);
+                alert('Error fetching data. Check the console for more details.');
+            })
+            .finally(() => {
+                loadingIndicatorOnq.style.display = 'none'; // Hide loading indicator
+            });
+    }
+
+    function fetchCSVOnq(csvFile) {
+        return new Promise((resolve, reject) => {
+            const monthName = getMonthNameFromCsvOnq(csvFile);
+            const date = getDateFromCsvOnq(csvFile);
+
+            fetch(csvFile)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Unable to fetch ${csvFile}. Status: ${response.status}`);
+                    }
+                    return response.text();
+                })
+                .then(text => {
+                    const csvData = parseCSVOnq(text);
+                    resolve({ monthName, csvData, date });
+                })
+                .catch(error => {
+                    console.error(`Error fetching data for ${monthName}:`, error);
+                    resolve(null);
+                });
+        });
+    }
+
+    function getDateFromCsvOnq(csvFile) {
+        const fileName = csvFile.replace('onq_', '');
+        const monthMap = {
+            'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'may': 4, 'jun': 5,
+            'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11
+        };
+        const monthPart = fileName.slice(0, 3);
+        const yearPart = '20' + fileName.slice(3, 5);
+        const monthIndex = monthMap[monthPart];
+        return new Date(yearPart, monthIndex);
+    }
+
+    function getMonthNameFromCsvOnq(csvFile) {
+        const fileName = csvFile.replace('onq_', '');
+        const monthMap = {
+            'jan': 'January', 'feb': 'February', 'mar': 'March', 'apr': 'April', 'may': 'May', 'jun': 'June',
+            'jul': 'July', 'aug': 'August', 'sep': 'September', 'oct': 'October', 'nov': 'November', 'dec': 'December'
+        };
+        const monthPart = fileName.slice(0, 3);
+        const yearPart = '20' + fileName.slice(3, 5);
+        return `${monthMap[monthPart]} ${yearPart}`;
+    }
+
+    function parseCSVOnq(data) {
+        const rows = data.trim().split('\n');
+        return rows.map(row => row.split(','));
+    }
+
+    function displayEmployeeInfoOnq(monthName, csvData) {
+        const employeeInfoSectionOnq = document.getElementById('employeeInfoOnq');
+        let employeeFound = false;
+
+        for (let i = 1; i < csvData.length; i++) {
+            const row = csvData[i];
+            if (row.length < 4) continue;
+            const empno = row[3];
+            if (empno === document.getElementById('searchInputOnq').value.trim()) {
+                employeeFound = true;
+
+                const div = row[1];
+                const sta = row[2];
+                const fname = row[4];
+                const mi = row[5];
+                const lname = row[6];
+
+                employeeInfoSectionOnq.innerHTML = `
+                    <strong>NAME:</strong><b style="color:orange"> ${fname} ${mi} ${lname}</b><br/>
+                    <strong>EMPNO:</strong><b style="color:orange">   ${empno} </b><br/>
+                    <strong>DIV / STA:</strong><b style="color:orange"> ${div} / ${sta}</b><br/>
+                `;
+                break;
+            }
+        }
+
+        if (!employeeFound) {
+            employeeInfoSectionOnq.innerHTML = 'No employee found in the latest data.';
+        }
+    }
+
+    function displayResultsTableOnq(fetchedDataOnq) {
+        const resultsSectionOnq = document.getElementById('resultsonq');
+        
+        const table = document.createElement('table');
+        table.classList.add('table', 'table-borderless', 'text-white');
+
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+        headerRow.innerHTML = `
+            <th class="font-weight-bold">MONTH</th>
+            <th class="font-weight-bold">DEDAMT</th>
+        `;
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        const tbody = document.createElement('tbody');
+        const resultsMap = new Map();
+
+        fetchedDataOnq.forEach(data => {
+            data.csvData.forEach((row, index) => {
+                if (index === 0) return;
+
+                const empno = row[3];
+                if (empno === document.getElementById('searchInputOnq').value.trim()) {
+                    const monthName = data.monthName;
+                    const dedamt = parseFloat(row[13]);
+                    
+                    if (!resultsMap.has(monthName)) {
+                        resultsMap.set(monthName, { sum: 0, details: [] });
+                    }
+
+                    const dedcode = row[7];
+                    const effyy = row[9];
+                    const effmm = convertMonth(row[10]); // Convert month number
+                    const termyy = row[11];
+                    const termmm = convertMonth(row[12]); // Convert month number
+                    const policyno = row[15];
+
+                    const entry = resultsMap.get(monthName);
+                    entry.sum += dedamt;
+                    entry.details.push({ dedcode, policyno, effyy, effmm, termyy, termmm, dedamt });
+                }
+            });
+        });
+
+        resultsMap.forEach((data, monthName) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${monthName}</td>
+                    <!-- <td>₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td> -->
+                <td id="totalAmount">₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td> <!-- Start with ₱0.00 -->
+
+
+            `;
+            tbody.appendChild(row);
+            const detailRow = document.createElement('tr');
+    const detailCell = document.createElement('td');
+    detailCell.setAttribute('colspan', 2);
+    detailCell.innerHTML = `
+    <table class="table table-sm text-white" style="font-size:11px">
+        <thead>
+            <tr>
+                <th>/</th>
+                <th>PLI</th>
+                <th>EFFECTIVE</th>
+                <th>TERMINATE</th>
+                <th>DEDAMT</th>
+                <th>POLICYNO</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${data.details.map(d => `
+                <tr>
+                    <td><input type="checkbox" class="dedamt-checkbox" data-dedamt="${d.dedamt}" checked /></td>
+                    <td>${d.dedcode.toString().padStart(5, '0')}</td>
+                    <td>${d.effmm.toString().padStart(2, '0')}/${d.effyy}</td>
+                    <td>${d.termmm.toString().padStart(2, '0')}/${d.termyy}</td>
+                    <td><b>₱${d.dedamt.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                    <td>${d.policyno}</td>
+                </tr>
+            `).join('')}
+        </tbody>
+    </table>
+`;
+
+
+
+
+
+
+
+function calculateTotal() {
+    const checkboxes = document.querySelectorAll('.dedamt-checkbox');
+    let total = 0;
+
+    checkboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+            total += parseFloat(checkbox.dataset.dedamt);
+        }
+    });
+
+    // Update the total display
+    const totalDisplay = document.querySelector('#totalAmount');
+    totalDisplay.innerText = `₱${total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+}
+
+// Event listener for checkbox changes
+document.addEventListener('change', (event) => {
+    if (event.target.classList.contains('dedamt-checkbox')) {
+        calculateTotal();
+    }
+});
+
+// Initial calculation on page load
+document.addEventListener('DOMContentLoaded', calculateTotal);
+
+
+
+
+
+
+
+
+    detailRow.appendChild(detailCell);
+    tbody.appendChild(detailRow);
+
+        });
+
+        table.appendChild(tbody);
+        resultsSectionOnq.appendChild(table);
+    }
+
+    function convertMonth(monthNumber) {
+        const monthNames = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
+        return monthNames[parseInt(monthNumber, 10) - 1];
+    }

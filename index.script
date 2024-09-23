@@ -1,0 +1,214 @@
+
+// =====================================================================================================
+// INDEX 1 =============================================================================================
+// =====================================================================================================
+
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        const prompt = document.getElementById('fullscreenPrompt');
+
+        // Show the prompt when the mouse moves
+        document.addEventListener('mousemove', () => {
+            prompt.style.display = 'block';
+        });
+
+        // Enter fullscreen when the prompt is clicked
+        prompt.addEventListener('click', () => {
+            openFullscreen();
+            prompt.style.display = 'none'; // Hide prompt after entering full-screen
+        });
+    });
+
+    function openFullscreen() {
+        const elem = document.documentElement;
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+        } else if (elem.mozRequestFullScreen) {
+            elem.mozRequestFullScreen();
+        } else if (elem.webkitRequestFullscreen) {
+            elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) {
+            elem.msRequestFullscreen();
+        }
+    }
+
+
+
+    
+        const csvFilesNetpay = [
+            'aug24.csv', 'jul24.csv', 'jun24.csv', 'may24.csv', 'apr24.csv', 'mar24.csv',
+            'feb24.csv', 'jan24.csv', 'dec23.csv', 'nov23.csv', 'oct23.csv', 'sep23.csv'
+        ];
+        
+    document.getElementById('searchButtonNetpay').addEventListener('click', searchEmployeeNetpay);
+
+    function searchEmployeeNetpay() {
+    const searchInputNetpay = document.getElementById('searchInputNetpay').value.trim();
+    const loadingIndicatorNetpay = document.getElementById('loadingIndicatorNetpay');
+
+    if (!searchInputNetpay) {
+        alert('Please enter an employee number.');
+        return;
+    }
+
+    const Netpay = document.getElementById('resultsNetpay');
+    const employeeInfoSectionNetpay = document.getElementById('employeeInfoNetpay');
+    Netpay.innerHTML = ''; // Clear previous results
+    employeeInfoSectionNetpay.innerHTML = ''; // Clear previous employee info
+    loadingIndicatorNetpay.style.display = 'block'; // Show loading indicator
+
+    // Automatically limit to the last 12 months (latest first)
+    const last12MonthsFilesNetpay = csvFilesNetpay.slice(0, 12);
+
+    let fetchedDataNet = [];
+    let latestCsvDataNetpay = null;
+
+    Promise.all(last12MonthsFilesNetpay.map(csvFile => fetchCSVNetpay(csvFile)))
+        .then(allData => {
+            fetchedDataNet = allData;
+            fetchedDataNet.sort((a, b) => b.date - a.date);
+            latestCsvDataNetpay = fetchedDataNet[0].csvData;
+            displayEmployeeInfoNetpay(fetchedDataNet[0].monthName, latestCsvDataNetpay);
+            displayResultsTableNetpay(fetchedDataNet);
+        })
+        .catch(error => {
+            console.error('Error fetching CSV data:', error);
+        })
+        .finally(() => {
+            loadingIndicatorNetpay.style.display = 'none'; // Hide loading indicator
+        });
+}
+
+
+    function fetchCSVNetpay(csvFile) {
+        return new Promise((resolve, reject) => {
+            const monthName = getMonthNameFromCsvNetpay(csvFile);
+            const date = getDateFromCsvNetpay(csvFile);
+
+            fetch(csvFile)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Unable to fetch ${csvFile}`);
+                    }
+                    return response.text();
+                })
+                .then(text => {
+                    const csvData = parseCSVNetpay(text);
+                    resolve({ monthName, csvData, date });
+                })
+                .catch(error => {
+                    console.error(`Error fetching data for ${monthName}:`, error);
+                    reject(error);
+                });
+        });
+    }
+
+    function getDateFromCsvNetpay(csvFile) {
+        const monthMap = {
+            'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'may': 4, 'jun': 5,
+            'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11
+        };
+        const monthPart = csvFile.slice(0, 3);
+        const yearPart = '20' + csvFile.slice(3, 5);
+        const monthIndex = monthMap[monthPart];
+        return new Date(yearPart, monthIndex);
+    }
+
+    function getMonthNameFromCsvNetpay(csvFile) {
+        const monthMap = {
+            'jan': 'January', 'feb': 'February', 'mar': 'March', 'apr': 'April', 'may': 'May', 'jun': 'June',
+            'jul': 'July', 'aug': 'August', 'sep': 'September', 'oct': 'October', 'nov': 'November', 'dec': 'December'
+        };
+        const monthPart = csvFile.slice(0, 3);
+        const yearPart = '20' + csvFile.slice(3, 5);
+        return `${monthMap[monthPart]} ${yearPart}`;
+    }
+
+    function parseCSVNetpay(data) {
+        const rows = data.trim().split('\n');
+        return rows.map(row => row.split(','));
+    }
+
+    function displayEmployeeInfoNetpay(monthName, csvData) {
+        const employeeInfoSectionNetpay = document.getElementById('employeeInfoNetpay');
+        let employeeFound = false;
+
+        for (let i = 1; i < csvData.length; i++) {
+            const row = csvData[i];
+            if (row.length < 4) continue;
+            const empno = row[3];
+            if (empno === document.getElementById('searchInputNetpay').value.trim()) {
+                employeeFound = true;
+
+                const div = row[1];
+                const sta = row[2];
+                const fname = row[4];
+                const mi = row[5];
+                const lname = row[6];
+                const account = row[8];
+
+                employeeInfoSectionNetpay.innerHTML = `
+                    <strong>NAME:</strong><b style="color:orange"> ${fname} ${mi} ${lname}</b><br/>
+                    <strong>EMPNO:</strong><b style="color:orange">   ${empno} </b><br/>
+                    <strong>DIV / STA:</strong><b style="color:orange"> ${div} / ${sta}</b><br/>
+                    <!-- <strong>ACC:</strong><b style="color:orange">  ${account}</b> -->
+
+                `;
+                break;
+            }
+        }
+
+        if (!employeeFound) {
+            employeeInfoSectionNetpay.innerHTML = 'No employee found in the latest data.';
+        }
+    }
+
+    function displayResultsTableNetpay(fetchedDataNet) {
+        const resultsSectionNetpay = document.getElementById('resultsNetpay');
+        
+        // Create a table with a single header row
+        const table = document.createElement('table');
+        table.classList.add('table', 'table-borderless', 'text-white');
+
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+        headerRow.innerHTML = `
+            <th class="font-weight-bold">MONTH</th>
+            <th class="font-weight-bold">TAKEHOME</th>
+        `;
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        const tbody = document.createElement('tbody');
+
+        // Iterate over the fetched data and add rows to the table body
+        fetchedDataNet.forEach(data => {
+            data.csvData.forEach((row, index) => {
+                if (index === 0) return; // Skip header row
+                if (row.length < 4) return; // Skip malformed rows
+
+                const empno = row[3];
+                if (empno === document.getElementById('searchInputNetpay').value.trim()) {
+                    const monthName = data.monthName;
+                    const takehome = parseFloat(row[7]).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
+
+                    const rowElement = document.createElement('tr');
+                    rowElement.innerHTML = `
+                        <td>${monthName}</td>
+                        <td><b>${takehome}</b></td>
+                    `;
+                    tbody.appendChild(rowElement);
+                }
+            });
+        });
+
+        if (tbody.children.length > 0) {
+            table.appendChild(tbody);
+            resultsSectionNetpay.appendChild(table);
+        }
+    }
+
+
+
+
+

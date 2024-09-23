@@ -32,18 +32,18 @@
 <body>
 
 <div id="searchSection" class="container  mt-5">
-    <h1 class="text-center pt-5 pb-3 mb-2">DEDAMT</h1>
+    <h1 class="text-center pt-5 pb-3 mb-2">DEDAMT POSITIVE</h1>
     <div class="row pt-2">
         <div class="col-12 d-flex">
-            <input type="text" id="searchInput" class="form-control" placeholder="Employee Number..." style="flex-grow: 1;">
-            <button id="searchButton" class="btn btn-primary ml-2">Search</button>
+            <input type="text" id="searchInputPos" class="form-control" placeholder="Employee Number..." style="flex-grow: 1;">
+            <button id="searchButtonPos" class="btn btn-primary ml-2">Search</button>
         </div>
 
         
 
 
         <!-- Loading GIF -->
-<div id="loadingIndicator" style="display: none; text-align: center;">
+<div id="loadingIndicatorPos" style="display: none; text-align: center;">
     <img src="loading.gif" alt="Loading..." style="max-width: 100px;">
 </div>
 
@@ -56,10 +56,10 @@
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-            <h3 id="employeeInfo" class="text-white"></h3>
+            <h3 id="employeeInfoPos" class="text-white"></h3>
         </div>
     </div>
-    <div class="row results rounded-bottom rounded-top" id="results">
+    <div class="row results rounded-bottom rounded-top" id="resultspos">
         <!-- Table will be dynamically inserted here -->
     </div>
 </div>
@@ -70,264 +70,9 @@
 
 
 
-
-<footer style="background-color: hsl(45, 100%, 1%);bottom:0;padding: 0.5rem 1rem;margin-top:500px;">
-    <div class="navbar-nav text-white" style="display: flex; justify-content: center;">
-        <div style="display: flex; align-items: center;">
-            <a class="nav-item text-white nav-link p-2" href="#">Files to upload</b></a>
-            <a class="nav-item text-white nav-link p-2" href="#">Monthly Netpay</b></a>
-            <a class="nav-item text-white nav-link p-2" href="#">Monthly Positive</b></a>
-            <a class="nav-item text-white nav-link p-2" href="#">Monthly Onqueue</b></a>
-            <a class="nav-item text-white nav-link p-2" href="#">Monthly PLI</b></a>
-        </div>
-    </div>
-</footer>
-
-
-
+<script src="index2.script"></script>
 
 <script>
-    
-    document.addEventListener('DOMContentLoaded', () => {
-        const prompt = document.getElementById('fullscreenPrompt');
-
-        // Show the prompt when the mouse moves
-        document.addEventListener('mousemove', () => {
-            prompt.style.display = 'block';
-        });
-
-        // Enter fullscreen when the prompt is clicked
-        prompt.addEventListener('click', () => {
-            openFullscreen();
-            prompt.style.display = 'none'; // Hide prompt after entering full-screen
-        });
-    });
-
-    function openFullscreen() {
-        const elem = document.documentElement;
-        if (elem.requestFullscreen) {
-            elem.requestFullscreen();
-        } else if (elem.mozRequestFullScreen) {
-            elem.mozRequestFullScreen();
-        } else if (elem.webkitRequestFullscreen) {
-            elem.webkitRequestFullscreen();
-        } else if (elem.msRequestFullscreen) {
-            elem.msRequestFullscreen();
-        }
-    }
-
-
-
-const csvFiles = [
-    'pos_aug24.csv', 'pos_jul24.csv', 'pos_jun24.csv', 'pos_may24.csv', 'pos_apr24.csv', 'pos_mar24.csv',
-    'pos_feb24.csv', 'pos_jan24.csv', 'pos_dec23.csv', 'pos_nov23.csv', 'pos_oct23.csv', 'pos_sep23.csv'
-];
-
-document.getElementById('searchButton').addEventListener('click', searchEmployee);
-
-function searchEmployee() {
-    const searchInput = document.getElementById('searchInput').value.trim();
-    const loadingIndicator = document.getElementById('loadingIndicator');
-
-    if (!searchInput) {
-        alert('Please enter an employee number.');
-        return;
-    }
-
-    const resultsSection = document.getElementById('results');
-    const employeeInfoSection = document.getElementById('employeeInfo');
-    resultsSection.innerHTML = ''; // Clear previous results
-    employeeInfoSection.innerHTML = ''; // Clear previous employee info
-    loadingIndicator.style.display = 'block'; // Show loading indicator
-
-    // Automatically limit to the last 12 months (latest first)
-    const last12MonthsFiles = csvFiles.slice(0, 12);
-
-    let fetchedData = [];
-
-    Promise.all(last12MonthsFiles.map(csvFile => fetchCSV(csvFile)))
-        .then(allData => {
-            fetchedData = allData.filter(data => data !== null); // Filter out failed fetches
-            if (fetchedData.length === 0) {
-                alert('No valid data found in the provided files.');
-                return;
-            }
-            fetchedData.sort((a, b) => b.date - a.date);
-            displayEmployeeInfo(fetchedData[0].monthName, fetchedData[0].csvData);
-            displayResultsTable(fetchedData);
-        })
-        .catch(error => {
-            console.error('Error fetching CSV data:', error);
-            alert('Error fetching data. Check the console for more details.');
-        })
-        .finally(() => {
-            loadingIndicator.style.display = 'none'; // Hide loading indicator
-        });
-}
-
-function fetchCSV(csvFile) {
-    return new Promise((resolve, reject) => {
-        const monthName = getMonthNameFromCsv(csvFile);
-        const date = getDateFromCsv(csvFile);
-
-        console.log(`Fetching data from file: ${csvFile}`);
-
-        fetch(csvFile)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Unable to fetch ${csvFile}. Status: ${response.status}`);
-                }
-                return response.text();
-            })
-            .then(text => {
-                console.log(`Successfully fetched data from ${csvFile}`);
-                const csvData = parseCSV(text);
-                resolve({ monthName, csvData, date });
-            })
-            .catch(error => {
-                console.error(`Error fetching data for ${monthName}:`, error);
-                resolve(null); // Return null for failed fetches, don't reject to allow Promise.all to proceed
-            });
-    });
-}
-
-function getDateFromCsv(csvFile) {
-    const fileName = csvFile.replace('pos_', ''); // Remove 'pos_' prefix
-    const monthMap = {
-        'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'may': 4, 'jun': 5,
-        'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11
-    };
-    const monthPart = fileName.slice(0, 3);
-    const yearPart = '20' + fileName.slice(3, 5);
-    const monthIndex = monthMap[monthPart];
-    return new Date(yearPart, monthIndex);
-}
-
-function getMonthNameFromCsv(csvFile) {
-    const fileName = csvFile.replace('pos_', ''); // Remove 'pos_' prefix
-    const monthMap = {
-        'jan': 'January', 'feb': 'February', 'mar': 'March', 'apr': 'April', 'may': 'May', 'jun': 'June',
-        'jul': 'July', 'aug': 'August', 'sep': 'September', 'oct': 'October', 'nov': 'November', 'dec': 'December'
-    };
-    const monthPart = fileName.slice(0, 3);
-    const yearPart = '20' + fileName.slice(3, 5);
-    return `${monthMap[monthPart]} ${yearPart}`;
-}
-
-function parseCSV(data) {
-    const rows = data.trim().split('\n');
-    return rows.map(row => row.split(','));
-}
-
-function displayEmployeeInfo(monthName, csvData) {
-    const employeeInfoSection = document.getElementById('employeeInfo');
-    let employeeFound = false;
-
-    for (let i = 1; i < csvData.length; i++) {
-        const row = csvData[i];
-        if (row.length < 4) continue;
-        const empno = row[3];
-        if (empno === document.getElementById('searchInput').value.trim()) {
-            employeeFound = true;
-
-            const div = row[1];
-            const sta = row[2];
-            const fname = row[4];
-            const mi = row[5];
-            const lname = row[6];
-
-            employeeInfoSection.innerHTML = `
-                <strong>NAME:</strong><b style="color:orange"> ${fname} ${mi} ${lname}</b><br/>
-                <strong>EMPNO:</strong><b style="color:orange">   ${empno} </b><br/>
-                <strong>DIV / STA:</strong><b style="color:orange"> ${div} / ${sta}</b><br/>
-            `;
-            break;
-        }
-    }
-
-    if (!employeeFound) {
-        employeeInfoSection.innerHTML = 'No employee found in the latest data.';
-    }
-}
-
-
-function displayResultsTable(fetchedData) {
-    const resultsSection = document.getElementById('results');
-    
-    // Create a table with a single header row
-    const table = document.createElement('table');
-    table.classList.add('table', 'table-borderless', 'text-white');
-
-    const thead = document.createElement('thead');
-    const headerRow = document.createElement('tr');
-    headerRow.innerHTML = `
-        <th class="font-weight-bold">MONTH</th>
-        <th class="font-weight-bold">DEDAMT</th>
-    `;
-    thead.appendChild(headerRow);
-    table.appendChild(thead);
-
-    const tbody = document.createElement('tbody');
-    const resultsMap = new Map(); // To store sums and details for dropdown
-
-    fetchedData.forEach(data => {
-        data.csvData.forEach((row, index) => {
-            if (index === 0) return; // Skip header row
-            if (row.length < 4) return; // Skip malformed rows
-
-            const empno = row[3];
-            if (empno === document.getElementById('searchInput').value.trim()) {
-                const monthName = data.monthName;
-                const dedamt = parseFloat(row[13]);
-                
-                // Accumulate amounts
-                if (!resultsMap.has(monthName)) {
-                    resultsMap.set(monthName, { sum: 0, details: [] });
-                }
-                const entry = resultsMap.get(monthName);
-                entry.sum += dedamt;
-                entry.details.push(dedamt.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' }));
-            }
-        });
-    });
-
-    // Add aggregated results to the table
-    resultsMap.forEach((value, monthName) => {
-        const totalDedAmt = value.sum.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
-        
-        const rowElement = document.createElement('tr');
-        rowElement.innerHTML = `
-            <td>${monthName}</td>
-            <td>
-                <div class="position-relative">
-                    <u><b class="sum-amount" style="cursor: pointer;">${totalDedAmt}</b></u>
-                    <div class="dropdown-menu" style="display: none; position: absolute; z-index: 1;">
-                        ${value.details.map(detail => `<div class="dropdown-item">${detail}</div>`).join('')}
-                    </div>
-                </div>
-            </td>
-        `;
-        
-        // Add hover event listeners
-        const sumAmount = rowElement.querySelector('.sum-amount');
-        const dropdownMenu = rowElement.querySelector('.dropdown-menu');
-
-        sumAmount.addEventListener('mouseenter', () => {
-            dropdownMenu.style.display = 'block';
-        });
-
-        sumAmount.addEventListener('mouseleave', () => {
-            dropdownMenu.style.display = 'none';
-        });
-
-        tbody.appendChild(rowElement);
-    });
-
-    if (tbody.children.length > 0) {
-        table.appendChild(tbody);
-        resultsSection.appendChild(table);
-    }
-}
 
 
 </script>

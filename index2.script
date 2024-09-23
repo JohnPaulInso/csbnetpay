@@ -1,0 +1,245 @@
+
+// =====================================================================================================
+// INDEX 2 =============================================================================================
+// =====================================================================================================
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const prompt = document.getElementById('fullscreenPrompt');
+
+        // Show the prompt when the mouse moves
+        document.addEventListener('mousemove', () => {
+            prompt.style.display = 'block';
+        });
+
+        // Enter fullscreen when the prompt is clicked
+        prompt.addEventListener('click', () => {
+            openFullscreen();
+            prompt.style.display = 'none'; // Hide prompt after entering full-screen
+        });
+    });
+
+    function openFullscreen() {
+        const elem = document.documentElement;
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+        } else if (elem.mozRequestFullScreen) {
+            elem.mozRequestFullScreen();
+        } else if (elem.webkitRequestFullscreen) {
+            elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) {
+            elem.msRequestFullscreen();
+        }
+    }
+
+
+
+const csvFilesPos = [
+    'pos_aug24.csv', 'pos_jul24.csv', 'pos_jun24.csv', 'pos_may24.csv', 'pos_apr24.csv', 'pos_mar24.csv',
+    'pos_feb24.csv', 'pos_jan24.csv', 'pos_dec23.csv', 'pos_nov23.csv', 'pos_oct23.csv', 'pos_sep23.csv'
+];
+
+document.getElementById('searchButtonPos').addEventListener('click', searchEmployeePos);
+
+function searchEmployeePos() {
+    const searchInputPos = document.getElementById('searchInputPos').value.trim();
+    const loadingIndicatorPos = document.getElementById('loadingIndicatorPos');
+
+    if (!searchInputPos) {
+        alert('Please enter an employee number.');
+        return;
+    }
+
+    const resultsSectionPos = document.getElementById('resultspos');
+    const employeeInfoSectionPos = document.getElementById('employeeInfoPos');
+    resultsSectionPos.innerHTML = ''; // Clear previous results
+    employeeInfoSectionPos.innerHTML = ''; // Clear previous employee info
+    loadingIndicatorPos.style.display = 'block'; // Show loading indicator
+
+    // Automatically limit to the last 12 months (latest first)
+    const last12MonthsFilesPos = csvFilesPos.slice(0, 12);
+
+    let fetchedDataPos = [];
+
+    Promise.all(last12MonthsFilesPos.map(csvFile => fetchCSVPos(csvFile)))
+        .then(allData => {
+            fetchedDataPos = allData.filter(data => data !== null); // Filter out failed fetches
+            if (fetchedDataPos.length === 0) {
+                alert('No valid data found in the provided files.');
+                return;
+            }
+            fetchedDataPos.sort((a, b) => b.date - a.date);
+            displayEmployeeInfoPos(fetchedDataPos[0].monthName, fetchedDataPos[0].csvData);
+            displayResultsTablePos(fetchedDataPos);
+        })
+        .catch(error => {
+            console.error('Error fetching CSV data:', error);
+            alert('Error fetching data. Check the console for more details.');
+        })
+        .finally(() => {
+            loadingIndicatorPos.style.display = 'none'; // Hide loading indicator
+        });
+}
+
+function fetchCSVPos(csvFile) {
+    return new Promise((resolve, reject) => {
+        const monthName = getMonthNameFromCsvPos(csvFile);
+        const date = getDateFromCsvPos(csvFile);
+
+        console.log(`Fetching data from file: ${csvFile}`);
+
+        fetch(csvFile)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Unable to fetch ${csvFile}. Status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(text => {
+                console.log(`Successfully fetched data from ${csvFile}`);
+                const csvData = parseCSVPos(text);
+                resolve({ monthName, csvData, date });
+            })
+            .catch(error => {
+                console.error(`Error fetching data for ${monthName}:`, error);
+                resolve(null); // Return null for failed fetches, don't reject to allow Promise.all to proceed
+            });
+    });
+}
+
+function getDateFromCsvPos(csvFile) {
+    const fileName = csvFile.replace('pos_', ''); // Remove 'pos_' prefix
+    const monthMap = {
+        'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'may': 4, 'jun': 5,
+        'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11
+    };
+    const monthPart = fileName.slice(0, 3);
+    const yearPart = '20' + fileName.slice(3, 5);
+    const monthIndex = monthMap[monthPart];
+    return new Date(yearPart, monthIndex);
+}
+
+function getMonthNameFromCsvPos(csvFile) {
+    const fileName = csvFile.replace('pos_', ''); // Remove 'pos_' prefix
+    const monthMap = {
+        'jan': 'January', 'feb': 'February', 'mar': 'March', 'apr': 'April', 'may': 'May', 'jun': 'June',
+        'jul': 'July', 'aug': 'August', 'sep': 'September', 'oct': 'October', 'nov': 'November', 'dec': 'December'
+    };
+    const monthPart = fileName.slice(0, 3);
+    const yearPart = '20' + fileName.slice(3, 5);
+    return `${monthMap[monthPart]} ${yearPart}`;
+}
+
+function parseCSVPos(data) {
+    const rows = data.trim().split('\n');
+    return rows.map(row => row.split(','));
+}
+
+function displayEmployeeInfoPos(monthName, csvData) {
+    const employeeInfoSectionPos = document.getElementById('employeeInfoPos');
+    let employeeFound = false;
+
+    for (let i = 1; i < csvData.length; i++) {
+        const row = csvData[i];
+        if (row.length < 4) continue;
+        const empno = row[3];
+        if (empno === document.getElementById('searchInputPos').value.trim()) {
+            employeeFound = true;
+
+            const div = row[1];
+            const sta = row[2];
+            const fname = row[4];
+            const mi = row[5];
+            const lname = row[6];
+
+            employeeInfoSectionPos.innerHTML = `
+                <strong>NAME:</strong><b style="color:orange"> ${fname} ${mi} ${lname}</b><br/>
+                <strong>EMPNO:</strong><b style="color:orange">   ${empno} </b><br/>
+                <strong>DIV / STA:</strong><b style="color:orange"> ${div} / ${sta}</b><br/>
+            `;
+            break;
+        }
+    }
+
+    if (!employeeFound) {
+        employeeInfoSectionPos.innerHTML = 'No employee found in the latest data.';
+    }
+}
+
+
+function displayResultsTablePos(fetchedDataPos) {
+    const resultsSectionPos = document.getElementById('resultspos');
+    
+    // Create a table with a single header row
+    const table = document.createElement('table');
+    table.classList.add('table', 'table-borderless', 'text-white');
+
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    headerRow.innerHTML = `
+        <th class="font-weight-bold">MONTH</th>
+        <th class="font-weight-bold">DEDAMT</th>
+    `;
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+    const resultsMap = new Map(); // To store sums and details for dropdown
+
+    fetchedDataPos.forEach(data => {
+        data.csvData.forEach((row, index) => {
+            if (index === 0) return; // Skip header row
+            if (row.length < 4) return; // Skip malformed rows
+
+            const empno = row[3];
+            if (empno === document.getElementById('searchInputPos').value.trim()) {
+                const monthName = data.monthName;
+                const dedamt = parseFloat(row[13]);
+                
+                // Accumulate amounts
+                if (!resultsMap.has(monthName)) {
+                    resultsMap.set(monthName, { sum: 0, details: [] });
+                }
+                const entry = resultsMap.get(monthName);
+                entry.sum += dedamt;
+                entry.details.push(dedamt.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' }));
+            }
+        });
+    });
+
+    // Add aggregated results to the table
+    resultsMap.forEach((value, monthName) => {
+        const totalDedAmt = value.sum.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
+        
+        const rowElement = document.createElement('tr');
+        rowElement.innerHTML = `
+            <td>${monthName}</td>
+            <td>
+                <div class="position-relative">
+                    <u><b class="sum-amount" style="cursor: pointer;">${totalDedAmt}</b></u>
+                    <div class="dropdown-menu" style="display: none; position: absolute; z-index: 1;">
+                        ${value.details.map(detail => `<div class="dropdown-item">${detail}</div>`).join('')}
+                    </div>
+                </div>
+            </td>
+        `;
+        
+        // Add hover event listeners
+        const sumAmount = rowElement.querySelector('.sum-amount');
+        const dropdownMenu = rowElement.querySelector('.dropdown-menu');
+
+        sumAmount.addEventListener('mouseenter', () => {
+            dropdownMenu.style.display = 'block';
+        });
+
+        sumAmount.addEventListener('mouseleave', () => {
+            dropdownMenu.style.display = 'none';
+        });
+
+        tbody.appendChild(rowElement);
+    });
+
+    if (tbody.children.length > 0) {
+        table.appendChild(tbody);
+        resultsSectionPos.appendChild(table);
+    }
+}
