@@ -24,21 +24,88 @@
     </div>
 </nav>
 
-<!-- NETPAY Section -->
-<div id="searchSectionNetpay" class="container mt-5">
-    <h1 class="text-center pt-5 pb-3 mb-2">Historical Netpay</h1>
-    <div class="row pt-2">
-        <p>AUG 2024 4694264        </p>
-        <div class="col-12 d-flex">
-            <input type="text" id="searchInputNetpay" class="form-control" placeholder="Employee Number..." style="flex-grow: 1;" oninput="syncInputs(this.value)">
-            <button id="searchButtonNetpay" class="btn btn-primary ml-2" onclick="triggerAllSearches()">Search</button>
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- NETPAY Section --><div class="container mt-5">
+    <h1 class="text-center pt-5 pb-3 mb-2">LOAN EVALUATION</h1>
+    <div class="row">
+        <div id="searchSectionNetpay" class="col-md-5">
+            <div class="row pt-2">
+                <a>AUG 2024</a>
+                <div></div>
+                <a>4694264</p>
+                <div class="col-12 d-flex">
+                    <input type="text" id="searchInputNetpay" class="form-control" placeholder="Employee Number..." style="flex-grow: 1;" oninput="syncInputs(this.value)">
+                    <button id="searchButtonNetpay" class="btn btn-primary ml-2" onclick="triggerAllSearches()">Search</button>
+                </div>
+                <div id="loadingIndicatorNetpay" style="display: none; text-align: center;">
+                    <img src="loading.gif" alt="Loading..." style="max-width: 100px;">
+                </div>
+            </div>
         </div>
-        <div id="loadingIndicatorNetpay" style="display: none; text-align: center;">
-            <img src="loading.gif" alt="Loading..." style="max-width: 100px;">
+
+        <div class="col-md-4 offset-md-1"> <!-- Added offset-md-1 to create space -->
+            <div class="calculator bg-dark text-light border border-light p-4 rounded shadow-lg">
+                <h2 class="text-center">Loan Payment Calculator</h2>
+
+                <!-- Loan Amount -->
+                <div class="mb-3">
+                    <label for="loanAmount" class="form-label">Loan Amount (Php)</label>
+                    <input type="text" class="form-control bg-dark text-light border-light" id="loanAmount" value="50,000" onblur="formatLoanAmount()" />
+                </div>
+
+                <!-- Rate -->
+                <div class="mb-3">
+                    <label for="rate" class="form-label">Interest Rate (%)</label>
+                    <input type="text" class="form-control bg-dark text-light border-light" id="rate" value="9.66" readonly />
+                </div>
+
+                <!-- Terms Dropdown -->
+                <div class="mb-3">
+                    <label for="terms" class="form-label">Terms (months)</label>
+                    <select id="terms" class="form-select bg-dark text-light border-light form-control" onchange="updateInterestRate()">
+                        <script>
+                            for (let i = 6; i <= 60; i++) {
+                                document.write('<option value="' + i + '"' + (i === 24 ? ' selected' : '') + '>' + i + '</option>');
+                            }
+                        </script>
+                    </select>
+                </div>
+
+                <!-- Calculate Button -->
+                <button class="btn btn-light w-100" onclick="calculatePayment()">Calculate Payment</button>
+
+                <!-- Result Display -->
+                <div class="result text-center mt-4">
+                    Monthly Payment: Php <span id="monthlyPayment">0.00</span>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-<br/>
+
+
+
+
+
+
+
+
+
+
+
+
+
 <div class="container">
     <div class="row">
         <div class="col-md-12">
@@ -47,6 +114,10 @@
     </div>
     </div>
 </div>
+
+
+
+
 
 <!-- DEDAMT Section -->
 <div id="searchSectionPos" class="container mt-5 d-none">
@@ -109,19 +180,15 @@
     </div>
 </div>
 <br/>
-<div class="container pb-5 mb-5">
+<div class="container  ">
     <div class="row">
         <div class="col-md-12">
             <h3 id="employeeInfoPLI" class="text-white"></h3>
         </div>
     </div>
-    <div class="row results rounded-bottom rounded-top pb-5 mb-5" id="resultsPLI">
+    <div class="row results rounded-bottom rounded-top " id="resultsPLI">
     </div>
 </div>
-
-
-
-
 
 
 
@@ -167,7 +234,19 @@ updateNetPayCell();
 
 
 
-<div style="margin-top: 20px;">
+
+
+
+
+
+
+
+
+
+
+
+
+<div style="margin-top: 150px;">
     
     <table style="width: 100%; border-collapse: collapse; text-align: left;">
         
@@ -348,6 +427,8 @@ updateNetPayCell();
         
     </table>
 
+
+    <div class="container pt-5 pb-5 mt-5 mb-5"></div>
 </div>
 
 
@@ -881,7 +962,7 @@ function displayResultsTablePos(fetchedDataPos) {
     ];
 
     document.getElementById('searchButtonOnq').addEventListener('click', searchEmployeeOnq);
-    function searchEmployeeOnq() {
+   function searchEmployeeOnq() {
     const searchInputOnq = document.getElementById('searchInputOnq').value.trim();
     const loadingIndicatorOnq = document.getElementById('loadingIndicatorOnq');
 
@@ -927,6 +1008,11 @@ function displayResultsTablePos(fetchedDataPos) {
 
 function calculateAndUpdateMonthlyPayment() {
     // Simulate clicking the Calculate button
+
+
+
+
+    
     calculatePayment();
 
     // Retrieve the value from the monthlyPayment span
@@ -1728,55 +1814,6 @@ function convertMonth(monthNumber) {
 
 
 
-<div class="col-md-4">
-    <div class="calculator bg-dark text-light border border-light p-4 rounded shadow-lg ">
-        <h2 class="text-center">Loan Payment Calculator</h2>
-
-        <!-- Loan Amount -->
-        <div class="mb-3">
-            <label for="loanAmount" class="form-label">Loan Amount (Php)</label>
-            <input type="text" class="form-control bg-dark text-light border-light" id="loanAmount" value="50,000" onblur="formatLoanAmount()" />
-        </div>
-
-        <!-- Rate -->
-        <div class="mb-3">
-            <label for="rate" class="form-label">Interest Rate (%)</label>
-            <input type="text" class="form-control bg-dark text-light border-light" id="rate" value="9.66" readonly />
-        </div>
-
-        <!-- Terms Dropdown -->
-        <div class="mb-3">
-            <label for="terms" class="form-label">Terms (months)</label>
-            <select id="terms" class="form-select bg-dark text-light border-light form-control" onchange="updateInterestRate()">
-                <script>
-                    for (let i = 6; i <= 60; i++) {
-                        if (i === 24) {
-                            document.write('<option value="' + i + '" selected>' + i + '</option>');
-                        } else {
-                            document.write('<option value="' + i + '">' + i + '</option>');
-                        }
-                    }
-                </script>
-            </select>
-        </div>
-
-        <!-- Calculate Button -->
-        <button class="btn btn-light w-100" onclick="calculatePayment()">Calculate Payment</button>
-
-        <!-- Result Display -->
-        <div class="result text-center mt-4">
-            Monthly Payment: Php <span id="monthlyPayment">0.00</span>
-        </div>
-    </div>
-</div>
-</div>
-</div>
-
-
-
-
-
-
 <script>
 // Function to add thousand separators to loan amount
 function formatLoanAmount() {
@@ -1800,7 +1837,7 @@ function updateInterestRate() {
     }
 }
 
-// Calculate payment using the PMT formula
+// Calculate payment using the PMT formula// Calculate payment using the PMT formula
 function calculatePayment() {
     let loanAmount = parseFloat(document.getElementById("loanAmount").value.replace(/,/g, '')); // Remove commas
     let rate = parseFloat(document.getElementById("rate").value);
@@ -1816,9 +1853,17 @@ function calculatePayment() {
     monthlyPayment = Math.abs(monthlyPayment);
     monthlyPayment = Math.ceil(monthlyPayment * 100) / 100;
 
-    // Display the result
-    document.getElementById("monthlyPayment").textContent = monthlyPayment.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    // Format the payment as PHP currency
+    const formattedPayment = `₱${monthlyPayment.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+    // Display the result in the monthlyPayment cell
+    document.getElementById("monthlyPayment").textContent = formattedPayment;
+
+    // Update the monthlyPaymentCell with the formatted payment
+    const monthlyPaymentCell = document.getElementById("monthlyPaymentCell");
+    monthlyPaymentCell.textContent = formattedPayment; // Update the cell with the payment value
 }
+
 </script>
 
 

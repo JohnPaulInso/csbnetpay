@@ -87,9 +87,17 @@ z-index: 1000;
     }
        /* Adjust input field size on mobile */
 #searchInput {
+    font-size: 1.2em; /* Make the input text larger on mobile */
+    padding: 25px;    /* Increase padding for a larger input box */
+    }
+
+#employeeInfoNetpay {
 font-size: 1.2em; /* Make the input text larger on mobile */
-padding: 25px;    /* Increase padding for a larger input box */
 }
+
+
+
+
 
 
 }
