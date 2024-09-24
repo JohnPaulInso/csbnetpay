@@ -263,20 +263,39 @@ updateNetPayCell();
             <td style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">NETPAY & OLD CSB SUB TOTAL:</td>
             <td id="netpaypositivetotalvalue" style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">Total of #netpaytable + #positivetable</td>
         </tr>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Function to calculate and update the total
+        function updateTotal() {
+            // Get values from #netpaytable and #positivetable
+            var netpay = parseFloat(document.getElementById('netpaytable').textContent) || 0;
+            var positive = parseFloat(document.getElementById('positivetable').textContent) || 0;
 
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    // Get values from #netpaytable and #positivetable
-                    var netpay = parseFloat(document.getElementById('netpaytable').textContent) || 0;
-                    var positive = parseFloat(document.getElementById('positivetable').textContent) || 0;
-                
-                    // Calculate the total
-                    var total = netpay + positive;
-                
-                    // Display the total in the specified cell
-                    document.getElementById('netpaypositivetotalvalue').textContent = total;
-                });
-                </script>
+            // Calculate the total
+            var total = netpay + positive;
+
+            // Display the total in the specified cell
+            document.getElementById('netpaypositivetotalvalue').textContent = total.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        // Initial update when the page is loaded
+        updateTotal();
+
+        // Set up a MutationObserver to watch for changes in #netpaytable and #positivetable
+        const netpayTable = document.getElementById('netpaytable');
+        const positiveTable = document.getElementById('positivetable');
+
+        const observer = new MutationObserver(updateTotal);
+
+        // Observe changes to both elements
+        observer.observe(netpayTable, { childList: true, subtree: true });
+        observer.observe(positiveTable, { childList: true, subtree: true });
+
+        // Optional: If you update the textContent of netpaytable and positivetable programmatically,
+        // make sure to call updateTotal() after those updates.
+    });
+</script>
+
                 
 
 
