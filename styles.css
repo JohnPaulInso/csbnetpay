@@ -21,7 +21,7 @@ nav {
     border: 1px solid #ffffff4a;
 }
 
-#searchButtonNetpay, #searchButtonPos, #searchButtonOnq, #searchButtonPLI {
+#searchButtonNetpay, #searchButtonPos, #searchButtonOnq, #searchButtonPLI, #viewmore{
     padding: 10px 15px;
     font-size: 16px;
     background-color: #6f42c1; /* Purple */

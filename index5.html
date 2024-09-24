@@ -171,12 +171,43 @@ updateNetPayCell();
     
     <table style="width: 100%; border-collapse: collapse; text-align: left;">
         
-    <div class="row results rounded-bottom rounded-top" id="resultsNetpay"></div>
-    <div class="row results rounded-bottom rounded-top" id="resultspos"></div>
+
 
         
-        <tr>
+        <tr class=" " id="resultsNetpay">
+        </tr>
+
+        <tr class=" " id="resultspos">
+        </tr>
             
+        <tr>
+            <td style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">NETPAY & OLD CSB SUB TOTAL:</td>
+            <td id="netpaypositivetotalvalue" style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">Total of #netpaytable + #positivetable</td>
+        </tr>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Get values from #netpaytable and #positivetable
+                    var netpay = parseFloat(document.getElementById('netpaytable').textContent) || 0;
+                    var positive = parseFloat(document.getElementById('positivetable').textContent) || 0;
+                
+                    // Calculate the total
+                    var total = netpay + positive;
+                
+                    // Display the total in the specified cell
+                    document.getElementById('netpaypositivetotalvalue').textContent = total;
+                });
+                </script>
+                
+
+
+            </table>
+
+
+
+
+
+        <!-- <tr>
             <td style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;">NETPAY:</td>
             <td  id="netpayCell" style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;">This must change to the same value as #netpaytable td</td>
         </tr>
@@ -187,57 +218,136 @@ updateNetPayCell();
         <tr>
             <td style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">NETPAY & OLD CSB SUB TOTAL:</td>
             <td style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">Total of NETPAY: + ADD OLD CSB:</td>
-        </tr>
-        <tr>
-            <td style="border: 1px solid #ccc; padding: 8px;">ADD: ABSENCES/PVP</td>
-            <td style="border: 1px solid #ccc; padding: 8px;"><input type="text" value="0" /></td>
-        </tr>
-        <tr>
-            <td style="border: 1px solid #ccc; padding: 8px;">ADD: REDEMPTION PLI 1 STOPPAGE</td>
-            <td style="border: 1px solid #ccc; padding: 8px;"><input type="text" value="0" /></td>
-        </tr>
-        <tr>
-            <td style="border: 1px solid #ccc; padding: 8px;">ADD: REDEMPTION PLI 2</td>
-            <td style="border: 1px solid #ccc; padding: 8px;"><input type="text" value="0" /></td>
-        </tr>
-        <tr>
-            <td style="border: 1px solid #ccc; padding: 8px;">ADD: REDEMPTION PLI 3</td>
-            <td style="border: 1px solid #ccc; padding: 8px;"><input type="text" value="0" /></td>
-        </tr>
-        <tr>
-            <td style="border: 1px solid #ccc; padding: 8px;">ADD: REDEMPTION PLI 4</td>
-            <td style="border: 1px solid #ccc; padding: 8px;"><input type="text" value="0" /></td>
-        </tr>
-        <tr>
-            <td style="border: 1px solid #ccc; padding: 8px;">ADD: ANTICIPATION:</td>
-            <td style="border: 1px solid #ccc; padding: 8px;"><input type="text" /></td>
-        </tr>
-        <tr>
-            <td style="border: 1px solid #ccc; padding: 8px;">ADD: PROMOTION:</td>
-            <td style="border: 1px solid #ccc; padding: 8px;"><input type="text" /></td>
-        </tr>
-        <tr>
-            <td style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">PLI TOTAL:</td>
-            <td style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">Total of NETPAY: and ADD OLD CSB: + ADD: ABSENCES/PVP + 4  PLIS + ANTICIPATION + PROMOTION</td>
-        </tr>
+        </tr> -->
+
+
+
+        <table class="mt-5">
+            <tbody>
+                <tr class="mt-5">
+                    <td style="border: 1px solid #ccc; padding: 8px;">ADD: ABSENCES/PVP</td>
+                    <td style="border: 1px solid #ccc; padding: 8px;"><input type="text" value="5500" class="input-field" /></td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 8px;">ADD: REDEMPTION PLI 1 STOPPAGE</td>
+                    <td style="border: 1px solid #ccc; padding: 8px;"><input type="number" value="5200" class="input-field" /></td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 8px;">ADD: REDEMPTION PLI 2</td>
+                    <td style="border: 1px solid #ccc; padding: 8px;"><input type="number" value="8000" class="input-field" /></td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 8px;">ADD: REDEMPTION PLI 3</td>
+                    <td style="border: 1px solid #ccc; padding: 8px;"><input type="number" value="6000" class="input-field" /></td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 8px;">ADD: REDEMPTION PLI 4</td>
+                    <td style="border: 1px solid #ccc; padding: 8px;"><input type="number" value="8500" class="input-field" /></td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 8px;">ADD: ANTICIPATION:</td>
+                    <td style="border: 1px solid #ccc; padding: 8px;"><input type="number" value="500" class="input-field" /></td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 8px;">ADD: PROMOTION:</td>
+                    <td style="border: 1px solid #ccc; padding: 8px;"><input type="number" value="500" class="input-field" /></td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">PLI TOTAL:</td>
+                    <td id="plitotalvalue" style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">₱0.00</td>
+                </tr>
+                
+            </tbody>
+        </table>
+
+        
+        <script>
+            // Function to calculate the total
+            function calculateTotal() {
+                const inputs = document.querySelectorAll('.input-field');
+                let total = 0;
+        
+                // Loop through each input field and add its value to the total
+                inputs.forEach(input => {
+                    total += parseFloat(input.value) || 0; // Convert value to float and handle NaN
+                });
+        
+                // Format the total as PHP currency (Philippine pesos)
+                const formattedTotal = total.toLocaleString('en-PH', { style: 'currency', currency: 'PHP', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        
+                // Update the total in the designated element
+                document.getElementById('plitotalvalue').innerText = formattedTotal;
+            }
+        
+            // Add event listeners to each input field to calculate the total on input
+            document.querySelectorAll('.input-field').forEach(input => {
+                input.addEventListener('input', calculateTotal);
+            });
+        
+            // Initial calculation in case there are preset values
+            calculateTotal();
+
+
+
+
+
+                // JavaScript to handle the calculation
+        document.addEventListener('DOMContentLoaded', function() {
+            const plitotalvalueInput = document.getElementById('plitotalvalue');
+            const onqueueCellInput = document.getElementById('onqueueCell');
+            const semiTotalValueInput = document.getElementById('semiTotalValue');
+
+            function updateSemiTotalValue() {
+                const plitotalvalue = parseFloat(plitotalvalueInput.value) || 0;
+                const onqueueCell = parseFloat(onqueueCellInput.value) || 0;
+                const semiTotalValue = plitotalvalue - onqueueCell;
+
+                semiTotalValueInput.value = semiTotalValue.toFixed(2); // Format to 2 decimal places
+            }
+
+            plitotalvalueInput.addEventListener('input', updateSemiTotalValue);
+            onqueueCellInput.addEventListener('input', updateSemiTotalValue);
+        });
+        </script>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        <table class="mt-5">
+
         <tr>
             <td style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;">LESS: ONQUEUE:</td>
             <td id="onqueueCell" style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;">This must change to the same value as #totalAmount td</td>
         </tr>
+
+
+        
         <tr>
             <td style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">SEMI TOTAL:</td>
-            <td style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">PLI TOTAL - LESS: ONQUEUE:</td>
-        </tr>
+            <td id="semiTotalValue" style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">₱0.00</td>
+</tr>
         <tr>
             <td style="border: 1px solid #ccc; padding: 8px;">LESS: NEW CSB DED:</td>
-            <td style="border: 1px solid #ccc; padding: 8px;">MONTHLY PAYMENT FROM CALCULATOR RESULT </td>
+            <td id="monthlyPaymentCell" style="border: 1px solid #ccc; padding: 8px;">MONTHLY PAYMENT FROM CALCULATOR RESULT </td>
         </tr>
         <tr>
             <td style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">NEW NETPAY:</td>
-            <td style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">Formula: SEMI TOTAL - MONTHLY PAYMENT FROM CALCULATOR RESULT
-            </td>
+            <td  id="finalTotalValue" style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">semiTotalValue minus monthlyPaymentCell</td>
+
         </tr>
+
+        
     </table>
+
 </div>
 
 
@@ -454,51 +564,67 @@ document.addEventListener('DOMContentLoaded', () => {
             employeeInfoSectionNetpay.innerHTML = 'No employee found in the latest data.';
         }
     }
-
     function displayResultsTableNetpay(fetchedDataNet) {
-        const resultsSectionNetpay = document.getElementById('resultsNetpay');
-        
-        // Create a table with a single header row
-        const table = document.createElement('table');
-        table.classList.add('table', 'table-borderless', 'text-white');
+    const resultsSectionNetpay = document.getElementById('resultsNetpay');
+    
+    // Create a table with a single header row
+    const table = document.createElement('table');
+    table.classList.add('table', 'table-borderless', 'text-white');
 
-        const thead = document.createElement('thead');
-        const headerRow = document.createElement('tr');
-        headerRow.innerHTML = `
-            <th class="font-weight-bold">NETPAY MONTH</th>
-            <th class="font-weight-bold">TAKEHOME</th>
-        `;
-        thead.appendChild(headerRow);
-        table.appendChild(thead);
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    headerRow.innerHTML = `
+      <!--   <th class="font-weight-bold">NETPAY MONTH</th>
+     <th class="font-weight-bold">TAKEHOME</th> -->
+    `;
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
 
-        const tbody = document.createElement('tbody');
+    const tbody = document.createElement('tbody');
 
-        // Iterate over the fetched data and add rows to the table body
-        fetchedDataNet.forEach(data => {
-            data.csvData.forEach((row, index) => {
-                if (index === 0) return; // Skip header row
-                if (row.length < 4) return; // Skip malformed rows
+    // Iterate over the fetched data and add rows to the table body
+    fetchedDataNet.forEach(data => {
+        data.csvData.forEach((row, index) => {
+            if (index === 0) return; // Skip header row
+            if (row.length < 4) return; // Skip malformed rows
 
-                const empno = row[3];
-                if (empno === document.getElementById('searchInputNetpay').value.trim()) {
-                    const monthName = data.monthName;
-                    const takehome = parseFloat(row[7]).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
+            const empno = row[3];
+            if (empno === document.getElementById('searchInputNetpay').value.trim()) {
+                const monthName = data.monthName;
+                const takehome = parseFloat(row[7]).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
 
-                    const rowElement = document.createElement('tr');
-                    rowElement.innerHTML = `
-                        <td>${monthName}</td>
-                        <td id="netpaytable"><b>${takehome}</b></td>
-                    `;
-                    tbody.appendChild(rowElement);
-                }
-            });
+                const rowElement = document.createElement('tr');
+                rowElement.innerHTML = `
+                    <td>${monthName} NETPAY</td>
+                    <td id="netpaytable"><b>${takehome}</b></td>
+                `;
+                tbody.appendChild(rowElement);
+            }
         });
+    });
 
-        if (tbody.children.length > 0) {
-            table.appendChild(tbody);
-            resultsSectionNetpay.appendChild(table);
-        }
+    if (tbody.children.length > 0) {
+        table.appendChild(tbody);
+        resultsSectionNetpay.appendChild(table);
     }
+
+    // Sum netpay and positivetable after content is added
+    calculateAndDisplayTotal();
+}
+
+function calculateAndDisplayTotal() {
+    // Get the netpay value
+    const netpayValue = document.getElementById('netpaytable').textContent.replace(/[^\d.-]/g, '') || 0;
+    
+    // Get the positivetable value (assuming it's already populated elsewhere)
+    const positiveValue = document.getElementById('positivetable').textContent.replace(/[^\d.-]/g, '') || 0;
+
+    // Calculate total
+    const total = parseFloat(netpayValue) + parseFloat(positiveValue);
+
+    // Display the total in netpaypositivetotalvalue element
+    document.getElementById('netpaypositivetotalvalue').textContent = total.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
+}
 
 
 
@@ -656,8 +782,8 @@ function displayResultsTablePos(fetchedDataPos) {
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
     headerRow.innerHTML = `
-        <th class="font-weight-bold">POSITIVE MONTH</th>
-        <th class="font-weight-bold">DEDAMT</th>
+         <!--  <th class="font-weight-bold">POSITIVE MONTH</th>
+        <th class="font-weight-bold">DEDAMT</th> -->
     `;
     thead.appendChild(headerRow);
     table.appendChild(thead);
@@ -692,7 +818,8 @@ function displayResultsTablePos(fetchedDataPos) {
         
         const rowElement = document.createElement('tr');
         rowElement.innerHTML = `
-            <td>${monthName}</td>
+            <td>${monthName} POSITIVE</td>
+            
             <td id="positivetable">
                 <div class="position-relative">
                     <u><b class="sum-amount" style="cursor: pointer;">${totalDedAmt}</b></u>
@@ -754,45 +881,147 @@ function displayResultsTablePos(fetchedDataPos) {
     ];
 
     document.getElementById('searchButtonOnq').addEventListener('click', searchEmployeeOnq);
-
     function searchEmployeeOnq() {
-        const searchInputOnq = document.getElementById('searchInputOnq').value.trim();
-        const loadingIndicatorOnq = document.getElementById('loadingIndicatorOnq');
+    const searchInputOnq = document.getElementById('searchInputOnq').value.trim();
+    const loadingIndicatorOnq = document.getElementById('loadingIndicatorOnq');
 
-        if (!searchInputOnq) {
-            alert('Please enter an employee number.');
-            return;
-        }
-
-        const resultsSectionOnq = document.getElementById('resultsonq');
-        const employeeInfoSectionOnq = document.getElementById('employeeInfoOnq');
-        resultsSectionOnq.innerHTML = ''; // Clear previous results
-        employeeInfoSectionOnq.innerHTML = ''; // Clear previous employee info
-        loadingIndicatorOnq.style.display = 'block'; // Show loading indicator
-
-        const last12MonthsFilesOnq = csvFilesOnq.slice(0, 12);
-
-        let fetchedDataOnq = [];
-
-        Promise.all(last12MonthsFilesOnq.map(csvFile => fetchCSVOnq(csvFile)))
-            .then(allData => {
-                fetchedDataOnq = allData.filter(data => data !== null);
-                if (fetchedDataOnq.length === 0) {
-                    alert('No valid data found in the provided files.');
-                    return;
-                }
-                fetchedDataOnq.sort((a, b) => b.date - a.date);
-                displayEmployeeInfoOnq(fetchedDataOnq[0].monthName, fetchedDataOnq[0].csvData);
-                displayResultsTableOnq(fetchedDataOnq);
-            })
-            .catch(error => {
-                console.error('Error fetching CSV data:', error);
-                alert('Error fetching data. Check the console for more details.');
-            })
-            .finally(() => {
-                loadingIndicatorOnq.style.display = 'none'; // Hide loading indicator
-            });
+    if (!searchInputOnq) {
+        alert('Please enter an employee number.');
+        return;
     }
+
+    const resultsSectionOnq = document.getElementById('resultsonq');
+    const employeeInfoSectionOnq = document.getElementById('employeeInfoOnq');
+    resultsSectionOnq.innerHTML = ''; // Clear previous results
+    employeeInfoSectionOnq.innerHTML = ''; // Clear previous employee info
+    loadingIndicatorOnq.style.display = 'block'; // Show loading indicator
+
+    const last12MonthsFilesOnq = csvFilesOnq.slice(0, 12);
+    let fetchedDataOnq = [];
+
+    Promise.all(last12MonthsFilesOnq.map(csvFile => fetchCSVOnq(csvFile)))
+        .then(allData => {
+            fetchedDataOnq = allData.filter(data => data !== null);
+            if (fetchedDataOnq.length === 0) {
+                alert('No valid data found in the provided files.');
+                return;
+            }
+            fetchedDataOnq.sort((a, b) => b.date - a.date);
+            displayEmployeeInfoOnq(fetchedDataOnq[0].monthName, fetchedDataOnq[0].csvData);
+            displayResultsTableOnq(fetchedDataOnq);
+
+            // Call the function to update the onqueueCell after results are displayed
+            updateOnQueueCell();
+
+            // Automatically press the Calculate button and update the monthly payment
+            calculateAndUpdateMonthlyPayment();
+        })
+        .catch(error => {
+            console.error('Error fetching CSV data:', error);
+            alert('Error fetching data. Check the console for more details.');
+        })
+        .finally(() => {
+            loadingIndicatorOnq.style.display = 'none'; // Hide loading indicator
+        });
+}
+
+function calculateAndUpdateMonthlyPayment() {
+    // Simulate clicking the Calculate button
+    calculatePayment();
+
+    // Retrieve the value from the monthlyPayment span
+    const monthlyPaymentValue = document.getElementById('monthlyPayment').textContent;
+
+    // Update the monthlyPaymentCell with the retrieved value
+    const monthlyPaymentCell = document.getElementById('monthlyPaymentCell');
+    monthlyPaymentCell.textContent = monthlyPaymentValue; // Update the cell with the payment value
+
+    // Get the semiTotalValue and calculate the new net pay
+    const semiTotalValue = parseFloat(document.getElementById('semiTotalValue').textContent.replace(/₱/g, '').replace(/,/g, ''));
+
+    // Extract the numeric value from the monthly payment and format it for calculation
+    const monthlyPaymentNumeric = parseFloat(monthlyPaymentValue.replace(/₱/g, '').replace(/,/g, ''));
+
+    // Calculate NEW NETPAY
+    const newNetPay = semiTotalValue - monthlyPaymentNumeric;
+
+    // Update the finalTotalValue with the new net pay
+    document.getElementById('finalTotalValue').textContent = `₱${newNetPay.toFixed(2)}`;
+}
+
+
+
+
+
+
+
+function formatCurrency(value) {
+    // Format the number with commas as thousands separators
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function updateSemiTotalValue() {
+    const plitotalvalueCell = document.getElementById('plitotalvalue');
+    const onqueueCell = document.getElementById('onqueueCell');
+    const semiTotalValueCell = document.getElementById('semiTotalValue');
+
+    // Extract the numeric values from the cells
+    const plitotalvalue = parseFloat(plitotalvalueCell.textContent.replace(/[₱,]/g, '').trim()) || 0; // Remove currency symbol and commas
+    const onqueueValue = parseFloat(onqueueCell.textContent.replace(/[₱,]/g, '').trim()) || 0; // Remove currency symbol and commas
+
+    // Calculate the semiTotalValue
+    const semiTotalValue = plitotalvalue - onqueueValue;
+
+    // Set the calculated value in the semiTotalValue cell with formatted number
+    semiTotalValueCell.textContent = `₱${formatCurrency(semiTotalValue.toFixed(2))}`; // Format to 2 decimal places and add comma separators
+}
+
+// Call updateSemiTotalValue to initialize it
+updateSemiTotalValue();
+
+
+
+
+
+
+function updateOnQueueCell() {
+    // Get the total amount from the totalAmount cell
+    const totalAmountCell = document.getElementById('totalAmount');
+    const totalAmountText = totalAmountCell.textContent || ""; // Fallback in case of no content
+    const totalAmountNumber = parseFloat(totalAmountText.replace(/[₱,]/g, '').trim()); // Remove currency and commas
+
+    // Update the onqueueCell with the total amount
+    const onqueueCell = document.getElementById('onqueueCell');
+    onqueueCell.textContent = `₱${totalAmountNumber.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+
+    // Calculate the semiTotal
+    calculateSemiTotal(totalAmountNumber);
+}
+
+function calculateSemiTotal(pliTotal) {
+    // Get the onqueue value
+    const onqueueCell = document.getElementById('onqueueCell');
+    const onqueueText = onqueueCell.textContent || "";
+    const onqueueValue = parseFloat(onqueueText.replace(/[₱,]/g, '').trim()); // Remove currency and commas
+
+    // Calculate the semi total
+    const semiTotalValue = pliTotal - onqueueValue;
+
+    // Update the semiTotal cell
+    const semiTotalCell = document.getElementById('semiTotal');
+    semiTotalCell.textContent = `₱${semiTotalValue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+}
+
+
+
+
+
+
+
+
+
+
+
 
     function fetchCSVOnq(csvFile) {
         return new Promise((resolve, reject) => {
@@ -872,97 +1101,143 @@ function displayResultsTablePos(fetchedDataPos) {
             employeeInfoSectionOnq.innerHTML = 'No employee found in the latest data.';
         }
     }
-
     function displayResultsTableOnq(fetchedDataOnq) {
-        const resultsSectionOnq = document.getElementById('resultsonq');
-        
-        const table = document.createElement('table');
-        table.classList.add('table', 'table-borderless', 'text-white');
+    const resultsSectionOnq = document.getElementById('resultsonq');
 
-        const thead = document.createElement('thead');
-        const headerRow = document.createElement('tr');
-        headerRow.innerHTML = `
-            <th class="font-weight-bold">ONQUEUE MONTH</th>
-            <th class="font-weight-bold">DEDAMT</th>
-        `;
-        thead.appendChild(headerRow);
-        table.appendChild(thead);
+    const table = document.createElement('table');
+    table.classList.add('table', 'table-borderless', 'text-white');
 
-        const tbody = document.createElement('tbody');
-        const resultsMap = new Map();
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    headerRow.innerHTML = `
+        <th class="font-weight-bold">ONQUEUE MONTH</th>
+        <th class="font-weight-bold">DEDAMT</th>
+    `;
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
 
-        fetchedDataOnq.forEach(data => {
-            data.csvData.forEach((row, index) => {
-                if (index === 0) return;
+    const tbody = document.createElement('tbody');
+    const resultsMap = new Map();
 
-                const empno = row[3];
-                if (empno === document.getElementById('searchInputOnq').value.trim()) {
-                    const monthName = data.monthName;
-                    const dedamt = parseFloat(row[13]);
-                    
-                    if (!resultsMap.has(monthName)) {
-                        resultsMap.set(monthName, { sum: 0, details: [] });
-                    }
+    fetchedDataOnq.forEach(data => {
+        data.csvData.forEach((row, index) => {
+            if (index === 0) return;
 
-                    const dedcode = row[7];
-                    const effyy = row[9];
-                    const effmm = convertMonth(row[10]); // Convert month number
-                    const termyy = row[11];
-                    const termmm = convertMonth(row[12]); // Convert month number
-                    const policyno = row[15];
+            const empno = row[3];
+            if (empno === document.getElementById('searchInputOnq').value.trim()) {
+                const monthName = data.monthName;
+                const dedamt = parseFloat(row[13]);
 
-                    const entry = resultsMap.get(monthName);
-                    entry.sum += dedamt;
-                    entry.details.push({ dedcode, policyno, effyy, effmm, termyy, termmm, dedamt });
+                if (!resultsMap.has(monthName)) {
+                    resultsMap.set(monthName, { sum: 0, details: [] });
                 }
-            });
+
+                const dedcode = row[7];
+                const effyy = row[9];
+                const effmm = convertMonth(row[10]); // Convert month number
+                const termyy = row[11];
+                const termmm = convertMonth(row[12]); // Convert month number
+                const policyno = row[15];
+
+                const entry = resultsMap.get(monthName);
+                entry.sum += dedamt;
+                entry.details.push({ dedcode, policyno, effyy, effmm, termyy, termmm, dedamt });
+            }
         });
+    });
 
-        resultsMap.forEach((data, monthName) => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${monthName}</td>
-                    <!-- <td>₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td> -->
-                <td id="totalAmount">₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td> <!-- Start with ₱0.00 -->
+    resultsMap.forEach((data, monthName) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${monthName}</td>
+            <td id="totalAmount">
+                ₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                <button id="viewmore" class="btn btn-link" style="color: white; padding-left: 10px;" onclick="toggleDetails(this)">View More</button>
+            </td>
+        `;
+        tbody.appendChild(row);
+        
+        const detailRow = document.createElement('tr');
+        detailRow.classList.add('details-row', 'hidden'); // Initially hidden
+        const detailCell = document.createElement('td');
+        detailCell.setAttribute('colspan', 2);
+        detailCell.innerHTML = `
+            <table class="table table-sm text-white" style="font-size:11px">
+                <thead>
+                    <tr>
+                        <th>/</th>
+                        <th>PLI</th>
+                        <th>EFFECTIVE</th>
+                        <th>TERMINATE</th>
+                        <th>DEDAMT</th>
+                        <th>POLICYNO</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${data.details.map(d => `
+                        <tr>
+                            <td><input type="checkbox" class="dedamt-checkbox" data-dedamt="${d.dedamt}" checked /></td>
+                            <td>${d.dedcode.toString().padStart(5, '0')}</td>
+                            <td>${d.effmm.toString().padStart(2, '0')}/${d.effyy}</td>
+                            <td>${d.termmm.toString().padStart(2, '0')}/${d.termyy}</td>
+                            <td><b>₱${d.dedamt.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                            <td>${d.policyno}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+        
+        detailRow.appendChild(detailCell);
+        tbody.appendChild(detailRow);
+    });
+
+    table.appendChild(tbody);
+    resultsSectionOnq.appendChild(table);
+}
+
+function toggleDetails(button) {
+    const detailsRow = button.closest('tr').nextElementSibling; // Find the next row (details)
+    detailsRow.classList.toggle('hidden'); // Toggle visibility
+}
 
 
-            `;
-            tbody.appendChild(row);
-            const detailRow = document.createElement('tr');
-    const detailCell = document.createElement('td');
-    detailCell.setAttribute('colspan', 2);
-    detailCell.innerHTML = `
-    <table class="table table-sm text-white" style="font-size:11px">
-        <thead>
-            <tr>
-                <th>/</th>
-                <th>PLI</th>
-                <th>EFFECTIVE</th>
-                <th>TERMINATE</th>
-                <th>DEDAMT</th>
-                <th>POLICYNO</th>
-            </tr>
-        </thead>
-        <tbody>
-            ${data.details.map(d => `
-                <tr>
-                    <td><input type="checkbox" class="dedamt-checkbox" data-dedamt="${d.dedamt}" checked /></td>
-                    <td>${d.dedcode.toString().padStart(5, '0')}</td>
-                    <td>${d.effmm.toString().padStart(2, '0')}/${d.effyy}</td>
-                    <td>${d.termmm.toString().padStart(2, '0')}/${d.termyy}</td>
-                    <td><b>₱${d.dedamt.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</b></td>
-                    <td>${d.policyno}</td>
-                </tr>
-            `).join('')}
-        </tbody>
-    </table>
+
+function updateOnQueueCell() {
+    // Get the total amount from the totalAmount cell
+    const totalAmountCell = document.getElementById('totalAmount');
+    const totalAmountText = totalAmountCell.textContent || ""; // Fallback in case of no content
+    const totalAmountNumber = parseFloat(totalAmountText.replace(/[₱,]/g, '').trim()); // Remove currency and commas
+
+    // Update the onqueueCell with the total amount
+    const onqueueCell = document.getElementById('onqueueCell');
+    onqueueCell.textContent = `₱${totalAmountNumber.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+}
+
+// Call this function whenever the total amount is updated
+// Example usage after you set the total amount somewhere in your code
+// updateOnQueueCell();
+
+
+
+
+
+
+
+
+// Initial CSS to hide details rows
+const style = document.createElement('style');
+style.textContent = `
+    .hidden {
+        display: none;
+    }
 `;
+document.head.appendChild(style);
 
-
-
-
-
-
+function convertMonth(monthNumber) {
+    const monthNames = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
+    return monthNames[parseInt(monthNumber, 10) - 1];
+}
 
 function calculateTotal() {
     const checkboxes = document.querySelectorAll('.dedamt-checkbox');
@@ -974,7 +1249,6 @@ function calculateTotal() {
         }
     });
 
-    // Update the total display
     const totalDisplay = document.querySelector('#totalAmount');
     totalDisplay.innerText = `₱${total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
 }
@@ -989,21 +1263,6 @@ document.addEventListener('change', (event) => {
 // Initial calculation on page load
 document.addEventListener('DOMContentLoaded', calculateTotal);
 
-
-
-    detailRow.appendChild(detailCell);
-    tbody.appendChild(detailRow);
-
-        });
-
-        table.appendChild(tbody);
-        resultsSectionOnq.appendChild(table);
-    }
-
-    function convertMonth(monthNumber) {
-        const monthNames = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
-        return monthNames[parseInt(monthNumber, 10) - 1];
-    }
 
 
 
@@ -1202,7 +1461,6 @@ function displayEmployeeInfoPLI(monthName, csvData) {
         employeeInfoSectionPLI.innerHTML = 'No employee found in the latest data.';
     }
 }
-
 function displayResultsTablePLI(fetchedDataPLI) {
     const resultsSectionPLI = document.getElementById('resultsPLI');
     
@@ -1228,7 +1486,7 @@ function displayResultsTablePLI(fetchedDataPLI) {
             const empno = row[3];
             if (empno === document.getElementById('searchInputPLI').value.trim()) {
                 const monthName = data.monthName;
-                const dedamtpli = parseFloat(row[13]);
+                const dedamtpli = parseFloat(row[15]);
                 
                 if (!resultsMap.has(monthName)) {
                     resultsMap.set(monthName, { sum: 0, details: [] });
@@ -1251,98 +1509,60 @@ function displayResultsTablePLI(fetchedDataPLI) {
     resultsMap.forEach((data, monthName) => {
         const row = document.createElement('tr');
         row.innerHTML = `
-         <td>${monthName}</td>
-                    <!-- <td>₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td> -->
-                <td id="totalAmountPLI">₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td> <!-- Start with ₱0.00 -->
-
+            <td>${monthName}</td>
+            <td id="totalAmountPLI">
+                ₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                <button id="viewmore" class="view-more-btn" style="margin-left: 10px;">View More</button>
+            </td>
         `;
         tbody.appendChild(row);
+        
         const detailRow = document.createElement('tr');
-const detailCell = document.createElement('td');
-detailCell.setAttribute('colspan', 2);
-detailCell.innerHTML = `
-    <table class="table table-sm text-white" style="font-size:11px">
-        <thead>
-            <tr>
-                <th>/</th>
-                <th>PLI</th>
-                <th>EFFECTIVE</th>
-                <th>TERMINATE</th>
-                <th>DEDAMTPLI</th>
-                <th>POLICYNO</th>
-            </tr>
-        </thead>
-        <tbody>
-            ${data.details.map(d => `
-                <tr>
-                    <td><input type="checkbox" class="dedamtpli-checkbox" data-dedamtpli="${d.dedamtpli}" checked /></td>
-                   <td>${d.dedcode.toString().padStart(5, '0')}</td>
+        const detailCell = document.createElement('td');
+        detailCell.setAttribute('colspan', 2);
+        detailCell.innerHTML = `
+            <table class="table table-sm text-white" style="font-size:11px">
+                <thead>
+                    <tr>
+                        <th>/</th>
+                        <th>PLI</th>
+                        <th>EFFECTIVE</th>
+                        <th>TERMINATE</th>
+                        <th>DEDAMTPLI</th>
+                        <th>POLICYNO</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${data.details.map(d => `
+                        <tr>
+                            <td><input type="checkbox" class="dedamtpli-checkbox" data-dedamtpli="${d.dedamtpli}" checked /></td>
+                            <td>${d.dedcode.toString().padStart(5, '0')}</td>
+                            <td>${d.effmm.toString().padStart(2, '0')}/${d.effyy}</td>
+                            <td>${d.termmm.toString().padStart(2, '0')}/${d.termyy}</td>
+                            <td><b>₱${d.dedamtpli.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                            <td>${d.policyno}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
 
-                   <td>${d.effmm.toString().padStart(2, '0')}/${d.effyy}</td>
-                   <td>${d.termmm.toString().padStart(2, '0')}/${d.termyy}</td>
-                   
-                    <td><b>₱${d.dedamtpli.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</b></td>
-                    <td>${d.policyno}</td>
-                </tr>
-            `).join('')}
-        </tbody>
-    </table>
-`;
+        // Initially hide the detail row
+        detailRow.style.display = 'none';
 
-
-
-
-
-
-
-
-
-
-function calculateTotalPLI() {
-    const checkboxesPLI = document.querySelectorAll('.dedamtpli-checkbox');
-    let total = 0;
-
-    checkboxesPLI.forEach(checkbox => {
-        if (checkbox.checked) {
-            total += parseFloat(checkbox.dataset.dedamtpli);
-        }
-    });
-
-    // Update the total display
-    const totalDisplayPLI = document.querySelector('#totalAmountPLI');
-    totalDisplayPLI.innerText = `₱${total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
-}
-
-// Event listener for checkbox changes
-document.addEventListener('change', (event) => {
-    if (event.target.classList.contains('dedamtpli-checkbox')) {
-        const checkboxesPLI = document.querySelectorAll('.dedamtpli-checkbox');
-        checkboxesPLI.forEach(checkbox => {
-            if (checkbox !== event.target) {
-                checkbox.checked = false; // Uncheck other checkboxesPLI
-            }
+        // Add click event to the "View More" button
+        row.querySelector('.view-more-btn').addEventListener('click', () => {
+            const isVisible = detailRow.style.display === 'table-row';
+            detailRow.style.display = isVisible ? 'none' : 'table-row';
         });
-        calculateTotalPLI(); // Recalculate total after changing checkboxesPLI
-    }
-});
 
-
-// Initial calculation on page load
-document.addEventListener('DOMContentLoaded', calculateTotalPLI);
-
-
-
-
-
-detailRow.appendChild(detailCell);
-tbody.appendChild(detailRow);
-
+        detailRow.appendChild(detailCell);
+        tbody.appendChild(detailRow);
     });
 
     table.appendChild(tbody);
     resultsSectionPLI.appendChild(table);
 }
-
 function convertMonth(monthNumber) {
     const monthNames = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
     return monthNames[parseInt(monthNumber, 10) - 1];
@@ -1356,6 +1576,30 @@ function convertMonth(monthNumber) {
 
 
 </SCRIPT>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

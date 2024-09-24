@@ -190,7 +190,7 @@ function displayResultsTablePLI(fetchedDataPLI) {
             const empno = row[3];
             if (empno === document.getElementById('searchInputPLI').value.trim()) {
                 const monthName = data.monthName;
-                const dedamtpli = parseFloat(row[13]);
+                const dedamtpli = parseFloat(row[15]);
                 
                 if (!resultsMap.has(monthName)) {
                     resultsMap.set(monthName, { sum: 0, details: [] });
