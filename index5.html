@@ -222,7 +222,7 @@ updateNetPayCell();
         
         <tr>
             <td id="A1" style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;">NETPAY:</td>
-            <td id="resultsNetpay" style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;">This must change to the same value as #totalAmount td</td>
+            <td id="resultsNetpay" style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;"></td>
         </tr>
 
 
@@ -230,44 +230,52 @@ updateNetPayCell();
         
         <tr>
             <td id="A2"style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;">POSITIVE:</td>
-            <td id="resultspos" style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;">This must change to the same value as #totalAmount td</td>
+            <td id="resultspos" style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;"></td>
         </tr>
 
 
         <tr>
             <td id="A3" style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">NETPAY & OLD CSB SUB TOTAL:</td>
-            <td id="netpaypositivetotalvalue" style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">Total of #netpaytable + #positivetable</td>
+            <td id="netpaypositivetotalvalue" style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;"></td>
         </tr>
         
+      
+      
 
 
-                
+        
+        
 
 
             <tbody>
                 <tr class="mt-5">
                     <td id="A4" style="border: 1px solid #ccc; padding: 8px;">ADD: ABSENCES/PVP</td>
                     <td style="border: 1px solid #ccc; padding: 8px;" id="resultsPLI1"></td>
+                    <td class="d-none" style="border: 1px solid #ccc; padding: 8px;" id="resultsPLI0hidden"></td>
                 </tr>
                 <tr>
                     
                     <td  id="A5" style="border: 1px solid #ccc; padding: 8px;">ADD: REDEMPTION PLI 1 STOPPAGE</td>
                     <td style="border: 1px solid #ccc; padding: 8px;" id="resultsPLI2"></td>
+                    <td class="d-none" style="border: 1px solid #ccc; padding: 8px;" id="resultsPLI1hidden"></td>
             
                 </tr>
                 <tr>
                     <td  id="A6" style="border: 1px solid #ccc; padding: 8px;">ADD: REDEMPTION PLI 2</td>
                     <td style="border: 1px solid #ccc; padding: 8px;" id="resultsPLI3"></td>
+                    <td class="d-none" style="border: 1px solid #ccc; padding: 8px;" id="resultsPLI2hidden"></td>
               
                 </tr>
                 <tr>
                     <td id="A7"  style="border: 1px solid #ccc; padding: 8px;">ADD: REDEMPTION PLI 3</td>
                     <td style="border: 1px solid #ccc; padding: 8px;" id="resultsPLI4"></td>
+                    <td class="d-none" style="border: 1px solid #ccc; padding: 8px;" id="resultsPLI3hidden"></td>
             
                 </tr>
                 <tr>
                     <td  id="A8" style="border: 1px solid #ccc; padding: 8px;">ADD: REDEMPTION PLI 4</td>
                     <td style="border: 1px solid #ccc; padding: 8px;" id="resultsPLI5"></td>
+                    <td class="d-none" style="border: 1px solid #ccc; padding: 8px;" id="resultsPLI4hidden"></td>
             
                 
                 
@@ -275,45 +283,125 @@ updateNetPayCell();
                 </tr>
                 <tr>
                     <td  id="A10" style="border: 1px solid #ccc; padding: 8px;">ADD: ANTICIPATION:</td>
-                    <td  id="anticipation" style="border: 1px solid #ccc; padding: 8px;"><input type="number" value="10000" class="input-field" /></td>
+
+                    <td id="anticipation" style="border: 1px solid #ccc; padding: 8px; color: #5f5f5f;">₱0.00</td>
+                    <td class="d-none" id="anticipationhidden" style="border: 1px solid #ccc; padding: 8px; color: white;"></td>
+               
                 </tr>
                 <tr>
                     <td  id="A11" style="border: 1px solid #ccc; padding: 8px;">ADD: PROMOTION:</td>
-                    <td  id="promotion" style="border: 1px solid #ccc; padding: 8px;"><input type="number" value="20000" class="input-field" /></td>
+                   
+                    <td id="promotion" style="border: 1px solid #ccc; padding: 8px; color: #5f5f5f;">₱0.00</td>
+                    <td class="d-none" id="promotionhidden" style="border: 1px solid #ccc; padding: 8px; color: white;"></td>
+               
                 </tr>
-                <tr>
-                    <td id="A12" style="border: 1px solid #ccc; padding: 8px; background-color: #200000; color: white;">PLI TOTAL:</td>
-                    <td id="plitotalvalue" style="border: 1px solid #ccc; padding: 8px; background-color: #200000; color: white;">₱0.00</td>
-                </tr>
+                    <tr>
+                        <td id="A12" style="border: 1px solid #ccc; padding: 8px; background-color: #200000; color: white;">PLI TOTAL:</td>
+                        <td id="plitotalvalue" style="border: 1px solid #ccc; padding: 8px; background-color: #200000; color: white;">₱0.00</td>
+                        <td class="d-none"  id="plitotalvaluehidden" style="border: 1px solid #ccc; padding: 8px; background-color: #200000; color: white;">₱0.00</td>
+                    </tr>
                 
             </tbody>
         
 
+
+
+
+
+
+
+
+            
+
         <script>
-            // Function to calculate the total
-            function calculateTotal() {
-                const inputs = document.querySelectorAll('.input-field');
-                let total = 0;
-        
-                // Loop through each input field and add its value to the total
-                inputs.forEach(input => {
-                    total += parseFloat(input.value) || 0; // Convert value to float and handle NaN
-                });
-        
-                // Format the total as PHP currency (Philippine pesos)
-                const formattedTotal = total.toLocaleString('en-PH', { style: 'currency', currency: 'PHP', minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        
-                // Update the total in the designated element
-                document.getElementById('plitotalvalue').innerText = formattedTotal;
+            
+
+
+
+
+
+
+
+
+// Function to update hidden cells with the current total amounts
+function updateHiddenCells() {
+    let totalPLI = 0; // Initialize total for PLI calculation
+
+    // Loop through each index from 0 to 4 to access totalAmount and hidden cells
+    for (let i = 0; i <= 4; i++) {
+        const totalAmountCell = document.querySelector(`#totalAmountPLI${i}`);
+        const hiddenCell = document.querySelector(`#resultsPLI${i}hidden`);
+
+        if (totalAmountCell && hiddenCell) {
+            const totalAmountText = totalAmountCell.innerText.trim();
+            const totalAmountValue = parseFloat(totalAmountText.replace(/₱|,/g, '').trim());
+
+            if (!isNaN(totalAmountValue)) {
+                hiddenCell.textContent = totalAmountValue.toFixed(2);
+                totalPLI += totalAmountValue; // Add to totalPLI
+            } else {
+                hiddenCell.textContent = '';
             }
-        
-            // Add event listeners to each input field to calculate the total on input
-            document.querySelectorAll('.input-field').forEach(input => {
-                input.addEventListener('input', calculateTotal);
-            });
-        
-            // Initial calculation in case there are preset values
-            calculateTotal();
+        }
+    }
+
+    // Handle anticipation and promotion cells
+    const anticipationCell = document.querySelector(`#anticipation`);
+    const anticipationHiddenCell = document.querySelector(`#anticipationhidden`);
+    const promotionCell = document.querySelector(`#promotion`);
+    const promotionHiddenCell = document.querySelector(`#promotionhidden`);
+
+    // Update anticipation hidden cell and add to totalPLI
+    if (anticipationCell && anticipationHiddenCell) {
+        const anticipationText = anticipationCell.innerText.trim();
+        const anticipationValue = parseFloat(anticipationText.replace(/₱|,/g, '').trim());
+
+        if (!isNaN(anticipationValue)) {
+            anticipationHiddenCell.textContent = anticipationValue.toFixed(2);
+            totalPLI += anticipationValue; // Add to totalPLI
+        } else {
+            anticipationHiddenCell.textContent = '';
+        }
+    }
+
+    // Update promotion hidden cell and add to totalPLI
+    if (promotionCell && promotionHiddenCell) {
+        const promotionText = promotionCell.innerText.trim();
+        const promotionValue = parseFloat(promotionText.replace(/₱|,/g, '').trim());
+
+        if (!isNaN(promotionValue)) {
+            promotionHiddenCell.textContent = promotionValue.toFixed(2);
+            totalPLI += promotionValue; // Add to totalPLI
+        } else {
+            promotionHiddenCell.textContent = '';
+        }
+    }
+
+    // Update the PLI total hidden cell
+    const plitotalValueHiddenCell = document.querySelector(`#plitotalvalue`);
+    if (plitotalValueHiddenCell) {
+        plitotalValueHiddenCell.textContent = '₱' + totalPLI.toFixed(2); // Display the total in the hidden cell
+    }
+}
+
+// Set an interval to continuously update the hidden cells every 2 seconds (2000 ms)
+setInterval(updateHiddenCells, 1000);
+
+// Initial call to set values immediately
+updateHiddenCells();
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -371,48 +459,31 @@ updateNetPayCell();
 </tr>
         <tr>
             <td style="border: 1px solid #ccc; padding: 8px;">LESS: NEW CSB DED:</td>
-            <td id="monthlyPaymentCell" style="border: 1px solid #ccc; padding: 8px;">MONTHLY PAYMENT FROM CALCULATOR RESULT </td>
+            <td id="monthlyPaymentCell" style="border: 1px solid #ccc; padding: 8px;"></td>
+            <!-- MONTHLY PAYMENT FROM CALCULATOR RESULT  -->
         </tr>
         <tr>
             <td style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">NEW NETPAY:</td>
-            <td  id="finalTotalValue" style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">semiTotalValue minus monthlyPaymentCell</td>
+            <td  id="finalTotalValue" style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;"></td>
+            <!-- semiTotalValue minus monthlyPaymentCell -->
 
         </tr>
 
         
     </table>
+<div class="d-flex justify-content-center mt-5">
+    <button class="btn btn-success" onclick="calculateAll()">CALCULATE ALL</button>
+</div>
 
-    <div class="d-flex justify-content-center mt-5">
-        <button class="btn btn-success" onclick="calculateAll()">CALCULATE ALL</button>
-    </div>
-    
-
-
-
-
-
-
-
-
-
-
-
-    
-    <script>
-    
-    function calculateAll() {
+<script>
+function calculateAll() {
     // Helper function to get the numeric value
     function getNumericValue(id) {
         const element = document.getElementById(id);
         if (element) {
-            // Get only the text nodes by excluding child elements
-            const textContent = Array.from(element.childNodes)
-                .filter(node => node.nodeType === Node.TEXT_NODE) // Only keep text nodes
-                .map(node => node.textContent)
-                .join(''); // Join text content
-
             // Parse the numeric value while removing currency symbols and commas
-            return parseFloat(textContent.replace(/[₱, ]/g, '').trim()) || 0;
+            const value = parseFloat(element.textContent.replace(/[₱, ]/g, '').trim());
+            return isNaN(value) ? 0 : value; // Return 0 if value is NaN
         } else {
             console.error(`Element with ID "${id}" not found.`);
             return 0; // Return 0 if the element does not exist
@@ -427,16 +498,19 @@ updateNetPayCell();
     const monthlyPaymentCell = getNumericValue("monthlyPaymentCell");
 
     // Get additional values from table cells
-    const resultsPLI1 = getNumericValue("resultsPLI1"); // Change to the correct ID
-    const resultsPLI2 = getNumericValue("resultsPLI2"); // Change to the correct ID
-    const resultsPLI3 = getNumericValue("resultsPLI3"); // Change to the correct ID
-    const resultsPLI4 = getNumericValue("resultsPLI4"); // Change to the correct ID
-    const resultsPLI5 = getNumericValue("resultsPLI5"); // Extract value from resultsPLI5
+    const resultsPLI1 = getNumericValue("totalAmountPLI0");
+    const resultsPLI2 = getNumericValue("totalAmountPLI1");
+    const resultsPLI3 = getNumericValue("totalAmountPLI2");
+    const resultsPLI4 = getNumericValue("totalAmountPLI3");
+    const resultsPLI5 = getNumericValue("totalAmountPLI4");
     const anticipation = getNumericValue("anticipation");
     const promotion = getNumericValue("promotion");
 
     // Calculate total additions
-    const totalAdditions = resultsPLI1 + resultsPLI2 + resultsPLI3 + resultsPLI4 + resultsPLI5 + anticipation + promotion;
+    const totalAdditions = resultsPLI1 + resultsPLI2 + resultsPLI3 + resultsPLI4 + resultsPLI5;
+
+    // Debugging: Log values for verification
+    console.log(`Netpay: ₱${resultsNetpay}, POS: ₱${resultspos}, Additions: ₱${totalAdditions}`);
 
     // First calculation: Adding resultsNetpay + resultspos + totalAdditions
     const netpayPositiveTotal = resultsNetpay + resultspos + totalAdditions;
@@ -446,15 +520,16 @@ updateNetPayCell();
     const semiTotalValue = pliTotalValue - resultsonq;
     document.getElementById("semiTotalValue").textContent = `₱${semiTotalValue.toFixed(2)}`;
 
+    // Debugging: Log semiTotalValue for verification
+    console.log(`Semi Total Value: ₱${semiTotalValue}`);
+
     // Final calculation: Semi Total - Monthly Payment
     const finalTotalValue = semiTotalValue - monthlyPaymentCell;
     document.getElementById("finalTotalValue").textContent = `₱${finalTotalValue.toFixed(2)}`;
+
+    // Debugging: Log finalTotalValue for verification
+    console.log(`Final Total Value: ₱${finalTotalValue}`);
 }
-
-
-
-
-
 </script>
 
 
@@ -678,7 +753,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (!employeeFound) {
-            employeeInfoSectionNetpay.innerHTML = 'No employee found in the latest data.';
+            employeeInfoSectionNetpay.innerHTML = 'No Netpay found in the latest data.';
         }
     }
 
@@ -906,7 +981,7 @@ function displayEmployeeInfoPos(monthName, csvData) {
     }
 
     if (!employeeFound) {
-        employeeInfoSectionPos.innerHTML = 'No employee found in the latest data.';
+        employeeInfoSectionPos.innerHTML = 'No Positive Dedamt found in the latest data.';
     }
 }
 
@@ -1240,7 +1315,7 @@ function calculateSemiTotal() {
         }
 
         if (!employeeFound) {
-            employeeInfoSectionOnq.innerHTML = 'No employee found in the latest data.';
+            employeeInfoSectionOnq.innerHTML = 'No On-queue found in the latest data.';
         }
 
     }
@@ -1672,9 +1747,17 @@ function displayEmployeeInfoPLI(monthName, csvData) {
     }
 
     if (!employeeFound) {
-        employeeInfoSectionPLI.innerHTML = 'No employee found in the latest data.';
+        employeeInfoSectionPLI.innerHTML = 'No PLI found in the latest data.';
     }
 }
+
+
+
+
+
+
+
+
 
 
 
@@ -1752,7 +1835,7 @@ function createResultsTable(fetchedDataPLI, tableIndex) {
                <!-- ₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")} -->
                 
                 ₱0.00
-                <button class="view-more-btn" style="margin-left: 10px;">Select PLI</button>
+                <button class="view-more-btn btn-warning" style="margin-left: 10px;">Select PLI</button>
             </td>
         `;
         tbody.appendChild(row);
@@ -1831,7 +1914,7 @@ function createResultsTable(fetchedDataPLI, tableIndex) {
         // Create and append new "View More" button
         const viewMoreButton = document.createElement('button');
         viewMoreButton.textContent = "Select PLI";
-        viewMoreButton.classList.add('view-more-btn');
+        viewMoreButton.classList.add('view-more-btn', 'btn-warning');
         viewMoreButton.style.marginLeft = '10px';
 
         viewMoreButton.addEventListener('click', (event) => {

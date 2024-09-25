@@ -29,6 +29,14 @@ nav {
     color: white;
 }
 
+.selectplis{
+    padding: 5px 5px;
+    font-size: 16px;
+    background-color: #4b3900; 
+    border-color: #4b3900; 
+    color: white;
+}
+
 #searchInputNetpay, #searchInputPos, #searchInputOnq, #searchInputPLI {
 font-size: 1.2em; /* Make the input text larger on mobile */
 padding: 25px;    /* Increase padding for a larger input box */
