@@ -12,14 +12,14 @@
 
 <body>
 
-<nav style="background-color: #34006b; position: sticky; top: 0; z-index: 1000; padding: 0.5rem 1rem;">
+<nav style="background-color: #003d6b; position: sticky; top: 0; z-index: 1000; padding: 0.5rem 1rem;">
     <div class="navbar-nav" style="color:#ddd;display: flex; justify-content: center;">
         <div style="color:#ddd;display: flex; align-items: center;">
-            <a class="nav-item nav-link p-2 text-white" href="index.html"><b>NETPAY</b></a>
+            <a style="color:#aaa;" class="nav-item nav-link p-2" href="index.html"><b>NETPAY</b></a>
             <a style="color:#aaa;" class="nav-item nav-link p-2" href="index2.html"><b>DEDAMT</b></a>
             <a style="color:#aaa;" class="nav-item nav-link p-2" href="index3.html"><b>ONQUEUE</b></a>
             <a style="color:#aaa;" class="nav-item nav-link p-2" href="index4.html"><b>PLI</b></a>
-            <a style="color:#aaa;" class="nav-item nav-link p-2" href="index5.html"><b>LE</b></a>
+            <a class="nav-item nav-link p-2 text-white" href="index5.html"><b>LE</b></a>
         </div>
     </div>
 </nav>
@@ -212,17 +212,11 @@ updateNetPayCell();
 
         
 
-
-            <tr class="row results d-none">
-                <td  id="resultsonq"> </td>
-                <td></td>
-            </tr>
-
-
+<!-- 
             <tr class="row results d-nones" >
                 <td id="resultsPLI"></td>
                 <td></td>
-            </tr>
+            </tr> -->
 
 
         
@@ -253,23 +247,31 @@ updateNetPayCell();
             <tbody>
                 <tr class="mt-5">
                     <td id="A4" style="border: 1px solid #ccc; padding: 8px;">ADD: ABSENCES/PVP</td>
-                    <td id="absencesPVP" style="border: 1px solid #ccc; padding: 8px;"><input type="text" value="1234" class="input-field" /></td>
+                    <td style="border: 1px solid #ccc; padding: 8px;" id="resultsPLI1"></td>
                 </tr>
                 <tr>
+                    
                     <td  id="A5" style="border: 1px solid #ccc; padding: 8px;">ADD: REDEMPTION PLI 1 STOPPAGE</td>
-                    <td  id="redemptionPLI1" style="border: 1px solid #ccc; padding: 8px;"><input type="number" value="4565" class="input-field" /></td>
+                    <td style="border: 1px solid #ccc; padding: 8px;" id="resultsPLI2"></td>
+            
                 </tr>
                 <tr>
                     <td  id="A6" style="border: 1px solid #ccc; padding: 8px;">ADD: REDEMPTION PLI 2</td>
-                    <td id="redemptionPLI2"  style="border: 1px solid #ccc; padding: 8px;"><input type="number" value="5675" class="input-field" /></td>
+                    <td style="border: 1px solid #ccc; padding: 8px;" id="resultsPLI3"></td>
+              
                 </tr>
                 <tr>
                     <td id="A7"  style="border: 1px solid #ccc; padding: 8px;">ADD: REDEMPTION PLI 3</td>
-                    <td  id="redemptionPLI3" style="border: 1px solid #ccc; padding: 8px;"><input type="number" value="2345" class="input-field" /></td>
+                    <td style="border: 1px solid #ccc; padding: 8px;" id="resultsPLI4"></td>
+            
                 </tr>
                 <tr>
                     <td  id="A8" style="border: 1px solid #ccc; padding: 8px;">ADD: REDEMPTION PLI 4</td>
-                    <td  id="redemptionPLI4" style="border: 1px solid #ccc; padding: 8px;"><input type="number" value="1234" class="input-field" /></td>
+                    <td style="border: 1px solid #ccc; padding: 8px;" id="resultsPLI5"></td>
+            
+                
+                
+                
                 </tr>
                 <tr>
                     <td  id="A10" style="border: 1px solid #ccc; padding: 8px;">ADD: ANTICIPATION:</td>
@@ -348,7 +350,11 @@ updateNetPayCell();
 
         <tr>
             <td style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;">LESS: ONQUEUE:</td>
-            <td id="onqueueCell" style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;">This must change to the same value as #totalAmount td</td>
+            <td id="onqueueCell" style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;"></td>
+     
+     
+                <td  id="resultsonq" class="onqueueCell" style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;"> </td>
+
         </tr>
 
 
@@ -373,61 +379,59 @@ updateNetPayCell();
     <div class="d-flex justify-content-center mt-5">
         <button class="btn btn-success" onclick="calculateAll()">CALCULATE ALL</button>
     </div>
-    
+
     <script>
-        function calculateAll() {
-            // Helper function to get the numeric value
-            function getNumericValue(id) {
-                const element = document.getElementById(id);
-                if (element) {
+    function calculateAll() {
+        // Helper function to get the numeric value
+        function getNumericValue(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                // Check if element is an input field
+                if (element.tagName === 'INPUT') {
+                    // Get value from input fields
+                    return parseFloat(element.value.replace(/[₱, ]/g, '').trim()) || 0;
+                } else {
                     // Parse the numeric value while removing currency symbols and commas
                     return parseFloat(element.textContent.replace(/[₱, ]/g, '').trim()) || 0;
-                } else {
-                    console.error(`Element with ID "${id}" not found.`);
-                    return 0; // Return 0 if the element does not exist
                 }
+            } else {
+                console.error(`Element with ID "${id}" not found.`);
+                return 0; // Return 0 if the element does not exist
             }
-    
-            
-            calculatePayment(); // Call the function directly
-            calculatePayment(); // Call the function directly
-
-            
-            // Get numeric values
-            const resultsNetpay = getNumericValue("resultsNetpay");
-            const resultsPos = getNumericValue("resultsPos");
-            const pliTotalValue = getNumericValue("plitotalvalue");
-            const onQueueCell = getNumericValue("onqueueCell");
-            const monthlyPaymentCell = getNumericValue("monthlyPaymentCell");
-    
-            // Get additional values
-            const absencesPVP = getNumericValue("absencesPVP");
-            const redemptionPLI1 = getNumericValue("redemptionPLI1");
-            const redemptionPLI2 = getNumericValue("redemptionPLI2");
-            const redemptionPLI3 = getNumericValue("redemptionPLI3");
-            const redemptionPLI4 = getNumericValue("redemptionPLI4");
-            const anticipation = getNumericValue("anticipation");
-            const promotion = getNumericValue("promotion");
-    
-            // Calculate total additions
-            const totalAdditions = absencesPVP + redemptionPLI1 + redemptionPLI2 + redemptionPLI3 + redemptionPLI4 + anticipation + promotion;
-    
-            // First calculation: Adding resultsNetpay + resultsPos + totalAdditions
-            const netpayPositiveTotal = resultsNetpay + resultsPos + totalAdditions;
-            document.getElementById("netpaypositivetotalvalue").textContent = `₱${netpayPositiveTotal.toFixed(2)}`;
-    
-            // Second calculation: PLI Total - On Queue
-            const semiTotalValue = pliTotalValue - onQueueCell;
-            document.getElementById("semiTotalValue").textContent = `₱${semiTotalValue.toFixed(2)}`;
-    
-            // Final calculation: Semi Total - Monthly Payment
-            const finalTotalValue = semiTotalValue - monthlyPaymentCell;
-            document.getElementById("finalTotalValue").textContent = `₱${finalTotalValue.toFixed(2)}`;
-    
-            // Trigger the Calculate Payment button
         }
-    </script>
-    
+
+        // Get numeric values
+        const resultsNetpay = getNumericValue("resultsNetpay");
+        const resultspos = getNumericValue("resultspos");
+        const pliTotalValue = getNumericValue("plitotalvalue");
+        const onQueueCell = getNumericValue("onqueueCell");
+        const monthlyPaymentCell = getNumericValue("monthlyPaymentCell");
+
+        // Get additional values
+        const resultsPLI1 = getNumericValue("#totalAmountPLI0");
+        const resultsPLI2 = getNumericValue("#totalAmountPLI1");
+        const resultsPLI3 = getNumericValue("#totalAmountPLI2");
+        const resultsPLI4 = getNumericValue("#totalAmountPLI3");
+        const resultsPLI5 = getNumericValue("#totalAmountPLI4");
+        const anticipation = getNumericValue("anticipation");
+        const promotion = getNumericValue("promotion");
+
+        // Calculate total additions
+        const totalAdditions = resultsPLI1 + resultsPLI2 + resultsPLI3 + resultsPLI4 + resultsPLI5 + anticipation + promotion;
+
+        // First calculation: Adding resultsNetpay + resultspos + totalAdditions
+        const netpayPositiveTotal = resultsNetpay + resultspos + totalAdditions;
+        document.getElementById("netpaypositivetotalvalue").textContent = `₱${netpayPositiveTotal.toFixed(2)}`;
+
+        // Second calculation: PLI Total - On Queue
+        const semiTotalValue = pliTotalValue - onQueueCell;
+        document.getElementById("semiTotalValue").textContent = `₱${semiTotalValue.toFixed(2)}`;
+
+        // Final calculation: Semi Total - Monthly Payment
+        const finalTotalValue = semiTotalValue - monthlyPaymentCell;
+        document.getElementById("finalTotalValue").textContent = `₱${finalTotalValue.toFixed(2)}`;
+    }
+</script>
 
 
 
@@ -1214,7 +1218,12 @@ function calculateSemiTotal() {
         if (!employeeFound) {
             employeeInfoSectionOnq.innerHTML = 'No employee found in the latest data.';
         }
+
     }
+
+
+
+    
     function displayResultsTableOnq(fetchedDataOnq) {
     const resultsSectionOnq = document.getElementById('resultsonq');
 
@@ -1224,8 +1233,8 @@ function calculateSemiTotal() {
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
     headerRow.innerHTML = `
-        <th class="font-weight-bold">ONQUEUE MONTH</th>
-        <th class="font-weight-bold">DEDAMT</th>
+       <!-- <th class="font-weight-bold">ONQUEUE MONTH</th>
+        <th class="font-weight-bold">DEDAMT</th> -->
     `;
     thead.appendChild(headerRow);
     table.appendChild(thead);
@@ -1263,7 +1272,7 @@ function calculateSemiTotal() {
     resultsMap.forEach((data, monthName) => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${monthName}</td>
+        <!--     <td>${monthName}</td> -->
             <td id="totalAmount">
                 ₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                 <button id="viewmore" class="btn btn-link" style="color: white; padding-left: 10px;" onclick="toggleDetails(this)">View More</button>
@@ -1348,11 +1357,13 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
+
+
+
 function convertMonth(monthNumber) {
     const monthNames = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
     return monthNames[parseInt(monthNumber, 10) - 1];
 }
-
 function calculateTotal() {
     const checkboxes = document.querySelectorAll('.dedamt-checkbox');
     let total = 0;
@@ -1365,7 +1376,24 @@ function calculateTotal() {
 
     const totalDisplay = document.querySelector('#totalAmount');
     totalDisplay.innerText = `₱${total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+
+    // Create or update the View More button
+    let viewMoreButton = document.querySelector('#viewmore');
+    if (!viewMoreButton) {
+        // Create the button if it doesn't exist
+        viewMoreButton = document.createElement('button');
+        viewMoreButton.setAttribute('id', 'viewmore');
+        viewMoreButton.classList.add('btn', 'btn-link');
+        viewMoreButton.style.color = 'white';
+        viewMoreButton.style.paddingLeft = '10px';
+        viewMoreButton.innerText = 'View More';
+        viewMoreButton.onclick = function () { toggleDetails(this); };
+
+        // Append the button to the totalDisplay element
+        totalDisplay.appendChild(viewMoreButton);
+    }
 }
+
 
 // Event listener for checkbox changes
 document.addEventListener('change', (event) => {
@@ -1484,6 +1512,14 @@ const csvFilesPLI = [
 
 document.getElementById('searchButtonPLI').addEventListener('click', searchEmployeePLI);
 
+
+
+
+
+
+
+
+
 function searchEmployeePLI() {
     const searchInputPLI = document.getElementById('searchInputPLI').value.trim();
     const loadingIndicatorPLI = document.getElementById('loadingIndicatorPLI');
@@ -1493,9 +1529,22 @@ function searchEmployeePLI() {
         return;
     }
 
-    const resultsSectionPLI = document.getElementById('resultsPLI');
+    const resultsSectionPLI1 = document.getElementById('resultsPLI1');
+    const resultsSectionPLI2 = document.getElementById('resultsPLI2');
+    const resultsSectionPLI3 = document.getElementById('resultsPLI3');
+    const resultsSectionPLI4 = document.getElementById('resultsPLI4');
+    const resultsSectionPLI5 = document.getElementById('resultsPLI5');
+    
+    
     const employeeInfoSectionPLI = document.getElementById('employeeInfoPLI');
-    resultsSectionPLI.innerHTML = ''; // Clear previous results
+
+
+    resultsSectionPLI1.innerHTML = ''; // Clear previous results
+
+
+
+
+
     employeeInfoSectionPLI.innerHTML = ''; // Clear previous employee info
     loadingIndicatorPLI.style.display = 'block'; // Show loading indicator
 
@@ -1602,18 +1651,42 @@ function displayEmployeeInfoPLI(monthName, csvData) {
         employeeInfoSectionPLI.innerHTML = 'No employee found in the latest data.';
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
 function displayResultsTablePLI(fetchedDataPLI) {
-    const resultsSectionPLI = document.getElementById('resultsPLI');
-    
+    const resultsSections = [
+        document.getElementById('resultsPLI1'),
+        document.getElementById('resultsPLI2'),
+        document.getElementById('resultsPLI3'),
+        document.getElementById('resultsPLI4'),
+        document.getElementById('resultsPLI5'),
+    ];
+
+    resultsSections.forEach((resultsSection, index) => {
+        // Create a new table for each results section
+        const table = createResultsTable(fetchedDataPLI, index);
+        resultsSection.appendChild(table);
+    });
+}
+
+function createResultsTable(fetchedDataPLI, tableIndex) {
     const table = document.createElement('table');
     table.classList.add('table', 'table-borderless', 'text-white');
 
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
-    headerRow.innerHTML = `
-        <th class="font-weight-bold">PLI MONTH</th>
-        <th class="font-weight-bold">DEDAMTPLI</th>
-    `;
+    headerRow.innerHTML = `<!-- <th class="font-weight-bold">PLI MONTH</th>
+        <th class="font-weight-bold">Total Amount</th> -->`;
     thead.appendChild(headerRow);
     table.appendChild(thead);
 
@@ -1628,16 +1701,16 @@ function displayResultsTablePLI(fetchedDataPLI) {
             if (empno === document.getElementById('searchInputPLI').value.trim()) {
                 const monthName = data.monthName;
                 const dedamtpli = parseFloat(row[15]);
-                
+
                 if (!resultsMap.has(monthName)) {
                     resultsMap.set(monthName, { sum: 0, details: [] });
                 }
 
                 const dedcode = row[9];
                 const effyy = row[11];
-                const effmm = convertMonth(row[12]); // Convert month number
+                const effmm = convertMonth(row[12]);
                 const termyy = row[13];
-                const termmm = convertMonth(row[14]); // Convert month number
+                const termmm = convertMonth(row[14]);
                 const policyno = row[16];
 
                 const entry = resultsMap.get(monthName);
@@ -1650,14 +1723,14 @@ function displayResultsTablePLI(fetchedDataPLI) {
     resultsMap.forEach((data, monthName) => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${monthName}</td>
-            <td id="totalAmountPLI">
+            <!-- <td>${monthName}</td> -->
+            <td id="totalAmountPLI${tableIndex}">
                 ₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                <button id="viewmore" class="view-more-btn" style="margin-left: 10px;">View More</button>
+                <button class="view-more-btn" style="margin-left: 10px;">Select PLI</button>
             </td>
         `;
         tbody.appendChild(row);
-        
+
         const detailRow = document.createElement('tr');
         const detailCell = document.createElement('td');
         detailCell.setAttribute('colspan', 2);
@@ -1676,7 +1749,7 @@ function displayResultsTablePLI(fetchedDataPLI) {
                 <tbody>
                     ${data.details.map(d => `
                         <tr>
-                            <td><input type="checkbox" class="dedamtpli-checkbox" data-dedamtpli="${d.dedamtpli}" checked /></td>
+                            <td><input type="checkbox" class="dedamtpli-checkbox" data-dedamtpli="${d.dedamtpli}" /></td>
                             <td>${d.dedcode.toString().padStart(5, '0')}</td>
                             <td>${d.effmm.toString().padStart(2, '0')}/${d.effyy}</td>
                             <td>${d.termmm.toString().padStart(2, '0')}/${d.termyy}</td>
@@ -1688,10 +1761,8 @@ function displayResultsTablePLI(fetchedDataPLI) {
             </table>
         `;
 
-        // Initially hide the detail row
         detailRow.style.display = 'none';
 
-        // Add click event to the "View More" button
         row.querySelector('.view-more-btn').addEventListener('click', () => {
             const isVisible = detailRow.style.display === 'table-row';
             detailRow.style.display = isVisible ? 'none' : 'table-row';
@@ -1702,17 +1773,112 @@ function displayResultsTablePLI(fetchedDataPLI) {
     });
 
     table.appendChild(tbody);
-    resultsSectionPLI.appendChild(table);
+    
+    // Handle checkbox logic
+    const handleCheckboxClick = (event) => {
+        // Deselect all other checkboxes in this specific table
+        let totalAmount = 0;
+
+        // Loop through all checkboxes in this table's context
+        table.querySelectorAll('.dedamtpli-checkbox').forEach(checkbox => {
+            if (checkbox === event.target) {
+                // If the current checkbox is checked, add to total
+                if (checkbox.checked) {
+                    totalAmount = parseFloat(checkbox.getAttribute('data-dedamtpli'));
+                }
+            } else {
+                // Uncheck all other checkboxes
+                checkbox.checked = false;
+            }
+        });
+
+        // Update the total amount displayed in the table
+        const totalAmountPLICell = document.querySelector(`#totalAmountPLI${tableIndex}`);
+        totalAmountPLICell.innerHTML = `₱${totalAmount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+
+        // Clear previous "View More" button if exists
+        const existingButton = totalAmountPLICell.querySelector('.view-more-btn');
+        if (existingButton) {
+            existingButton.remove();
+        }
+
+        // Create and append new "View More" button
+        const viewMoreButton = document.createElement('button');
+        viewMoreButton.textContent = "Select PLI";
+        viewMoreButton.classList.add('view-more-btn');
+        viewMoreButton.style.marginLeft = '10px';
+
+        viewMoreButton.addEventListener('click', (event) => {
+            const detailRow = event.target.closest('tr').nextElementSibling;
+            const isVisible = detailRow.style.display === 'table-row';
+            detailRow.style.display = isVisible ? 'none' : 'table-row';
+        });
+
+        totalAmountPLICell.appendChild(viewMoreButton);
+    };
+
+    // Add event listeners to checkboxes for this table
+    table.querySelectorAll('.dedamtpli-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', handleCheckboxClick);
+    });
+
+    return table;
 }
-function convertMonth(monthNumber) {
-    const monthNames = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
-    return monthNames[parseInt(monthNumber, 10) - 1];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function checkFinalTotalValue() {
+    const finalTotalElement = document.getElementById('finalTotalValue');
+    const value = parseFloat(finalTotalElement.textContent.replace(/[^0-9.-]+/g,"")); // Remove any non-numeric characters
+
+    if (value < 5000) {
+        finalTotalElement.style.color = 'red';
+    } else {
+        finalTotalElement.style.color = ''; // Reset to default if not below 5000
+    }
 }
 
-
-
-
-
+// Call the function whenever needed (e.g., after value update)
+checkFinalTotalValue();
 
 
 
