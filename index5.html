@@ -211,6 +211,45 @@ updateNetPayCell();
 
 
         
+        <tr>
+            <td   class="smallfont"  style="border: 1px solid #ccc; padding: 10px;">LOAN AMT</td>
+            <td style="border: 1px solid #ccc; padding: 10px;">
+                <input type="text" class="form-control bg-dark text-light border-0 loanAmountInput" id="loanAmount" value="50,000" 
+             onblur="formatLoanAmount()" />
+            </td>
+        </tr>
+        
+        <!-- Terms Row -->
+        <tr>
+            <td  class="smallfont"   style="border: 1px solid #ccc; padding: 10px;">TERM</td>
+            <td style="border: 1px solid #ccc; padding: 10px;">
+                <select id="terms" class="form-select bg-dark text-light border-0 termsSelect" 
+                style="padding: 10px; width: 100%;" onchange="updateInterestRate()">
+                    <script>
+                        for (let i = 6; i <= 60; i++) {
+                            document.write('<option value="' + i + '"' + (i === 24 ? ' selected' : '') + '>' + i + '</option>');
+                        }
+                    </script>
+                </select>
+            </td>
+        </tr>
+
+        <!-- Interest Rate Row (Read Only) -->
+        <tr class="d-none">
+            <td style="border: 1px solid #ccc; padding: 10px;">Interest Rate (%)</td>
+            <td style="border: 1px solid #ccc; padding: 10px;">
+                <input type="text" class="form-control bg-dark text-light" id="rate" value="9.66" 
+                style="border: 1px solid #ccc; padding: 10px; width: 100%;" readonly />
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
 
 <!-- 
             <tr class="row results d-nones" >
@@ -219,28 +258,28 @@ updateNetPayCell();
             </tr> -->
 
 
-            <thead>
-                <td id="a" class="smallfont" style="border: 1px solid #ccc; padding: 8px; background-color: #393939;">DESCRIPTION:</td>
-                <td id="a" class="smallfont" style="border: 1px solid #ccc; padding: 8px; background-color: #393939;">AMOUNT</td>
-            </thead>
+            <!-- <thead>
+                <td id="a" class="smallfont" style="border: 1px solid #ccc; padding:  10px; background-color: #393939;">DESCRIPTION:</td>
+                <td id="a" class="smallfont" style="border: 1px solid #ccc; padding:  10px; background-color: #393939;">AMOUNT</td>
+            </thead> -->
         
         <tr>
-            <td id="A1" class="smallfont" style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;">NETPAY:</td>
-            <td id="resultsNetpay" style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;"></td>
+            <td id="A1" class="smallfont" style="border: 1px solid #ccc; padding:  10px; background-color: #4d4d00;">NETPAY</td>
+            <td id="resultsNetpay" style="border: 1px solid #ccc; padding:  10px; background-color: #4d4d00;"></td>
         </tr>
 
 
 
         
         <tr>
-            <td id="A2" class="smallfont" style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;">POSITIVE:</td>
-            <td id="resultspos" style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;"></td>
+            <td id="A2" class="smallfont" style="border: 1px solid #ccc; padding:  10px; background-color: #4d4d00;">POS:</td>
+            <td id="resultspos" style="border: 1px solid #ccc; padding:  10px; background-color: #4d4d00;"></td>
         </tr>
 
 
         <tr>
-            <td id="A3"  class="smallfont" style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">SUB TOTAL</td>
-            <td id="netpaypositivetotalvalue" style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;"></td>
+            <td id="A3"  class="smallfont" style="border: 1px solid #ccc; padding:  10px; background-color: green; color: white;">SUB TOTAL</td>
+            <td id="netpaypositivetotalvalue" style="border: 1px solid #ccc; padding:  10px; background-color: green; color: white;"></td>
         </tr>
         
       
@@ -253,56 +292,73 @@ updateNetPayCell();
 
             <tbody>
                 <tr class="mt-5">
-                    <td id="A4" class="smallfont"  style="border: 1px solid #ccc; padding: 8px;">ABSENCES/PVP</td>
-                    <td style="border: 1px solid #ccc; padding: 8px;" id="resultsPLI1"></td>
-                    <td class="d-none" style="border: 1px solid #ccc; padding: 8px;" id="resultsPLI0hidden"></td>
+                    <td id="A4" class="smallfont"  style="border: 1px solid #ccc; padding:  10px;">ABSNC/PVP</td>
+                    <td style="padding-left:0px !important;border: 1px solid #ccc; padding:  10px;" id="resultsPLI1"></td>
+                    <td class="d-none" style="padding-left:0px !important;border: 1px solid #ccc; padding:  10px;" id="resultsPLI0hidden"></td>
                 </tr>
                 <tr>
                     
-                    <td  id="A5" class="smallfont"  style="border: 1px solid #ccc; padding: 8px;">REDEMPTION PLI STPG</td>
-                    <td style="border: 1px solid #ccc; padding: 8px;" id="resultsPLI2"></td>
-                    <td class="d-none" style="border: 1px solid #ccc; padding: 8px;" id="resultsPLI1hidden"></td>
+                    <td  id="A5" class="smallfont"  style="border: 1px solid #ccc; padding:  10px;">PLI STPG</td>
+                    <td style="padding-left:0px !important;border: 1px solid #ccc; padding:  10px;" id="resultsPLI2"></td>
+                    <td class="d-none" style="padding-left:0px !important;border: 1px solid #ccc; padding:  10px;" id="resultsPLI1hidden"></td>
             
                 </tr>
                 <tr>
-                    <td  id="A6" class="smallfont"  style="border: 1px solid #ccc; padding: 8px;">REDEMPTION PLI 2</td>
-                    <td style="border: 1px solid #ccc; padding: 8px;" id="resultsPLI3"></td>
-                    <td class="d-none" style="border: 1px solid #ccc; padding: 8px;" id="resultsPLI2hidden"></td>
+                    <td  id="A6" class="smallfont"  style="border: 1px solid #ccc; padding:  10px;">PLI 2</td>
+                    <td style="padding-left:0px !important;border: 1px solid #ccc; padding:  10px;" id="resultsPLI3"></td>
+                    <td class="d-none" style="padding-left:0px !important;border: 1px solid #ccc; padding:  10px;" id="resultsPLI2hidden"></td>
               
                 </tr>
                 <tr>
-                    <td id="A7"  class="smallfont"  style="border: 1px solid #ccc; padding: 8px;">REDEMPTION PLI 3</td>
-                    <td style="border: 1px solid #ccc; padding: 8px;" id="resultsPLI4"></td>
-                    <td class="d-none" style="border: 1px solid #ccc; padding: 8px;" id="resultsPLI3hidden"></td>
+                    <td id="A7"  class="smallfont"  style="border: 1px solid #ccc; padding:  10px;">PLI 3</td>
+                    <td style="padding-left:0px !important;border: 1px solid #ccc; padding:  10px;" id="resultsPLI4"></td>
+                    <td class="d-none" style="padding-left:0px !important;border: 1px solid #ccc; padding:  10px;" id="resultsPLI3hidden"></td>
             
                 </tr>
                 <tr>
-                    <td  id="A8" class="smallfont"  style="border: 1px solid #ccc; padding: 8px;">REDEMPTION PLI 4</td>
-                    <td style="border: 1px solid #ccc; padding: 8px;" id="resultsPLI5"></td>
-                    <td class="d-none" style="border: 1px solid #ccc; padding: 8px;" id="resultsPLI4hidden"></td>
+                    <td  id="A8" class="smallfont"  style="border: 1px solid #ccc; padding:  10px;">PLI 4</td>
+                    <td style="padding-left:0px !important;border: 1px solid #ccc; padding:  10px;" id="resultsPLI5"></td>
+                    <td class="d-none" style="padding-left:0px !important;border: 1px solid #ccc; padding:  10px;" id="resultsPLI4hidden"></td>
             
                 
                 
                 
                 </tr>
-                <tr>
-                    <td  id="A10" class="smallfont"  style="border: 1px solid #ccc; padding: 8px;">ANTICIPATION</td>
 
-                    <td id="anticipation" style="border: 1px solid #ccc; padding: 8px; color: #5f5f5f;">₱0.00</td>
-                    <td class="d-none" id="anticipationhidden" style="border: 1px solid #ccc; padding: 8px; color: white;"></td>
-               
-                </tr>
-                <tr>
-                    <td  id="A11" class="smallfont"  style="border: 1px solid #ccc; padding: 8px;">PROMOTION</td>
-                   
-                    <td id="promotion" style="border: 1px solid #ccc; padding: 8px; color: #5f5f5f;">₱0.00</td>
-                    <td class="d-none" id="promotionhidden" style="border: 1px solid #ccc; padding: 8px; color: white;"></td>
-               
-                </tr>
+                
+
+
+
+
+<tr>
+    <td id="A10" class="smallfont" style="border: 1px solid #ccc; padding: 10px;">ANTICPT</td>
+    <td style="border: 1px solid #ccc; padding: 10px; color: #5f5f5f;">
+        <input id="anticipation" type="number" value="" class="form-control bg-dark text-light border-0">
+
+    </td>
+    <td class="d-none" id="anticipationhidden" style="border: 1px solid #ccc; padding: 10px; color: white;"></td>
+</tr>
+<tr>
+    <td id="A11" class="smallfont" style="border: 1px solid #ccc; padding: 10px;">PRMTION</td>
+    <td style="border: 1px solid #ccc; padding: 10px; color: #5f5f5f;">
+        <input id="promotion" type="number" value="" class="form-control bg-dark text-light border-0">
+
+    </td>
+    <td class="d-none" id="promotionhidden" style="border: 1px solid #ccc; padding: 10px; color: white;"></td>
+</tr>
+
+
+
+
+
+
+
+
+
                     <tr>
-                        <td id="A12"  class="smallfont"  style="border: 1px solid #ccc; padding: 8px; background-color: #200000; color: white;">PLI TOTAL:</td>
-                        <td id="plitotalvalue" style="border: 1px solid #ccc; padding: 8px; background-color: #200000; color: white;">₱0.00</td>
-                        <td class="d-none"  id="plitotalvaluehidden" style="border: 1px solid #ccc; padding: 8px; background-color: #200000; color: white;">₱0.00</td>
+                        <td id="A12"  class="smallfont"  style="border: 1px solid #ccc; padding:  10px; background-color: #200000; color: white;">PLI TOTAL:</td>
+                        <td id="plitotalvalue" style="border: 1px solid #ccc; padding:  10px;padding-left:  10px !important; background-color: #200000; color: white;">₱0.00</td>
+                        <td class="d-none"  id="plitotalvaluehidden" style="border: 1px solid #ccc; padding:  10px; background-color: #200000; color: white;">₱0.00</td>
                     </tr>
                 
             </tbody>
@@ -310,23 +366,10 @@ updateNetPayCell();
 
 
 
-
-
-
-
-
             
 
         <script>
             
-
-
-
-
-
-
-
-
 // Function to update hidden cells with the current total amounts
 function updateHiddenCells() {
     let totalPLI = 0; // Initialize total for PLI calculation
@@ -357,8 +400,7 @@ function updateHiddenCells() {
 
     // Update anticipation hidden cell and add to totalPLI
     if (anticipationCell && anticipationHiddenCell) {
-        const anticipationText = anticipationCell.innerText.trim();
-        const anticipationValue = parseFloat(anticipationText.replace(/₱|,/g, '').trim());
+        const anticipationValue = parseFloat(anticipationCell.value.trim()); // Get the value from the input
 
         if (!isNaN(anticipationValue)) {
             anticipationHiddenCell.textContent = anticipationValue.toFixed(2);
@@ -370,8 +412,7 @@ function updateHiddenCells() {
 
     // Update promotion hidden cell and add to totalPLI
     if (promotionCell && promotionHiddenCell) {
-        const promotionText = promotionCell.innerText.trim();
-        const promotionValue = parseFloat(promotionText.replace(/₱|,/g, '').trim());
+        const promotionValue = parseFloat(promotionCell.value.trim()); // Get the value from the input
 
         if (!isNaN(promotionValue)) {
             promotionHiddenCell.textContent = promotionValue.toFixed(2);
@@ -387,6 +428,7 @@ function updateHiddenCells() {
         plitotalValueHiddenCell.textContent = '₱' + totalPLI.toFixed(2); // Display the total in the hidden cell
     }
 }
+
 
 // Set an interval to continuously update the hidden cells every 2 seconds (2000 ms)
 setInterval(updateHiddenCells, 1000);
@@ -447,28 +489,28 @@ updateHiddenCells();
 
 
         <tr>
-            <td id="A13"  class="smallfont"  style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;">LESS: ONQUEUE:</td>
-            <!-- <td class="resultsonq d-none" style="visibility:hidden;border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;"></td> -->
+            <td id="A13"  class="smallfont"  style="border: 1px solid #ccc; padding:  10px; background-color: #4d4d00;">LESS ONQ:</td>
+            <!-- <td class="resultsonq d-none" style="visibility:hidden;border: 1px solid #ccc; padding:  10px; background-color: #4d4d00;"></td> -->
      
      
-                <td  id="resultsonq"  style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;"> </td>
+                <td  id="resultsonq"  style="padding-left:0px !important;border: 1px solid #ccc; padding: -5px; background-color: #4d4d00;"> </td>
       
         </tr>
 
 
         
         <tr>
-            <td id="A14"  class="smallfont"  style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">SEMI TOTAL:</td>
-            <td id="semiTotalValue" style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">₱0.00</td>
+            <td id="A14"  class="smallfont"  style="border: 1px solid #ccc; padding:  10px; background-color: green; color: white;">SEMI TOTAL:</td>
+            <td id="semiTotalValue" style=" border: 1px solid #ccc; padding:  10px; background-color: green; color: white;">₱0.00</td>
 </tr>
         <tr>
-            <td id="A15"  class="smallfont"  style="border: 1px solid #ccc; padding: 8px;">LESS: NEW CSB DED:</td>
-            <td id="monthlyPaymentCell" style="border: 1px solid #ccc; padding: 8px;"></td>
+            <td id="A15"  class="smallfont"  style="border: 1px solid #ccc; padding:  10px;">NEW CSB DED</td>
+            <td id="monthlyPaymentCell" style=" border: 1px solid #ccc; padding:  10px;"></td>
             <!-- MONTHLY PAYMENT FROM CALCULATOR RESULT  -->
         </tr>
         <tr>
-            <td id="A16" class="smallfont" style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">NEW NETPAY:</td>
-            <td  id="finalTotalValue" style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;"></td>
+            <td id="A16" class="smallfont" style="border: 1px solid #ccc; padding:  10px; background-color: green; color: white;">NEW NETPAY:</td>
+            <td  id="finalTotalValue" style=" border: 1px solid #ccc; padding:  10px; background-color: green; color: white;"></td>
             <!-- semiTotalValue minus monthlyPaymentCell -->
 
         </tr>
@@ -493,6 +535,9 @@ function calculateAll() {
             return 0; // Return 0 if the element does not exist
         }
     }
+
+    calculatePayment()
+    calculatePayment()
 
     // Get numeric values from table cells
     const resultsNetpay = getNumericValue("resultsNetpay");
@@ -747,10 +792,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const account = row[8];
 
                 employeeInfoSectionNetpay.innerHTML = `
+                <div class="pt-4">
                   <strong>NAME:</strong><b style="color:orange"> ${fname} ${mi} ${lname}</b><br/>
                     <strong>EMPNO:</strong><b style="color:orange">   ${empno} </b><br/>
                     <strong>DIV / STA:</strong><b style="color:orange"> ${div} / ${sta}</b><br/>
-                
+                  </div>
                 `;
                 break;
             }
@@ -1331,7 +1377,7 @@ function calculateSemiTotal() {
     const resultsSectionOnq = document.getElementById('resultsonq');
 
     const table = document.createElement('table');
-    table.classList.add('table', 'table-borderless', 'text-white');
+    table.classList.add('table', 'table-borderless', 'border-0', 'text-white');
 
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
@@ -1375,11 +1421,21 @@ function calculateSemiTotal() {
     resultsMap.forEach((data, monthName) => {
         const row = document.createElement('tr');
         row.innerHTML = `
-        <!--     <td>${monthName}</td> -->
+        <!--     <td>${monthName}</td> 
             <td id="totalAmount">
                 ₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                 <button id="viewmore" class="btn btn-link" style="color: white; padding-left: 10px;" onclick="toggleDetails(this)">View More</button>
-            </td>
+           -->
+
+
+     <td id="totalAmount" style="border: 0;border:none;margin-bottom:0px" class="d-flex justify-content-between align-items-center">
+    <span id="onqueuespan">
+                ₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                </span>
+    <button class="view-more-btn border-0 bg-transparent p-0"  onclick="toggleDetails(this)">📖</button>
+</td>
+           
+                </td>
         `;
         tbody.appendChild(row);
         
@@ -1486,10 +1542,12 @@ function calculateTotal() {
         // Create the button if it doesn't exist
         viewMoreButton = document.createElement('button');
         viewMoreButton.setAttribute('id', 'viewmore');
-        viewMoreButton.classList.add('btn', 'btn-link');
+        viewMoreButton.classList.add('btn', 'btn-link', 'border-0', 'bg-transparent', 'p-0');
         viewMoreButton.style.color = 'white';
         viewMoreButton.style.paddingLeft = '10px';
-        viewMoreButton.innerText = 'View More';
+        viewMoreButton.innerText = '📖';
+
+        
         viewMoreButton.onclick = function () { toggleDetails(this); };
 
         // Append the button to the totalDisplay element
@@ -1792,7 +1850,7 @@ function displayResultsTablePLI(fetchedDataPLI) {
 
 function createResultsTable(fetchedDataPLI, tableIndex) {
     const table = document.createElement('table');
-    table.classList.add('table', 'table-borderless', 'text-white');
+    table.classList.add('table', 'table-borderless', 'border-0', 'text-white');
 
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
@@ -1835,12 +1893,12 @@ function createResultsTable(fetchedDataPLI, tableIndex) {
         const row = document.createElement('tr');
         row.innerHTML = `
             <!-- <td>${monthName}</td> -->
-            <td id="totalAmountPLI${tableIndex}">
                <!-- ₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")} -->
-                
-                ₱0.00
-                <button class="view-more-btn btn-warning" style="margin-left: 10px;">Select PLI</button>
-            </td>
+     <td id="totalAmountPLI${tableIndex}" style="border: 0;border:none;margin-bottom:0px" class="d-flex justify-content-between align-items-center">
+    <span>₱0.00</span>
+    <button class="view-more-btn border-0 bg-transparent p-0">📖</button>
+</td>
+
         `;
         tbody.appendChild(row);
 
@@ -1917,8 +1975,8 @@ function createResultsTable(fetchedDataPLI, tableIndex) {
 
         // Create and append new "View More" button
         const viewMoreButton = document.createElement('button');
-        viewMoreButton.textContent = "Select PLI";
-        viewMoreButton.classList.add('view-more-btn', 'btn-warning');
+        viewMoreButton.textContent = "📖";
+        viewMoreButton.classList.add('view-more-btn', 'bg-transparent', 'border-0', 'p-0');
         viewMoreButton.style.marginLeft = '10px';
 
         viewMoreButton.addEventListener('click', (event) => {
@@ -2130,33 +2188,9 @@ checkFinalTotalValue();
 
 
 
-<div class="col-md-12 offset-md-1"> <!-- Added offset-md-1 to create space -->
+<div class="col-md-12 offset-md-1 d-none"> <!-- Added offset-md-1 to create space -->
     <div class="calculator bg-dark text-light border border-light p-4 rounded shadow-lg">
-        <h2 class="text-center">Loan Payment Calculator</h2>
 
-        <!-- Loan Amount -->
-        <div class="mb-3">
-            <label for="loanAmount" class="form-label">Loan Amount (Php)</label>
-            <input type="text" class="form-control bg-dark text-light border-light" id="loanAmount" value="50,000" onblur="formatLoanAmount()" />
-        </div>
-
-        <!-- Rate -->
-        <div class="mb-3">
-            <label for="rate" class="form-label">Interest Rate (%)</label>
-            <input type="text" class="form-control bg-dark text-light border-light" id="rate" value="9.66" readonly />
-        </div>
-
-        <!-- Terms Dropdown -->
-        <div class="mb-3">
-            <label for="terms" class="form-label">Terms (months)</label>
-            <select id="terms" class="form-select bg-dark text-light border-light form-control" onchange="updateInterestRate()">
-                <script>
-                    for (let i = 6; i <= 60; i++) {
-                        document.write('<option value="' + i + '"' + (i === 24 ? ' selected' : '') + '>' + i + '</option>');
-                    }
-                </script>
-            </select>
-        </div>
 
         <!-- Calculate Button -->
         <button class="btn btn-light w-100" id="calculatorinclude" onclick="calculatePayment()">Calculate Payment</button>
