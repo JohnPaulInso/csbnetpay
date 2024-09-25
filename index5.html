@@ -39,10 +39,8 @@
 <!-- NETPAY Section --><div class="container mt-5">
     <h1 class="text-center pt-5 pb-3 mb-2">LOAN EVALUATION</h1>
     <div class="row">
-        <div id="searchSectionNetpay" class="col-md-5">
+        <div id="searchSectionNetpay" class="col-md-12">
             <div class="row pt-2">
-                <a>AUG 2024</a>
-                <div></div>
                 <a>4694264</p>
                 <div class="col-12 d-flex">
                     <input type="text" id="searchInputNetpay" class="form-control" placeholder="Employee Number..." style="flex-grow: 1;" oninput="syncInputs(this.value)">
@@ -54,43 +52,8 @@
             </div>
         </div>
 
-        <div class="col-md-4 offset-md-1"> <!-- Added offset-md-1 to create space -->
-            <div class="calculator bg-dark text-light border border-light p-4 rounded shadow-lg">
-                <h2 class="text-center">Loan Payment Calculator</h2>
+        
 
-                <!-- Loan Amount -->
-                <div class="mb-3">
-                    <label for="loanAmount" class="form-label">Loan Amount (Php)</label>
-                    <input type="text" class="form-control bg-dark text-light border-light" id="loanAmount" value="50,000" onblur="formatLoanAmount()" />
-                </div>
-
-                <!-- Rate -->
-                <div class="mb-3">
-                    <label for="rate" class="form-label">Interest Rate (%)</label>
-                    <input type="text" class="form-control bg-dark text-light border-light" id="rate" value="9.66" readonly />
-                </div>
-
-                <!-- Terms Dropdown -->
-                <div class="mb-3">
-                    <label for="terms" class="form-label">Terms (months)</label>
-                    <select id="terms" class="form-select bg-dark text-light border-light form-control" onchange="updateInterestRate()">
-                        <script>
-                            for (let i = 6; i <= 60; i++) {
-                                document.write('<option value="' + i + '"' + (i === 24 ? ' selected' : '') + '>' + i + '</option>');
-                            }
-                        </script>
-                    </select>
-                </div>
-
-                <!-- Calculate Button -->
-                <button class="btn btn-light w-100" onclick="calculatePayment()">Calculate Payment</button>
-
-                <!-- Result Display -->
-                <div class="result text-center mt-4">
-                    Monthly Payment: Php <span id="monthlyPayment">0.00</span>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 
@@ -162,7 +125,6 @@
             <h3 id="employeeInfoOnq" class="text-white"></h3>
         </div>
     </div>
-    <div class="row results rounded-bottom rounded-top " id="resultsonq">
     </div>
 </div>
 
@@ -186,7 +148,6 @@
             <h3 id="employeeInfoPLI" class="text-white"></h3>
         </div>
     </div>
-    <div class="row results rounded-bottom rounded-top " id="resultsPLI">
     </div>
 </div>
 
@@ -243,122 +204,89 @@ updateNetPayCell();
 
 
 
-
-
-
-<div style="margin-top: 150px;">
+<div style="margin-top: 10px;">
     
     <table style="width: 100%; border-collapse: collapse; text-align: left;">
         
 
 
         
-        <tr class=" " id="resultsNetpay">
+
+
+            <tr class="row results d-none">
+                <td  id="resultsonq"> </td>
+                <td></td>
+            </tr>
+
+
+            <tr class="row results d-nones" >
+                <td id="resultsPLI"></td>
+                <td></td>
+            </tr>
+
+
+        
+        <tr>
+            <td id="A1" style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;">NETPAY:</td>
+            <td id="resultsNetpay" style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;">This must change to the same value as #totalAmount td</td>
         </tr>
 
-        <tr class=" " id="resultspos">
-        </tr>
-            
+
+
+        
         <tr>
-            <td style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">NETPAY & OLD CSB SUB TOTAL:</td>
+            <td id="A2"style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;">POSITIVE:</td>
+            <td id="resultspos" style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;">This must change to the same value as #totalAmount td</td>
+        </tr>
+
+
+        <tr>
+            <td id="A3" style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">NETPAY & OLD CSB SUB TOTAL:</td>
             <td id="netpaypositivetotalvalue" style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">Total of #netpaytable + #positivetable</td>
         </tr>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Function to calculate and update the total
-        function updateTotal() {
-            // Get values from #netpaytable and #positivetable
-            var netpay = parseFloat(document.getElementById('netpaytable').textContent) || 0;
-            var positive = parseFloat(document.getElementById('positivetable').textContent) || 0;
+        
 
-            // Calculate the total
-            var total = netpay + positive;
-
-            // Display the total in the specified cell
-            document.getElementById('netpaypositivetotalvalue').textContent = total.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        }
-
-        // Initial update when the page is loaded
-        updateTotal();
-
-        // Set up a MutationObserver to watch for changes in #netpaytable and #positivetable
-        const netpayTable = document.getElementById('netpaytable');
-        const positiveTable = document.getElementById('positivetable');
-
-        const observer = new MutationObserver(updateTotal);
-
-        // Observe changes to both elements
-        observer.observe(netpayTable, { childList: true, subtree: true });
-        observer.observe(positiveTable, { childList: true, subtree: true });
-
-        // Optional: If you update the textContent of netpaytable and positivetable programmatically,
-        // make sure to call updateTotal() after those updates.
-    });
-</script>
 
                 
 
 
-            </table>
-
-
-
-
-
-        <!-- <tr>
-            <td style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;">NETPAY:</td>
-            <td  id="netpayCell" style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;">This must change to the same value as #netpaytable td</td>
-        </tr>
-        <tr>
-            <td style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;">ADD OLD CSB:</td>
-            <td  id="posCell" style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;">This must change to the same value as #positivetable td</td>
-        </tr>
-        <tr>
-            <td style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">NETPAY & OLD CSB SUB TOTAL:</td>
-            <td style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">Total of NETPAY: + ADD OLD CSB:</td>
-        </tr> -->
-
-
-
-        <table class="mt-5">
             <tbody>
                 <tr class="mt-5">
-                    <td style="border: 1px solid #ccc; padding: 8px;">ADD: ABSENCES/PVP</td>
-                    <td style="border: 1px solid #ccc; padding: 8px;"><input type="text" value="5500" class="input-field" /></td>
+                    <td id="A4" style="border: 1px solid #ccc; padding: 8px;">ADD: ABSENCES/PVP</td>
+                    <td id="absencesPVP" style="border: 1px solid #ccc; padding: 8px;"><input type="text" value="1234" class="input-field" /></td>
                 </tr>
                 <tr>
-                    <td style="border: 1px solid #ccc; padding: 8px;">ADD: REDEMPTION PLI 1 STOPPAGE</td>
-                    <td style="border: 1px solid #ccc; padding: 8px;"><input type="number" value="5200" class="input-field" /></td>
+                    <td  id="A5" style="border: 1px solid #ccc; padding: 8px;">ADD: REDEMPTION PLI 1 STOPPAGE</td>
+                    <td  id="redemptionPLI1" style="border: 1px solid #ccc; padding: 8px;"><input type="number" value="4565" class="input-field" /></td>
                 </tr>
                 <tr>
-                    <td style="border: 1px solid #ccc; padding: 8px;">ADD: REDEMPTION PLI 2</td>
-                    <td style="border: 1px solid #ccc; padding: 8px;"><input type="number" value="8000" class="input-field" /></td>
+                    <td  id="A6" style="border: 1px solid #ccc; padding: 8px;">ADD: REDEMPTION PLI 2</td>
+                    <td id="redemptionPLI2"  style="border: 1px solid #ccc; padding: 8px;"><input type="number" value="5675" class="input-field" /></td>
                 </tr>
                 <tr>
-                    <td style="border: 1px solid #ccc; padding: 8px;">ADD: REDEMPTION PLI 3</td>
-                    <td style="border: 1px solid #ccc; padding: 8px;"><input type="number" value="6000" class="input-field" /></td>
+                    <td id="A7"  style="border: 1px solid #ccc; padding: 8px;">ADD: REDEMPTION PLI 3</td>
+                    <td  id="redemptionPLI3" style="border: 1px solid #ccc; padding: 8px;"><input type="number" value="2345" class="input-field" /></td>
                 </tr>
                 <tr>
-                    <td style="border: 1px solid #ccc; padding: 8px;">ADD: REDEMPTION PLI 4</td>
-                    <td style="border: 1px solid #ccc; padding: 8px;"><input type="number" value="8500" class="input-field" /></td>
+                    <td  id="A8" style="border: 1px solid #ccc; padding: 8px;">ADD: REDEMPTION PLI 4</td>
+                    <td  id="redemptionPLI4" style="border: 1px solid #ccc; padding: 8px;"><input type="number" value="1234" class="input-field" /></td>
                 </tr>
                 <tr>
-                    <td style="border: 1px solid #ccc; padding: 8px;">ADD: ANTICIPATION:</td>
-                    <td style="border: 1px solid #ccc; padding: 8px;"><input type="number" value="500" class="input-field" /></td>
+                    <td  id="A10" style="border: 1px solid #ccc; padding: 8px;">ADD: ANTICIPATION:</td>
+                    <td  id="anticipation" style="border: 1px solid #ccc; padding: 8px;"><input type="number" value="4567" class="input-field" /></td>
                 </tr>
                 <tr>
-                    <td style="border: 1px solid #ccc; padding: 8px;">ADD: PROMOTION:</td>
-                    <td style="border: 1px solid #ccc; padding: 8px;"><input type="number" value="500" class="input-field" /></td>
+                    <td  id="A11" style="border: 1px solid #ccc; padding: 8px;">ADD: PROMOTION:</td>
+                    <td  id="promotion" style="border: 1px solid #ccc; padding: 8px;"><input type="number" value="7890" class="input-field" /></td>
                 </tr>
                 <tr>
-                    <td style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">PLI TOTAL:</td>
-                    <td id="plitotalvalue" style="border: 1px solid #ccc; padding: 8px; background-color: green; color: white;">₱0.00</td>
+                    <td id="A12" style="border: 1px solid #ccc; padding: 8px; background-color: #200000; color: white;">PLI TOTAL:</td>
+                    <td id="plitotalvalue" style="border: 1px solid #ccc; padding: 8px; background-color: #200000; color: white;">₱0.00</td>
                 </tr>
                 
             </tbody>
-        </table>
-
         
+
         <script>
             // Function to calculate the total
             function calculateTotal() {
@@ -418,10 +346,6 @@ updateNetPayCell();
 
 
 
-
-
-        <table class="mt-5">
-
         <tr>
             <td style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;">LESS: ONQUEUE:</td>
             <td id="onqueueCell" style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;">This must change to the same value as #totalAmount td</td>
@@ -446,7 +370,72 @@ updateNetPayCell();
         
     </table>
 
+    <div class="d-flex justify-content-center mt-5">
+        <button class="btn btn-success" onclick="calculateAll()">CALCULATE ALL</button>
+    </div>
+    
+    <script>
+        function calculateAll() {
+            // Helper function to get the numeric value
+            function getNumericValue(id) {
+                const element = document.getElementById(id);
+                if (element) {
+                    // Parse the numeric value while removing currency symbols and commas
+                    return parseFloat(element.textContent.replace(/[₱, ]/g, '').trim()) || 0;
+                } else {
+                    console.error(`Element with ID "${id}" not found.`);
+                    return 0; // Return 0 if the element does not exist
+                }
+            }
+    
+            
+            calculatePayment(); // Call the function directly
+            calculatePayment(); // Call the function directly
 
+            
+            // Get numeric values
+            const resultsNetpay = getNumericValue("resultsNetpay");
+            const resultsPos = getNumericValue("resultsPos");
+            const pliTotalValue = getNumericValue("plitotalvalue");
+            const onQueueCell = getNumericValue("onqueueCell");
+            const monthlyPaymentCell = getNumericValue("monthlyPaymentCell");
+    
+            // Get additional values
+            const absencesPVP = getNumericValue("absencesPVP");
+            const redemptionPLI1 = getNumericValue("redemptionPLI1");
+            const redemptionPLI2 = getNumericValue("redemptionPLI2");
+            const redemptionPLI3 = getNumericValue("redemptionPLI3");
+            const redemptionPLI4 = getNumericValue("redemptionPLI4");
+            const anticipation = getNumericValue("anticipation");
+            const promotion = getNumericValue("promotion");
+    
+            // Calculate total additions
+            const totalAdditions = absencesPVP + redemptionPLI1 + redemptionPLI2 + redemptionPLI3 + redemptionPLI4 + anticipation + promotion;
+    
+            // First calculation: Adding resultsNetpay + resultsPos + totalAdditions
+            const netpayPositiveTotal = resultsNetpay + resultsPos + totalAdditions;
+            document.getElementById("netpaypositivetotalvalue").textContent = `₱${netpayPositiveTotal.toFixed(2)}`;
+    
+            // Second calculation: PLI Total - On Queue
+            const semiTotalValue = pliTotalValue - onQueueCell;
+            document.getElementById("semiTotalValue").textContent = `₱${semiTotalValue.toFixed(2)}`;
+    
+            // Final calculation: Semi Total - Monthly Payment
+            const finalTotalValue = semiTotalValue - monthlyPaymentCell;
+            document.getElementById("finalTotalValue").textContent = `₱${finalTotalValue.toFixed(2)}`;
+    
+            // Trigger the Calculate Payment button
+        }
+    </script>
+    
+
+
+
+
+
+
+
+    
     <div class="container pt-5 pb-5 mt-5 mb-5"></div>
 </div>
 
@@ -664,25 +653,21 @@ document.addEventListener('DOMContentLoaded', () => {
             employeeInfoSectionNetpay.innerHTML = 'No employee found in the latest data.';
         }
     }
+
+
+
+
+
+
     function displayResultsTableNetpay(fetchedDataNet) {
     const resultsSectionNetpay = document.getElementById('resultsNetpay');
     
-    // Create a table with a single header row
-    const table = document.createElement('table');
-    table.classList.add('table', 'table-borderless', 'text-white');
+    // Clear previous results
+    resultsSectionNetpay.innerHTML = '';
 
-    const thead = document.createElement('thead');
-    const headerRow = document.createElement('tr');
-    headerRow.innerHTML = `
-      <!--   <th class="font-weight-bold">NETPAY MONTH</th>
-     <th class="font-weight-bold">TAKEHOME</th> -->
-    `;
-    thead.appendChild(headerRow);
-    table.appendChild(thead);
+    let totalNetPay = 0; // Variable to hold the total net pay
 
-    const tbody = document.createElement('tbody');
-
-    // Iterate over the fetched data and add rows to the table body
+    // Iterate over the fetched data and add rows to the results section
     fetchedDataNet.forEach(data => {
         data.csvData.forEach((row, index) => {
             if (index === 0) return; // Skip header row
@@ -691,36 +676,33 @@ document.addEventListener('DOMContentLoaded', () => {
             const empno = row[3];
             if (empno === document.getElementById('searchInputNetpay').value.trim()) {
                 const monthName = data.monthName;
-                const takehome = parseFloat(row[7]).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
+                const takehome = parseFloat(row[7]);
+                totalNetPay += takehome; // Accumulate total net pay
+
+                const formattedTakehome = takehome.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
 
                 const rowElement = document.createElement('tr');
                 rowElement.innerHTML = `
-                    <td>${monthName} NETPAY</td>
-                    <td id="netpaytable"><b>${takehome}</b></td>
+    <!-- <tr>${monthName} NETPAY</tr> -->
+                    <tr id="netpaytable"><b>${formattedTakehome}</b></tr>
                 `;
-                tbody.appendChild(rowElement);
+                resultsSectionNetpay.appendChild(rowElement); // Append directly to the results section
             }
         });
     });
 
-    if (tbody.children.length > 0) {
-        table.appendChild(tbody);
-        resultsSectionNetpay.appendChild(table);
+    if (totalNetPay > 0) {
+        // Only calculate total if there's net pay to display
+        calculateAndDisplayTotal(totalNetPay);
     }
-
-    // Sum netpay and positivetable after content is added
-    calculateAndDisplayTotal();
 }
 
-function calculateAndDisplayTotal() {
-    // Get the netpay value
-    const netpayValue = document.getElementById('netpaytable').textContent.replace(/[^\d.-]/g, '') || 0;
-    
+function calculateAndDisplayTotal(totalNetPay) {
     // Get the positivetable value (assuming it's already populated elsewhere)
     const positiveValue = document.getElementById('positivetable').textContent.replace(/[^\d.-]/g, '') || 0;
 
     // Calculate total
-    const total = parseFloat(netpayValue) + parseFloat(positiveValue);
+    const total = parseFloat(totalNetPay) + parseFloat(positiveValue);
 
     // Display the total in netpaypositivetotalvalue element
     document.getElementById('netpaypositivetotalvalue').textContent = total.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
@@ -728,8 +710,37 @@ function calculateAndDisplayTotal() {
 
 
 
-
     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -872,64 +883,72 @@ function displayEmployeeInfoPos(monthName, csvData) {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 function displayResultsTablePos(fetchedDataPos) {
     const resultsSectionPos = document.getElementById('resultspos');
     
-    // Create a table with a single header row
-    const table = document.createElement('table');
-    table.classList.add('table', 'table-borderless', 'text-white');
+    // Clear previous results
+    resultsSectionPos.innerHTML = '';
 
-    const thead = document.createElement('thead');
-    const headerRow = document.createElement('tr');
-    headerRow.innerHTML = `
-         <!--  <th class="font-weight-bold">POSITIVE MONTH</th>
-        <th class="font-weight-bold">DEDAMT</th> -->
-    `;
-    thead.appendChild(headerRow);
-    table.appendChild(thead);
-
-    const tbody = document.createElement('tbody');
     const resultsMap = new Map(); // To store sums and details for dropdown
 
     fetchedDataPos.forEach(data => {
-        data.csvData.forEach((row, index) => {
-            if (index === 0) return; // Skip header row
-            if (row.length < 4) return; // Skip malformed rows
+    data.csvData.forEach((row, index) => {
+        if (index === 0) return; // Skip header row
+        if (row.length < 4) return; // Skip malformed rows
 
-            const empno = row[3];
-            if (empno === document.getElementById('searchInputPos').value.trim()) {
-                const monthName = data.monthName;
-                const dedamt = parseFloat(row[13]);
-                
-                // Accumulate amounts
-                if (!resultsMap.has(monthName)) {
-                    resultsMap.set(monthName, { sum: 0, details: [] });
-                }
-                const entry = resultsMap.get(monthName);
-                entry.sum += dedamt;
-                entry.details.push(dedamt.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' }));
-            }
-        });
-    });
-
-    // Add aggregated results to the table
-    resultsMap.forEach((value, monthName) => {
-        const totalDedAmt = value.sum.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
-        
-        const rowElement = document.createElement('tr');
-        rowElement.innerHTML = `
-            <td>${monthName} POSITIVE</td>
+        const empno = row[3];
+        if (empno === document.getElementById('searchInputPos').value.trim()) {
+            const monthName = data.monthName;
+            const termyy = parseFloat(row[12]);
+            const termm = parseFloat(row[11]); 
+            const dedamt = parseFloat(row[13]);
             
-            <td id="positivetable">
-                <div class="position-relative">
-                    <u><b class="sum-amount" style="cursor: pointer;">${totalDedAmt}</b></u>
-                    <div class="dropdown-menu" style="display: none; position: absolute; z-index: 1;">
-                        ${value.details.map(detail => `<div class="dropdown-item">${detail}</div>`).join('')}
+            // Accumulate amounts
+            if (!resultsMap.has(monthName)) {
+                resultsMap.set(monthName, { sum: 0, details: [] });
+            }
+            const entry = resultsMap.get(monthName);
+            entry.sum += dedamt;
+            entry.details.push(dedamt.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' }));
+entry.details.push(termyy.toLocaleString('en-PH'));
+entry.details.push(termm.toLocaleString('en-PH'));
+        }
+    });
+});
+
+
+
+// Add aggregated results directly to the results section
+const resultsTable = document.getElementById('resultsTable'); // Assume there's a table with this ID
+resultsMap.forEach((value, monthName) => {
+    const totalDedAmt = value.sum.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
+    
+    const rowElement = document.createElement('tr');
+    rowElement.innerHTML = `
+        <td>
+            <div class="position-relative">
+                <u><b class="sum-amount" style="cursor: pointer">${totalDedAmt}</b></u>
+                <div class="dropdown-menu p-1 pl-3" style="display: none; position: absolute; z-index: 1; width: 210px;"> 
+                    <div style="display: flex; justify-content: space-between;"> <!-- Use flexbox for alignment -->
+                        ${value.details.join(' / ')} <!-- Join details with a slash or space -->
                     </div>
                 </div>
-            </td>
-        `;
-        
+            </div>
+        </td>
+    `;
+    
         // Add hover event listeners
         const sumAmount = rowElement.querySelector('.sum-amount');
         const dropdownMenu = rowElement.querySelector('.dropdown-menu');
@@ -942,14 +961,42 @@ function displayResultsTablePos(fetchedDataPos) {
             dropdownMenu.style.display = 'none';
         });
 
-        tbody.appendChild(rowElement);
+        resultsSectionPos.appendChild(rowElement); // Append directly to the results section
     });
-
-    if (tbody.children.length > 0) {
-        table.appendChild(tbody);
-        resultsSectionPos.appendChild(table);
-    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1056,69 +1103,31 @@ function calculateAndUpdateMonthlyPayment() {
 
 
 
-
-
-
-
-function formatCurrency(value) {
-    // Format the number with commas as thousands separators
-    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
-
-function updateSemiTotalValue() {
-    const plitotalvalueCell = document.getElementById('plitotalvalue');
-    const onqueueCell = document.getElementById('onqueueCell');
-    const semiTotalValueCell = document.getElementById('semiTotalValue');
-
-    // Extract the numeric values from the cells
-    const plitotalvalue = parseFloat(plitotalvalueCell.textContent.replace(/[₱,]/g, '').trim()) || 0; // Remove currency symbol and commas
-    const onqueueValue = parseFloat(onqueueCell.textContent.replace(/[₱,]/g, '').trim()) || 0; // Remove currency symbol and commas
-
-    // Calculate the semiTotalValue
-    const semiTotalValue = plitotalvalue - onqueueValue;
-
-    // Set the calculated value in the semiTotalValue cell with formatted number
-    semiTotalValueCell.textContent = `₱${formatCurrency(semiTotalValue.toFixed(2))}`; // Format to 2 decimal places and add comma separators
-}
-
-// Call updateSemiTotalValue to initialize it
-updateSemiTotalValue();
-
-
-
-
-
-
 function updateOnQueueCell() {
-    // Get the total amount from the totalAmount cell
     const totalAmountCell = document.getElementById('totalAmount');
-    const totalAmountText = totalAmountCell.textContent || ""; // Fallback in case of no content
-    const totalAmountNumber = parseFloat(totalAmountText.replace(/[₱,]/g, '').trim()); // Remove currency and commas
+    const totalAmountText = totalAmountCell.textContent || "";
+    const totalAmountNumber = parseFloat(totalAmountText.replace(/[₱,]/g, '').trim());
 
-    // Update the onqueueCell with the total amount
     const onqueueCell = document.getElementById('onqueueCell');
     onqueueCell.textContent = `₱${totalAmountNumber.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
 
-    // Calculate the semiTotal
-    calculateSemiTotal(totalAmountNumber);
+    calculateSemiTotal();
 }
 
-function calculateSemiTotal(pliTotal) {
-    // Get the onqueue value
+function calculateSemiTotal() {
+    const pliTotalCell = document.getElementById('plitotalvalue');
+    const pliTotalText = pliTotalCell.textContent || "";
+    const pliTotalValue = parseFloat(pliTotalText.replace(/[₱,]/g, '').trim());
+
     const onqueueCell = document.getElementById('onqueueCell');
     const onqueueText = onqueueCell.textContent || "";
-    const onqueueValue = parseFloat(onqueueText.replace(/[₱,]/g, '').trim()); // Remove currency and commas
+    const onqueueValue = parseFloat(onqueueText.replace(/[₱,]/g, '').trim());
 
-    // Calculate the semi total
-    const semiTotalValue = pliTotal - onqueueValue;
+    const semiTotalValue = pliTotalValue - onqueueValue;
 
-    // Update the semiTotal cell
     const semiTotalCell = document.getElementById('semiTotal');
     semiTotalCell.textContent = `₱${semiTotalValue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
 }
-
-
-
 
 
 
@@ -1383,6 +1392,33 @@ document.addEventListener('DOMContentLoaded', calculateTotal);
 
 
     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1815,6 +1851,43 @@ function convertMonth(monthNumber) {
 
 
 
+<div class="col-md-12 offset-md-1"> <!-- Added offset-md-1 to create space -->
+    <div class="calculator bg-dark text-light border border-light p-4 rounded shadow-lg">
+        <h2 class="text-center">Loan Payment Calculator</h2>
+
+        <!-- Loan Amount -->
+        <div class="mb-3">
+            <label for="loanAmount" class="form-label">Loan Amount (Php)</label>
+            <input type="text" class="form-control bg-dark text-light border-light" id="loanAmount" value="50,000" onblur="formatLoanAmount()" />
+        </div>
+
+        <!-- Rate -->
+        <div class="mb-3">
+            <label for="rate" class="form-label">Interest Rate (%)</label>
+            <input type="text" class="form-control bg-dark text-light border-light" id="rate" value="9.66" readonly />
+        </div>
+
+        <!-- Terms Dropdown -->
+        <div class="mb-3">
+            <label for="terms" class="form-label">Terms (months)</label>
+            <select id="terms" class="form-select bg-dark text-light border-light form-control" onchange="updateInterestRate()">
+                <script>
+                    for (let i = 6; i <= 60; i++) {
+                        document.write('<option value="' + i + '"' + (i === 24 ? ' selected' : '') + '>' + i + '</option>');
+                    }
+                </script>
+            </select>
+        </div>
+
+        <!-- Calculate Button -->
+        <button class="btn btn-light w-100" id="calculatorinclude" onclick="calculatePayment()">Calculate Payment</button>
+
+        <!-- Result Display -->
+        <div class="result text-center mt-4">
+            Monthly Payment: Php <span id="monthlyPayment">0.00</span>
+        </div>
+    </div>
+</div>
 
 
 
