@@ -275,11 +275,11 @@ updateNetPayCell();
                 </tr>
                 <tr>
                     <td  id="A10" style="border: 1px solid #ccc; padding: 8px;">ADD: ANTICIPATION:</td>
-                    <td  id="anticipation" style="border: 1px solid #ccc; padding: 8px;"><input type="number" value="4567" class="input-field" /></td>
+                    <td  id="anticipation" style="border: 1px solid #ccc; padding: 8px;"><input type="number" value="10000" class="input-field" /></td>
                 </tr>
                 <tr>
                     <td  id="A11" style="border: 1px solid #ccc; padding: 8px;">ADD: PROMOTION:</td>
-                    <td  id="promotion" style="border: 1px solid #ccc; padding: 8px;"><input type="number" value="7890" class="input-field" /></td>
+                    <td  id="promotion" style="border: 1px solid #ccc; padding: 8px;"><input type="number" value="20000" class="input-field" /></td>
                 </tr>
                 <tr>
                     <td id="A12" style="border: 1px solid #ccc; padding: 8px; background-color: #200000; color: white;">PLI TOTAL:</td>
@@ -320,22 +320,28 @@ updateNetPayCell();
 
 
                 // JavaScript to handle the calculation
-        document.addEventListener('DOMContentLoaded', function() {
-            const plitotalvalueInput = document.getElementById('plitotalvalue');
-            const onqueueCellInput = document.getElementById('onqueueCell');
-            const semiTotalValueInput = document.getElementById('semiTotalValue');
+                document.addEventListener('DOMContentLoaded', function() {
+    const plitotalvalueInput = document.getElementById('plitotalvalue');
+    const resultsonqs = document.getElementsByClassName('resultsonq');
+    const semiTotalValueInput = document.getElementById('semiTotalValue');
 
-            function updateSemiTotalValue() {
-                const plitotalvalue = parseFloat(plitotalvalueInput.value) || 0;
-                const onqueueCell = parseFloat(onqueueCellInput.value) || 0;
-                const semiTotalValue = plitotalvalue - onqueueCell;
+    function updateSemiTotalValue() {
+        const plitotalvalue = parseFloat(plitotalvalueInput.value) || 0;
 
-                semiTotalValueInput.value = semiTotalValue.toFixed(2); // Format to 2 decimal places
-            }
+        // Extract the numeric value from the totalAmount cell
+        const resultsonqValue = parseFloat(resultsonqs.innerText.replace(/[₱,]/g, '').trim()) || 0;
+        
+        const semiTotalValue = plitotalvalue - resultsonqValue;
 
-            plitotalvalueInput.addEventListener('input', updateSemiTotalValue);
-            onqueueCellInput.addEventListener('input', updateSemiTotalValue);
-        });
+        semiTotalValueInput.value = semiTotalValue.toFixed(2); // Format to 2 decimal places
+    }
+
+    // Add input event listeners
+    plitotalvalueInput.addEventListener('input', updateSemiTotalValue);
+    // Call updateSemiTotalValue when the page loads to set initial value
+    updateSemiTotalValue();
+});
+
         </script>
         
 
@@ -350,11 +356,11 @@ updateNetPayCell();
 
         <tr>
             <td style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;">LESS: ONQUEUE:</td>
-            <td id="onqueueCell" style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;"></td>
+            <!-- <td class="resultsonq d-none" style="visibility:hidden;border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;"></td> -->
      
      
-                <td  id="resultsonq" class="onqueueCell" style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;"> </td>
-
+                <td  id="resultsonq"  style="border: 1px solid #ccc; padding: 8px; background-color: #4d4d00;"> </td>
+      
         </tr>
 
 
@@ -379,58 +385,76 @@ updateNetPayCell();
     <div class="d-flex justify-content-center mt-5">
         <button class="btn btn-success" onclick="calculateAll()">CALCULATE ALL</button>
     </div>
+    
 
+
+
+
+
+
+
+
+
+
+
+    
     <script>
+    
     function calculateAll() {
-        // Helper function to get the numeric value
-        function getNumericValue(id) {
-            const element = document.getElementById(id);
-            if (element) {
-                // Check if element is an input field
-                if (element.tagName === 'INPUT') {
-                    // Get value from input fields
-                    return parseFloat(element.value.replace(/[₱, ]/g, '').trim()) || 0;
-                } else {
-                    // Parse the numeric value while removing currency symbols and commas
-                    return parseFloat(element.textContent.replace(/[₱, ]/g, '').trim()) || 0;
-                }
-            } else {
-                console.error(`Element with ID "${id}" not found.`);
-                return 0; // Return 0 if the element does not exist
-            }
+    // Helper function to get the numeric value
+    function getNumericValue(id) {
+        const element = document.getElementById(id);
+        if (element) {
+            // Get only the text nodes by excluding child elements
+            const textContent = Array.from(element.childNodes)
+                .filter(node => node.nodeType === Node.TEXT_NODE) // Only keep text nodes
+                .map(node => node.textContent)
+                .join(''); // Join text content
+
+            // Parse the numeric value while removing currency symbols and commas
+            return parseFloat(textContent.replace(/[₱, ]/g, '').trim()) || 0;
+        } else {
+            console.error(`Element with ID "${id}" not found.`);
+            return 0; // Return 0 if the element does not exist
         }
-
-        // Get numeric values
-        const resultsNetpay = getNumericValue("resultsNetpay");
-        const resultspos = getNumericValue("resultspos");
-        const pliTotalValue = getNumericValue("plitotalvalue");
-        const onQueueCell = getNumericValue("onqueueCell");
-        const monthlyPaymentCell = getNumericValue("monthlyPaymentCell");
-
-        // Get additional values
-        const resultsPLI1 = getNumericValue("#totalAmountPLI0");
-        const resultsPLI2 = getNumericValue("#totalAmountPLI1");
-        const resultsPLI3 = getNumericValue("#totalAmountPLI2");
-        const resultsPLI4 = getNumericValue("#totalAmountPLI3");
-        const resultsPLI5 = getNumericValue("#totalAmountPLI4");
-        const anticipation = getNumericValue("anticipation");
-        const promotion = getNumericValue("promotion");
-
-        // Calculate total additions
-        const totalAdditions = resultsPLI1 + resultsPLI2 + resultsPLI3 + resultsPLI4 + resultsPLI5 + anticipation + promotion;
-
-        // First calculation: Adding resultsNetpay + resultspos + totalAdditions
-        const netpayPositiveTotal = resultsNetpay + resultspos + totalAdditions;
-        document.getElementById("netpaypositivetotalvalue").textContent = `₱${netpayPositiveTotal.toFixed(2)}`;
-
-        // Second calculation: PLI Total - On Queue
-        const semiTotalValue = pliTotalValue - onQueueCell;
-        document.getElementById("semiTotalValue").textContent = `₱${semiTotalValue.toFixed(2)}`;
-
-        // Final calculation: Semi Total - Monthly Payment
-        const finalTotalValue = semiTotalValue - monthlyPaymentCell;
-        document.getElementById("finalTotalValue").textContent = `₱${finalTotalValue.toFixed(2)}`;
     }
+
+    // Get numeric values from table cells
+    const resultsNetpay = getNumericValue("resultsNetpay");
+    const resultspos = getNumericValue("resultspos");
+    const pliTotalValue = getNumericValue("plitotalvalue");
+    const resultsonq = getNumericValue("resultsonq");
+    const monthlyPaymentCell = getNumericValue("monthlyPaymentCell");
+
+    // Get additional values from table cells
+    const resultsPLI1 = getNumericValue("resultsPLI1"); // Change to the correct ID
+    const resultsPLI2 = getNumericValue("resultsPLI2"); // Change to the correct ID
+    const resultsPLI3 = getNumericValue("resultsPLI3"); // Change to the correct ID
+    const resultsPLI4 = getNumericValue("resultsPLI4"); // Change to the correct ID
+    const resultsPLI5 = getNumericValue("resultsPLI5"); // Extract value from resultsPLI5
+    const anticipation = getNumericValue("anticipation");
+    const promotion = getNumericValue("promotion");
+
+    // Calculate total additions
+    const totalAdditions = resultsPLI1 + resultsPLI2 + resultsPLI3 + resultsPLI4 + resultsPLI5 + anticipation + promotion;
+
+    // First calculation: Adding resultsNetpay + resultspos + totalAdditions
+    const netpayPositiveTotal = resultsNetpay + resultspos + totalAdditions;
+    document.getElementById("netpaypositivetotalvalue").textContent = `₱${netpayPositiveTotal.toFixed(2)}`;
+
+    // Second calculation: PLI Total - On Queue
+    const semiTotalValue = pliTotalValue - resultsonq;
+    document.getElementById("semiTotalValue").textContent = `₱${semiTotalValue.toFixed(2)}`;
+
+    // Final calculation: Semi Total - Monthly Payment
+    const finalTotalValue = semiTotalValue - monthlyPaymentCell;
+    document.getElementById("finalTotalValue").textContent = `₱${finalTotalValue.toFixed(2)}`;
+}
+
+
+
+
+
 </script>
 
 
@@ -460,7 +484,7 @@ updateNetPayCell();
         // Get values from the referenced tables
         const netpayCell = document.querySelector('#netpaytable td');
         const posCell = document.querySelector('#positivetable td');
-        const onqueueCell = document.querySelector('#totalAmount td');
+        // const resultsonq = document.querySelector('#totalAmount td');
     
         // Only update if the cells have values
         if (netpayCell && netpayCell.innerText) {
@@ -469,8 +493,8 @@ updateNetPayCell();
         if (posCell && posCell.innerText) {
             document.getElementById('posCell').innerText = posCell.innerText;
         }
-        if (onqueueCell && onqueueCell.innerText) {
-            document.getElementById('onqueueCell').innerText = onqueueCell.innerText;
+        if (resultsonq && resultsonq.innerText) {
+            document.getElementById('resultsonq').innerText = resultsonq.innerText;
         }
     }
     </script>
@@ -1061,8 +1085,8 @@ resultsMap.forEach((value, monthName) => {
             displayEmployeeInfoOnq(fetchedDataOnq[0].monthName, fetchedDataOnq[0].csvData);
             displayResultsTableOnq(fetchedDataOnq);
 
-            // Call the function to update the onqueueCell after results are displayed
-            updateOnQueueCell();
+            // Call the function to update the resultsonq after results are displayed
+            updateresultsonq();
 
             // Automatically press the Calculate button and update the monthly payment
             calculateAndUpdateMonthlyPayment();
@@ -1107,13 +1131,13 @@ function calculateAndUpdateMonthlyPayment() {
 
 
 
-function updateOnQueueCell() {
-    const totalAmountCell = document.getElementById('totalAmount');
+function updateresultsonq() {
+    const totalAmountCell = document.getElementsById('totalAmount');
     const totalAmountText = totalAmountCell.textContent || "";
     const totalAmountNumber = parseFloat(totalAmountText.replace(/[₱,]/g, '').trim());
 
-    const onqueueCell = document.getElementById('onqueueCell');
-    onqueueCell.textContent = `₱${totalAmountNumber.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+    const resultsonq = document.getElementsById('resultsonq');
+    resultsonq.textContent = `₱${totalAmountNumber.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
 
     calculateSemiTotal();
 }
@@ -1123,8 +1147,8 @@ function calculateSemiTotal() {
     const pliTotalText = pliTotalCell.textContent || "";
     const pliTotalValue = parseFloat(pliTotalText.replace(/[₱,]/g, '').trim());
 
-    const onqueueCell = document.getElementById('onqueueCell');
-    const onqueueText = onqueueCell.textContent || "";
+    const resultsonq = document.getElementsByClassName('resultsonq');
+    const onqueueText = resultsonq.textContent || "";
     const onqueueValue = parseFloat(onqueueText.replace(/[₱,]/g, '').trim());
 
     const semiTotalValue = pliTotalValue - onqueueValue;
@@ -1326,20 +1350,20 @@ function toggleDetails(button) {
 
 
 
-function updateOnQueueCell() {
+function updateresultsonq() {
     // Get the total amount from the totalAmount cell
     const totalAmountCell = document.getElementById('totalAmount');
     const totalAmountText = totalAmountCell.textContent || ""; // Fallback in case of no content
     const totalAmountNumber = parseFloat(totalAmountText.replace(/[₱,]/g, '').trim()); // Remove currency and commas
 
-    // Update the onqueueCell with the total amount
-    const onqueueCell = document.getElementById('onqueueCell');
-    onqueueCell.textContent = `₱${totalAmountNumber.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+    // Update the resultsonq with the total amount
+    const resultsonq = document.getElementsByClassName('resultsonq');
+    resultsonq.textContent = `₱${totalAmountNumber.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
 }
 
 // Call this function whenever the total amount is updated
 // Example usage after you set the total amount somewhere in your code
-// updateOnQueueCell();
+// updateresultsonq();
 
 
 
@@ -1725,7 +1749,9 @@ function createResultsTable(fetchedDataPLI, tableIndex) {
         row.innerHTML = `
             <!-- <td>${monthName}</td> -->
             <td id="totalAmountPLI${tableIndex}">
-                ₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+               <!-- ₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")} -->
+                
+                ₱0.00
                 <button class="view-more-btn" style="margin-left: 10px;">Select PLI</button>
             </td>
         `;
