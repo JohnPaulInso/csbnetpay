@@ -366,7 +366,7 @@ updateNetPayCell();
                 
 <tr>
     <td id="A13"  class="smallfont"  style="border: 1px solid #ccc; padding:  10px; background-color: #001f14; color: white;">TOTAL</td>
-    <td id="netpaypPliTotal" style="border: 1px solid #ccc; padding:  10px;padding-left:  10px !important; background-color: #001f14; color: white;">Netpay Total + PLI Total</td>
+    <td id="netpaypPliTotal" style="border: 1px solid #ccc; padding:  10px;padding-left:  10px !important; background-color: #001f14; color: white;"></td>
     <!-- <td class="d-none"  id="plitotalvaluehidden" style="border: 1px solid #ccc; padding:  10px; background-color: #001f14; color: white;">₱0.00</td> -->
 </tr>
 
@@ -2184,54 +2184,55 @@ checkFinalTotalValue();
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div class="col-md-12 offset-md-1 d-none"> <!-- Added offset-md-1 to create space -->
+<div class="offset-md-1 d-nones mb-5 pb-5"> <!-- Added offset-md-1 to create space -->
     <div class="calculator bg-dark text-light border border-light p-4 rounded shadow-lg">
 
 
         <!-- Calculate Button -->
-        <button class="btn btn-light w-100" id="calculatorinclude" onclick="calculatePayment()">Calculate Payment</button>
+        <button class="btn btn-light w-100" id="calculatorinclude" onclick="calculatePayment()">Calculate CSB DED</button>
 
         <!-- Result Display -->
-        <div class="result text-center mt-4">
-            Monthly Payment: Php <span id="monthlyPayment">0.00</span>
+        <div class="result text-center mt-4 ">
+            <span style="font-size:15px;"">Monthly Payment: Php <span id="monthlyPayment">0.00</span></span>
         </div>
     </div>
 </div>
+
+<div style="height:300px"></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
