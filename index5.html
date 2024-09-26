@@ -37,10 +37,9 @@
 
 
 <!-- NETPAY Section --><div class="container mt-3">
-    <h1 class="text-center pt-5 pb-3 mb-2">LOAN EVALUATION</h1>
+    <h4 class="text-center pt-5 pb-3 mb-2">LOAN EVALUATION</h4>
     <div class="row">
         <div id="searchSectionNetpay" class="col-md-12">
-            <a>4694264</p>
             <div class="row pt-2">
                 <div class="col-12 d-flex">
                     <input type="text" id="searchInputNetpay" class="form-control" placeholder="Employee Number..." style="flex-grow: 1;" oninput="syncInputs(this.value)">
@@ -49,6 +48,7 @@
           
             </div>
 
+            <a>4694264</p>
             
 
         </div>     
@@ -144,7 +144,7 @@
     </div>
 </div>
 <br/>
-<div class="container  ">
+<div class="container  d-none">
     <div class="row">
         <div class="col-md-12">
             <h3 id="employeeInfoPLI" class="text-white"></h3>
@@ -1108,10 +1108,13 @@ function displayResultsTablePos(fetchedDataPos) {
                 resultsMap.set(monthName, { sum: 0, details: [] });
             }
             const entry = resultsMap.get(monthName);
-            entry.sum += dedamt;
-            entry.details.push(dedamt.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' }));
-entry.details.push(termyy.toLocaleString('en-PH'));
-entry.details.push(termm.toLocaleString('en-PH'));
+entry.sum += dedamt;
+entry.details.push(dedamt.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' }));
+
+// Push the year and month as formatted date string
+entry.details.push(termyy.toString());  // Ensure it's treated as a string
+entry.details.push(termm.toString().padStart(2, '0'));  // Ensure it's treated as a two-digit string
+
         }
     });
 });
@@ -1129,6 +1132,7 @@ resultsMap.forEach((value, monthName) => {
             <div class="position-relative">
                 <u><b class="sum-amount" style="cursor: pointer">${totalDedAmt}</b></u>
                 <div class="dropdown-menu p-1 pl-3" style="display: none; position: absolute; z-index: 1; width: 210px;"> 
+                
                     <div style="display: flex; justify-content: space-between;"> <!-- Use flexbox for alignment -->
                         ${value.details.join(' / ')} <!-- Join details with a slash or space -->
                     </div>
