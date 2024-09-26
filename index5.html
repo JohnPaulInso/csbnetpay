@@ -17,7 +17,7 @@
         <div style="color:#ddd;display: flex; align-items: center;">
             <a style="color:#aaa;" class="nav-item nav-link p-2" href="index.html"><b>NETPAY</b></a>
             <a style="color:#aaa;" class="nav-item nav-link p-2" href="index2.html"><b>DEDAMT</b></a>
-            <a style="color:#aaa;" class="nav-item nav-link p-2" href="index3.html"><b>ONQUEUE</b></a>
+            <a style="color:#aaa;" class="nav-item nav-link p-2" href="index3.html"><b>ONQ</b></a>
             <a style="color:#aaa;" class="nav-item nav-link p-2" href="index4.html"><b>PLI</b></a>
             <a class="nav-item nav-link p-2 text-white" href="index5.html"><b>LE</b></a>
         </div>
@@ -36,25 +36,30 @@
 
 
 
-<!-- NETPAY Section --><div class="container mt-5">
+<!-- NETPAY Section --><div class="container mt-3">
     <h1 class="text-center pt-5 pb-3 mb-2">LOAN EVALUATION</h1>
     <div class="row">
         <div id="searchSectionNetpay" class="col-md-12">
+            <a>4694264</p>
             <div class="row pt-2">
-                <a>4694264</p>
                 <div class="col-12 d-flex">
                     <input type="text" id="searchInputNetpay" class="form-control" placeholder="Employee Number..." style="flex-grow: 1;" oninput="syncInputs(this.value)">
                     <button id="searchButtonNetpay" class="btn btn-primary ml-2" onclick="triggerAllSearches()">Search</button>
                 </div>
-                <div id="loadingIndicatorNetpay" style="display: none; text-align: center;">
-                    <img src="loading.gif" alt="Loading..." style="max-width: 100px;">
-                </div>
+          
             </div>
-        </div>
 
+            
+
+        </div>     
         
 
+        <div id="loadingIndicatorNetpay" style="top:50% !important;display: none; text-align: center;">
+            <img src="loading.gif" alt="Loading..." style="max-width: 100px;">
+    
+        </div>
     </div>
+
 </div>
 
 
@@ -67,9 +72,7 @@
 
 
 
-
-
-<div class="container">
+<div class="container ">
     <div class="row">
         <div class="col-md-12">
             <h3 id="employeeInfoNetpay" class="text-white"></h3>
@@ -95,8 +98,7 @@
         </div>
     </div>
 </div>
-<br/>
-<div class="container">
+<div class="container  d-none">
     <div class="row">
         <div class="col-md-12">
             <h3 id="employeeInfoPos" class="text-white"></h3>
@@ -119,7 +121,7 @@
     </div>
 </div>
 <br/>
-<div class="container ">
+<div class="container d-none ">
     <div class="row">
         <div class="col-md-12">
             <h3 id="employeeInfoOnq" class="text-white"></h3>
@@ -514,7 +516,7 @@ updateHiddenCells();
             <td id="semiTotalValue" style=" border: 1px solid #ccc; padding:  10px; background-color: green; color: white;">₱0.00</td>
 </tr>
         <tr>
-            <td id="A15"  class="smallfont"  style="border: 1px solid #ccc; padding:  10px;">NEW CSB DED</td>
+            <td id="A15"  class="smallfont"  style="border: 1px solid #ccc; padding:  10px;">NEW CSBDED</td>
             <td id="monthlyPaymentCell" style=" border: 1px solid #ccc; padding:  10px;"></td>
             <!-- MONTHLY PAYMENT FROM CALCULATOR RESULT  -->
         </tr>
@@ -527,12 +529,15 @@ updateHiddenCells();
 
         
     </table>
+
+
+
+
 <div class="d-flex justify-content-center mt-5">
-    <button class="btn btn-success btn-lg" onclick="calculateAll()">CALCULATE ALL</button>
+    <button class="btn btn-success btn-lg fs-5" onclick="calculateAll()">COMPUTE</button>
 </div>
 
-<script>
-function calculateAll() {
+<script>function calculateAll() {
     // Helper function to get the numeric value
     function getNumericValue(id) {
         const element = document.getElementById(id);
@@ -545,9 +550,6 @@ function calculateAll() {
             return 0; // Return 0 if the element does not exist
         }
     }
-
-    calculatePayment()
-    calculatePayment()
 
     // Get numeric values from table cells
     const resultsNetpay = getNumericValue("resultsNetpay");
@@ -588,7 +590,26 @@ function calculateAll() {
 
     // Debugging: Log finalTotalValue for verification
     console.log(`Final Total Value: ₱${finalTotalValue}`);
+
+    // Now calculate the final addition of netPayPositiveTotal and pliTotalValue
+    const netPayValue = getNumericValue("netpaypositivetotalvalue");
+    const total = netPayValue + pliTotalValue;
+
+    // Format the result as PHP currency (2 decimal places)
+    const formattedTotal = total.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
+
+    // Display the result in the element with id="netpaypPliTotal"
+    document.getElementById("netpaypPliTotal").textContent = formattedTotal;
 }
+
+
+
+
+
+
+
+
+
 </script>
 
 
@@ -802,7 +823,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const account = row[8];
 
                 employeeInfoSectionNetpay.innerHTML = `
-                <div class="pt-4">
+                <div class="pt-4 mt-3 pl-3 pr-3">
                   <strong>NAME:</strong><b style="color:orange"> ${fname} ${mi} ${lname}</b><br/>
                     <strong>EMPNO:</strong><b style="color:orange">   ${empno} </b><br/>
                     <strong>DIV / STA:</strong><b style="color:orange"> ${div} / ${sta}</b><br/>
