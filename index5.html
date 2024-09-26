@@ -494,25 +494,27 @@ updateHiddenCells();
 
 
 
-
-
 function updateOnQueueValue() {
     // Helper function to get the numeric value
-    function getNumericValue(id) {
-        const element = document.getElementById(id);
-        if (element) {
-            // Parse the numeric value while removing currency symbols and commas
-            const value = parseFloat(element.textContent.replace(/[₱, ]/g, '').trim());
-            return isNaN(value) ? 0 : value; // Return 0 if value is NaN
-        } else {
-            console.error(`Element with ID "${id}" not found.`);
-            return 0; // Return 0 if the element does not exist
+    function getNumericValue(ids) {
+        let value = 0;
+        
+        // Loop through the array of IDs and check for the first available element
+        for (let id of ids) {
+            const element = document.getElementById(id);
+            if (element) {
+                // Parse the numeric value while removing currency symbols and commas
+                value = parseFloat(element.textContent.replace(/[₱, ]/g, '').trim());
+                return isNaN(value) ? 0 : value; // Return the valid numeric value
+            }
         }
+        
+        console.error(`None of the elements with IDs "${ids.join(', ')}" were found.`);
+        return 0; // Return 0 if neither element exists
     }
 
     function copyOnQueueToResult() {
-        // Get the numeric value from the element with id "onqueuespan"
-        const onQueueValue = getNumericValue("onqueuespan");
+        const onQueueValue = getNumericValue(["onqueuespan", "totalAmount"]);
 
         // Set the value in the element with id "resultsonqhidden"
         document.getElementById("resultsonqhidden").textContent = `₱${onQueueValue.toFixed(2)}`;
@@ -2014,7 +2016,7 @@ function createResultsTable(fetchedDataPLI, tableIndex) {
             <!-- <td>${monthName}</td> -->
                <!-- ₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")} -->
      <td id="totalAmountPLI${tableIndex}" style="border: 0;border:none;margin-bottom:0px" class="d-flex justify-content-between align-items-center">
-    <span>₱0.00</span>
+    <span id="">₱0.00</span>
     <button class="view-more-btn border-0 bg-transparent p-0">📖</button>
 </td>
 
