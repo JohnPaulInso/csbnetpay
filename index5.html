@@ -229,7 +229,7 @@ updateNetPayCell();
                 style="padding: 10px; width: 100%;" onchange="updateInterestRate()">
                     <script>
                         for (let i = 6; i <= 60; i++) {
-                            document.write('<option value="' + i + '"' + (i === 24 ? ' selected' : '') + '>' + i + '</option>');
+                            document.write('<option value="' + i + '"' + (i === 60 ? ' selected' : '') + '>' + i + '</option>');
                         }
                     </script>
                 </select>
@@ -443,7 +443,7 @@ function updateHiddenCells() {
 
 
 // Set an interval to continuously update the hidden cells every 2 seconds (2000 ms)
-setInterval(updateHiddenCells, 1000);
+setInterval(updateHiddenCells, 10);
 
 // Initial call to set values immediately
 updateHiddenCells();
@@ -468,8 +468,10 @@ updateHiddenCells();
                 // JavaScript to handle the calculation
                 document.addEventListener('DOMContentLoaded', function() {
     const plitotalvalueInput = document.getElementById('plitotalvalue');
-    const resultsonqs = document.getElementsByClassName('resultsonq');
+    const resultsonqs = document.getElementsById('resultsonqhidden');
     const semiTotalValueInput = document.getElementById('semiTotalValue');
+
+    const netpaypPliTotal = document.getElementById('netpaypPliTotal');
 
     function updateSemiTotalValue() {
         const plitotalvalue = parseFloat(plitotalvalueInput.value) || 0;
@@ -477,7 +479,9 @@ updateHiddenCells();
         // Extract the numeric value from the totalAmount cell
         const resultsonqValue = parseFloat(resultsonqs.innerText.replace(/[₱,]/g, '').trim()) || 0;
         
-        const semiTotalValue = plitotalvalue - resultsonqValue;
+
+        
+        const semiTotalValue = netpaypPliTotal - resultsonqValue;
 
         semiTotalValueInput.value = semiTotalValue.toFixed(2); // Format to 2 decimal places
     }
@@ -487,6 +491,46 @@ updateHiddenCells();
     // Call updateSemiTotalValue when the page loads to set initial value
     updateSemiTotalValue();
 });
+
+
+
+
+
+function updateOnQueueValue() {
+    // Helper function to get the numeric value
+    function getNumericValue(id) {
+        const element = document.getElementById(id);
+        if (element) {
+            // Parse the numeric value while removing currency symbols and commas
+            const value = parseFloat(element.textContent.replace(/[₱, ]/g, '').trim());
+            return isNaN(value) ? 0 : value; // Return 0 if value is NaN
+        } else {
+            console.error(`Element with ID "${id}" not found.`);
+            return 0; // Return 0 if the element does not exist
+        }
+    }
+
+    function copyOnQueueToResult() {
+        // Get the numeric value from the element with id "onqueuespan"
+        const onQueueValue = getNumericValue("onqueuespan");
+
+        // Set the value in the element with id "resultsonqhidden"
+        document.getElementById("resultsonqhidden").textContent = `₱${onQueueValue.toFixed(2)}`;
+    }
+
+    // Call the function immediately to set the initial value
+    copyOnQueueToResult();
+
+    // Update the value every 1000 milliseconds (1 second)
+    setInterval(() => {
+        copyOnQueueToResult();
+        calculateAll(); // Ensure calculateAll() is called as well
+    }, 1000);
+}
+
+// Call the update function when the page loads
+window.onload = updateOnQueueValue;
+
 
         </script>
         
@@ -506,7 +550,8 @@ updateHiddenCells();
      
      
                 <td  id="resultsonq"  style="padding-left:0px !important;border: 1px solid #ccc; padding: -5px; background-color: #4d4d00;"> </td>
-      
+                <td class="d-none"  id="resultsonqhidden" style="border: 1px solid #ccc; padding:  10px; background-color: #4d4d00; color: white;"></td>
+
         </tr>
 
 
@@ -539,6 +584,10 @@ updateHiddenCells();
 
 <script>
 
+
+
+
+
 function calculateAll() {
     // Helper function to get the numeric value
     function getNumericValue(id) {
@@ -562,6 +611,15 @@ function calculateAll() {
     const resultsonq = getNumericValue("resultsonq");
     const monthlyPaymentCell = getNumericValue("monthlyPaymentCell");
 
+    
+    const netpaypPliTotal = getNumericValue("netpaypPliTotal");
+    
+
+
+    const resultsonqhidden = getNumericValue("resultsonqhidden");
+    
+
+
     // Get additional values from table cells
     const resultsPLI1 = getNumericValue("totalAmountPLI0");
     const resultsPLI2 = getNumericValue("totalAmountPLI1");
@@ -578,15 +636,17 @@ function calculateAll() {
     console.log(`Netpay: ₱${resultsNetpay}, POS: ₱${resultspos}, Additions: ₱${totalAdditions}`);
 
     // First calculation: Adding resultsNetpay + resultspos + totalAdditions
-    const netpayPositiveTotal = resultsNetpay + resultspos + totalAdditions;
+    const netpayPositiveTotal = resultsNetpay + resultspos;
     document.getElementById("netpaypositivetotalvalue").textContent = `₱${netpayPositiveTotal.toFixed(2)}`;
 
     // Second calculation: PLI Total - On Queue
-    const semiTotalValue = pliTotalValue - resultsonq;
+const resultsonqValue = resultsonq || 0; // Default to 0 if resultsonq is empty or undefined
+const semiTotalValue = netpaypPliTotal  - resultsonqhidden;
+document.getElementById("semiTotalValue").textContent = `₱${semiTotalValue.toFixed(2)}`;
+
+    // Second calculation: PLI Total - On Queue
     document.getElementById("semiTotalValue").textContent = `₱${semiTotalValue.toFixed(2)}`;
 
-    // Debugging: Log semiTotalValue for verification
-    console.log(`Semi Total Value: ₱${semiTotalValue}`);
 
     // Final calculation: Semi Total - Monthly Payment
     const finalTotalValue = semiTotalValue - monthlyPaymentCell;
@@ -610,6 +670,12 @@ function calculateAll() {
 
 
 
+// Add event listener to the button
+document.getElementById("calculateButton").addEventListener("click", function() {
+    for (let i = 0; i < 3; i++) {
+        calculateAll(); // Call the function three times
+    }
+});
 
 
 
@@ -1306,19 +1372,33 @@ function updateresultsonq() {
     calculateSemiTotal();
 }
 
+
 function calculateSemiTotal() {
+    // Fetch and parse the PLI total value
     const pliTotalCell = document.getElementById('plitotalvalue');
     const pliTotalText = pliTotalCell.textContent || "";
     const pliTotalValue = parseFloat(pliTotalText.replace(/[₱,]/g, '').trim());
 
-    const resultsonq = document.getElementsByClassName('resultsonq');
-    const onqueueText = resultsonq.textContent || "";
+
+    // Fetch and parse the onqueue value
+    const resultsonq = document.getElementsByClassName('resultsonqhidden');
+    const onqueueText = resultsonq.length > 0 ? resultsonq[0].textContent : "";  // Assuming you're getting the first element
     const onqueueValue = parseFloat(onqueueText.replace(/[₱,]/g, '').trim());
+    
+    const netpaypPliTotal = document.getElementsByClassName('netpaypPliTotal');
+    const netpaypPliTotalText = resultsonq.length > 0 ? resultsonq[0].textContent : "";  // Assuming you're getting the first element
+    const netpaypPliTotalValue = parseFloat(onqueueText.replace(/[₱,]/g, '').trim());
 
-    const semiTotalValue = pliTotalValue - onqueueValue;
+    // Calculate the semi total
+    const semiTotalValue = netpaypPliTotal - onqueueValue;
 
-    const semiTotalCell = document.getElementById('semiTotal');
-    semiTotalCell.textContent = `₱${semiTotalValue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+    // Update the semi total cell with the formatted value
+    const semiTotalCell = document.getElementById('semitotalvalue'); // Ensure you use the correct ID
+    if (!isNaN(semiTotalValue)) {
+        semiTotalCell.textContent = `₱${semiTotalValue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+    } else {
+        semiTotalCell.textContent = "Error in calculation";
+    }
 }
 
 
