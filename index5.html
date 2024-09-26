@@ -537,7 +537,9 @@ updateHiddenCells();
     <button class="btn btn-success btn-lg fs-5" onclick="calculateAll()">COMPUTE</button>
 </div>
 
-<script>function calculateAll() {
+<script>
+
+function calculateAll() {
     // Helper function to get the numeric value
     function getNumericValue(id) {
         const element = document.getElementById(id);
@@ -550,6 +552,8 @@ updateHiddenCells();
             return 0; // Return 0 if the element does not exist
         }
     }
+
+    calculatePayment()
 
     // Get numeric values from table cells
     const resultsNetpay = getNumericValue("resultsNetpay");
@@ -712,7 +716,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     
         const csvFilesNetpay = [
-            'aug24.csv'
+            'sep24.csv'
         ];
         
     document.getElementById('searchButtonNetpay').addEventListener('click', searchEmployeeNetpay);
@@ -939,7 +943,7 @@ function calculateAndDisplayTotal(totalNetPay) {
 
 
 const csvFilesPos = [
-    'pos_aug24.csv'
+    'pos_sep24.csv'
 ];
 
 document.getElementById('searchButtonPos').addEventListener('click', searchEmployeePos);
@@ -1208,7 +1212,7 @@ resultsMap.forEach((value, monthName) => {
 
 
     const csvFilesOnq = [
-        'onq_aug24.csv'
+        'onq_sep24.csv'
     ];
 
     document.getElementById('searchButtonOnq').addEventListener('click', searchEmployeeOnq);
@@ -1475,7 +1479,7 @@ function calculateSemiTotal() {
         const detailCell = document.createElement('td');
         detailCell.setAttribute('colspan', 2);
         detailCell.innerHTML = `
-            <table class="table table-sm text-white" style="font-size:11px">
+            <table class="table table-sm text-white" style="font-size:9px">
                 <thead>
                     <tr>
                         <th>/</th>
@@ -1699,7 +1703,7 @@ document.addEventListener('DOMContentLoaded', calculateTotal);
 
 
 const csvFilesPLI = [
-    'pli_aug24.csv'
+    'pli_sep24.csv'
 ];
 
 document.getElementById('searchButtonPLI').addEventListener('click', searchEmployeePLI);
@@ -1937,7 +1941,7 @@ function createResultsTable(fetchedDataPLI, tableIndex) {
         const detailCell = document.createElement('td');
         detailCell.setAttribute('colspan', 2);
         detailCell.innerHTML = `
-            <table class="table table-sm text-white" style="font-size:11px">
+            <table class="table table-sm text-white" style="font-size:9px">
                 <thead>
                     <tr>
                         <th>/</th>
@@ -2184,7 +2188,7 @@ checkFinalTotalValue();
 
 
 
-<div class="offset-md-1 d-nones mb-5 pb-5"> <!-- Added offset-md-1 to create space -->
+<div class="offset-md-1 d-none mb-5 pb-5"> <!-- Added offset-md-1 to create space -->
     <div class="calculator bg-dark text-light border border-light p-4 rounded shadow-lg">
 
 
