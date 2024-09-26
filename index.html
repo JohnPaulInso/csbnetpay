@@ -29,6 +29,23 @@
 
 
 
+
+<script>
+    document.getElementById("searchButtonNetpay").addEventListener("click", function() {
+        var employeeNumber = document.getElementById("searchInputNetpay").value;
+        if (employeeNumber) {
+            console.log("Storing Employee Number:", employeeNumber);  // Debug log
+            localStorage.setItem("employeeNumber", employeeNumber); // Store the employee number
+        }
+    });
+</script>
+
+
+
+
+
+
+
 <body>
 
 <div id="searchSection" class="container  mt-5">

@@ -42,6 +42,25 @@
         
 
 
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                var employeeNumber = localStorage.getItem("employeeNumber"); // Retrieve the employee number
+        
+                if (employeeNumber) {
+                    console.log("Retrieved Employee Number:", employeeNumber);  // Debug log
+                    document.getElementById("searchInputPos").value = employeeNumber; // Fill the input
+        
+                    // Automatically trigger the search button click
+                    document.getElementById("searchButtonPos").click();
+                } else {
+                    console.log("No employee number found in localStorage.");  // Debug log
+                }
+            });
+        </script>
+
+
+
+
         <!-- Loading GIF -->
 <div id="loadingIndicatorPos" style="display: none; text-align: center;">
     <img src="loading.gif" alt="Loading..." style="max-width: 100px;">
