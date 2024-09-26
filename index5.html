@@ -355,20 +355,19 @@ updateNetPayCell();
 
 
 
+                    <tr>
+                        <td id="A12"  class="smallfont"  style="border: 1px solid #ccc; padding:  10px; background-color: #200000; color: white;">PLI TOTAL:</td>
+                        <td id="plitotalvalue" style="border: 1px solid #ccc; padding:  10px;padding-left:  10px !important; background-color: #200000; color: white;">₱0.00</td>
+                        <td class="d-none"  id="plitotalvaluehidden" style="border: 1px solid #ccc; padding:  10px; background-color: #200000; color: white;">₱0.00</td>
+                    </tr>
+                
+                
 <tr>
-    <td id="A12"  class="smallfont"  style="border: 1px solid #ccc; padding:  10px; background-color: #200000; color: white;">PLI TOTAL</td>
-    <td id="plitotalvalue" style="border: 1px solid #ccc; padding:  10px;padding-left:  10px !important; background-color: #200000; color: white;">₱0.00</td>
-    <td class="d-none"  id="plitotalvaluehidden" style="border: 1px solid #ccc; padding:  10px; background-color: #200000; color: white;">₱0.00</td>
-</tr>
-
-
-
-
-<tr>
-    <td id="A12"  class="smallfont"  style="border: 1px solid #ccc; padding:  10px; background-color: #001f14; color: white;">TOTAL</td>
+    <td id="A13"  class="smallfont"  style="border: 1px solid #ccc; padding:  10px; background-color: #001f14; color: white;">TOTAL</td>
     <td id="netpaypPliTotal" style="border: 1px solid #ccc; padding:  10px;padding-left:  10px !important; background-color: #001f14; color: white;">Netpay Total + PLI Total</td>
     <!-- <td class="d-none"  id="plitotalvaluehidden" style="border: 1px solid #ccc; padding:  10px; background-color: #001f14; color: white;">₱0.00</td> -->
 </tr>
+
 
 
 
@@ -495,14 +494,7 @@ updateHiddenCells();
 
 
 
-        <tr>
-            <td id="A11" class="smallfont" style="border: 1px solid #ccc; padding: 10px;">INCOMING</td>
-            <td style="border: 1px solid #ccc; padding: 10px; color: #5f5f5f;">
-                <input id="incoming" type="number" value="" class="form-control bg-dark text-light border-0">
-        
-            </td>
-            <td class="d-none" id="incominghidden" style="border: 1px solid #ccc; padding: 10px; color: white;"></td>
-        </tr>
+
 
 
 
@@ -519,7 +511,7 @@ updateHiddenCells();
         
         <tr>
             <td id="A14"  class="smallfont"  style="border: 1px solid #ccc; padding:  10px; background-color: green; color: white;">SEMI TOTAL:</td>
-            <td id="semiTotalValue" style=" border: 1px solid #ccc; padding:  10px; background-color: green; color: white;"></td>
+            <td id="semiTotalValue" style=" border: 1px solid #ccc; padding:  10px; background-color: green; color: white;">₱0.00</td>
 </tr>
         <tr>
             <td id="A15"  class="smallfont"  style="border: 1px solid #ccc; padding:  10px;">NEW CSB DED</td>
@@ -535,11 +527,10 @@ updateHiddenCells();
 
         
     </table>
-
-
 <div class="d-flex justify-content-center mt-5">
     <button class="btn btn-success btn-lg" onclick="calculateAll()">CALCULATE ALL</button>
 </div>
+
 <script>
 function calculateAll() {
     // Helper function to get the numeric value
@@ -584,11 +575,15 @@ function calculateAll() {
     const netpayPositiveTotal = resultsNetpay + resultspos + totalAdditions;
     document.getElementById("netpaypositivetotalvalue").textContent = `₱${netpayPositiveTotal.toFixed(2)}`;
 
-    // Debugging: Log netpayPositiveTotal for verification
-    console.log(`Netpay Positive Total: ₱${netpayPositiveTotal}`);
+    // Second calculation: PLI Total - On Queue
+    const semiTotalValue = pliTotalValue - resultsonq;
+    document.getElementById("semiTotalValue").textContent = `₱${semiTotalValue.toFixed(2)}`;
 
-    // Final calculation: (Netpay Positive Total + PLI Total) - On Queue - Monthly Payment
-    const finalTotalValue = (netpayPositiveTotal + pliTotalValue) - resultsonq - monthlyPaymentCell;
+    // Debugging: Log semiTotalValue for verification
+    console.log(`Semi Total Value: ₱${semiTotalValue}`);
+
+    // Final calculation: Semi Total - Monthly Payment
+    const finalTotalValue = semiTotalValue - monthlyPaymentCell;
     document.getElementById("finalTotalValue").textContent = `₱${finalTotalValue.toFixed(2)}`;
 
     // Debugging: Log finalTotalValue for verification
@@ -818,7 +813,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (!employeeFound) {
-            // employeeInfoSectionNetpay.innerHTML = 'No Netpay found in the latest data.';
+            employeeInfoSectionNetpay.innerHTML = 'No Netpay found in the latest data.';
         }
     }
 
@@ -1046,7 +1041,7 @@ function displayEmployeeInfoPos(monthName, csvData) {
     }
 
     if (!employeeFound) {
-        // employeeInfoSectionPos.innerHTML = 'No Positive Dedamt found in the latest data.';
+        employeeInfoSectionPos.innerHTML = 'No Positive Dedamt found in the latest data.';
     }
 }
 
@@ -1252,7 +1247,7 @@ function calculateAndUpdateMonthlyPayment() {
     // Retrieve the value from the monthlyPayment span
     const monthlyPaymentValue = document.getElementById('monthlyPayment').textContent;
 
-    // Update the    with the retrieved value
+    // Update the monthlyPaymentCell with the retrieved value
     const monthlyPaymentCell = document.getElementById('monthlyPaymentCell');
     monthlyPaymentCell.textContent = monthlyPaymentValue; // Update the cell with the payment value
 
@@ -1380,7 +1375,7 @@ function calculateSemiTotal() {
         }
 
         if (!employeeFound) {
-            // employeeInfoSectionOnq.innerHTML = 'No On-queue found in the latest data.';
+            employeeInfoSectionOnq.innerHTML = 'No On-queue found in the latest data.';
         }
 
     }
@@ -2304,4 +2299,3 @@ function calculatePayment() {
 </body>
 
 </html>
-
