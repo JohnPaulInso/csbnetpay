@@ -749,8 +749,7 @@ document.getElementById("calculateButton").addEventListener("click", function() 
         <td id="A8" class="smallfont" style="border: 1px solid #ccc; padding: 10px;">PROCEEDS</td>
         <td style="border: 1px solid #ccc; padding: 10px;" id="proceeds"></td>
     </tr>
-</table>
-<script>
+</table><script>
     // Helper function to format numbers with thousands separators and two decimal places
     function formatNumber(number) {
         return number.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -779,14 +778,18 @@ document.getElementById("calculateButton").addEventListener("click", function() 
         document.getElementById("proceeds").innerText = formatNumber(proceeds);
     }
 
-    // Event listeners for inputs to trigger the calculation
-    document.getElementById("loanAmount").addEventListener("input", calculateValues);
-    document.getElementById("redemption1").addEventListener("input", calculateValues);
-    document.getElementById("redemption2").addEventListener("input", calculateValues);
-    document.getElementById("redemption3").addEventListener("input", calculateValues);
-    document.getElementById("oldBalance").addEventListener("input", calculateValues);
-</script>
+    // Initialize calculation at page load
+    calculateValues();
 
+    // Event listeners for inputs to trigger the calculation initially
+    const inputIds = ["loanAmount", "redemption1", "redemption2", "redemption3", "oldBalance"];
+    inputIds.forEach(id => {
+        document.getElementById(id).addEventListener("input", calculateValues);
+    });
+
+    // Set interval to compute values every 2 seconds
+    setInterval(calculateValues, 2000);
+</script>
 
 
 
