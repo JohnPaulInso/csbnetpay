@@ -758,19 +758,20 @@ document.getElementById("calculateButton").addEventListener("click", function() 
 
     // Function to calculate values based on the loanAmount
     function calculateValues() {
-        const loanAmount = parseFloat(document.getElementById("loanAmount").value) || 0;
+        const loanAmount = parseFloat(document.getElementById("loanAmount").value.replace(/,/g, '') ) || 0;
+
         const redemption1 = parseFloat(document.getElementById("redemption1").value) || 0;
         const redemption2 = parseFloat(document.getElementById("redemption2").value) || 0;
         const redemption3 = parseFloat(document.getElementById("redemption3").value) || 0;
         const oldBalance = parseFloat(document.getElementById("oldBalance").value) || 0;
 
         // Loan Proceeds formula: loanAmount - (loanAmount * 6%) = 50,000 - (50,000 * 6%) = 47,000
-        const loanProceeds = (loanAmount - (loanAmount * 0.06)) * 1000;
+        const loanProceeds = (loanAmount - (loanAmount * 0.06)) ;
 
         document.getElementById("loanProceeds").innerText = formatNumber(loanProceeds);
 
         // DAB formula: loanAmount * 1.5% = 50,000 * 1.5% = 750
-        const dab = loanAmount * 0.015 * 1000;
+        const dab = loanAmount * 0.015 ;
         document.getElementById("dab").innerText = formatNumber(dab);
 
         // Proceeds formula: Loan Proceeds - Redemption 1 - Redemption 2 - Redemption 3 - Old Balance
