@@ -344,7 +344,6 @@ updateNetPayCell();
     <td id="A11" class="smallfont" style="border: 1px solid #ccc; padding: 10px;">PRMTION</td>
     <td style="border: 1px solid #ccc; padding: 10px; color: #5f5f5f;">
         <input id="promotion" type="number" value="" class="form-control bg-dark text-light border-0">
-
     </td>
     <td class="d-none" id="promotionhidden" style="border: 1px solid #ccc; padding: 10px; color: white;"></td>
 </tr>
@@ -683,6 +682,115 @@ document.getElementById("calculateButton").addEventListener("click", function() 
 
 
 </script>
+
+
+
+
+
+
+
+
+
+<table class="mt-5" style="width: 100%; border-collapse: collapse; text-align: left;">
+    <!-- Loan Proceeds -->
+    <tr>
+        <td id="A1" class="smallfont" style="border: 1px solid #ccc; padding: 10px;">LOAN PRCDS</td>
+        <td style="border: 1px solid #ccc; padding: 10px;" id="loanProceeds"></td>
+    </tr>
+    
+    <!-- Redemption 1 -->
+    <tr>
+        <td id="A2" class="smallfont" style="border: 1px solid #ccc; padding: 10px;">RDMTN 1</td>
+        <td style="border: 1px solid #ccc; padding: 10px;">
+            <input id="redemption1" type="number" value="" class="form-control bg-dark text-light border-0">
+        </td>
+    </tr>
+
+    <!-- Redemption 2 -->
+    <tr>
+        <td id="A3" class="smallfont" style="border: 1px solid #ccc; padding: 10px;">RDMTN 2</td>
+        <td style="border: 1px solid #ccc; padding: 10px;">
+            <input id="redemption2" type="number" value="" class="form-control bg-dark text-light border-0">
+        </td>
+    </tr>
+
+    <!-- Redemption 3 -->
+    <tr>
+        <td id="A4" class="smallfont" style="border: 1px solid #ccc; padding: 10px;">RDMTN 3</td>
+        <td style="border: 1px solid #ccc; padding: 10px;">
+            <input id="redemption3" type="number" value="" class="form-control bg-dark text-light border-0">
+        </td>
+    </tr>
+
+    <!-- Old Balance -->
+    <tr>
+        <td id="A5" class="smallfont" style="border: 1px solid #ccc; padding: 10px;">OLD BLNCE</td>
+        <td style="border: 1px solid #ccc; padding: 10px;">
+            <input id="oldBalance" type="number" value="" class="form-control bg-dark text-light border-0">
+        </td>
+    </tr>
+
+    <!-- Top Up -->
+    <tr>
+        <td id="A6" class="smallfont" style="border: 1px solid #ccc; padding: 10px;">TOP UP</td>
+        <td style="border: 1px solid #ccc; padding: 10px;">
+            <input id="topUp" type="number" value="" class="form-control bg-dark text-light border-0">
+        </td>
+    </tr>
+
+    <!-- DAB -->
+    <tr>
+        <td id="A7" class="smallfont" style="border: 1px solid #ccc; padding: 10px;">DAB</td>
+        <td style="border: 1px solid #ccc; padding: 10px;" id="dab"></td>
+    </tr>
+
+    <!-- Proceeds -->
+    <tr>
+        <td id="A8" class="smallfont" style="border: 1px solid #ccc; padding: 10px;">PROCEEDS</td>
+        <td style="border: 1px solid #ccc; padding: 10px;" id="proceeds"></td>
+    </tr>
+</table>
+<script>
+    // Helper function to format numbers with thousands separators and two decimal places
+    function formatNumber(number) {
+        return number.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // Function to calculate values based on the loanAmount
+    function calculateValues() {
+        const loanAmount = parseFloat(document.getElementById("loanAmount").value) || 0;
+        const redemption1 = parseFloat(document.getElementById("redemption1").value) || 0;
+        const redemption2 = parseFloat(document.getElementById("redemption2").value) || 0;
+        const redemption3 = parseFloat(document.getElementById("redemption3").value) || 0;
+        const oldBalance = parseFloat(document.getElementById("oldBalance").value) || 0;
+
+        // Loan Proceeds formula: loanAmount - (loanAmount * 6%) = 50,000 - (50,000 * 6%) = 47,000
+        const loanProceeds = (loanAmount - (loanAmount * 0.06)) * 1000;
+
+        document.getElementById("loanProceeds").innerText = formatNumber(loanProceeds);
+
+        // DAB formula: loanAmount * 1.5% = 50,000 * 1.5% = 750
+        const dab = loanAmount * 0.015 * 1000;
+        document.getElementById("dab").innerText = formatNumber(dab);
+
+        // Proceeds formula: Loan Proceeds - Redemption 1 - Redemption 2 - Redemption 3 - Old Balance
+        const proceeds = loanProceeds - redemption1 - redemption2 - redemption3 - oldBalance;
+        document.getElementById("proceeds").innerText = formatNumber(proceeds);
+    }
+
+    // Event listeners for inputs to trigger the calculation
+    document.getElementById("loanAmount").addEventListener("input", calculateValues);
+    document.getElementById("redemption1").addEventListener("input", calculateValues);
+    document.getElementById("redemption2").addEventListener("input", calculateValues);
+    document.getElementById("redemption3").addEventListener("input", calculateValues);
+    document.getElementById("oldBalance").addEventListener("input", calculateValues);
+</script>
+
+
+
+
+
+
 
 
 
