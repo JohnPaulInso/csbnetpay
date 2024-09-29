@@ -740,60 +740,197 @@ document.getElementById("calculateButton").addEventListener("click", function() 
         </td>
     </tr>
 
+
+
+
+
+
+
+
+    
     <!-- DAB -->
     <tr>
         <td id="A7" class="smallfont" style="border: 1px solid #ccc; padding: 10px;">DAB</td>
-        <td style="border: 1px solid #ccc; padding: 10px;" id="dab"></td>
+        <td style="border: 1px solid #ccc; padding: 10px; position: relative;">
+            <span id="dab">0.00</span>
+            <input type="checkbox" class="dab-checkbox" checked style="position: absolute; right: 10px; transform: scale(1.3); -webkit-transform: scale(1.3);" />
+        </td>
+    </tr>
+    
+    <!-- ADVANCE PAYMENT -->
+    <tr>
+        <td id="A8" class="smallfont" style="border: 1px solid #ccc; padding: 10px;">ADVANCE PAYMENT</td>
+        <td style="border: 1px solid #ccc; padding: 10px; position: relative;"  id="advancepaymentCell">
+            <span id="advancepayment">0.00</span>
+
+
+            <select id="multiplierAdvance" class="bg-dark text-light" style="position: absolute; right: 35px;font-size: 12px;" ></select>
+        
+            <script>
+                const select = document.getElementById('multiplierAdvance');
+                for (let i = 1; i <= 8; i++) {
+                    select.innerHTML += `<option value="${i}">${i}</option>`;
+                }
+            </script>
+
+
+
+
+            <input type="checkbox" class="advancepayment-checkbox" checked style="position: absolute; right: 10px; transform: scale(1.3); -webkit-transform: scale(1.3);" />
+        </td>
     </tr>
 
     <!-- Proceeds -->
     <tr>
-        <td id="A8" class="smallfont" style="border: 1px solid #ccc; padding: 10px;">PROCEEDS</td>
+        <td id="A9" class="smallfont" style="border: 1px solid #ccc; padding: 10px;">PROCEEDS</td>
         <td style="border: 1px solid #ccc; padding: 10px;" id="proceeds"></td>
+        
     </tr>
-</table><script>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+<script>
     // Helper function to format numbers with thousands separators and two decimal places
     function formatNumber(number) {
         return number.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
-    // Function to calculate values based on the loanAmount
+    // Helper function to parse currency formatted values (like ₱10,540.07) into numbers
+    function parseCurrency(value) {
+        return parseFloat(value.replace(/[₱,]/g, '')) || 0;
+    }
+
+    let originalDab = 0;
+    let originalAdvancePayment = 0;
+    let currentMultiplier = 1; // Track current multiplier
+    let intervalId; // Store the interval ID for managing the setInterval
+
+    // Function to calculate values including advance payment
     function calculateValues() {
-        const loanAmount = parseFloat(document.getElementById("loanAmount").value.replace(/,/g, '') ) || 0;
+        const loanAmount = parseFloat(document.getElementById("loanAmount").value.replace(/,/g, '')) || 0;
+    const redemption1 = parseFloat(document.getElementById("redemption1").value) || 0;
+    const redemption2 = parseFloat(document.getElementById("redemption2").value) || 0;
+    const redemption3 = parseFloat(document.getElementById("redemption3").value) || 0;
+    const oldBalance = parseFloat(document.getElementById("oldBalance").value) || 0;
+    const topUp = parseFloat(document.getElementById("topUp").value) || 0;
 
-        const redemption1 = parseFloat(document.getElementById("redemption1").value) || 0;
-        const redemption2 = parseFloat(document.getElementById("redemption2").value) || 0;
-        const redemption3 = parseFloat(document.getElementById("redemption3").value) || 0;
-        const oldBalance = parseFloat(document.getElementById("oldBalance").value) || 0;
+    // Loan Proceeds formula
+    const loanProceeds = loanAmount - (loanAmount * 0.06);
+    document.getElementById("loanProceeds").innerText = formatNumber(loanProceeds);
 
-        // Loan Proceeds formula: loanAmount - (loanAmount * 6%) = 50,000 - (50,000 * 6%) = 47,000
-        const loanProceeds = (loanAmount - (loanAmount * 0.06)) ;
+    // DAB formula
+    const dabCheckbox = document.querySelector(".dab-checkbox");
+    let dab = 0; // Default to 0 if checkbox is unchecked
+    if (dabCheckbox.checked) {
+        dab = loanAmount * 0.015;
+        originalDab = dab; // Save original value
+    }
+    document.getElementById("dab").innerText = formatNumber(dab);
 
-        document.getElementById("loanProceeds").innerText = formatNumber(loanProceeds);
+    // Retrieve advancepayment from the DOM or use the computed one
+    const advancepayment = parseFloat(document.getElementById("advancepayment").innerText.replace(/,/g, '')) || 0;
 
-        // DAB formula: loanAmount * 1.5% = 50,000 * 1.5% = 750
-        const dab = loanAmount * 0.015 ;
-        document.getElementById("dab").innerText = formatNumber(dab);
+    // Proceeds formula, now includes conditional DAB value
+    const proceeds = loanProceeds - redemption1 - redemption2 - redemption3 - oldBalance + topUp + dab - advancepayment;
+    document.getElementById("proceeds").innerText = formatNumber(proceeds);
 
-        // Proceeds formula: Loan Proceeds - Redemption 1 - Redemption 2 - Redemption 3 - Old Balance
-        const proceeds = loanProceeds - redemption1 - redemption2 - redemption3 - oldBalance;
-        document.getElementById("proceeds").innerText = formatNumber(proceeds);
+        // Get the values from the monthly payment and sum amount elements
+        const monthlyPaymentElement = document.getElementById("monthlyPaymentCell");
+        const sumAmountElement = document.querySelector(".sum-amount");
+
+        // Ensure the elements exist
+        if (!monthlyPaymentElement || !sumAmountElement) {
+            console.log("Required elements not found!");
+            return;
+        }
+
+        const monthlyPayment = parseCurrency(monthlyPaymentElement.innerText);
+        const sumAmount = parseCurrency(sumAmountElement.innerText);
+
+        // Calculate advance payment based on current multiplier
+        const advancePayment = (monthlyPayment - sumAmount) * currentMultiplier;
+        originalAdvancePayment = monthlyPayment - sumAmount; // Save original advance payment for further calculations
+        document.getElementById("advancepayment").innerText = formatNumber(advancePayment);
+    }
+
+    // Function to update values based on checkboxes
+    function updateValuesOnCheckbox() {
+        const dabCheckbox = document.querySelector(".dab-checkbox");
+        const advancePaymentCheckbox = document.querySelector(".advancepayment-checkbox");
+        const multiplierAdvance = document.getElementById('multiplierAdvance');
+
+        // If the DAB checkbox is unchecked, set DAB to 0, else restore original value
+        if (!dabCheckbox.checked) {
+            document.getElementById("dab").innerText = formatNumber(0);
+        } else {
+            document.getElementById("dab").innerText = formatNumber(originalDab);
+        }
+
+        // If the Advance Payment checkbox is unchecked
+        if (!advancePaymentCheckbox.checked) {
+            document.getElementById("advancepayment").innerText = formatNumber(0);
+            multiplierAdvance.style.display = 'none'; // Hide the dropdown
+        } else {
+            multiplierAdvance.style.display = 'block'; // Show the dropdown
+            // Recalculate the advance payment with current multiplier
+            document.getElementById("advancepayment").innerText = formatNumber(originalAdvancePayment * currentMultiplier);
+        }
+
+        // Check if any checkbox is checked
+        if (dabCheckbox.checked || advancePaymentCheckbox.checked) {
+            startInterval(); // Restart the interval if at least one is checked
+        } else {
+            clearInterval(intervalId); // Clear the interval if both are unchecked
+        }
+    }
+
+    // Function to handle multiplier selection
+    function handleMultiplierChange() {
+        const multiplierAdvance = document.getElementById('multiplierAdvance');
+        currentMultiplier = parseInt(multiplierAdvance.value, 10);
+
+        // Update advance payment based on the selected multiplier
+        const originalAdvancePayment = parseCurrency(document.getElementById("advancepayment").innerText);
+        const newAdvancePayment = originalAdvancePayment * currentMultiplier;
+        document.getElementById("advancepayment").innerText = formatNumber(newAdvancePayment);
+    }
+
+    // Start the interval for calculations
+    function startInterval() {
+        if (!intervalId) { // Only set the interval if it's not already set
+            intervalId = setInterval(() => {
+                const dabCheckbox = document.querySelector(".dab-checkbox");
+                const advancePaymentCheckbox = document.querySelector(".advancepayment-checkbox");
+
+                // Only calculate if at least one checkbox is checked
+                if (dabCheckbox.checked || advancePaymentCheckbox.checked) {
+                    calculateValues();
+                    updateValuesOnCheckbox(); // Update display based on checkbox state
+                }
+            }, 300);
+        }
     }
 
     // Initialize calculation at page load
     calculateValues();
+    startInterval(); // Start the interval for the first time
 
-    // Event listeners for inputs to trigger the calculation initially
-    const inputIds = ["loanAmount", "redemption1", "redemption2", "redemption3", "oldBalance"];
-    inputIds.forEach(id => {
-        document.getElementById(id).addEventListener("input", calculateValues);
-    });
+    // Event listeners for checkboxes
+    document.querySelector(".dab-checkbox").addEventListener("change", updateValuesOnCheckbox);
+    document.querySelector(".advancepayment-checkbox").addEventListener("change", updateValuesOnCheckbox);
 
-    // Set interval to compute values every 2 seconds
-    setInterval(calculateValues, 2000);
+    // Event listener for the dropdown
+    document.getElementById('multiplierAdvance').addEventListener('change', handleMultiplierChange);
 </script>
-
-
 
 
 
