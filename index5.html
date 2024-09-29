@@ -795,9 +795,6 @@ document.getElementById("calculateButton").addEventListener("click", function() 
 
 
 
-
-
-
 <script>
     // Helper function to format numbers with thousands separators and two decimal places
     function formatNumber(number) {
@@ -810,38 +807,37 @@ document.getElementById("calculateButton").addEventListener("click", function() 
     }
 
     let originalDab = 0;
-    let originalAdvancePayment = 0;
     let currentMultiplier = 1; // Track current multiplier
     let intervalId; // Store the interval ID for managing the setInterval
 
     // Function to calculate values including advance payment
     function calculateValues() {
         const loanAmount = parseFloat(document.getElementById("loanAmount").value.replace(/,/g, '')) || 0;
-    const redemption1 = parseFloat(document.getElementById("redemption1").value) || 0;
-    const redemption2 = parseFloat(document.getElementById("redemption2").value) || 0;
-    const redemption3 = parseFloat(document.getElementById("redemption3").value) || 0;
-    const oldBalance = parseFloat(document.getElementById("oldBalance").value) || 0;
-    const topUp = parseFloat(document.getElementById("topUp").value) || 0;
+        const redemption1 = parseFloat(document.getElementById("redemption1").value) || 0;
+        const redemption2 = parseFloat(document.getElementById("redemption2").value) || 0;
+        const redemption3 = parseFloat(document.getElementById("redemption3").value) || 0;
+        const oldBalance = parseFloat(document.getElementById("oldBalance").value) || 0;
+        const topUp = parseFloat(document.getElementById("topUp").value) || 0;
 
-    // Loan Proceeds formula
-    const loanProceeds = loanAmount - (loanAmount * 0.06);
-    document.getElementById("loanProceeds").innerText = formatNumber(loanProceeds);
+        // Loan Proceeds formula
+        const loanProceeds = loanAmount - (loanAmount * 0.06);
+        document.getElementById("loanProceeds").innerText = formatNumber(loanProceeds);
 
-    // DAB formula
-    const dabCheckbox = document.querySelector(".dab-checkbox");
-    let dab = 0; // Default to 0 if checkbox is unchecked
-    if (dabCheckbox.checked) {
-        dab = loanAmount * 0.015;
-        originalDab = dab; // Save original value
-    }
-    document.getElementById("dab").innerText = formatNumber(dab);
+        // DAB formula
+        const dabCheckbox = document.querySelector(".dab-checkbox");
+        let dab = 0; // Default to 0 if checkbox is unchecked
+        if (dabCheckbox.checked) {
+            dab = loanAmount * 0.015;
+            originalDab = dab; // Save original value
+        }
+        document.getElementById("dab").innerText = formatNumber(dab);
 
-    // Retrieve advancepayment from the DOM or use the computed one
-    const advancepayment = parseFloat(document.getElementById("advancepayment").innerText.replace(/,/g, '')) || 0;
+        // Retrieve advancepayment from the DOM or use the computed one
+        const advancepayment = parseFloat(document.getElementById("advancepayment").innerText.replace(/,/g, '')) || 0;
 
-    // Proceeds formula, now includes conditional DAB value
-    const proceeds = loanProceeds - redemption1 - redemption2 - redemption3 - oldBalance + topUp + dab - advancepayment;
-    document.getElementById("proceeds").innerText = formatNumber(proceeds);
+        // Proceeds formula, now includes conditional DAB value
+        const proceeds = loanProceeds - redemption1 - redemption2 - redemption3 - oldBalance + topUp + dab - advancepayment;
+        document.getElementById("proceeds").innerText = formatNumber(proceeds);
 
         // Get the values from the monthly payment and sum amount elements
         const monthlyPaymentElement = document.getElementById("monthlyPaymentCell");
@@ -858,8 +854,7 @@ document.getElementById("calculateButton").addEventListener("click", function() 
 
         // Calculate advance payment based on current multiplier
         const advancePayment = (monthlyPayment - sumAmount) * currentMultiplier;
-        originalAdvancePayment = monthlyPayment - sumAmount; // Save original advance payment for further calculations
-        document.getElementById("advancepayment").innerText = formatNumber(advancePayment);
+        document.getElementById("advancepayment").innerText = formatNumber(advancePayment); // Update displayed advance payment
     }
 
     // Function to update values based on checkboxes
@@ -882,7 +877,7 @@ document.getElementById("calculateButton").addEventListener("click", function() 
         } else {
             multiplierAdvance.style.display = 'block'; // Show the dropdown
             // Recalculate the advance payment with current multiplier
-            document.getElementById("advancepayment").innerText = formatNumber(originalAdvancePayment * currentMultiplier);
+            calculateValues(); // Ensure it uses the updated numbers for advance payment
         }
 
         // Check if any checkbox is checked
@@ -899,9 +894,7 @@ document.getElementById("calculateButton").addEventListener("click", function() 
         currentMultiplier = parseInt(multiplierAdvance.value, 10);
 
         // Update advance payment based on the selected multiplier
-        const originalAdvancePayment = parseCurrency(document.getElementById("advancepayment").innerText);
-        const newAdvancePayment = originalAdvancePayment * currentMultiplier;
-        document.getElementById("advancepayment").innerText = formatNumber(newAdvancePayment);
+        calculateValues(); // This will ensure the recalculation uses the latest multiplier
     }
 
     // Start the interval for calculations
@@ -931,8 +924,6 @@ document.getElementById("calculateButton").addEventListener("click", function() 
     // Event listener for the dropdown
     document.getElementById('multiplierAdvance').addEventListener('change', handleMultiplierChange);
 </script>
-
-
 
 
 
