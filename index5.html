@@ -343,17 +343,46 @@ updateNetPayCell();
 <tr>
     <td id="A11" class="smallfont" style="border: 1px solid #ccc; padding: 10px;">PRMTION</td>
     <td style="border: 1px solid #ccc; padding: 10px; color: #5f5f5f;">
-        <input id="promotion" type="number" value="" class="form-control bg-dark text-light border-0">
+
+
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+        <div id="contentArea"></div>
+
+        <script>
+            $(document).ready(function() {
+                // Load content from index10.html
+                $("#contentArea").load("index10.html", function(response, status, xhr) {
+                    if (status === "error") {
+                        console.log("Error loading page: " + xhr.status + " " + xhr.statusText);
+                    }
+                });
+            });
+        </script>
+    
+
+
+
+
     </td>
-    <td class="d-none" id="promotionhidden" style="border: 1px solid #ccc; padding: 10px; color: white;"></td>
+
+
+
+
+    <td class="d-none" id="promotionhidden" style="border: 1px solid #ccc; padding: 10px; color: white;">
+
+
+        
+
+        
+    </td>
+
+
+
+
+    
 </tr>
-
-
-
-
-
-
-
 
 
                     <tr>
@@ -376,6 +405,17 @@ updateNetPayCell();
         
 
 
+
+
+
+
+
+
+
+
+
+
+            
 
             
 
@@ -406,7 +446,7 @@ function updateHiddenCells() {
     // Handle anticipation and promotion cells
     const anticipationCell = document.querySelector(`#anticipation`);
     const anticipationHiddenCell = document.querySelector(`#anticipationhidden`);
-    const promotionCell = document.querySelector(`#promotion`);
+    const promotionCell1 = document.querySelector(`#promotion`);
     const promotionHiddenCell = document.querySelector(`#promotionhidden`);
 
     // Update anticipation hidden cell and add to totalPLI
@@ -422,12 +462,12 @@ function updateHiddenCells() {
     }
 
     // Update promotion hidden cell and add to totalPLI
-    if (promotionCell && promotionHiddenCell) {
-        const promotionValue = parseFloat(promotionCell.value.trim()); // Get the value from the input
+    if (promotionCell1 && promotionHiddenCell) {
+        const promotionValue1 = parseFloat(promotionCell1.value.trim()); // Get the value from the input
 
-        if (!isNaN(promotionValue)) {
-            promotionHiddenCell.textContent = promotionValue.toFixed(2);
-            totalPLI += promotionValue; // Add to totalPLI
+        if (!isNaN(promotionValue1)) {
+            promotionHiddenCell.textContent = promotionValue1.toFixed(2);
+            totalPLI += promotionValue1; // Add to totalPLI
         } else {
             promotionHiddenCell.textContent = '';
         }
