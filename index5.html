@@ -350,17 +350,25 @@ updateNetPayCell();
 
         <div id="contentArea"></div>
 
-        <script>
-            $(document).ready(function() {
-                // Load content from index10.html
-                $("#contentArea").load("index10.html", function(response, status, xhr) {
-                    if (status === "error") {
-                        console.log("Error loading page: " + xhr.status + " " + xhr.statusText);
-                    }
-                });
-            });
-        </script>
-    
+     
+<script>
+    $(document).ready(function() {
+        // Show loading indicator
+        $("#loading").show();
+
+        // Attempt to load content from index10.html
+        $("#contentArea").load("index10.html", function(response, status, xhr) {
+            $("#loading").hide(); // Hide loading indicator
+            if (status === "error") {
+                console.log("Error loading page: " + xhr.status + " " + xhr.statusText);
+                // Optionally handle the error here
+            } else {
+                // Successfully loaded content
+                console.log("Content loaded successfully.");
+            }
+        });
+    });
+</script>
 
 
 
