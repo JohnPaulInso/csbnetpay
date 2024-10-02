@@ -346,29 +346,70 @@ updateNetPayCell();
 
 
 
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-        <div id="contentArea"></div>
 
-     
-<script>
-    $(document).ready(function() {
-        // Show loading indicator
-        $("#loading").show();
 
-        // Attempt to load content from index10.html
-        $("#contentArea").load("index10.html", function(response, status, xhr) {
-            $("#loading").hide(); // Hide loading indicator
-            if (status === "error") {
-                console.log("Error loading page: " + xhr.status + " " + xhr.statusText);
-                // Optionally handle the error here
-            } else {
-                // Successfully loaded content
-                console.log("Content loaded successfully.");
-            }
-        });
-    });
-</script>
+
+
+
+
+
+            <!-- Table 1: Dropdown in First Column -->
+            <div class="table-responsive" style="font-size:10px;">
+                <table class="table table-dark table-sm">
+                    <thead>
+                        <tr style="font-size:8px;">
+                            <th class="dropdown-col">SLRY GRD</th>
+                            <th>BASIC</th>
+                            <th>PRMTN NET</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table1Body">
+                        <!-- First Row -->
+                        <tr>
+                            <td style="font-size:10px;">
+                                <select id="salaryGradeDropdown1" class="form-select bg-dark text-white" onchange="updateSalaryRow(1)">
+                                    <!-- Dropdown options will be populated dynamically -->
+                                </select>
+                            </td>
+                            <td id="basicPayTable1"></td>
+                            <td id="prmtnNetpayTable1"></td>
+                        </tr>
+                        <!-- Second Row -->
+                        <tr>
+                            <td style="font-size:10px;">
+                                <select id="salaryGradeDropdown2" class="form-select bg-dark text-white" onchange="updateSalaryRow(2)">
+                                    <!-- Dropdown options will be populated dynamically -->
+                                </select>
+                            </td>
+                            <td id="basicPayTable2"></td>
+                            <td id="prmtnNetpayTable2"></td>
+                        </tr>
+                        <tr>
+                            <td>DIFF</td>
+                            <td id="basicPayTable3" ></td>
+                            <td>
+                               
+                                <input 
+                                id="promotion" 
+                                type="number" 
+                                class="bg-dark text-light border-0" 
+                                style="font-size:10px; font-weight: bold; width:50%;"  
+                                step="0.01" 
+                                oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\..*/g, '$1').replace(/(\.\d{2})\d*/, '$1')" 
+                                pattern="^\d+(\.\d{0,2})?$" 
+                                min="0" 
+                                placeholder="0.00"
+                            />
+                            
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+
 
 
 
@@ -378,7 +419,7 @@ updateNetPayCell();
 
 
 
-    <td class="d-none" id="promotionhidden" style="border: 1px solid #ccc; padding: 10px; color: white;">
+    <td class="d-none" value="" id="promotionhidden" style="border: 1px solid #ccc; padding: 10px; color: white;">
 
 
         
@@ -394,7 +435,7 @@ updateNetPayCell();
 
 
                     <tr>
-                        <td id="A12"  class="smallfont"  style="border: 1px solid #ccc; padding:  10px; background-color: #200000; color: white;">PLI TOTAL:</td>
+                        <td id="A12"  class="smallfont"  style="border: 1px solid #ccc; padding:  10px; background-color: #200000; color: white;">SUB TOTAL:</td>
                         <td id="plitotalvalue" style="border: 1px solid #ccc; padding:  10px;padding-left:  10px !important; background-color: #200000; color: white;">₱0.00</td>
                         <td class="d-none"  id="plitotalvaluehidden" style="border: 1px solid #ccc; padding:  10px; background-color: #200000; color: white;">₱0.00</td>
                     </tr>
@@ -1029,6 +1070,169 @@ document.getElementById("calculateButton").addEventListener("click", function() 
 
 
 
+
+
+
+
+    <script>
+        // Load and parse CSV when the page is loaded
+        window.onload = function () {
+            loadprmtnCSV();
+        };
+        
+        // Function to load and parse CSV file
+        function loadprmtnCSV() {
+            fetch("promotion_bracket.csv")
+                .then(response => response.text())
+                .then(data => {
+                    const parsedData = parseCSV(data);
+                    populateSalaryDropdown(parsedData);
+                })
+                .catch(error => console.error("Error loading CSV:", error));
+        }
+        
+        // Function to parse CSV data into an array of objects
+        function parseCSV(data) {
+            const rows = data.split('\n').map(row => row.split(','));
+            const jsonData = rows.slice(1).map(row => {
+                return {
+                    salaryGrade: row[0] ? row[0].trim() : '',
+                    basicPay: row[1] ? row[1].trim() : '',
+                    prmtnNetpay: row[11] ? row[11].trim() : '' // Ensure this index matches the correct column for PRMTN NET
+                };
+            });
+            return jsonData;
+        }
+        
+        // Function to populate both dropdowns with unique salary grade steps
+        function populateSalaryDropdown(data) {
+            const dropdown1 = document.getElementById("salaryGradeDropdown1");
+            const dropdown2 = document.getElementById("salaryGradeDropdown2");
+            const uniqueSalaryGradeStep = new Set();
+        
+            data.forEach(row => {
+                const salaryGradeStep = row.salaryGrade;
+        
+                if (!uniqueSalaryGradeStep.has(salaryGradeStep)) {
+                    uniqueSalaryGradeStep.add(salaryGradeStep);
+                    
+                    const option1 = new Option(salaryGradeStep, salaryGradeStep);
+                    dropdown1.add(option1);
+                    
+                    const option2 = new Option(salaryGradeStep, salaryGradeStep);
+                    dropdown2.add(option2);
+                }
+            });
+        }
+        
+        // Global variables to store selected values for comparison
+        let firstRowBasicPay = 0;
+        let secondRowBasicPay = 0;
+        let firstRowprmtnNetpay = 0;
+        let secondRowprmtnNetpay = 0;
+        
+        // Helper function to clean and parse the numeric values from the table
+        function parseValue(value) {
+            return parseFloat(value.replace(/,/g, '') || 0);
+        }
+        
+        // Update only the specific row's data based on dropdown selection
+        function updateSalaryRow(rowNumber) {
+            const selectedSalaryGrade = document.getElementById(`salaryGradeDropdown${rowNumber}`).value;
+        
+            fetch("promotion_bracket.csv")
+                .then(response => response.text())
+                .then(data => {
+                    const parsedData = parseCSV(data);
+        
+                    // Log the selected salary grade for debugging
+                    console.log("Selected Salary Grade for Row " + rowNumber + ": " + selectedSalaryGrade);
+                    
+                    const filteredData = parsedData.find(row => {
+                        return row.salaryGrade === selectedSalaryGrade;
+                    });
+        
+                    if (filteredData) {
+                        const basicPay = parseValue(filteredData.basicPay);
+                        const prmtnNetpay = parseValue(filteredData.prmtnNetpay);
+        
+                        // Log values for debugging
+                        console.log(`Row ${rowNumber} Basic Pay: ${basicPay}, Promotion Net Pay: ${prmtnNetpay}`);
+        
+                        document.getElementById(`basicPayTable${rowNumber}`).textContent = basicPay.toLocaleString();
+                        document.getElementById(`prmtnNetpayTable${rowNumber}`).textContent = prmtnNetpay.toLocaleString();
+        
+                        // Update global variables for salary differences
+                        if (rowNumber === 1) {
+                            firstRowBasicPay = basicPay;
+                            firstRowprmtnNetpay = prmtnNetpay;
+                        } else if (rowNumber === 2) {
+                            secondRowBasicPay = basicPay;
+                            secondRowprmtnNetpay = prmtnNetpay;
+                        }
+        
+                        // Calculate and display the difference
+                        calculateSalaryDifference();
+                    } else {
+                        console.warn(`No data found for the selected salary grade: ${selectedSalaryGrade}`);
+                    }
+                })
+                .catch(error => console.error("Error updating salary row:", error));
+        }
+        
+        // Function to calculate the differences
+        function calculateSalaryDifference() {
+            if (firstRowBasicPay !== 0 && secondRowBasicPay !== 0) {
+                const basicPayDifference = secondRowBasicPay - firstRowBasicPay;
+                document.getElementById("basicPayTable3").textContent = basicPayDifference.toLocaleString();
+            }
+        
+            if (firstRowprmtnNetpay !== 0 && secondRowprmtnNetpay !== 0) {
+                const prmtnNetpayDifference = secondRowprmtnNetpay - firstRowprmtnNetpay;
+                // Set the value formatted to 2 decimal points
+                document.getElementById("promotion").value = prmtnNetpayDifference.toFixed(2);
+            }
+        }
+        </script>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
 
 
 
@@ -2509,6 +2713,7 @@ checkFinalTotalValue();
         document.getElementById('searchInputPos').value = value;
         document.getElementById('searchInputOnq').value = value;
         document.getElementById('searchInputPLI').value = value;
+        document.getElementById('searchInputLCS').value = value;
     }
 
     function checkLoadingComplete(loadingIndicatorId) {
@@ -2539,12 +2744,14 @@ checkFinalTotalValue();
         document.getElementById('searchButtonPos').click();
         document.getElementById('searchButtonOnq').click();
         document.getElementById('searchButtonPLI').click();
+        document.getElementById('searchButtonLCS').click();
 
         // Disable all buttons after the first click to prevent future clicks
         document.getElementById('searchButtonNetpay').disabled = true;
         document.getElementById('searchButtonPos').disabled = true;
         document.getElementById('searchButtonOnq').disabled = true;
         document.getElementById('searchButtonPLI').disabled = true;
+        document.getElementById('searchButtonLCS').disabled = true;
     }
 
     // Add event listeners to all buttons
@@ -2552,6 +2759,7 @@ checkFinalTotalValue();
     document.getElementById('searchButtonPos').addEventListener('click', triggerAllButtonsOnce);
     document.getElementById('searchButtonOnq').addEventListener('click', triggerAllButtonsOnce);
     document.getElementById('searchButtonPLI').addEventListener('click', triggerAllButtonsOnce);
+    document.getElementById('searchButtonLCS').addEventListener('click', triggerAllButtonsOnce);
 
 
 </script>
@@ -2577,9 +2785,6 @@ checkFinalTotalValue();
         </div>
     </div>
 </div>
-
-<div style="height:300px"></div>
-
 
 
 
@@ -2682,6 +2887,505 @@ function calculatePayment() {
 }
 
 </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<body>
+
+    <div id="searchSectionLCS" class="container mt-5 d-none">
+        
+        <div translate="no">
+        </div>
+        
+    
+        <div class="row pt-2">
+            <div class="col-12 d-flex">
+                <input type="text" id="searchInputLCS" class="form-control" placeholder="Employee Number..." style="flex-grow: 1;">
+                <button id="searchButtonLCS" class="btn btn-primary ml-2">Search</button>
+            </div>
+            <!-- Loading GIF -->
+            <div id="loadingIndicatorLCS" style="display: none; text-align: center;">
+                <img src="loading.gif" alt="Loading..." style="max-width: 100px;">
+            </div>
+        </div>
+    </div>
+    
+    <br/>
+    
+    <!-- Section to display employee detailLCSs -->
+    <div class="container pb-5 mb-5">
+        
+        <h4 class="text-center pt-5 pb-3 mb-2">LOAN ACCOUNTS</h4>
+        <div class="row">
+            <div class="col-md-12">
+                <h3 id="employeeInfoLCS" style="font-size:12px" class="text-white"></h3>
+            </div>
+        </div>
+        <div class="row results rounded-bottom rounded-top pb-5 mb-5" style="font-size:10px" id="resultsLCS">
+            <!-- Table will be dynamically inserted here -->
+        </div>
+    </div>
+    
+    
+
+
+
+
+
+
+
+
+    <div style="height:300px"></div>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    <script>
+    
+    
+    // =====================================================================================================
+    // INDEX 3 =============================================================================================
+    // =====================================================================================================
+    
+    
+
+    
+    
+    
+    document.addEventListener('DOMContentLoaded', () => {
+                const prompt = document.getElementById('fullscreenPrompt');
+    
+                // Show the prompt when the mouse moves
+                document.addEventListener('mousemove', () => {
+                    prompt.style.display = 'block';
+                });
+    
+                // Enter fullscreen when the prompt is clicked
+                prompt.addEventListener('click', () => {
+                    openFullscreen();
+                    prompt.style.display = 'none'; // Hide prompt after entering full-screen
+                });
+            });
+    
+            function openFullscreen() {
+                const elem = document.documentElement;
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                } else if (elem.mozRequestFullScreen) {
+                    elem.mozRequestFullScreen();
+                } else if (elem.webkitRequestFullscreen) {
+                    elem.webkitRequestFullscreen();
+                } else if (elem.msRequestFullscreen) {
+                    elem.msRequestFullscreen();
+                }
+            }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        const csvFilesLCS = [
+            'lcs_sep24.csv'
+        ];
+    
+        document.getElementById('searchButtonLCS').addEventListener('click', searchEmployeeLCS);
+    
+        function searchEmployeeLCS() {
+            const searchInputLCS = document.getElementById('searchInputLCS').value.trim();
+            const loadingIndicatorLCS = document.getElementById('loadingIndicatorLCS');
+    
+            if (!searchInputLCS) {
+                alert('Please enter an employee number.');
+                return;
+            }
+    
+            const resultsSectionLCS = document.getElementById('resultsLCS');
+            const employeeInfoSectionLCS = document.getElementById('employeeInfoLCS');
+            resultsSectionLCS.innerHTML = ''; // Clear previous results
+            employeeInfoSectionLCS.innerHTML = ''; // Clear previous employee info
+            loadingIndicatorLCS.style.display = 'block'; // Show loading indicator
+    
+            const last12MonthsFilesLCS = csvFilesLCS.slice(0, 12);
+    
+            let fetchedDataLCS = [];
+    
+            Promise.all(last12MonthsFilesLCS.map(csvFile => fetchCSVLCS(csvFile)))
+                .then(allData => {
+                    fetchedDataLCS = allData.filter(data => data !== null);
+                    if (fetchedDataLCS.length === 0) {
+                        alert('No valid data found in the provided files.');
+                        return;
+                    }
+                    fetchedDataLCS.sort((a, b) => b.date - a.date);
+                    displayEmployeeInfoLCS(fetchedDataLCS[0].monthName, fetchedDataLCS[0].csvData);
+                    displayResultsTableLCS(fetchedDataLCS);
+                })
+           
+                .finally(() => {
+                    loadingIndicatorLCS.style.display = 'none'; // Hide loading indicator
+                });
+        }
+        
+    
+        function fetchCSVLCS(csvFile) {
+            return new Promise((resolve, reject) => {
+                const monthName = getMonthNameFromCsvLCS(csvFile);
+                const date = getDateFromCsvLCS(csvFile);
+    
+                fetch(csvFile)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Unable to fetch ${csvFile}. Status: ${response.status}`);
+                        }
+                        return response.text();
+                    })
+                    .then(text => {
+                        const csvData = parseCSVLCS(text);
+                        resolve({ monthName, csvData, date });
+                    })
+                    .catch(error => {
+                        console.error(`Error fetching data for ${monthName}:`, error);
+                        resolve(null);
+                    });
+            });
+        }
+    
+        
+        function getDateFromCsvLCS(csvFile) {
+            const fileName = csvFile.replace('lcs_', '');
+            const monthMap = {
+                'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'may': 4, 'jun': 5,
+                'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11
+            };
+            const monthPart = fileName.slice(0, 3);
+            const yearPart = '20' + fileName.slice(3, 5);
+            const monthIndex = monthMap[monthPart];
+            return new Date(yearPart, monthIndex);
+        }
+    
+        function getMonthNameFromCsvLCS(csvFile) {
+            const fileName = csvFile.replace('lcs_', '');
+            const monthMap = {
+                'jan': 'January', 'feb': 'February', 'mar': 'March', 'apr': 'April', 'may': 'May', 'jun': 'June',
+                'jul': 'July', 'aug': 'August', 'sep': 'September', 'oct': 'October', 'nov': 'November', 'dec': 'December'
+            };
+            const monthPart = fileName.slice(0, 3);
+            const yearPart = '20' + fileName.slice(3, 5);
+            return `${monthMap[monthPart]} ${yearPart}`;
+        }
+    
+        function parseCSVLCS(data) {
+            const rows = data.trim().split('\n');
+            return rows.map(row => row.split(','));
+        }
+    
+        function displayEmployeeInfoLCS(monthName, csvData) {
+            const employeeInfoSectionLCS = document.getElementById('employeeInfoLCS');
+            let employeeFound = false;
+    
+            for (let i = 1; i < csvData.length; i++) {
+                const row = csvData[i];
+                if (row.length < 4) continue;
+                const empno = row[34];
+                if (empno === document.getElementById('searchInputLCS').value.trim()) {
+                    employeeFound = true;
+    
+                    const branch_name = row[1];
+                    const custid = row[7];
+                    const accountnumber = row[2];
+                    const account_name = row[8];
+                    const group_name = row[38];
+                    const contact_no = row[46];
+    
+                    const ref_date = row[59];
+    
+                    const loanamount = row[15];
+                    const monthlyamort = row[32];
+    
+    
+                    const endingbalance = row[16];
+                    const accruedint = row[40];
+                    const overdueint = row[20];
+                    const totalBalanceLCSLCS = row[16 + 20 + 40];
+                    const adj_npl_bckt = row[63];
+    
+                    employeeInfoSectionLCS.innerHTML = `
+                        <strong>BRANCH:</strong><b style="color:orange"> ${branch_name}</b><br/>
+                        <strong>CUST ID:</strong><b style="color:orange">   ${custid} </b><br/>
+                        <strong>ACC NO:</strong><b style="color:orange"> ${accountnumber}</b><br/>
+                        <strong>ACC NAME:</strong><b style="color:orange"> ${account_name}</b><br/>
+                        <strong>SCHOOL:</strong><b style="color:orange"> ${group_name}</b><br/>
+                        <strong>CONTACT:</strong><b style="color:orange"> ${contact_no}</b><br/>
+    
+                        <strong>REF DATE:</strong><b style="color:orange"> ${ref_date}</b><br/>
+    
+    
+    
+                    `;
+                    break;
+                }
+            }
+    
+            if (!employeeFound) {
+                employeeInfoSectionLCS.innerHTML = 'No employee found in the latest data.';
+            }
+        }
+        function displayResultsTableLCS(fetchedDataLCS) {
+            const resultsSectionLCS = document.getElementById('resultsLCS');
+            const table = document.createElement('table');
+            table.classList.add('table', 'table-bordered', 'table-striped', 'text-white'); // Adjust classes as necessary
+    
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            headerRow.innerHTML = `
+                <th>Account Number</th>
+                <th>Loan Amount</th>
+                <th>Monthly Amort</th>
+                <th>Ending Balance</th>
+                <th>Accrued Interest</th>
+                <th>Overdue Interest</th>
+                <th>Total Balance</th>
+                <th>Adjusted NPL Bucket</th>
+            `;
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+    
+            const tbody = document.createElement('tbody');
+    
+            // Initialize totals
+            let totalLoanAmountLCS = 0;
+            let totalMonthlyAmortLCS = 0;
+            let totalBalanceLCS = 0;
+    
+            fetchedDataLCS.forEach(data => {
+                data.csvData.forEach((row, index) => {
+                    if (index === 0) return; // Skip header row
+    
+                    const empno = row[34];
+                    if (empno === document.getElementById('searchInputLCS').value.trim()) {
+                        const loanAmount = parseFloat(row[15]) || 0;
+                        const monthlyAmort = parseFloat(row[32]) || 0;
+                        const endingBalance = parseFloat(row[16]) || 0;
+                        const accruedInt = parseFloat(row[40]) || 0;
+                        const overdueInt = parseFloat(row[20]) || 0;
+                        const totalBal = endingBalance + accruedInt + overdueInt; // Adjust as needed
+                        const adjNplBckt = row[63] || '';
+    
+                        // Accumulate totals
+                        totalLoanAmountLCS += loanAmount;
+                        totalMonthlyAmortLCS += monthlyAmort;
+                        totalBalanceLCS += totalBal;
+    
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${row[2]}</td>
+                            <td>${loanAmount.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
+                            <td>${monthlyAmort.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
+                            <td>${endingBalance.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
+                            <td>${accruedInt.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
+                            <td>${overdueInt.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
+                            <td>${totalBal.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
+                            <td>${adjNplBckt}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    }
+                });
+            });
+    
+            table.appendChild(tbody);
+    
+            // Create footer for totals
+            const tfoot = document.createElement('tfoot');
+            const footerRow = document.createElement('tr');
+            footerRow.innerHTML = `
+                <th>Total</th>
+                <th>${totalLoanAmountLCS.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</th>
+                <th>${totalMonthlyAmortLCS.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th id="totalBalanceLCSOld">${totalBalanceLCS.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</th>
+                <th></th>
+            `;
+            tfoot.appendChild(footerRow);
+            table.appendChild(tfoot);
+    
+            resultsSectionLCS.appendChild(table);
+    
+    
+            resultsMap.forEach((data, monthName) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+    
+            
+             <td>${detailLCS.branch_name}</td>
+                <td>${detailLCS.custid}</td>
+                <td>${detailLCS.accountnumber}</td>
+                <td>${detailLCS.account_name}</td>
+                <td>${detailLCS.group_name}</td>
+                <td>${detailLCS.contact_no}</td>
+                <td>${detailLCS.ref_date}</td>
+                <td>${detailLCS.loanamount}</td>
+                <td>${detailLCS.monthlyamort}</td>
+                <td>${detailLCS.endingbalance}</td>
+                <td>${detailLCS.accruedint}</td>
+                <td>${detailLCS.overdueint}</td>
+                <td>${detailLCS.totalBalanceLCSLCS}</td>
+                <td>${detailLCS.adj_npl_bckt}</td>
+    
+                `;
+                tbody.appendChild(row);
+                const detailLCSRow = document.createElement('tr');
+        const detailLCSCell = document.createElement('td');
+        detailLCSCell.setAttribute('colspan', 2);
+        detailLCSCell.innerHTML = `
+    
+    `;
+    
+    
+    
+    
+
+
+
+
+
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // Check if the element with ID 'totalBalanceLCSOld' exists
+        const totalBalanceElement = document.getElementById("totalBalanceLCSOld");
+        
+        // Debugging: log the totalBalanceElement to check if it exists
+        console.log("Total Balance Element:", totalBalanceElement);
+
+        if (totalBalanceElement) {
+            // Get the text content of the element
+            const balanceText = totalBalanceElement.textContent;
+            
+            // Debugging: log the balanceText to see the extracted text
+            console.log("Balance Text:", balanceText);
+
+            // Remove the currency symbol and commas, then convert to a number
+            const balanceNumber = parseFloat(balanceText.replace(/₱|,/g, '').trim());
+
+            // Debugging: log the converted balanceNumber
+            console.log("Converted Balance Number:", balanceNumber);
+
+            // Set the value of the input field if balanceNumber is a valid number
+            if (!isNaN(balanceNumber)) {
+                const inputField = document.getElementById("oldBalance");
+                inputField.value = balanceNumber; // Set the value as a number
+                
+                // Debugging: log the inputField to verify the value is set
+                console.log("Input Field Value Set To:", inputField.value);
+            } else {
+                console.error("Converted balance is not a valid number.");
+            }
+        } else {
+            console.error("Total Balance Element not found.");
+        }
+    });
+
+
+    
+    
+    
+    
+    function calculateTotal() {
+        const checkboxes = document.querySelectorAll('.dedamt-checkbox');
+        let total = 0;
+    
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                total += parseFloat(checkbox.dataset.dedamt);
+            }
+        });
+    
+        // Update the total display
+        const totalDisplay = document.querySelector('#totalAmount');
+        totalDisplay.innerText = `₱${total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+    }
+    
+    // Event listener for checkbox changes
+    document.addEventListener('change', (event) => {
+        if (event.target.classList.contains('dedamt-checkbox')) {
+            calculateTotal();
+        }
+    });
+    
+    // Initial calculation on page load
+    document.addEventListener('DOMContentLoaded', calculateTotal);
+    
+    
+    
+    
+    
+    
+    
+    
+        detailLCSRow.appendChild(detailLCSCell);
+        tbody.appendChild(detailLCSRow);
+    
+            });
+    
+            table.appendChild(tbody);
+            resultsSectionLCS.appendChild(table);
+        }
+    
+        function convertMonth(monthNumber) {
+            const monthNames = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
+            return monthNames[parseInt(monthNumber, 10) - 1];
+        }
+    </script>
+
+
+
+
+
+
+
 
 
 

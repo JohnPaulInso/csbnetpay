@@ -22,7 +22,7 @@ nav {
     border: 1px solid #ffffff4a;
 }
 
-#searchButtonNetpay, #searchButtonPos, #searchButtonOnq, #searchButtonPLI, #viewmore{
+#searchButtonNetpay, #searchButtonPos, #searchButtonOnq, #searchButtonPLI, #searchButtonLCS, #viewmore{
     padding: 10px 15px;
     font-size: 16px;
     background-color: #6f42c1; /* Purple */
@@ -38,7 +38,7 @@ nav {
     color: white;
 }
 
-#searchInputNetpay, #searchInputPos, #searchInputOnq, #searchInputPLI {
+#searchInputNetpay, #searchInputPos, #searchInputOnq, #searchInputPLI, #searchInputLCS {
 font-size: 1.2em; /* Make the input text larger on mobile */
 padding: 25px;    /* Increase padding for a larger input box */
 }
@@ -125,6 +125,7 @@ z-index: 1000;
 #employeeInfoNetpay, #employeeInfoPos, #employeeInfoOnq, #employeeInfoPLI  {
 font-size: 1.2em; /* Make the input text larger on mobile */
 }
+
 
 
 
