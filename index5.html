@@ -3155,9 +3155,14 @@ function calculatePayment() {
                         <strong>CUST ID:</strong><b style="color:orange">   ${custid} </b><br/>
                         <strong>ACC NO:</strong><b style="color:orange"> ${accountnumber}</b><br/>
                         <strong>ACC NAME:</strong><b style="color:orange"> ${account_name}</b><br/>
-                        <strong>SCHOOL:</strong><b style="color:orange"> ${group_name}</b><br/>
-                        <strong>CONTACT:</strong><b style="color:orange"> ${contact_no}</b><br/>
-    
+                            <strong>SCHOOL:</strong><b style="color:orange"> ${group_name}</b><br/>
+
+                            
+                            <strong>CONTACT:</strong>
+<a href="tel:+63${contact_no}" style="color:orange; text-decoration:underline;">
+  +63 ${contact_no}
+</a><br/>
+
                         <strong>REF DATE:</strong><b style="color:orange"> ${ref_date}</b><br/>
     
     
@@ -3171,136 +3176,90 @@ function calculatePayment() {
                 employeeInfoSectionLCS.innerHTML = 'No employee found in the latest data.';
             }
         }
-
-function displayEmployeeInfoLCS(monthName, csvData) {
-    const employeeInfoSectionLCS = document.getElementById('employeeInfoLCS');
-    let employeeFound = false;
-
-    for (let i = 1; i < csvData.length; i++) {
-        const row = csvData[i];
-        if (row.length < 4) continue;
-        const empno = row[34];
-        if (empno === document.getElementById('searchInputLCS').value.trim()) {
-            employeeFound = true;
-
-            const branch_name = row[1];
-            const custid = row[7];
-            const accountnumber = row[2];
-            const account_name = row[8];
-            const group_name = row[38];
-            const contact_no = row[46];
-
-            const ref_date = row[59];
-
-            const loanamount = row[15];
-            const monthlyamort = row[32];
-
-
-            const endingbalance = row[16];
-            const accruedint = row[40];
-            const overdueint = row[20];
-            const totalBalanceLCSLCS = row[16 + 20 + 40];
-            const adj_npl_bckt = row[63];
-
-            employeeInfoSectionLCS.innerHTML = `
-                <strong>BRANCH:</strong><b style="color:orange"> ${branch_name}</b><br/>
-                <strong>CUST ID:</strong><b style="color:orange">   ${custid} </b><br/>
-                <strong>ACC NO:</strong><b style="color:orange"> ${accountnumber}</b><br/>
-                <strong>ACC NAME :</strong><b style="color:orange"> ${account_name}</b><br/>
-                <strong>SCHOOL:</strong><b style="color:orange"> ${group_name}</b><br/>
-                <strong>CONTACT:</strong><b style="color:orange"> ${contact_no}</b><br/>
-
-                <strong>REF DATE:</strong><b style="color:orange"> ${ref_date}</b><br/>
-
-
-
+        function displayResultsTableLCS(fetchedDataLCS) {
+            const resultsSectionLCS = document.getElementById('resultsLCS');
+            const table = document.createElement('table');
+            table.classList.add('table', 'table-sm', 'table-bordered', 'table-striped', 'text-white'); // Adjust classes as necessary
+    
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            headerRow.innerHTML = `
+                <th>Account Number</th>
+                <th>Loan Amount</th>
+                <th>Monthly Amort</th>
+                <th>Ending Balance</th>
+                <th>Accrued Interest</th>
+                <th>Overdue Interest</th>
+                <th>Total Balance</th>
+                <th>Adj NPL Bucket</th>
             `;
-            break;
-        }
-    }
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+    
+            const tbody = document.createElement('tbody');
 
-    if (!employeeFound) {
-        employeeInfoSectionLCS.innerHTML = 'No employee found in the latest data.';
-    }
-}
-function displayResultsTableLCS(fetchedDataLCS) {
-    const resultsSectionLCS = document.getElementById('resultsLCS');
-    const table = document.createElement('table');
-    table.classList.add('table', 'table-bordered', 'table-striped', 'text-white'); // Adjust classes as necessary
-
-    const thead = document.createElement('thead');
-    const headerRow = document.createElement('tr');
-    headerRow.innerHTML = `
-        <th>Account Number</th>
-        <th>Loan Amount</th>
-        <th>Monthly Amort</th>
-        <th>Ending Balance</th>
-        <th>Accrued Interest</th>
-        <th>Overdue Interest</th>
-        <th>Total Balance</th>
-        <th>Adjusted NPL Bucket</th>
-    `;
-    thead.appendChild(headerRow);
-    table.appendChild(thead);
-
-    const tbody = document.createElement('tbody');
-
-    // Initialize totals
-    let totalLoanAmountLCS = 0;
+     // Initialize totals
+     let totalLoanAmountLCS = 0;
     let totalMonthlyAmortLCS = 0;
     let totalBalanceLCS = 0;
+    let totalAccruedInterestLCS = 0;
+    let totalOverdueInterestLCS = 0;
+    let totalEndingBalanceLCS = 0;
 
-    fetchedDataLCS.forEach(data => {
-        data.csvData.forEach((row, index) => {
-            if (index === 0) return; // Skip header row
+    
+            fetchedDataLCS.forEach(data => {
+                data.csvData.forEach((row, index) => {
+                    if (index === 0) return; // Skip header row
+    
+                    const empno = row[34];
+                    if (empno === document.getElementById('searchInputLCS').value.trim()) {
+                        const loanAmount = parseFloat(row[15]) || 0;
+                        const monthlyAmort = parseFloat(row[32]) || 0;
+                        const endingBalance = parseFloat(row[16]) || 0;
+                        const accruedInt = parseFloat(row[40]) || 0;
+                        const overdueInt = parseFloat(row[20]) || 0;
+                        const totalBal = endingBalance + accruedInt + overdueInt; // Adjust as needed
+                        const adjNplBckt = row[63] || '';
 
-            const empno = row[34];
-            if (empno === document.getElementById('searchInputLCS').value.trim()) {
-                const loanAmount = parseFloat(row[15]) || 0;
-                const monthlyAmort = parseFloat(row[32]) || 0;
-                const endingBalance = parseFloat(row[16]) || 0;
-                const accruedInt = parseFloat(row[40]) || 0;
-                const overdueInt = parseFloat(row[20]) || 0;
-                
-            const accountnumber =  parseFloat(row[2]) || 0;
-                const totalBal = endingBalance + accruedInt + overdueInt; // Adjust as needed
-                const adjNplBckt = row[63] || '';
-
-                // Accumulate totals
+     // Accumulate totals
                 totalLoanAmountLCS += loanAmount;
                 totalMonthlyAmortLCS += monthlyAmort;
                 totalBalanceLCS += totalBal;
+                totalAccruedInterestLCS += accruedInt;
+                totalOverdueInterestLCS += overdueInt;
+                totalEndingBalanceLCS += endingBalance;
 
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                <td>${accountnumber.toString().padStart(12, '0')}</td>
-                    <td>${loanAmount.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
-                    <td>${monthlyAmort.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
-                    <td>${endingBalance.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
-                    <td>${accruedInt.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
-                    <td>${overdueInt.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
-                    <td>${totalBal.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
-                    <td>${adjNplBckt}</td>
-                `;
-                tbody.appendChild(tr);
-            }
-        });
-    });
-
-    table.appendChild(tbody);
+    
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${row[2]}</td>
+                            <td>${loanAmount.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
+                            <td>${monthlyAmort.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
+                            <td>${endingBalance.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
+                            <td>${accruedInt.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
+                            <td>${overdueInt.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
+                            <td>${totalBal.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
+                            <td>${adjNplBckt}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    }
+                });
+            });
+    
+            table.appendChild(tbody);
     
             // Create footer for totals
             const tfoot = document.createElement('tfoot');
             const footerRow = document.createElement('tr');
             footerRow.innerHTML = `
-                <th>Total</th>
-                <th>${totalLoanAmountLCS.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</th>
-                <th>${totalMonthlyAmortLCS.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</th>
-                <th></th>
-                <th></th>
-                <th></th>
-                <th id="totalBalanceLCSOld">${totalBalanceLCS.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</th>
-                <th></th>
+              <th>Total</th>
+        <th>${totalLoanAmountLCS.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</th>
+        <th>${totalMonthlyAmortLCS.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</th>
+<th>${totalEndingBalanceLCS.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</th>
+        <th>${totalAccruedInterestLCS.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</th>
+        <th>${totalOverdueInterestLCS.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</th>
+        <th>${totalBalanceLCS.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</th>
+        <th></th>
             `;
             tfoot.appendChild(footerRow);
             table.appendChild(tfoot);
@@ -3347,40 +3306,6 @@ function displayResultsTableLCS(fetchedDataLCS) {
 
 
 
-    document.addEventListener("DOMContentLoaded", function () {
-        // Check if the element with ID 'totalBalanceLCSOld' exists
-        const totalBalanceElement = document.getElementById("totalBalanceLCSOld");
-        
-        // Debugging: log the totalBalanceElement to check if it exists
-        console.log("Total Balance Element:", totalBalanceElement);
-
-        if (totalBalanceElement) {
-            // Get the text content of the element
-            const balanceText = totalBalanceElement.textContent;
-            
-            // Debugging: log the balanceText to see the extracted text
-            console.log("Balance Text:", balanceText);
-
-            // Remove the currency symbol and commas, then convert to a number
-            const balanceNumber = parseFloat(balanceText.replace(/₱|,/g, '').trim());
-
-            // Debugging: log the converted balanceNumber
-            console.log("Converted Balance Number:", balanceNumber);
-
-            // Set the value of the input field if balanceNumber is a valid number
-            if (!isNaN(balanceNumber)) {
-                const inputField = document.getElementById("oldBalance");
-                inputField.value = balanceNumber; // Set the value as a number
-                
-                // Debugging: log the inputField to verify the value is set
-                console.log("Input Field Value Set To:", inputField.value);
-            } else {
-                console.error("Converted balance is not a valid number.");
-            }
-        } else {
-            console.error("Total Balance Element not found.");
-        }
-    });
 
 
     
