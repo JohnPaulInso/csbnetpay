@@ -3149,6 +3149,7 @@ function calculatePayment() {
                     const overdueint = row[20];
                     const totalBalanceLCSLCS = row[16 + 20 + 40];
                     const adj_npl_bckt = row[63];
+                    const dateGranted = row[13];
     
                     employeeInfoSectionLCS.innerHTML = `
                         <strong>BRANCH:</strong><b style="color:orange"> ${branch_name}</b><br/>
@@ -3185,6 +3186,7 @@ function calculatePayment() {
             const headerRow = document.createElement('tr');
             headerRow.innerHTML = `
                 <th>Account Number</th>
+                <th>Date Granted</th>
                 <th>Loan Amount</th>
                 <th>Monthly Amort</th>
                 <th>Ending Balance</th>
@@ -3220,6 +3222,7 @@ function calculatePayment() {
                         const overdueInt = parseFloat(row[20]) || 0;
                         const totalBal = endingBalance + accruedInt + overdueInt; // Adjust as needed
                         const adjNplBckt = row[63] || '';
+                        const dateGranted = row[13] || '';
 
      // Accumulate totals
                 totalLoanAmountLCS += loanAmount;
@@ -3232,15 +3235,16 @@ function calculatePayment() {
     
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
-                            <td>${row[2]}</td>
-                            <td>${loanAmount.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
-                            <td>${monthlyAmort.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
-                            <td>${endingBalance.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
-                            <td>${accruedInt.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
-                            <td>${overdueInt.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
-                            <td>${totalBal.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
-                            <td>${adjNplBckt}</td>
-                        `;
+            <td>${row[2]}</td>
+                    <td>${dateGranted}</td> <!-- Display formatted Date Granted -->
+                    <td>${loanAmount.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
+                    <td>${monthlyAmort.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
+                    <td>${endingBalance.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
+                    <td>${accruedInt.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
+                    <td>${overdueInt.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
+                    <td>${totalBal.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
+                    <td>${adjNplBckt}</td>
+                `;
                         tbody.appendChild(tr);
                     }
                 });
@@ -3252,14 +3256,15 @@ function calculatePayment() {
             const tfoot = document.createElement('tfoot');
             const footerRow = document.createElement('tr');
             footerRow.innerHTML = `
-              <th>Total</th>
-        <th>${totalLoanAmountLCS.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</th>
-        <th>${totalMonthlyAmortLCS.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</th>
-<th>${totalEndingBalanceLCS.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</th>
-        <th>${totalAccruedInterestLCS.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</th>
-        <th>${totalOverdueInterestLCS.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</th>
-        <th>${totalBalanceLCS.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</th>
-        <th></th>
+            <th>Total</th>
+      <th></th> <!-- Empty for Date Granted column -->
+      <th>${totalLoanAmountLCS.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</th>
+      <th>${totalMonthlyAmortLCS.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</th>
+      <th>${totalEndingBalanceLCS.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</th>
+      <th>${totalAccruedInterestLCS.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</th>
+      <th>${totalOverdueInterestLCS.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</th>
+      <th>${totalBalanceLCS.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</th>
+      <th></th>
             `;
             tfoot.appendChild(footerRow);
             table.appendChild(tfoot);
@@ -3275,6 +3280,7 @@ function calculatePayment() {
              <td>${detailLCS.branch_name}</td>
                 <td>${detailLCS.custid}</td>
                 <td>${detailLCS.accountnumber}</td>
+                <td>${detailLCS.dateGranted}</td>
                 <td>${detailLCS.account_name}</td>
                 <td>${detailLCS.group_name}</td>
                 <td>${detailLCS.contact_no}</td>
