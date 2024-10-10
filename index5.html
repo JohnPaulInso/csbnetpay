@@ -774,13 +774,7 @@ window.onload = updateOnQueueValue;
 
 
 
-<div class="d-flex justify-content-center mt-5">
-    <button class="btn btn-success btn-lg fs-5" onclick="calculateAll()">COMPUTE</button>
-</div>
-
 <script>
-
-
 
 
 
@@ -798,7 +792,24 @@ function calculateAll() {
         }
     }
 
-    calculatePayment()
+    // Function to copy balance from table cell to input field
+    function copyBalanceToInput() {
+        const balanceElement = document.getElementById("totalBalancetoOldBalance");
+        const inputField = document.getElementById("oldBalance");
+        if (balanceElement && inputField) {
+            // Get the balance value and remove currency symbols and commas
+            const balanceValue = balanceElement.textContent.replace(/[₱, ]/g, '').trim();
+            // Set the value to the input field
+            inputField.value = parseFloat(balanceValue) || 0; // Default to 0 if parsing fails
+        } else {
+            console.error("Balance element or input field not found.");
+        }
+    }
+
+    // Call the function to copy balance to input field
+    copyBalanceToInput();
+
+    calculatePayment();
 
     // Get numeric values from table cells
     const resultsNetpay = getNumericValue("resultsNetpay");
@@ -806,15 +817,8 @@ function calculateAll() {
     const pliTotalValue = getNumericValue("plitotalvalue");
     const resultsonq = getNumericValue("resultsonq");
     const monthlyPaymentCell = getNumericValue("monthlyPaymentCell");
-
-    
     const netpaypPliTotal = getNumericValue("netpaypPliTotal");
-    
-
-
     const resultsonqhidden = getNumericValue("resultsonqhidden");
-    
-
 
     // Get additional values from table cells
     const resultsPLI1 = getNumericValue("totalAmountPLI0");
@@ -836,13 +840,9 @@ function calculateAll() {
     document.getElementById("netpaypositivetotalvalue").textContent = `₱${netpayPositiveTotal.toFixed(2)}`;
 
     // Second calculation: PLI Total - On Queue
-const resultsonqValue = resultsonq || 0; // Default to 0 if resultsonq is empty or undefined
-const semiTotalValue = netpaypPliTotal  - resultsonqhidden;
-document.getElementById("semiTotalValue").textContent = `₱${semiTotalValue.toFixed(2)}`;
-
-    // Second calculation: PLI Total - On Queue
+    const resultsonqValue = resultsonq || 0; // Default to 0 if resultsonq is empty or undefined
+    const semiTotalValue = netpaypPliTotal - resultsonqhidden;
     document.getElementById("semiTotalValue").textContent = `₱${semiTotalValue.toFixed(2)}`;
-
 
     // Final calculation: Semi Total - Monthly Payment
     const finalTotalValue = semiTotalValue - monthlyPaymentCell;
@@ -862,18 +862,12 @@ document.getElementById("semiTotalValue").textContent = `₱${semiTotalValue.toF
     document.getElementById("netpaypPliTotal").textContent = formattedTotal;
 }
 
-
-
-
-
 // Add event listener to the button
 document.getElementById("calculateButton").addEventListener("click", function() {
     for (let i = 0; i < 3; i++) {
         calculateAll(); // Call the function three times
     }
 });
-
-
 
 
 </script>
@@ -1122,6 +1116,13 @@ document.getElementById("calculateButton").addEventListener("click", function() 
 
 
 
+
+
+
+
+<div class="d-flex justify-content-center mt-5">
+    <button class="btn btn-success btn-lg fs-5" onclick="calculateAll()">COMPUTE</button>
+</div>
 
 
 
@@ -2751,6 +2752,9 @@ checkFinalTotalValue();
 
 
 
+
+
+
 <div class="offset-md-1 d-none mb-5 pb-5"> <!-- Added offset-md-1 to create space -->
     <div class="calculator bg-dark text-light border border-light p-4 rounded shadow-lg">
 
@@ -2764,11 +2768,6 @@ checkFinalTotalValue();
         </div>
     </div>
 </div>
-
-
-
-
-
 
 
 
