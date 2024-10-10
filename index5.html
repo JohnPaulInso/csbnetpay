@@ -51,8 +51,22 @@
             <a>4694264</p>
             
 
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="togglePLI">
+
+                    <label class="form-check-label" for="togglePLI">
+                      Show PLI
+                    </label>
+                  </div>
+
+
+
         </div>     
         
+
+
+
+
 
         <div id="loadingIndicatorNetpay" style="top:50% !important;display: none; text-align: center;">
             <img src="loading.gif" alt="Loading..." style="max-width: 100px;">
@@ -67,6 +81,34 @@
 
 
 
+
+
+
+
+<script>
+    
+
+    // Function to toggle visibility of elements with class 'plihide'
+function togglePLIVisibility(isChecked) {
+  const pliRows = document.querySelectorAll('.plihide');
+  
+  pliRows.forEach(row => {
+    row.style.display = isChecked ? '' : 'none'; // Hide rows if unchecked, show if checked
+  });
+}
+
+// Initially hide elements with class 'plihide' when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+  togglePLIVisibility(false); // Set to false to hide the rows initially
+});
+
+// Add event listener to toggle button
+document.getElementById('togglePLI').addEventListener('change', function() {
+  const isChecked = this.checked;
+  togglePLIVisibility(isChecked); // Toggle rows based on checkbox state
+});
+
+  </script>
 
 
 
@@ -200,6 +242,75 @@ updateNetPayCell();
 
 
 
+<script>
+    // Function to parse the PHP currency string and return a numeric value
+    function parseCurrencyCustom(value) {
+        return parseFloat(value.replace(/[₱,]/g, '')); // Removes '₱' and commas
+    }
+    
+    // Function to perform the calculation and update the loanAmount input
+    function calculateCustomLoanAmount() {
+        // Get values from the HTML elements
+        let customNetpay = parseCurrencyCustom(document.getElementById('resultsNetpay').innerText);
+        let customPos = parseCurrencyCustom(document.getElementById('resultspos').innerText);
+        let customPliTotal = parseCurrencyCustom(document.getElementById('plitotalvalue').innerText);
+        let customLessOnq = parseCurrencyCustom(document.getElementById('onqueuespan').innerText || document.getElementById('totalAmount').innerText);
+    
+        // Get the dropdown value
+        let customTerms = document.getElementById('terms').value;
+    
+        // Only run the calculation if the dropdown value is 60
+        if (customTerms == '60') {
+            // Perform the calculation
+            let customResult = Math.floor(((customNetpay + customPos + customPliTotal - customLessOnq - 5250) / 21.090) * 1000);
+    
+            // Update the loanAmount input value with the calculated result
+            document.getElementById('loanAmount').value = customResult.toLocaleString();
+        }
+    }
+    
+    // Function to handle the button click
+    function handleButtonClick() {
+        // Delay the calculation to allow other fields to load
+        setTimeout(() => {
+            calculateCustomLoanAmount();
+        }, 2000); // 3000 milliseconds = 5 seconds
+    }
+    
+    // Set up Mutation Observers for dynamic changes in onqueuespan and totalAmount
+    function setupObservers() {
+        // Target the onqueuespan element
+        const onQueueElement = document.getElementById('onqueuespan');
+        const totalAmountElement = document.getElementById('totalAmount');
+    
+        // Create a MutationObserver to monitor changes
+        const observer = new MutationObserver(() => {
+            calculateCustomLoanAmount();
+        });
+    
+        // Observer configuration
+        const config = { childList: true, subtree: true, characterData: true };
+    
+        // Start observing onqueuespan for changes
+        if (onQueueElement) {
+            observer.observe(onQueueElement, config);
+        }
+    
+        // Start observing totalAmount for changes
+        if (totalAmountElement) {
+            observer.observe(totalAmountElement, config);
+        }
+    }
+    
+    // Event listener for the button click
+    document.getElementById('searchButtonNetpay').addEventListener('click', handleButtonClick);
+    
+    // Initialize the observers
+    setupObservers();
+    </script>
+    
+
+
 
 
 
@@ -292,32 +403,32 @@ updateNetPayCell();
         
 
 
-            <tbody>
-                <tr class="mt-5">
+            <tbody >
+                <tr class="mt-5 plihide">
                     <td id="A4" class="smallfont"  style="border: 1px solid #ccc; padding:  10px;">ABSNC/PVP</td>
                     <td style="padding-left:0px !important;border: 1px solid #ccc; padding:  10px;" id="resultsPLI1"></td>
                     <td class="d-none" style="padding-left:0px !important;border: 1px solid #ccc; padding:  10px;" id="resultsPLI0hidden"></td>
                 </tr>
-                <tr>
+                <tr class="plihide">
                     
                     <td  id="A5" class="smallfont"  style="border: 1px solid #ccc; padding:  10px;">PLI STPG</td>
                     <td style="padding-left:0px !important;border: 1px solid #ccc; padding:  10px;" id="resultsPLI2"></td>
                     <td class="d-none" style="padding-left:0px !important;border: 1px solid #ccc; padding:  10px;" id="resultsPLI1hidden"></td>
             
                 </tr>
-                <tr>
+                <tr class="plihide">
                     <td  id="A6" class="smallfont"  style="border: 1px solid #ccc; padding:  10px;">PLI 2</td>
                     <td style="padding-left:0px !important;border: 1px solid #ccc; padding:  10px;" id="resultsPLI3"></td>
                     <td class="d-none" style="padding-left:0px !important;border: 1px solid #ccc; padding:  10px;" id="resultsPLI2hidden"></td>
               
                 </tr>
-                <tr>
+                <tr class="plihide">
                     <td id="A7"  class="smallfont"  style="border: 1px solid #ccc; padding:  10px;">PLI 3</td>
                     <td style="padding-left:0px !important;border: 1px solid #ccc; padding:  10px;" id="resultsPLI4"></td>
                     <td class="d-none" style="padding-left:0px !important;border: 1px solid #ccc; padding:  10px;" id="resultsPLI3hidden"></td>
             
                 </tr>
-                <tr>
+                <tr class="plihide">
                     <td  id="A8" class="smallfont"  style="border: 1px solid #ccc; padding:  10px;">PLI 4</td>
                     <td style="padding-left:0px !important;border: 1px solid #ccc; padding:  10px;" id="resultsPLI5"></td>
                     <td class="d-none" style="padding-left:0px !important;border: 1px solid #ccc; padding:  10px;" id="resultsPLI4hidden"></td>
@@ -327,12 +438,9 @@ updateNetPayCell();
                 
                 </tr>
 
-                
+              
 
-
-
-
-<tr>
+<tr class="plihide">
     <td id="A10" class="smallfont" style="border: 1px solid #ccc; padding: 10px;">ANTICPT</td>
     <td style="border: 1px solid #ccc; padding: 10px; color: #5f5f5f;">
         <input id="anticipation" type="number" value="" class="form-control bg-dark text-light border-0">
@@ -340,7 +448,7 @@ updateNetPayCell();
     </td>
     <td class="d-none" id="anticipationhidden" style="border: 1px solid #ccc; padding: 10px; color: white;"></td>
 </tr>
-<tr>
+<tr class="plihide">
     <td id="A11" class="smallfont" style="border: 1px solid #ccc; padding: 10px;">PRMTION</td>
     <td style="border: 1px solid #ccc; padding: 10px; color: #5f5f5f;">
 
@@ -351,67 +459,65 @@ updateNetPayCell();
 
 
 
-
-
-
-            <!-- Table 1: Dropdown in First Column -->
-            <div class="table-responsive" style="font-size:10px;">
-                <table class="table table-dark table-sm">
+        <div class=" mt-5 text-white bg-dark">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <td id="promotionCell" style="border: none; margin-bottom:0px"
+                            class="d-flex justify-content-between text-white align-items-center">
+                            <span id="promotionDisplay">₱ 0.00</span>
+                            <button class="promotion-button bg-transparent border-0 p-0" style="margin-left: 10px;"
+                                    onclick="toggleTable()">📖
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        
+            <div id="salaryTable" class="d-none">
+                <table class="table table-sm text-white bg-darktable-bordered">
                     <thead>
-                        <tr style="font-size:8px;">
-                            <th class="dropdown-col">SLRY GRD</th>
-                            <th>BASIC</th>
-                            <th>PRMTN NET</th>
-                        </tr>
+                    <tr>
+                        <th>SALARY GRADE</th>
+                        <th>BASIC PAY</th>
+                        <th>PRMTN NET</th>
+                    </tr>
                     </thead>
-                    <tbody id="table1Body">
-                        <!-- First Row -->
-                        <tr>
-                            <td style="font-size:10px;">
-                                <select id="salaryGradeDropdown1" class="form-select bg-dark text-white" onchange="updateSalaryRow(1)">
-                                    <!-- Dropdown options will be populated dynamically -->
-                                </select>
-                            </td>
-                            <td id="basicPayTable1"></td>
-                            <td id="prmtnNetpayTable1"></td>
-                        </tr>
-                        <!-- Second Row -->
-                        <tr>
-                            <td style="font-size:10px;">
-                                <select id="salaryGradeDropdown2" class="form-select bg-dark text-white" onchange="updateSalaryRow(2)">
-                                    <!-- Dropdown options will be populated dynamically -->
-                                </select>
-                            </td>
-                            <td id="basicPayTable2"></td>
-                            <td id="prmtnNetpayTable2"></td>
-                        </tr>
-                        <tr>
-                            <td>DIFF</td>
-                            <td id="basicPayTable3" ></td>
-                            <td>
-                               
-                                <input 
-                                id="promotion" 
-                                type="number" 
-                                class="bg-dark text-light border-0" 
-                                style="font-size:10px; font-weight: bold; width:50%;"  
-                                step="0.01" 
-                                oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\..*/g, '$1').replace(/(\.\d{2})\d*/, '$1')" 
-                                pattern="^\d+(\.\d{0,2})?$" 
-                                min="0" 
-                                placeholder="0.00"
-                            />
-                            
-                            </td>
-                        </tr>
+                    <tbody>
+                    <tr>
+                        <td>
+                            <select onchange="updateValues(this)" class="selectpromotion form-control">
+                                <option value="">Select SALARY GRADE</option>
+                            </select>
+                        </td>
+                        <td id="basicPay1">0</td>
+                        <td id="prmtnNet1">0</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <select onchange="updateValues(this)" class="selectpromotion form-control">
+                                <option value="">Select SALARY GRADE</option>
+                            </select>
+                        </td>
+                        <td id="basicPay2">0</td>
+                        <td id="prmtnNet2">0</td>
+                    </tr>
+                    <tr>
+                        <td>DIFF</td>
+                        <td id="basicPayTable3"></td>
+                        <td>
+                            <input id="promotion" type="number" class="bg-dark text-light border-0"
+                                   style="font-size:10px; font-weight: bold; width:50%;" step="0.01"
+                                   oninput="updatePromotionDisplay(this)" 
+                                   placeholder="0.00" min="0" />
+                        </td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
-
-
-
-
-
+        </div>
+        
+            
 
 
     </td>
@@ -434,7 +540,7 @@ updateNetPayCell();
 </tr>
 
 
-                    <tr>
+                    <tr  class="plihide">
                         <td id="A12"  class="smallfont"  style="border: 1px solid #ccc; padding:  10px; background-color: #200000; color: white;">SUB TOTAL:</td>
                         <td id="plitotalvalue" style="border: 1px solid #ccc; padding:  10px;padding-left:  10px !important; background-color: #200000; color: white;">₱0.00</td>
                         <td class="d-none"  id="plitotalvaluehidden" style="border: 1px solid #ccc; padding:  10px; background-color: #200000; color: white;">₱0.00</td>
@@ -789,8 +895,10 @@ document.getElementById("calculateButton").addEventListener("click", function() 
         <td style="border: 1px solid #ccc; padding: 10px;" id="loanProceeds"></td>
     </tr>
     
+    
+
     <!-- Redemption 1 -->
-    <tr>
+    <tr class="plihide">
         <td id="A2" class="smallfont" style="border: 1px solid #ccc; padding: 10px;">RDMTN 1</td>
         <td style="border: 1px solid #ccc; padding: 10px;">
             <input id="redemption1" type="number" value="" class="form-control bg-dark text-light border-0">
@@ -798,7 +906,7 @@ document.getElementById("calculateButton").addEventListener("click", function() 
     </tr>
 
     <!-- Redemption 2 -->
-    <tr>
+    <tr  class="plihide">
         <td id="A3" class="smallfont" style="border: 1px solid #ccc; padding: 10px;">RDMTN 2</td>
         <td style="border: 1px solid #ccc; padding: 10px;">
             <input id="redemption2" type="number" value="" class="form-control bg-dark text-light border-0">
@@ -806,12 +914,13 @@ document.getElementById("calculateButton").addEventListener("click", function() 
     </tr>
 
     <!-- Redemption 3 -->
-    <tr>
+    <tr  class="plihide">
         <td id="A4" class="smallfont" style="border: 1px solid #ccc; padding: 10px;">RDMTN 3</td>
         <td style="border: 1px solid #ccc; padding: 10px;">
             <input id="redemption3" type="number" value="" class="form-control bg-dark text-light border-0">
         </td>
     </tr>
+
 
     <!-- Old Balance -->
     <tr>
@@ -828,9 +937,6 @@ document.getElementById("calculateButton").addEventListener("click", function() 
             <input id="topUp" type="number" value="" class="form-control bg-dark text-light border-0">
         </td>
     </tr>
-
-
-
 
 
 
@@ -1033,6 +1139,8 @@ document.getElementById("calculateButton").addEventListener("click", function() 
         document.getElementById('netpaytable').style.display = 'block';
         document.getElementById('positivetable').style.display = 'block';
         document.getElementById('totalAmount').style.display = 'block';
+
+        calculateAll()
     
         // Call the function to update values after a short delay to allow the DOM to update
         setTimeout(updateValues, 100); // Adjust delay if needed
@@ -1068,133 +1176,6 @@ document.getElementById("calculateButton").addEventListener("click", function() 
 
 
 
-
-
-
-
-
-
-    <script>
-        // Load and parse CSV when the page is loaded
-        window.onload = function () {
-            loadprmtnCSV();
-        };
-        
-        // Function to load and parse CSV file
-        function loadprmtnCSV() {
-            fetch("promotion_bracket.csv")
-                .then(response => response.text())
-                .then(data => {
-                    const parsedData = parseCSV(data);
-                    populateSalaryDropdown(parsedData);
-                })
-                .catch(error => console.error("Error loading CSV:", error));
-        }
-        
-        // Function to parse CSV data into an array of objects
-        function parseCSV(data) {
-            const rows = data.split('\n').map(row => row.split(','));
-            const jsonData = rows.slice(1).map(row => {
-                return {
-                    salaryGrade: row[0] ? row[0].trim() : '',
-                    basicPay: row[1] ? row[1].trim() : '',
-                    prmtnNetpay: row[11] ? row[11].trim() : '' // Ensure this index matches the correct column for PRMTN NET
-                };
-            });
-            return jsonData;
-        }
-        
-        // Function to populate both dropdowns with unique salary grade steps
-        function populateSalaryDropdown(data) {
-            const dropdown1 = document.getElementById("salaryGradeDropdown1");
-            const dropdown2 = document.getElementById("salaryGradeDropdown2");
-            const uniqueSalaryGradeStep = new Set();
-        
-            data.forEach(row => {
-                const salaryGradeStep = row.salaryGrade;
-        
-                if (!uniqueSalaryGradeStep.has(salaryGradeStep)) {
-                    uniqueSalaryGradeStep.add(salaryGradeStep);
-                    
-                    const option1 = new Option(salaryGradeStep, salaryGradeStep);
-                    dropdown1.add(option1);
-                    
-                    const option2 = new Option(salaryGradeStep, salaryGradeStep);
-                    dropdown2.add(option2);
-                }
-            });
-        }
-        
-        // Global variables to store selected values for comparison
-        let firstRowBasicPay = 0;
-        let secondRowBasicPay = 0;
-        let firstRowprmtnNetpay = 0;
-        let secondRowprmtnNetpay = 0;
-        
-        // Helper function to clean and parse the numeric values from the table
-        function parseValue(value) {
-            return parseFloat(value.replace(/,/g, '') || 0);
-        }
-        
-        // Update only the specific row's data based on dropdown selection
-        function updateSalaryRow(rowNumber) {
-            const selectedSalaryGrade = document.getElementById(`salaryGradeDropdown${rowNumber}`).value;
-        
-            fetch("promotion_bracket.csv")
-                .then(response => response.text())
-                .then(data => {
-                    const parsedData = parseCSV(data);
-        
-                    // Log the selected salary grade for debugging
-                    console.log("Selected Salary Grade for Row " + rowNumber + ": " + selectedSalaryGrade);
-                    
-                    const filteredData = parsedData.find(row => {
-                        return row.salaryGrade === selectedSalaryGrade;
-                    });
-        
-                    if (filteredData) {
-                        const basicPay = parseValue(filteredData.basicPay);
-                        const prmtnNetpay = parseValue(filteredData.prmtnNetpay);
-        
-                        // Log values for debugging
-                        console.log(`Row ${rowNumber} Basic Pay: ${basicPay}, Promotion Net Pay: ${prmtnNetpay}`);
-        
-                        document.getElementById(`basicPayTable${rowNumber}`).textContent = basicPay.toLocaleString();
-                        document.getElementById(`prmtnNetpayTable${rowNumber}`).textContent = prmtnNetpay.toLocaleString();
-        
-                        // Update global variables for salary differences
-                        if (rowNumber === 1) {
-                            firstRowBasicPay = basicPay;
-                            firstRowprmtnNetpay = prmtnNetpay;
-                        } else if (rowNumber === 2) {
-                            secondRowBasicPay = basicPay;
-                            secondRowprmtnNetpay = prmtnNetpay;
-                        }
-        
-                        // Calculate and display the difference
-                        calculateSalaryDifference();
-                    } else {
-                        console.warn(`No data found for the selected salary grade: ${selectedSalaryGrade}`);
-                    }
-                })
-                .catch(error => console.error("Error updating salary row:", error));
-        }
-        
-        // Function to calculate the differences
-        function calculateSalaryDifference() {
-            if (firstRowBasicPay !== 0 && secondRowBasicPay !== 0) {
-                const basicPayDifference = secondRowBasicPay - firstRowBasicPay;
-                document.getElementById("basicPayTable3").textContent = basicPayDifference.toLocaleString();
-            }
-        
-            if (firstRowprmtnNetpay !== 0 && secondRowprmtnNetpay !== 0) {
-                const prmtnNetpayDifference = secondRowprmtnNetpay - firstRowprmtnNetpay;
-                // Set the value formatted to 2 decimal points
-                document.getElementById("promotion").value = prmtnNetpayDifference.toFixed(2);
-            }
-        }
-        </script>
-        
 
 
 
@@ -2037,16 +2018,14 @@ function calculateSemiTotal() {
         const row = document.createElement('tr');
         row.innerHTML = `
         <!--     <td>${monthName}</td> 
-            <td id="totalAmount">
-                ₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+            <td id="totalAmount"><span id="onqueuespan">
+                ₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</span>
                 <button id="viewmore" class="btn btn-link" style="color: white; padding-left: 10px;" onclick="toggleDetails(this)">View More</button>
            -->
 
 
      <td id="totalAmount" style="border: 0;border:none;margin-bottom:0px" class="d-flex justify-content-between align-items-center">
-    <span id="onqueuespan">
-                ₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                </span>
+    <span id="onqueuespan">₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</span>
     <button class="view-more-btn border-0 bg-transparent p-0"  onclick="toggleDetails(this)">📖</button>
 </td>
            
@@ -3120,63 +3099,67 @@ function calculatePayment() {
             return rows.map(row => row.split(','));
         }
     
+        
         function displayEmployeeInfoLCS(monthName, csvData) {
-            const employeeInfoSectionLCS = document.getElementById('employeeInfoLCS');
-            let employeeFound = false;
-    
-            for (let i = 1; i < csvData.length; i++) {
-                const row = csvData[i];
-                if (row.length < 4) continue;
-                const empno = row[34];
-                if (empno === document.getElementById('searchInputLCS').value.trim()) {
-                    employeeFound = true;
-    
-                    const branch_name = row[1];
-                    const custid = row[7];
-                    const accountnumber = row[2];
-                    const account_name = row[8];
-                    const group_name = row[38];
-                    const contact_no = row[46];
-    
-                    const ref_date = row[59];
-    
-                    const loanamount = row[15];
-                    const monthlyamort = row[32];
-    
-    
-                    const endingbalance = row[16];
-                    const accruedint = row[40];
-                    const overdueint = row[20];
-                    const totalBalanceLCSLCS = row[16 + 20 + 40];
-                    const adj_npl_bckt = row[63];
-                    const dateGranted = row[13];
-    
-                    employeeInfoSectionLCS.innerHTML = `
-                        <strong>BRANCH:</strong><b style="color:orange"> ${branch_name}</b><br/>
-                        <strong>CUST ID:</strong><b style="color:orange">   ${custid} </b><br/>
-                       
-                        <strong>ACC NAME:</strong><b style="color:orange"> ${account_name}</b><br/>
-                            <strong>SCHOOL:</strong><b style="color:orange"> ${group_name}</b><br/>
+    const employeeInfoSectionLCS = document.getElementById('employeeInfoLCS');
+    const oldBalanceInput = document.getElementById('oldBalance'); // Get the oldBalance input field
+    let employeeFound = false;
 
-                            
-                            <strong>CONTACT:</strong>
-<a href="tel:+63${contact_no}" style="color:orange; text-decoration:underline;">
-  +63 ${contact_no}
-</a><br/>
+    for (let i = 1; i < csvData.length; i++) {
+        const row = csvData[i];
+        if (row.length < 4) continue;
+        const empno = row[34];
+        if (empno === document.getElementById('searchInputLCS').value.trim()) {
+            employeeFound = true;
 
-                        <strong>REF DATE:</strong><b style="color:orange"> ${ref_date}</b><br/>
-    
-    
-    
-                    `;
-                    break;
-                }
-            }
-    
-            if (!employeeFound) {
-                employeeInfoSectionLCS.innerHTML = 'No employee found in the latest data.';
-            }
+            const branch_name = row[1];
+            const custid = row[7];
+            const accountnumber = row[2];
+            const account_name = row[8];
+            const group_name = row[38];
+            const contact_no = row[46];
+
+            const ref_date = row[59];
+
+            const loanamount = row[15];
+            const monthlyamort = row[32];
+
+            const endingbalance = row[16];
+            const accruedint = row[40];
+            const overdueint = row[20];
+            const totalBalanceLCSLCS = endingbalance + accruedint + overdueint; // Calculate total balance
+            const adj_npl_bckt = row[63];
+            const dateGranted = row[13];
+
+            // Scroll to the oldBalance input field
+            oldBalanceInput.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            // Set the value of oldBalance
+            oldBalanceInput.value = totalBalanceLCSLCS;
+
+            employeeInfoSectionLCS.innerHTML = `
+                <strong>BRANCH:</strong><b style="color:orange"> ${branch_name}</b><br/>
+                <strong>CUST ID:</strong><b style="color:orange">   ${custid} </b><br/>
+                <strong>ACC NAME:</strong><b style="color:orange"> ${account_name}</b><br/>
+                <strong>SCHOOL:</strong><b style="color:orange"> ${group_name}</b><br/>
+                <strong>CONTACT:
+                    <a href="tel:+63${contact_no}" style="color:orange; text-decoration:underline;">
+                    +63 ${contact_no}
+                    </a></strong><br/>
+                <strong>REF DATE:</strong><b style="color:orange"> ${ref_date}</b><br/>
+            `;
+            break;
         }
+    }
+
+    if (!employeeFound) {
+        employeeInfoSectionLCS.innerHTML = 'No employee found in the latest data.';
+    }
+}
+
+
+
+
         function displayResultsTableLCS(fetchedDataLCS) {
             const resultsSectionLCS = document.getElementById('resultsLCS');
             const table = document.createElement('table');
@@ -3232,6 +3215,9 @@ function calculatePayment() {
                 totalOverdueInterestLCS += overdueInt;
                 totalEndingBalanceLCS += endingBalance;
 
+
+
+                
     
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
@@ -3263,7 +3249,7 @@ function calculatePayment() {
       <th>${totalEndingBalanceLCS.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</th>
       <th>${totalAccruedInterestLCS.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</th>
       <th>${totalOverdueInterestLCS.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</th>
-      <th>${totalBalanceLCS.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</th>
+      <th id="totalBalancetoOldBalance">${totalBalanceLCS.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</th>
       <th></th>
             `;
             tfoot.appendChild(footerRow);
@@ -3303,8 +3289,6 @@ function calculatePayment() {
     `;
     
     
-    
-    
 
 
 
@@ -3314,8 +3298,6 @@ function calculatePayment() {
 
 
 
-    
-    
     
     
     function calculateTotal() {
@@ -3356,13 +3338,29 @@ function calculatePayment() {
             });
     
             table.appendChild(tbody);
-            resultsSectionLCS.appendChild(table);
+    resultsSectionLCS.appendChild(table);
+
+    // Set the value of oldBalance to totalBalanceLCS
+    document.getElementById('oldBalance').value = totalBalanceLCS.toFixed(2); // Set the value
+
         }
     
         function convertMonth(monthNumber) {
             const monthNames = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
             return monthNames[parseInt(monthNumber, 10) - 1];
         }
+
+
+
+
+
+
+
+
+
+
+
+
     </script>
 
 
@@ -3372,6 +3370,106 @@ function calculatePayment() {
 
 
 
+
+
+<script>
+    // Toggle the display of the salary table with 1 click
+    function toggleTable() {
+        const table = document.getElementById("salaryTable");
+        table.classList.toggle("d-none"); // Toggle the d-none class
+    }
+
+    // Update the displayed promotion value in the "promotionCell" when the input value changes
+    function updatePromotionDisplay(inputElement) {
+    const promotionValue = parseFloat(inputElement.value).toFixed(2);
+    document.getElementById('promotionDisplay').textContent = isNaN(promotionValue) ? '₱ 0.00' : '₱ ' + promotionValue;
+}
+
+    // Global variable to store parsed data
+    let parsedData = [];
+
+    // Load CSV data on window load
+    window.onload = function () {
+        loadprmtnCSV();
+    };
+
+    // Function to load and parse CSV file
+    function loadprmtnCSV() {
+        fetch("promotion_bracket.csv")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(data => {
+                parsedData = parseCSV(data);
+                console.log("Parsed Data:", parsedData); // Log parsed data for debugging
+                populateSalaryDropdown(parsedData);
+            })
+            .catch(error => console.error("Error loading CSV:", error));
+    }
+
+    // Function to parse CSV data
+    function parseCSV(data) {
+        const rows = data.trim().split('\n').map(row => row.split(','));
+        return rows.slice(1, 161).map(row => row.map(cell => cell.trim())); // Limit to first 163 rows after the header
+    }
+
+    // Populate salary dropdowns
+    function populateSalaryDropdown(data) {
+        const dropdowns = document.querySelectorAll('.selectpromotion');
+        dropdowns.forEach(dropdown => {
+            data.forEach(row => {
+                const option = document.createElement('option');
+                option.textContent = row[0];
+                dropdown.appendChild(option);
+            });
+        });
+    }
+
+    // Update values based on selection
+    function updateValues(selectElement) {
+        const selectedValue = selectElement.value;
+        const rowIndex = Array.from(selectElement.closest('tbody').rows).indexOf(selectElement.closest('tr'));
+
+        // Find the selected data using the selected value
+        const selectedData = parsedData.find(row => row[0] === selectedValue);
+
+        if (selectedData) {
+            const basicPay = parseFloat(selectedData[1]);
+            const prmtNNet = parseFloat(selectedData[2]);
+
+            // Update BASIC PAY and PRMTN NET for the selected row
+            document.getElementById(`basicPay${rowIndex + 1}`).textContent = !isNaN(basicPay) ? basicPay.toFixed(2) : '0';
+            document.getElementById(`prmtnNet${rowIndex + 1}`).textContent = !isNaN(prmtNNet) ? prmtNNet.toFixed(2) : '0';
+
+            // Check and calculate differences if both rows 1 and 2 are populated
+            const basicPay1 = parseFloat(document.getElementById('basicPay1').textContent) || 0;
+            const basicPay2 = parseFloat(document.getElementById('basicPay2').textContent) || 0;
+            const prmtNNet1 = parseFloat(document.getElementById('prmtnNet1').textContent) || 0;
+            const prmtNNet2 = parseFloat(document.getElementById('prmtnNet2').textContent) || 0;
+
+            console.log("BasicPay1:", basicPay1, "BasicPay2:", basicPay2);
+            console.log("PrmtNNet1:", prmtNNet1, "PrmtNNet2:", prmtNNet2);
+
+            // Calculate differences and update the difference row
+            const basicPayDiff = basicPay2 - basicPay1;
+            const prmtNNetDiff = prmtNNet2 - prmtNNet1;
+
+            console.log("Basic Pay Diff:", basicPayDiff, "Promotion Net Diff:", prmtNNetDiff);
+
+            // Update the difference fields
+            document.getElementById('basicPayTable3').textContent = !isNaN(basicPayDiff) ? basicPayDiff.toFixed(2) : '0';
+            document.getElementById('promotion').value = !isNaN(prmtNNetDiff) ? prmtNNetDiff.toFixed(2) : '0';
+
+            // Update the promotion value displayed in promotionCell
+            updatePromotionDisplay(document.getElementById('promotion'));
+        } else {
+            console.log("No matching data found for the selected value:", selectedValue);
+        }
+    }
+</script>
 
 
 
