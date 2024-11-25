@@ -36,7 +36,7 @@
 
     
         const csvFilesNetpay = [
-           'oct24.csv', 'sep24.csv', 'aug24.csv', 'jul24.csv', 'jun24.csv', 'may24.csv', 'apr24.csv', 'mar24.csv',
+           'nov24.csv', 'oct24.csv', 'sep24.csv', 'aug24.csv', 'jul24.csv', 'jun24.csv', 'may24.csv', 'apr24.csv', 'mar24.csv',
             'feb24.csv', 'jan24.csv', 'dec23.csv', 'nov23.csv', 'oct23.csv', 'sep23.csv'
         ];
         
