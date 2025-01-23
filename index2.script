@@ -34,7 +34,7 @@
 
 
 const csvFilesPos = [
-    'pos_nov24.csv', 'pos_oct24.csv',  'pos_sep24.csv', 'pos_aug24.csv', 'pos_jul24.csv', 'pos_jun24.csv', 'pos_may24.csv', 'pos_apr24.csv', 'pos_mar24.csv',
+    'pos_dec24.csv', 'pos_nov24.csv', 'pos_oct24.csv',  'pos_sep24.csv', 'pos_aug24.csv', 'pos_jul24.csv', 'pos_jun24.csv', 'pos_may24.csv', 'pos_apr24.csv', 'pos_mar24.csv',
     'pos_feb24.csv', 'pos_jan24.csv', 'pos_dec23.csv', 'pos_nov23.csv', 'pos_oct23.csv', 'pos_sep23.csv'
 ];
 
