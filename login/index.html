@@ -34,25 +34,49 @@
 </head>
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
+<style>
+/* Autofill text and background styling */
+input:-webkit-autofill {
+	font-family: 'Montserrat';
+    background-color: #cfcfcf !important; /* Dark background */
+    color: white !important; /* White text */
+    border: 1px solid #555 !important; /* Border color */
+    box-shadow: 0 0 0px 1000px #e7e7e7 inset !important; /* Fix autofill background */
+}
+
+/* When autofill is active and the input field is focused */
+input:-webkit-autofill:focus {
+    background-color: #717171 !important; /* Dark background */
+    color: white !important; /* White text */
+}
+
+/* Ensure autofill placeholder text is white */
+input:-webkit-autofill::placeholder {
+    color: white !important; /* White placeholder text */
+}
+
+
+</style>
+
 <body>
     <div class="limiter">
         <div class="container-login100" style="background-image: url('images/bg-01.jpg');">
-            <div class="wrap-login100 p-l-20 p-r-20 p-t-65 p-b-54 px-4">
+            <div class="wrap-login100 p-l-20 p-r-20 p-t-65 p-b-54 px-4" style="background-color:#222;">
                 <form class="login100-form validate-form">
-                    <span class="login100-form-title p-b-49" style="font-family: 'Inter', sans-serif;font-size:30px">CSB Mobile Netpay</span>
+                    <span class="login100-form-title p-b-49 text-white" style="font-family: 'Inter', sans-serif;font-size:30px">CSB Mobile Netpay</span>
 					
 
-                    <div class="wrap-input100 validate-input m-b-23" data-validate="Username is required">
-                        <span class="label-input100">Username</span>
-                        <input class="input100 pl-5" type="text" id="username"  style="font-size:15px; font-family: 'Montserrat'" name="username" placeholder="Type your username">
+                    <div class="wrap-input100 validate-input m-b-23 " data-validate="Username is required">
+                        <span class="label-input100 text-white" style="font-family: 'Montserrat'">Username</span>
+                        <input class="input100 pl-5" type="text" id="username"  style="font-size:15px; font-family: 'Montserrat';background-color: #333; color: white; border: 1px solid #555;"  name="username" placeholder="Type your username">
                         <span class="focus-input100 px-2" data-symbol="&#128100;"></span>
                     </div>
 
                
 					
 					<div class="wrap-input100 validate-input" data-validate="Password is required">
-						<span class="label-input100">Password</span>
-						<input class="input100 pl-5" type="password" id="password" style="font-size:15px; font-family: 'Montserrat'" name="pass" placeholder="Type your password">
+						<span class="label-input100 text-white" style="font-family: 'Montserrat'">Password</span>
+						<input class="input100 pl-5" type="password" id="password" style="font-size:15px; font-family: 'Montserrat'; background-color: #333; color: white; border: 1px solid #555;" name="pass" placeholder="Type your password">
 						<span class="focus-input100 px-2" data-symbol="&#128274;"></span>
 						<!-- Show/Hide Password Toggle -->
 						<input type="checkbox" id="togglePassword" class="position-absolute" style="bottom: 10px; right: 10px;" onclick="togglePasswordVisibility()">
@@ -77,35 +101,43 @@
                     <div class="container-login100-form-btn p-t-30">
                         <div class="wrap-login100-form-btn">
                             <div class="login100-form-bgbtn"></div>
-                            <button type="button" class="login100-form-btn" onclick="login()">Login</button>
+                            <button type="button" class="login100-form-btn"  style="font-family: 'Montserrat'" onclick="login()"><b>Login</b></button>
                         </div>
                     </div>
 
-                    <div class="flex-col-c p-t-55">
-                        <span class="txt1 p-b-17">No Account? Contact Administrator</span>
-                        <a href="#" class="txt2">Contact</a>
+                    <div class="flex-col-c p-t-55" >
+                        <span class="txt1 p-b-17 text-gray" style="font-family:'Montserrat'">No Account? Contact Administrator</span>
+                        <a href="#" class="txt2 text-white" style="font-family:'Montserrat'">Contact</a>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+
+
+
+
+
+	
 	<script>
 		// Function to handle login
-		function login() {
-			const username = document.getElementById("username").value;
-			const password = document.getElementById("password").value;
-	
-			// Validate username and password
-			if ((username === "jonathan77" && password === "atan77") || (username === "region7" && password === "ash7")) {
-				// Store the login time in localStorage (current timestamp in milliseconds)
-				localStorage.setItem("loginTime", new Date().getTime());
-	
-				// Redirect to index.html after successful login
-				window.location.href = "../index.html";
-			} else {
-				alert("Invalid username or password");
-			}
-		}
+function login() {
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    // Validate username and password
+    if ((username === "jonathan77" && password === "atan77") || (username === "region7" && password === "ash7")) {
+        // Store the login time and username in localStorage
+        localStorage.setItem("loginTime", new Date().getTime());
+        localStorage.setItem("loggedInUser", username); // Store logged-in username
+
+        // Redirect to index.html after successful login
+        window.location.href = "../index.html";
+    } else {
+        alert("Invalid username or password");
+    }
+}
+
 	</script>
 	
 
