@@ -260,11 +260,11 @@ detailCell.setAttribute('colspan', 2);
 detailCell.innerHTML = `
     <table class="table table-sm text-white" style="font-size:10px">
         <thead>
-            <tr>
+            <tr style="font-size:9px">
                 <th>/</th>
                 <th>PLI</th>
                 <th>EFF</th>
-                <th>TERM</th>
+                <th>TERMI</th>
                 <th>DEDAMTPLI</th>
                 <th>POLICYNO</th>
             </tr>
