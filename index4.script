@@ -342,3 +342,39 @@ function convertMonth(monthNumber) {
     const monthNames = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
     return monthNames[parseInt(monthNumber, 10) - 1];
 }
+
+
+
+
+
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const loginTime = localStorage.getItem("loginTime");
+
+            // Check if the login time exists and if the session has expired (4 hours)
+            if (!loginTime || (new Date().getTime() - loginTime) > 3 * 60 * 60 * 1000) {
+                // Redirect to login page if no login session or session expired
+                window.location.href = "login/index.html";
+            }
+        });
+
+// Function to handle logout
+function logout() {
+    // Clear the login-related data from localStorage
+    localStorage.removeItem("loginTime");
+    localStorage.removeItem("employeeNumber"); // If you store employeeNumber or any other login info
+
+    // Redirect to the login page
+    window.location.href = "login/index.html";
+}
+
+// Check if logged in (this part remains unchanged from your original code)
+document.addEventListener("DOMContentLoaded", function() {
+    const loginTime = localStorage.getItem("loginTime");
+
+    // Check if the login time exists and if the session has expired (4 hours)
+    if (!loginTime || (new Date().getTime() - loginTime) > 3 * 60 * 60 * 1000) {
+        // Redirect to login page if no login session or session expired
+        window.location.href = "login/index.html";
+    }
+});

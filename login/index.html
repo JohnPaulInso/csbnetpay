@@ -39,20 +39,40 @@
         <div class="container-login100" style="background-image: url('images/bg-01.jpg');">
             <div class="wrap-login100 p-l-20 p-r-20 p-t-65 p-b-54 px-4">
                 <form class="login100-form validate-form">
-                    <span class="login100-form-title p-b-49" style="font-family: 'Inter', sans-serif;">CSB Mobile Netpay</span>
+                    <span class="login100-form-title p-b-49" style="font-family: 'Inter', sans-serif;font-size:30px">CSB Mobile Netpay</span>
 					
 
                     <div class="wrap-input100 validate-input m-b-23" data-validate="Username is required">
                         <span class="label-input100">Username</span>
-                        <input class="input100" type="text" id="username" name="username" placeholder="Type your username">
+                        <input class="input100 pl-5" type="text" id="username"  style="font-size:15px; font-family: 'Montserrat'" name="username" placeholder="Type your username">
                         <span class="focus-input100 px-2" data-symbol="&#128100;"></span>
                     </div>
 
-                    <div class="wrap-input100 validate-input" data-validate="Password is required">
-                        <span class="label-input100">Password</span>
-                        <input class="input100" type="password" id="password" name="pass" placeholder="Type your password">
-                        <span class="focus-input100 px-2" data-symbol="&#128274;"></span>
-                    </div>
+               
+					
+					<div class="wrap-input100 validate-input" data-validate="Password is required">
+						<span class="label-input100">Password</span>
+						<input class="input100 pl-5" type="password" id="password" style="font-size:15px; font-family: 'Montserrat'" name="pass" placeholder="Type your password">
+						<span class="focus-input100 px-2" data-symbol="&#128274;"></span>
+						<!-- Show/Hide Password Toggle -->
+						<input type="checkbox" id="togglePassword" class="position-absolute" style="bottom: 10px; right: 10px;" onclick="togglePasswordVisibility()">
+					</div>
+					
+					<script>
+						// Toggle password visibility
+						function togglePasswordVisibility() {
+							const passwordField = document.getElementById("password");
+							const togglePassword = document.getElementById("togglePassword");
+							
+							if (togglePassword.checked) {
+								passwordField.type = "text";  // Show the password
+							} else {
+								passwordField.type = "password";  // Hide the password
+							}
+						}
+					</script>
+
+
 
                     <div class="container-login100-form-btn p-t-30">
                         <div class="wrap-login100-form-btn">
