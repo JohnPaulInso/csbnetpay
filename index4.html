@@ -20,7 +20,7 @@
 
 <body style="margin-bottom:200px">
 
-<nav style="background-color: hsl(0, 100%, 9%); position: sticky; top: 0; z-index: 1000; padding: 0.5rem 1rem;">
+<nav style="background-color: hsl(0, 100%, 9%); position: sticky; top: 0; z-index: 1000; padding: 0.5rem 1rem; font-family: 'Montserrat', sans-serif;">
     <div class="navbar-nav" style="color:#ddd;display: flex; justify-content: center;">
         <div style="color:#ddd;display: flex; align-items: center;">
             <a style="color:#aaa;" class="nav-item nav-link p-2" href="index.html"><b>NETPAY</b></a>
@@ -29,6 +29,13 @@
             <a class="nav-item text-white nav-link p-2" href="index4.html"><b>PLI</b></a>
             <a  style="color:#aaa;"  class="nav-item nav-link p-2" href="index5.html"><b>LE</b></a>
         </div>
+        
+        <!-- Reload Button with Emoji Icon -->
+<a href="javascript:void(0);" class="nav-item nav-link p-2 text-white" onclick="window.location.reload();" style="position: absolute; right: 10px; color: white; font-size: 1.5rem;">
+    <b>⟳</b>
+   </a>
+
+   
     </div>
 </nav>
 
@@ -37,12 +44,12 @@
 <div id="searchSection" class="container mt-5">
 
     <div translate="no">   
-    <h4 class="text-center pt-5 pb-3 mb-2" translate="no" style="font-family: 'Inter', sans-serif; font-size: 25px; font-weight: 900;">
+    <h4 class="text-center pt-5 pb-3 mb-2" translate="no" style="font-family: 'Inter', sans-serif; font-size: 30px; font-weight: 900;">
         PLI DEDUCTION RESULT
     </h4>
 </div>
 
-    <div class="row pt-2 px-4">
+    <div class="row pt-2 px-2">
         <div class="col-12 d-flex px-3"> <!-- Added px-3 for left & right padding -->
             <input type="text" id="searchInputPLI" class="form-control" placeholder="Employee Number..." style="flex-grow: 1;">
             <button id="searchButtonPLI" class="btn btn-primary ml-2">Search</button>
@@ -60,8 +67,8 @@
 <!-- Section to display employee details -->
 <div class="container">
     <div class="row">
-        <div class="col-md-12 pt-2 px-4">
-            <h3 id="employeeInfoPLI" class="text-white px-4"></h3>
+        <div class="col-md-12 pt-2 px-3">
+            <h3 id="employeeInfoPLI" class="text-white px-3"></h3>
         </div>
     </div>
     <div class="row results rounded-bottom rounded-top px-1" id="resultsPLI">
@@ -73,6 +80,21 @@
 
 
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("searchButtonPLI").addEventListener("click", function () {
+            var employeeNumber = document.getElementById("searchInputPLI").value.trim();
+    
+            if (employeeNumber) {
+                localStorage.setItem("employeeNumber", employeeNumber); // ✅ Save employee number
+                console.log("✅ Employee Number Stored:", employeeNumber); // Debugging
+            } else {
+                console.log("❌ No Employee Number Entered.");
+            }
+        });
+    });
+    </script>
+    
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
