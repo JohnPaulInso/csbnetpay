@@ -40,19 +40,21 @@ input:-webkit-autofill {
 	font-family: 'Montserrat';
     background-color: #cfcfcf !important; /* Dark background */
     color: white !important; /* White text */
-    border: 1px solid #555 !important; /* Border color */
+    border: 1px solid #222 !important; /* Border color */
     box-shadow: 0 0 0px 1000px #e7e7e7 inset !important; /* Fix autofill background */
 }
 
 /* When autofill is active and the input field is focused */
 input:-webkit-autofill:focus {
     background-color: #717171 !important; /* Dark background */
+    border: 1px solid #222 !important; /* Border color */
     color: white !important; /* White text */
 }
 
 /* Ensure autofill placeholder text is white */
 input:-webkit-autofill::placeholder {
     color: white !important; /* White placeholder text */
+    border: 1px solid #222 !important; /* Border color */
 }
 
 
@@ -68,7 +70,7 @@ input:-webkit-autofill::placeholder {
 
                     <div class="wrap-input100 validate-input m-b-23 " data-validate="Username is required">
                         <span class="label-input100 text-white" style="font-family: 'Montserrat'">Username</span>
-                        <input class="input100 pl-5" type="text" id="username"  style="font-size:15px; font-family: 'Montserrat';background-color: #333; color: white; border: 1px solid #555;"  name="username" placeholder="Type your username">
+                        <input class="input100 pl-5" type="text" id="username"  style="font-size:15px; font-family: 'Montserrat';background-color: #222; color: white; border: 1px solid #222;"  name="username" placeholder="Type your username">
                         <span class="focus-input100 px-2" data-symbol="&#128100;"></span>
                     </div>
 
@@ -76,7 +78,7 @@ input:-webkit-autofill::placeholder {
 					
 					<div class="wrap-input100 validate-input" data-validate="Password is required">
 						<span class="label-input100 text-white" style="font-family: 'Montserrat'">Password</span>
-						<input class="input100 pl-5" type="password" id="password" style="font-size:15px; font-family: 'Montserrat'; background-color: #333; color: white; border: 1px solid #555;" name="pass" placeholder="Type your password">
+						<input class="input100 pl-5" type="password" id="password" style="font-size:15px; font-family: 'Montserrat'; background-color: #222; color: white; border: 1px solid #222;" name="pass" placeholder="Type your password">
 						<span class="focus-input100 px-2" data-symbol="&#128274;"></span>
 						<!-- Show/Hide Password Toggle -->
 						<input type="checkbox" id="togglePassword" class="position-absolute" style="bottom: 10px; right: 10px;" onclick="togglePasswordVisibility()">
