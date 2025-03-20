@@ -89,25 +89,25 @@
             </div>
         </div>
     </div>
-
-    <script>
-        // Function to handle login
-        function login() {
-            const username = document.getElementById("username").value;
-            const password = document.getElementById("password").value;
-
-            // Validate username and password
-            if (username === "jonathan77" && password === "atan77") {
-                // Store the login time in localStorage (current timestamp in milliseconds)
-                localStorage.setItem("loginTime", new Date().getTime());
-
-                // Redirect to index.html after successful login
-                window.location.href = "../index.html";
-            } else {
-                alert("Invalid username or password");
-            }
-        }
-    </script>
+	<script>
+		// Function to handle login
+		function login() {
+			const username = document.getElementById("username").value;
+			const password = document.getElementById("password").value;
+	
+			// Validate username and password
+			if ((username === "jonathan77" && password === "atan77") || (username === "region7" && password === "ash7")) {
+				// Store the login time in localStorage (current timestamp in milliseconds)
+				localStorage.setItem("loginTime", new Date().getTime());
+	
+				// Redirect to index.html after successful login
+				window.location.href = "../index.html";
+			} else {
+				alert("Invalid username or password");
+			}
+		}
+	</script>
+	
 
 </body>
 
