@@ -263,8 +263,8 @@ detailCell.innerHTML = `
             <tr>
                 <th>/</th>
                 <th>PLI</th>
-                <th>EFFECTIVE</th>
-                <th>TERMINATE</th>
+                <th>EFF</th>
+                <th>TERM</th>
                 <th>DEDAMTPLI</th>
                 <th>POLICYNO</th>
             </tr>
@@ -279,7 +279,7 @@ detailCell.innerHTML = `
                    <td>${d.termmm.toString().padStart(2, '0')}/${d.termyy}</td>
                    
                     <td><b>₱${d.dedamtpli.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</b></td>
-                    <td>${d.policyno}</td>
+                    <td style="font-size:9px">${d.policyno}</td>
                 </tr>
             `).join('')}
         </tbody>
