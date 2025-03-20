@@ -6,82 +6,78 @@
 
 
 
+document.addEventListener('DOMContentLoaded', () => {
+    const prompt = document.getElementById('fullscreenPrompt');
 
+    // Show the prompt when the mouse moves
+    document.addEventListener('mousemove', () => {
+        prompt.style.display = 'block';
+    });
 
-    document.addEventListener('DOMContentLoaded', () => {
-            const prompt = document.getElementById('fullscreenPrompt');
+    // Enter fullscreen when the prompt is clicked
+    prompt.addEventListener('click', () => {
+        openFullscreen();
+        prompt.style.display = 'none'; // Hide prompt after entering full-screen
+    });
+});
 
-            // Show the prompt when the mouse moves
-            document.addEventListener('mousemove', () => {
-                prompt.style.display = 'block';
-            });
+function openFullscreen() {
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+    } else if (elem.mozRequestFullScreen) {
+        elem.mozRequestFullScreen();
+    } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) {
+        elem.msRequestFullscreen();
+    }
+}
 
-            // Enter fullscreen when the prompt is clicked
-            prompt.addEventListener('click', () => {
-                openFullscreen();
-                prompt.style.display = 'none'; // Hide prompt after entering full-screen
-            });
-        });
+// ======================= ONLY FETCH THE MOST RECENT FILE =======================
 
-        function openFullscreen() {
-            const elem = document.documentElement;
-            if (elem.requestFullscreen) {
-                elem.requestFullscreen();
-            } else if (elem.mozRequestFullScreen) {
-                elem.mozRequestFullScreen();
-            } else if (elem.webkitRequestFullscreen) {
-                elem.webkitRequestFullscreen();
-            } else if (elem.msRequestFullscreen) {
-                elem.msRequestFullscreen();
-            }
-        }
+// List of available CSV files (sorted in descending order for recency)
+const csvFilesOnq = [
+    'onq_dec25.csv', 'onq_nov25.csv', 'onq_oct25.csv', 'onq_sep25.csv', 'onq_aug25.csv',
+    'onq_jul25.csv', 'onq_jun25.csv', 'onq_may25.csv', 'onq_apr25.csv', 'onq_mar25.csv',
+    'onq_feb25.csv', 'onq_jan25.csv'
+];
 
+// Get only the most recent file
+const latestFile = csvFilesOnq[0];
 
+document.getElementById('searchButtonOnq').addEventListener('click', searchEmployeeOnq);
+function searchEmployeeOnq() {
+    const searchInputOnq = document.getElementById('searchInputOnq').value.trim();
+    const loadingIndicatorOnq = document.getElementById('loadingIndicatorOnq');
 
+    if (!searchInputOnq) {
+        alert('Please enter an employee number.');
+        return;
+    }
 
+    const resultsSectionOnq = document.getElementById('resultsonq');
+    const employeeInfoSectionOnq = document.getElementById('employeeInfoOnq');
+    resultsSectionOnq.innerHTML = ''; // Clear previous results
+    employeeInfoSectionOnq.innerHTML = ''; // Clear previous employee info
+    loadingIndicatorOnq.style.display = 'block'; // Show loading indicator
 
-
-
-
-
-
-
-
-    const csvFilesOnq = [
-        'onq_feb25.csv'
-    ];
-
-    document.getElementById('searchButtonOnq').addEventListener('click', searchEmployeeOnq);
-
-    function searchEmployeeOnq() {
-        const searchInputOnq = document.getElementById('searchInputOnq').value.trim();
-        const loadingIndicatorOnq = document.getElementById('loadingIndicatorOnq');
-
-        if (!searchInputOnq) {
-            alert('Please enter an employee number.');
+    findMostRecentFile().then(mostRecentFile => {
+        if (!mostRecentFile) {
+            alert('No available files found.');
+            loadingIndicatorOnq.style.display = 'none';
             return;
         }
 
-        const resultsSectionOnq = document.getElementById('resultsonq');
-        const employeeInfoSectionOnq = document.getElementById('employeeInfoOnq');
-        resultsSectionOnq.innerHTML = ''; // Clear previous results
-        employeeInfoSectionOnq.innerHTML = ''; // Clear previous employee info
-        loadingIndicatorOnq.style.display = 'block'; // Show loading indicator
-
-        const last12MonthsFilesOnq = csvFilesOnq.slice(0, 12);
-
-        let fetchedDataOnq = [];
-
-        Promise.all(last12MonthsFilesOnq.map(csvFile => fetchCSVOnq(csvFile)))
-            .then(allData => {
-                fetchedDataOnq = allData.filter(data => data !== null);
-                if (fetchedDataOnq.length === 0) {
-                    alert('No valid data found in the provided files.');
+        fetchCSVOnq(mostRecentFile)
+            .then(data => {
+                if (!data || !data.csvData.length) {
+                    alert('No data found in the most recent file.');
                     return;
                 }
-                fetchedDataOnq.sort((a, b) => b.date - a.date);
-                displayEmployeeInfoOnq(fetchedDataOnq[0].monthName, fetchedDataOnq[0].csvData);
-                displayResultsTableOnq(fetchedDataOnq);
+
+                displayEmployeeInfoOnq(data.monthName, data.csvData);
+                displayResultsTableOnq([data]); // Pass only the most recent available file
             })
             .catch(error => {
                 console.error('Error fetching CSV data:', error);
@@ -90,89 +86,108 @@
             .finally(() => {
                 loadingIndicatorOnq.style.display = 'none'; // Hide loading indicator
             });
-    }
+    });
+}
 
-    function fetchCSVOnq(csvFile) {
-        return new Promise((resolve, reject) => {
-            const monthName = getMonthNameFromCsvOnq(csvFile);
-            const date = getDateFromCsvOnq(csvFile);
+function findMostRecentFile() {
+    return new Promise(resolve => {
+        const last12MonthsFilesOnq = csvFilesOnq.slice(0, 12); // Get the 12 most recent file names
+        let fileFound = false;
 
-            fetch(csvFile)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`Unable to fetch ${csvFile}. Status: ${response.status}`);
-                    }
-                    return response.text();
-                })
-                .then(text => {
-                    const csvData = parseCSVOnq(text);
-                    resolve({ monthName, csvData, date });
-                })
-                .catch(error => {
-                    console.error(`Error fetching data for ${monthName}:`, error);
-                    resolve(null);
-                });
-        });
-    }
-
-    function getDateFromCsvOnq(csvFile) {
-        const fileName = csvFile.replace('onq_', '');
-        const monthMap = {
-            'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'may': 4, 'jun': 5,
-            'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11
-        };
-        const monthPart = fileName.slice(0, 3);
-        const yearPart = '20' + fileName.slice(3, 5);
-        const monthIndex = monthMap[monthPart];
-        return new Date(yearPart, monthIndex);
-    }
-
-    function getMonthNameFromCsvOnq(csvFile) {
-        const fileName = csvFile.replace('onq_', '');
-        const monthMap = {
-            'jan': 'January', 'feb': 'February', 'mar': 'March', 'apr': 'April', 'may': 'May', 'jun': 'June',
-            'jul': 'July', 'aug': 'August', 'sep': 'September', 'oct': 'October', 'nov': 'November', 'dec': 'December'
-        };
-        const monthPart = fileName.slice(0, 3);
-        const yearPart = '20' + fileName.slice(3, 5);
-        return `${monthMap[monthPart]} ${yearPart}`;
-    }
-
-    function parseCSVOnq(data) {
-        const rows = data.trim().split('\n');
-        return rows.map(row => row.split(','));
-    }
-
-    function displayEmployeeInfoOnq(monthName, csvData) {
-        const employeeInfoSectionOnq = document.getElementById('employeeInfoOnq');
-        let employeeFound = false;
-
-        for (let i = 1; i < csvData.length; i++) {
-            const row = csvData[i];
-            if (row.length < 4) continue;
-            const empno = row[3];
-            if (empno === document.getElementById('searchInputOnq').value.trim()) {
-                employeeFound = true;
-
-                const div = row[1];
-                const sta = row[2];
-                const fname = row[4];
-                const mi = row[5];
-                const lname = row[6];
-
-                employeeInfoSectionOnq.innerHTML = `
-                    <strong>NAME:</strong><b style="color:orange"> ${fname} ${mi} ${lname}</b><br/>
-                    <strong>EMPNO:</strong><b style="color:orange">   ${empno} </b><br/>
-                    <strong>DIV / STA:</strong><b style="color:orange"> ${div} / ${sta}</b><br/>
-                `;
-                break;
+        function checkNextFile(index) {
+            if (index >= last12MonthsFilesOnq.length) {
+                resolve(null); // No available file found
+                return;
             }
+
+            const file = last12MonthsFilesOnq[index];
+
+            fetch(file, { method: 'HEAD' }) // Check if the file exists
+                .then(response => {
+                    if (response.ok) {
+                        fileFound = true;
+                        resolve(file); // Return the first available file
+                    } else {
+                        checkNextFile(index + 1); // Check the next file
+                    }
+                })
+                .catch(() => checkNextFile(index + 1)); // Continue checking the next file if there's an error
         }
 
-        if (!employeeFound) {
-            employeeInfoSectionOnq.innerHTML = 'No employee found in the latest data.';
+        checkNextFile(0);
+    });
+}
+
+
+function fetchCSVOnq(csvFile) {
+    return new Promise((resolve, reject) => {
+        const monthName = getMonthNameFromCsvOnq(csvFile);
+
+        fetch(csvFile)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Unable to fetch ${csvFile}. Status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(text => {
+                const csvData = parseCSVOnq(text);
+                resolve({ monthName, csvData });
+            })
+            .catch(error => {
+                console.error(`Error fetching data for ${monthName}:`, error);
+                resolve(null);
+            });
+    });
+}
+
+function getMonthNameFromCsvOnq(csvFile) {
+    const fileName = csvFile.replace('onq_', '');
+    const monthMap = {
+        'jan': 'January', 'feb': 'February', 'mar': 'March', 'apr': 'April', 'may': 'May', 'jun': 'June',
+        'jul': 'July', 'aug': 'August', 'sep': 'September', 'oct': 'October', 'nov': 'November', 'dec': 'December'
+    };
+    const monthPart = fileName.slice(0, 3);
+    const yearPart = '20' + fileName.slice(3, 5);
+    return `${monthMap[monthPart]} ${yearPart}`;
+}
+
+function parseCSVOnq(data) {
+    const rows = data.trim().split('\n');
+    return rows.map(row => row.split(','));
+}
+
+function displayEmployeeInfoOnq(monthName, csvData) {
+    const employeeInfoSectionOnq = document.getElementById('employeeInfoOnq');
+    let employeeFound = false;
+
+    for (let i = 1; i < csvData.length; i++) {
+        const row = csvData[i];
+        if (row.length < 4) continue;
+        const empno = row[3];
+        if (empno === document.getElementById('searchInputOnq').value.trim()) {
+            employeeFound = true;
+
+            const div = row[1];
+            const sta = row[2];
+            const fname = row[4];
+            const mi = row[5];
+            const lname = row[6];
+
+            employeeInfoSectionOnq.innerHTML = `
+                <strong>NAME:</strong><b style="color:orange"> ${fname} ${mi} ${lname}</b><br/>
+                <strong>EMPNO:</strong><b style="color:orange">   ${empno} </b><br/>
+                <strong>DIV / STA:</strong><b style="color:orange"> ${div} / ${sta}</b><br/>
+            `;
+            break;
         }
     }
+
+    if (!employeeFound) {
+        employeeInfoSectionOnq.innerHTML = 'No employee found in the latest data.';
+    }
+}
+
 
     function displayResultsTableOnq(fetchedDataOnq) {
         const resultsSectionOnq = document.getElementById('resultsonq');
@@ -233,13 +248,13 @@
     const detailCell = document.createElement('td');
     detailCell.setAttribute('colspan', 2);
     detailCell.innerHTML = `
-    <table class="table table-sm text-white" style="font-size:11px">
+    <table class="table table-sm text-white" style="font-size:10px">
         <thead>
             <tr>
                 <th>/</th>
                 <th>PLI</th>
-                <th>EFFECTIVE</th>
-                <th>TERMINATE</th>
+                <th>EFF</th>
+                <th>TERM</th>
                 <th>DEDAMT</th>
                 <th>POLICYNO</th>
             </tr>

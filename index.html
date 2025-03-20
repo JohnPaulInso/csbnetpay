@@ -10,6 +10,9 @@
     <link rel="icon" href="favicon.ico" type="image/x-icon">
 <link rel="icon" href="favicon.png" type="image/png" sizes="any">
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Boldonse&family=Inter:wght@900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
 </head>
 
@@ -26,19 +29,21 @@
 </nav>
 
 
-
-
-
-
 <script>
-    document.getElementById("searchButtonNetpay").addEventListener("click", function() {
-        var employeeNumber = document.getElementById("searchInputNetpay").value;
-        if (employeeNumber) {
-            console.log("Storing Employee Number:", employeeNumber);  // Debug log
-            localStorage.setItem("employeeNumber", employeeNumber); // Store the employee number
-        }
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("searchButtonNetpay").addEventListener("click", function () {
+            var employeeNumber = document.getElementById("searchInputNetpay").value.trim();
+    
+            if (employeeNumber) {
+                localStorage.setItem("employeeNumber", employeeNumber); // ✅ Save employee number
+                console.log("✅ Employee Number Stored:", employeeNumber); // Debugging
+            } else {
+                console.log("❌ No Employee Number Entered.");
+            }
+        });
     });
-</script>
+    </script>
+    
 
 
 
@@ -46,11 +51,18 @@
 
 
 
-<body>
+
+
+
+<body style="margin-bottom:200px">
 <div id="searchSection" class="container  mt-5">
-    <h4 class="text-center pt-5 pb-3 mb-2">HISTORICAL NETPAY</h4>
-    <div class="row pt-2">
-        <div class="col-12 d-flex">
+    
+    <h4 class="text-center pt-5 pb-3 mb-2" style="font-family: 'Inter', sans-serif; font-size: 30px; font-weight: 900;">
+        HISTORICAL NETPAY
+    </h4>
+    
+    <div class="row pt-2 px-4">
+        <div class="col-12 d-flex px-3"> <!-- Added px-3 for left & right padding -->
             <input type="text" id="searchInputNetpay" class="form-control" placeholder="Employee Number..." style="flex-grow: 1;">
             <button id="searchButtonNetpay" class="btn btn-primary ml-2">Search</button>
         </div>
@@ -71,11 +83,11 @@
 <!-- Section to display employee details -->
 <div class="container">
     <div class="row">
-        <div class="col-md-12">
-            <h3 id="employeeInfoNetpay" class="text-white"></h3>
+        <div class="col-md-12 pt-2 px-4">
+            <h3 id="employeeInfoNetpay" class="text-white px-4"></h3>
         </div>
     </div>
-    <div class="row results rounded-bottom rounded-top" id="resultsNetpay">
+    <div class="row results rounded-bottom rounded-top px-1" id="resultsNetpay">
         <!-- Table will be dynamically inserted here -->
     </div>
 </div>
@@ -95,6 +107,22 @@
 </footer> -->
 
 
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var employeeNumber = localStorage.getItem("employeeNumber"); // Retrieve the employee number
+
+        if (employeeNumber) {
+            console.log("Retrieved Employee Number:", employeeNumber);  // Debug log
+            document.getElementById("searchInputNetpay").value = employeeNumber; // Fill the input
+
+            // Automatically trigger the search button click
+            document.getElementById("searchButtonNetpay").click();
+        } else {
+            console.log("No employee number found in localStorage.");  // Debug log
+        }
+    });
+</script>
 
 
 <script src="index.script"></script>

@@ -34,89 +34,120 @@
 
 
 const csvFilesPos = [
-    'pos_feb25.csv','pos_jan25.csv', 'pos_dec24.csv', 'pos_nov24.csv', 'pos_oct24.csv',  'pos_sep24.csv', 'pos_aug24.csv', 'pos_jul24.csv', 'pos_jun24.csv', 'pos_may24.csv', 'pos_apr24.csv', 'pos_mar24.csv',
+    'pos_dec25.csv', 'pos_nov25.csv', 'pos_oct25.csv', 'pos_sep25.csv', 'pos_aug25.csv', 
+    'pos_jul25.csv', 'pos_jun25.csv', 'pos_may25.csv', 'pos_apr25.csv', 'pos_mar25.csv', 
+    'pos_feb25.csv', 'pos_jan25.csv', 'pos_dec24.csv', 'pos_nov24.csv', 'pos_oct24.csv',  'pos_sep24.csv', 'pos_aug24.csv', 'pos_jul24.csv', 'pos_jun24.csv', 'pos_may24.csv', 'pos_apr24.csv', 'pos_mar24.csv',
     'pos_feb24.csv', 'pos_jan24.csv', 'pos_dec23.csv', 'pos_nov23.csv', 'pos_oct23.csv', 'pos_sep23.csv'
 ];
 
 document.getElementById('searchButtonPos').addEventListener('click', searchEmployeePos);
 
+
+
 function searchEmployeePos() {
-    const searchInputPos = document.getElementById('searchInputPos').value.trim();
     const loadingIndicatorPos = document.getElementById('loadingIndicatorPos');
 
-    if (!searchInputPos) {
-        alert('Please enter an employee number.');
-        return;
+    // Show loader while fetching
+    loadingIndicatorPos.style.display = 'block';
+
+    const monthNames = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+    let fileNames = [];
+
+    // Include all months from March 2024 - December 2025
+    for (let year = 2024; year <= 2025; year++) {
+        for (let i = (year === 2024 ? 2 : 0); i < 12; i++) { // Start from March in 2024
+            let fileName = `pos_${monthNames[i]}${year % 100}.csv`;
+            fileNames.push(fileName);
+        }
     }
 
-    const resultsSectionPos = document.getElementById('resultspos');
-    const employeeInfoSectionPos = document.getElementById('employeeInfoPos');
-    resultsSectionPos.innerHTML = ''; // Clear previous results
-    employeeInfoSectionPos.innerHTML = ''; // Clear previous employee info
-    loadingIndicatorPos.style.display = 'block'; // Show loading indicator
+    console.log("Generated file names:", fileNames);
 
-    // Automatically limit to the last 12 months (latest first)
-    const last12MonthsFilesPos = csvFilesPos.slice(0, 12);
-
-    let fetchedDataPos = [];
-
-    Promise.all(last12MonthsFilesPos.map(csvFile => fetchCSVPos(csvFile)))
-        .then(allData => {
-            fetchedDataPos = allData.filter(data => data !== null); // Filter out failed fetches
+    // Fetch all these files
+    Promise.all(fileNames.map(fetchCSVPos))
+        .then(results => {
+            let fetchedDataPos = results.filter(data => data !== null); // Remove failed fetches
+            
             if (fetchedDataPos.length === 0) {
                 alert('No valid data found in the provided files.');
                 return;
             }
+
+            // Sort by date (descending)
             fetchedDataPos.sort((a, b) => b.date - a.date);
+
+            // Keep only the latest 12 months for display
+            fetchedDataPos = fetchedDataPos.slice(0, 12);
+
+            console.log("Sorted & Filtered fetched data:", fetchedDataPos.map(d => d.monthName));
+
+            // Hide loader after fetching
+            loadingIndicatorPos.style.display = 'none';
+
+            // Display latest month data
             displayEmployeeInfoPos(fetchedDataPos[0].monthName, fetchedDataPos[0].csvData);
             displayResultsTablePos(fetchedDataPos);
         })
         .catch(error => {
-            console.error('Error fetching CSV data:', error);
-            alert('Error fetching data. Check the console for more details.');
-        })
-        .finally(() => {
-            loadingIndicatorPos.style.display = 'none'; // Hide loading indicator
+            console.error('Error fetching files:', error);
+            // Hide loader in case of error
+            loadingIndicatorPos.style.display = 'none';
         });
 }
+
+
+
 
 function fetchCSVPos(csvFile) {
     return new Promise((resolve, reject) => {
         const monthName = getMonthNameFromCsvPos(csvFile);
         const date = getDateFromCsvPos(csvFile);
 
-        console.log(`Fetching data from file: ${csvFile}`);
+        console.log(`Fetching file: ${csvFile}, Parsed Date: ${date}`);
 
         fetch(csvFile)
             .then(response => {
                 if (!response.ok) {
-                    throw new Error(`Unable to fetch ${csvFile}. Status: ${response.status}`);
+                    console.warn(`Skipping ${csvFile}: Fetch failed with status ${response.status}`);
+                    resolve(null);
+                    return;
                 }
                 return response.text();
             })
             .then(text => {
-                console.log(`Successfully fetched data from ${csvFile}`);
+                if (!text) {
+                    resolve(null);
+                    return;
+                }
+                console.log(`Fetched ${csvFile} successfully`);
                 const csvData = parseCSVPos(text);
                 resolve({ monthName, csvData, date });
             })
             .catch(error => {
-                console.error(`Error fetching data for ${monthName}:`, error);
-                resolve(null); // Return null for failed fetches, don't reject to allow Promise.all to proceed
+                console.error(`Fetch error for ${csvFile}:`, error);
+                resolve(null);
             });
     });
 }
 
+
+
 function getDateFromCsvPos(csvFile) {
-    const fileName = csvFile.replace('pos_', ''); // Remove 'pos_' prefix
+    const match = csvFile.match(/pos_([a-z]{3})(\d{2})\.csv$/);
+    if (!match) return null;
+
     const monthMap = {
         'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'may': 4, 'jun': 5,
         'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11
     };
-    const monthPart = fileName.slice(0, 3);
-    const yearPart = '20' + fileName.slice(3, 5);
+
+    const monthPart = match[1]; // e.g., "feb"
+    const yearPart = parseInt('20' + match[2]); // e.g., "25" -> "2025"
     const monthIndex = monthMap[monthPart];
-    return new Date(yearPart, monthIndex);
+
+    return new Date(yearPart, monthIndex, 1); // Return as a Date object for proper sorting
 }
+
 
 function getMonthNameFromCsvPos(csvFile) {
     const fileName = csvFile.replace('pos_', ''); // Remove 'pos_' prefix
@@ -216,8 +247,8 @@ function displayResultsTablePos(fetchedDataPos) {
             <td>
                 <div class="position-relative">
                     <u><b class="sum-amount" style="cursor: pointer;">${totalDedAmt}</b></u>
-                    <div class="dropdown-menu" style="display: none; position: absolute; z-index: 1;">
-                        ${value.details.map(detail => `<div class="dropdown-item">${detail}</div>`).join('')}
+                    <div class="dropdown-menu" id="dropdownPos" style="color:white; display: none; position: absolute; z-index: 1;">
+                        ${value.details.map(detail => `<div  id="dropdownitem" class="dropdown-item">${detail}</div>`).join('')}
                     </div>
                 </div>
             </td>

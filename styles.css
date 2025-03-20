@@ -151,8 +151,333 @@ font-size: 1.2em; /* Make the input text larger on mobile */
     margin-top: 20px;
 }
 .result span {
+
     color: #28a745;
 }
 
 
 
+
+
+
+
+
+
+
+
+
+
+/* Default button style */
+#searchButtonNetpay {
+    background-color: #4b00ac;
+    color: white;
+    border: none;
+    transition: background-color 0.2s ease-in-out;
+}
+
+/* Hover effect - Darker shade */
+#searchButtonNetpay:hover {
+    background-color: rgb(57, 0, 132);
+}
+
+/* Click (Active) effect - Even darker */
+#searchButtonNetpay:active {
+    background-color: #410096;
+}
+
+/* Remove blue outline when clicked */
+#searchButtonNetpay:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+
+/* Dark mode table styling */
+#resultsNetpay table {
+    width: 100%;
+    background-color: #131313; /* Dark background */
+    color: #ffffff; /* White text */
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Table header styling */
+#resultsNetpay thead {
+    background-color: #292929;
+}
+
+/* Table rows */
+#resultsNetpay tbody tr {
+    transition: background-color 0.2s ease-in-out;
+}
+
+/* Highlight row on hover */
+#resultsNetpay tbody tr:hover {
+    background-color: #5b5b5b;
+    cursor: pointer;
+}
+
+/* Rounded corners for the table */
+#resultsNetpay {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Default button style */
+#searchButtonPos {
+    background-color: #9d6100;
+    color: white;
+    border: none;
+    transition: background-color 0.2s ease-in-out;
+}
+
+/* Hover effect - Darker shade */
+#searchButtonPos:hover {
+    background-color: #875300;
+}
+
+/* Click (Active) effect - Even darker */
+#searchButtonPos:active {
+    background-color: #754800;
+}
+
+/* Remove blue outline when clicked */
+#searchButtonPos:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+
+
+
+
+/* Dark mode table styling */
+#resultspos table {
+    width: 100%;
+    background-color: #131313; /* Dark background */
+    color: #ffffff; /* White text */
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Table header styling */
+#resultspos thead {
+    background-color: #292929;
+}
+
+/* Table rows */
+#resultspos tbody tr {
+    transition: background-color 0.2s ease-in-out;
+}
+
+/* Highlight row on hover */
+#resultspos tbody tr:hover {
+    background-color: #444;
+    cursor: pointer;
+}
+
+/* Rounded corners for the table */
+#resultspos {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Dropdown styling */
+#dropdownPos {
+    background-color: #444; /* Dark gray background */
+    color: #ffffff; /* White text */
+    border-radius: 5px;
+    padding: 5px;
+}
+
+/* Dropdown items styling */
+#dropdownPos .dropdown-item {
+    color: #ffffff !important; /* White text */
+}
+
+/* Dropdown item hover effect */
+#dropdownPos .dropdown-item:hover {
+    background-color: #222 !important; /* Darker shade for hover */
+}
+
+/* Dropdown item hover effect */
+#dropdownPos .dropdown-item:hover {
+    background-color: #ffffff; /* Slightly lighter gray for hover */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Default button style */
+#searchButtonOnq {
+    background-color: #005312;
+    color: white;
+    border: none;
+    transition: background-color 0.2s ease-in-out;
+}
+
+/* Hover effect - Darker shade */
+#searchButtonOnq:hover {
+    background-color: #004810;
+}
+
+/* Click (Active) effect - Even darker */
+#searchButtonOnq:active {
+    background-color: #00410e;
+}
+
+/* Remove blue outline when clicked */
+#searchButtonOnq:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+
+
+
+
+
+
+
+/* Dark mode table styling */
+#resultsonq table {
+    width: 100%;
+    background-color: #131313; /* Dark background */
+    color: #ffffff; /* White text */
+    border-radius: 8px;
+    overflow: hidden;
+    
+}
+
+/* Table header styling */
+#resultsonq thead {
+    background-color: #292929;
+}
+
+/* Table rows */
+#resultsonq tbody tr {
+    transition: background-color 0.2s ease-in-out;
+}
+
+/* Highlight row on hover */
+#resultsonq tbody tr:hover {
+    cursor: pointer;
+}
+
+/* Rounded corners for the table */
+#resultsonq {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Default button style */
+#searchButtonPLI {
+    background-color: #560000;
+    color: white;
+    border: none;
+    transition: background-color 0.2s ease-in-out;
+}
+
+/* Hover effect - Darker shade */
+#searchButtonPLI:hover {
+    background-color: #4b0000;
+}
+
+/* Click (Active) effect - Even darker */
+#searchButtonPLI:active {
+    background-color: #400000;
+}
+
+/* Remove blue outline when clicked */
+#searchButtonPLI:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+
+
+
+
+
+
+
+/* Dark mode table styling */
+#resultsPLI table {
+    width: 100%;
+    background-color: #131313; /* Dark background */
+    color: #ffffff; /* White text */
+    border-radius: 8px;
+    overflow: hidden;
+    
+}
+
+/* Table header styling */
+#resultsPLI thead {
+    background-color: #292929;
+}
+
+/* Table rows */
+#resultsPLI tbody tr {
+    transition: background-color 0.2s ease-in-out;
+}
+
+/* Highlight row on hover */
+#resultsPLI tbody tr:hover {
+    cursor: pointer;
+}
+
+/* Rounded corners for the table */
+#resultsPLI {
+    border-radius: 8px;
+    overflow: hidden;
+}
