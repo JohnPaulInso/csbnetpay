@@ -99,14 +99,15 @@ input:-webkit-autofill::placeholder {
 					</script>
 
 
-
-                    <div class="container-login100-form-btn p-t-30">
-                        <div class="wrap-login100-form-btn">
-                            <div class="login100-form-bgbtn"></div>
-                            <button type="button" class="login100-form-btn"  style="font-family: 'Montserrat'" onclick="login()"><b>Login</b></button>
-                        </div>
-                    </div>
-
+<div class="container-login100-form-btn p-t-30">
+    <div class="wrap-login100-form-btn">
+        <div class="login100-form-bgbtn"></div>
+        <button type="button" class="login100-form-btn" id="login-btn" style="font-family: 'Montserrat'" onclick="startLoading()">
+            <span id="login-text"><b>Login</b></span>
+            <div id="loading-spinner" class="spinner" style="display: none;"></div>
+        </button>
+    </div>
+</div>
                     <div class="flex-col-c p-t-55" >
                         <span class="txt1 p-b-17 text-gray" style="font-family:'Montserrat'">No Account? Contact Administrator</span>
                         <a href="#" class="txt2 text-white" style="font-family:'Montserrat'">Contact</a>
@@ -121,9 +122,46 @@ input:-webkit-autofill::placeholder {
 
 
 	
+
+	<style>
+		.spinner {
+			width: 20px;
+			height: 20px;
+			border: 3px solid rgba(255, 255, 255, 0.3);
+			border-top: 3px solid white;
+			border-radius: 50%;
+			animation: spin 1s linear infinite;
+			display: inline-block;
+		}
+	
+		@keyframes spin {
+			0% { transform: rotate(0deg); }
+			100% { transform: rotate(360deg); }
+		}
+	</style>
+	
 	<script>
-		// Function to handle login
-function login() {
+		function startLoading() {
+			let loginText = document.getElementById("login-text");
+			let loadingSpinner = document.getElementById("loading-spinner");
+			let loginBtn = document.getElementById("login-btn");
+	
+			// Hide text and show spinner
+			loginText.style.display = "none";
+			loadingSpinner.style.display = "inline-block";
+			loginBtn.disabled = true; // Disable button during loading
+	
+			setTimeout(() => {
+				// Restore button text and call login function
+				loadingSpinner.style.display = "none";
+				loginText.style.display = "inline";
+				loginBtn.disabled = false;
+				login();
+			}, 700);
+		}
+	
+	// Function to handle login
+	function login() {
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
 
@@ -139,9 +177,8 @@ function login() {
         alert("Invalid username or password");
     }
 }
-
 	</script>
-	
+
 
 </body>
 
