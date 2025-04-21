@@ -56,11 +56,9 @@ async function searchEmployeeNetpay() {
         return;
     }
 
-    // Get latest file and extract last 12 months
-    const latestFileIndex = csvFilesNetpay.indexOf(availableFiles[0]);
-    const last12MonthsFilesNetpay = csvFilesNetpay.slice(latestFileIndex, latestFileIndex + 12);
+// Fetch all available CSV data
+let fetchedDataNet = await Promise.all(availableFiles.map(fetchCSVNetpay));
 
-    let fetchedDataNet = await Promise.all(last12MonthsFilesNetpay.map(fetchCSVNetpay));
 
     // Remove failed fetches
     fetchedDataNet = fetchedDataNet.filter(data => data !== null);
@@ -72,7 +70,7 @@ async function searchEmployeeNetpay() {
         displayEmployeeInfoNetpay(fetchedDataNet[0].monthName, fetchedDataNet[0].csvData);
         displayResultsTableNetpay(fetchedDataNet);
     } else {
-        employeeInfoSectionNetpay.innerHTML = 'No employee found in available data.';
+        employeeInfoSectionNetpay.innerHTML = 'No data available for the most recent month.';
     }
 
     loadingIndicatorNetpay.style.display = 'none';

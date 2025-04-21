@@ -43,7 +43,6 @@ const csvFilesPos = [
 document.getElementById('searchButtonPos').addEventListener('click', searchEmployeePos);
 
 
-
 function searchEmployeePos() {
     const loadingIndicatorPos = document.getElementById('loadingIndicatorPos');
 
@@ -76,10 +75,10 @@ function searchEmployeePos() {
             // Sort by date (descending)
             fetchedDataPos.sort((a, b) => b.date - a.date);
 
-            // Keep only the latest 12 months for display
-            fetchedDataPos = fetchedDataPos.slice(0, 12);
+            // ❌ Remove this to display all fetched months
+            // fetchedDataPos = fetchedDataPos.slice(0, 12);
 
-            console.log("Sorted & Filtered fetched data:", fetchedDataPos.map(d => d.monthName));
+            console.log("Sorted fetched data:", fetchedDataPos.map(d => d.monthName));
 
             // Hide loader after fetching
             loadingIndicatorPos.style.display = 'none';
@@ -94,6 +93,7 @@ function searchEmployeePos() {
             loadingIndicatorPos.style.display = 'none';
         });
 }
+
 
 
 
@@ -192,7 +192,7 @@ function displayEmployeeInfoPos(monthName, csvData) {
     }
 
     if (!employeeFound) {
-        employeeInfoSectionPos.innerHTML = 'No employee found in the latest data.';
+        employeeInfoSectionPos.innerHTML = 'No data available for the most recent month.';
     }
 }
 
