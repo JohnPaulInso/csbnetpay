@@ -3,7 +3,7 @@
 {
   "name": "Historical Netpay Search",
   "short_name": "Historical Netpay Search",
-  "start_url": "index.html",
+  "start_url": "login/index.html",
   "display": "standalone",
   "background_color": "#4F2683",
   "theme_color": "#4F2683",

@@ -1,7 +1,7 @@
 self.addEventListener("install", e => {
   e.waitUntil(
     caches.open("csb-netpay").then(cache => {
-      return cache.addAll(["index.html"]);
+      return cache.addAll(["login/index.html"]);
     })
   );
 });
