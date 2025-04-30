@@ -244,3 +244,6 @@ function checkLoggedInUser() {
 
 // Call this function on page load to check if jonathan77 is logged in
 checkLoggedInUser();
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
