@@ -146,7 +146,7 @@ function displayEmployeeInfoNetpay(monthName, csvData) {
     }
 
     if (!employeeFound) {
-        employeeInfoSectionNetpay.innerHTML = 'No employee found in available data.';
+        employeeInfoSectionNetpay.innerHTML = 'Employee ID not found in latest month.';
     }
 }
 

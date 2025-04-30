@@ -196,7 +196,7 @@ function displayEmployeeInfoPLI(monthName, csvData) {
     }
 
     if (!employeeFound) {
-        employeeInfoSectionPLI.innerHTML = 'No employee found in the latest data.';
+        employeeInfoSectionPLI.innerHTML = 'Employee ID not found in latest month.';
     }
 }
 

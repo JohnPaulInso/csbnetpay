@@ -184,7 +184,7 @@ function displayEmployeeInfoOnq(monthName, csvData) {
     }
 
     if (!employeeFound) {
-        employeeInfoSectionOnq.innerHTML = 'No employee found in the latest data.';
+        employeeInfoSectionOnq.innerHTML = 'Employee ID not found in latest month.';
     }
 }
 

@@ -192,7 +192,7 @@ function displayEmployeeInfoPos(monthName, csvData) {
     }
 
     if (!employeeFound) {
-        employeeInfoSectionPos.innerHTML = 'No data available for the most recent month.';
+        employeeInfoSectionPos.innerHTML = 'Employee ID not found in latest month.';
     }
 }
 
