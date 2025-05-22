@@ -68,6 +68,185 @@
 
 
 
+
+
+
+<div id="listeningOverlay"></div>
+
+<div class="container pt-4">
+  <div class="d-flex flex-column align-items-center">
+    <button id="micBtn" class="btn btn-primary mb-1" style="min-width: 150px;">
+      <i class="bi bi-mic"></i><span class="ms-2">Start Speaking</span>
+    </button>
+    <div id="feedback" class="text-danger fw-semibold" style="min-height: 1.5em;"></div>
+  </div>
+</div>
+
+<script>
+  const micBtn = document.getElementById("micBtn");
+  const feedback = document.getElementById("feedback");
+  const overlay = document.getElementById("listeningOverlay");
+
+  const listeningSound = new Audio('listening.ogg');
+  const searchingSound = new Audio('searching.ogg');
+  listeningSound.preload = 'auto';
+  searchingSound.preload = 'auto';
+
+  function showFeedback(message) {
+    feedback.textContent = message;
+  }
+
+  function clearFeedback() {
+    feedback.textContent = "";
+  }
+
+  function resetMicButton() {
+    micBtn.classList.remove("btn-danger");
+    micBtn.classList.add("btn-primary");
+    micBtn.innerHTML = '<i class="bi bi-mic"></i><span class="ms-2">Start Speaking</span>';
+    micBtn.disabled = false;
+    overlay.classList.remove("visible"); // fade out
+  }
+
+  micBtn.addEventListener("click", () => {
+    listeningSound.play();
+    micBtn.disabled = true;
+    overlay.classList.add("visible"); // fade in
+    startListening();
+  });
+
+  function startListening() {
+    clearFeedback();
+
+    if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
+      showFeedback("Sorry, your browser does not support speech recognition.");
+      resetMicButton();
+      return;
+    }
+
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'en-US';
+    recognition.interimResults = true;
+    recognition.continuous = true;
+
+    micBtn.classList.add("btn-danger");
+    micBtn.classList.remove("btn-primary");
+    micBtn.innerHTML = '<i class="bi bi-mic-fill"></i><span class="ms-2">Listening...</span>';
+
+    recognition.start();
+
+    let finalTranscript = "";
+    let processingTimeout;
+
+    recognition.onresult = (event) => {
+      clearTimeout(processingTimeout);
+
+      let interimTranscript = "";
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript;
+        } else {
+          interimTranscript += event.results[i][0].transcript;
+        }
+      }
+
+      const combinedTranscript = (finalTranscript + interimTranscript).toLowerCase().trim();
+
+      processingTimeout = setTimeout(() => {
+        searchingSound.play();
+        recognition.stop();
+        processCommand(combinedTranscript);
+      }, 1500);
+    };
+
+    recognition.onerror = (event) => {
+      showFeedback("Speech recognition error. Please try again.");
+      recognition.stop();
+      resetMicButton();
+    };
+
+    recognition.onend = () => {
+      searchingSound.play();
+      resetMicButton();
+    };
+
+    function processCommand(speech) {
+      if (!speech) {
+        showFeedback("Didn't catch that. Please try again.");
+        return;
+      }
+
+      console.log("Processing speech:", speech);
+
+      const routes = [
+        { keywords: ["netpay", "net pay", "net payment"], file: "index.html", inputId: "searchInputNetpay" },
+        { keywords: ["dedamt", "ded amount", "deduction amount", "positive", "deduction positive"], file: "index2.html", inputId: "searchInputPos" },
+        { keywords: ["onqueue", "on q", "on queue", "onq"], file: "index3.html", inputId: "searchInputOnq" },
+        { keywords: ["pli", "pli deduction"], file: "index4.html", inputId: "searchInputPLI" }
+      ];
+
+      let matchedRoute = null;
+      let employeeNumber = "";
+
+      for (const route of routes) {
+        for (const keyword of route.keywords) {
+          if (speech.startsWith(keyword)) {
+            matchedRoute = route;
+            let afterKeyword = speech.substring(keyword.length).trim();
+            employeeNumber = afterKeyword.match(/\d+/g)?.join('') || "";
+            break;
+          }
+        }
+        if (matchedRoute) break;
+      }
+
+      if (matchedRoute) {
+        if (!employeeNumber) {
+          showFeedback("Please say the employee number after the keyword.");
+          return;
+        }
+
+        localStorage.setItem("employeeNumber", employeeNumber);
+
+        if (window.location.pathname.endsWith(matchedRoute.file)) {
+          const inputField = document.getElementById(matchedRoute.inputId);
+          if (inputField) {
+            inputField.value = employeeNumber;
+            clearFeedback();
+            // Reload page to trigger search automatically
+            setTimeout(() => location.reload(), 500);
+          }
+        } else {
+          setTimeout(() => {
+            window.location.href = matchedRoute.file;
+          }, 500);
+        }
+      } else {
+        showFeedback("Command not recognized. Please try again.");
+      }
+    }
+  }
+
+  window.addEventListener("DOMContentLoaded", () => {
+    const employeeNumber = localStorage.getItem("employeeNumber");
+    if (employeeNumber) {
+      const possibleInputIds = ["searchInputNetpay", "searchInputPos", "searchInputOnq", "searchInputPLI"];
+      for (const id of possibleInputIds) {
+        const inputField = document.getElementById(id);
+        if (inputField) {
+          inputField.value = employeeNumber;
+          break;
+        }
+      }
+      localStorage.removeItem("employeeNumber");
+    }
+  });
+</script>
+
+
+
+
+
 <br/>
 
 
@@ -83,6 +262,123 @@
         <!-- Table will be dynamically inserted here -->
     </div>
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+  window.addEventListener("DOMContentLoaded", () => {
+    const params = new URLSearchParams(window.location.search);
+    const query = params.get("query");
+    const inputId = params.get("input");
+
+    if (query && inputId) {
+      const input = document.getElementById(inputId);
+      if (input) {
+        input.value = query;
+        input.dispatchEvent(new Event("input"));
+
+        // Try submitting with Enter key or button click
+        const form = input.closest("form");
+        if (form) {
+          const event = new KeyboardEvent("keydown", { key: "Enter", bubbles: true });
+          input.dispatchEvent(event);
+        } else {
+          const button = document.querySelector("button[type='submit'], button");
+          if (button) button.click();
+        }
+      }
+    }
+  });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
