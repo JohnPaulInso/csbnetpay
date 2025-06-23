@@ -243,7 +243,7 @@
           inputId: "searchInputPos",
         },
         {
-          keywords: ["onqueue", "on q", "on queue", "onq"],
+          keywords: ["onqueue", "on q", "on queue", "onq", "queue"],
           file: "index3.html",
           inputId: "searchInputOnq",
         },
@@ -346,6 +346,7 @@
 
 
 
+
         
 
         <!-- Loading GIF -->
@@ -369,6 +370,353 @@
         <!-- Table will be dynamically inserted here -->
     </div>
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div class="container mt-4">
+        <h5 class="text-white">Upload Latest Abstract</h5>
+        <p class="text-muted">Select the month and year, then upload an .xlsx file with NETPAY, POS, ONQUEUE, and PLI sheets.</p>
+
+       <div class="row mb-3">
+    <div class="col-md-3">
+        <label for="monthSelect" class="form-label text-light">Month</label>
+        <select  class="form-select bg-dark text-white border-secondary rounded-3 px-3 py-2 shadow-sm" id="monthSelect" class="form-select bg-dark text-white border-secondary">
+            <option value="" disabled selected>Select Month</option>
+            <!-- Dynamically populated via JavaScript -->
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <label for="yearSelect" class="form-label text-light">Year</label>
+  <select id="yearSelect" class="form-select bg-dark text-white border-secondary rounded-3 px-3 py-2">
+  <option value="2025" selected>2025</option>
+  <option value="2026">2026</option>
+</select>
+
+    </div>
+</div>
+
+
+        <div class="mb-3 col-md-6">
+            <label for="abstractFileInput" class="btn btn-secondary w-100">Choose .xlsx File</label>
+            <input type="file" id="abstractFileInput" class="d-none" accept=".xlsx" onchange="updateAbstractFileName()">
+            <small id="abstractFileName" class="form-text text-muted">No file chosen</small>
+        </div>
+
+        <div class="mb-3 col-md-6">
+            <button id="convertButton" class="btn btn-primary w-100" onclick="convertExcelToCSV()">
+                <span id="buttonText">CONVERT</span>
+                <span id="buttonSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+            </button>
+
+
+        </div>
+
+
+<div class="mb-3 col-md-12">
+    <small id="pliWarning" class="text-danger" style="display: none;">Take note: Recheck the PLI file exceeding 25 MB</small>
+</div>
+
+<div id="downloadButtons" class="mb-3 col-md-12 d-none"></div>
+
+
+
+
+        <div id="progressContainer" class="mb-3 col-md-12" style="display: none;">
+            <div class="progress">
+                <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <small id="progressText" class="form-text text-muted">Processing...</small>
+        </div>
+    </div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+    function populateMonthDropdown() {
+        const months = ["January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"];
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth();
+        const monthSelect = document.getElementById("monthSelect");
+
+        for (let i = 2; i >= 0; i--) {
+            const monthIndex = (currentMonth - i + 12) % 12;
+            const option = document.createElement("option");
+            option.value = months[monthIndex].substring(0, 3).toLowerCase();
+            option.text = months[monthIndex];
+            monthSelect.appendChild(option);
+        }
+    }
+
+    function updateAbstractFileName() {
+        const fileInput = document.getElementById("abstractFileInput");
+        const fileName = document.getElementById("abstractFileName");
+        fileName.textContent = fileInput.files.length
+            ? `Selected file: ${fileInput.files[0].name}`
+            : "No file chosen";
+    }
+
+    async function convertExcelToCSV() {
+        const monthSelect = document.getElementById("monthSelect");
+        const yearSelect = document.getElementById("yearSelect");
+        const fileInput = document.getElementById("abstractFileInput");
+        const progressContainer = document.getElementById("progressContainer");
+        const progressBar = document.getElementById("progressBar");
+        const progressText = document.getElementById("progressText");
+        const convertButton = document.getElementById("convertButton");
+        const buttonText = document.getElementById("buttonText");
+        const buttonSpinner = document.getElementById("buttonSpinner");
+        const pliWarning = document.getElementById("pliWarning");
+        const downloadButtonsContainer = document.getElementById("downloadButtons");
+
+        if (!monthSelect.value || !yearSelect.value) return alert("Please select both month and year.");
+        if (!fileInput.files.length) return alert("Please select an .xlsx file.");
+
+        convertButton.disabled = true;
+        buttonText.classList.add('d-none');
+        buttonSpinner.classList.remove('d-none');
+        progressContainer.style.display = "block";
+        progressBar.style.width = "0%";
+        progressBar.setAttribute("aria-valuenow", 0);
+        progressText.textContent = "Initializing...";
+        pliWarning.style.display = "none";
+        downloadButtonsContainer.classList.add("d-none");
+        downloadButtonsContainer.innerHTML = "";
+
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        const filesToDownload = [];
+
+        // Force loader to show 50% at 5 seconds
+        const timeout50 = setTimeout(() => {
+            progressBar.style.width = "50%";
+            progressBar.setAttribute("aria-valuenow", 50);
+            progressText.textContent = "Working on it (50%)...";
+        }, 5000);
+
+        // Force loader to show 80% at 20 seconds
+        const timeout80 = setTimeout(() => {
+            progressBar.style.width = "80%";
+            progressBar.setAttribute("aria-valuenow", 80);
+            progressText.textContent = "Still processing (80%)...";
+        }, 20000);
+
+        reader.onload = async function (e) {
+            try {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: "array" });
+
+                const sheetsToProcess = [
+                    { names: ["NETPAY", "netpay", "netPay"], output: `${monthSelect.value}${yearSelect.value.slice(-2)}.csv` },
+                    { names: ["POS", "pos", "positive", "dedamt"], output: `pos_${monthSelect.value}${yearSelect.value.slice(-2)}.csv` },
+                    { names: ["ONQUEUE", "ONQ", "QUEQUE"], output: `onq_${monthSelect.value}${yearSelect.value.slice(-2)}.csv` },
+                    { names: ["PLI", "pli"], output: `pli_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`, clearColumns: ["A", "S", "T", "U", "V", "W", "X", "Y", "Z"] }
+                ];
+
+                const presentSheets = sheetsToProcess.filter(sheetConfig =>
+                    Object.keys(workbook.Sheets).some(name => sheetConfig.names.includes(name))
+                );
+
+                if (presentSheets.length === 0) {
+                    alert('No matching sheets found in the Excel file.');
+                    resetUI();
+                    return;
+                }
+
+                for (const sheetConfig of presentSheets) {
+                    const sheetName = Object.keys(workbook.Sheets).find(name => sheetConfig.names.includes(name));
+                    let sheet = workbook.Sheets[sheetName];
+
+                    if (sheetConfig.clearColumns) {
+                        const range = XLSX.utils.decode_range(sheet["!ref"]);
+                        for (let col = range.s.c; col <= range.e.c; col++) {
+                            const colLetter = XLSX.utils.encode_col(col);
+                            if (sheetConfig.clearColumns.includes(colLetter)) {
+                                for (let row = range.s.r; row <= range.e.r; row++) {
+                                    const cellAddress = `${colLetter}${row + 1}`;
+                                    delete sheet[cellAddress];
+                                }
+                            }
+                        }
+                    }
+
+                    const csv = XLSX.utils.sheet_to_csv(sheet);
+                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+
+                    if (sheetConfig.output.startsWith('pli_') && blob.size > 25 * 1024 * 1024) {
+                        pliWarning.style.display = "block";
+                    }
+
+                    filesToDownload.push({
+                        filename: sheetConfig.output,
+                        blob: blob
+                    });
+
+                    progressText.textContent = `Prepared ${sheetConfig.output}`;
+                }
+
+                clearTimeout(timeout50);
+                clearTimeout(timeout80);
+
+                progressBar.style.width = "100%";
+                progressBar.setAttribute("aria-valuenow", 100);
+                progressText.textContent = "Conversion complete!";
+
+                // Show one download button for all files
+                const downloadBtn = document.createElement("button");
+                downloadBtn.className = "btn btn-success w-100 mt-3";
+                downloadBtn.textContent = "Download All Files";
+                downloadBtn.onclick = () => {
+                    filesToDownload.forEach(file => {
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(file.blob);
+                        link.download = file.filename;
+                        link.style.display = "none";
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(link.href);
+                    });
+                };
+                downloadButtonsContainer.appendChild(downloadBtn);
+                downloadButtonsContainer.classList.remove("d-none");
+
+                resetUI();
+            } catch (error) {
+                alert('Error processing the Excel file: ' + error.message);
+                resetUI();
+            }
+        };
+
+        reader.readAsArrayBuffer(file);
+
+        function resetUI() {
+            buttonText.classList.remove('d-none');
+            buttonSpinner.classList.add('d-none');
+            convertButton.disabled = false;
+            setTimeout(() => progressContainer.style.display = 'none', 2000);
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        populateMonthDropdown();
+        document.getElementById("yearSelect").value = "2025"; // Set default year
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
