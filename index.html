@@ -243,7 +243,7 @@
           inputId: "searchInputPos",
         },
         {
-          keywords: ["onqueue", "on q", "on queue", "onq", "queue"],
+          keywords: ["onqueue", "on q", "on queue", "onq", "queue", "onquee", "onqueu"],
           file: "index3.html",
           inputId: "searchInputOnq",
         },
@@ -610,7 +610,12 @@
                         }
                     }
 
-                    const csv = XLSX.utils.sheet_to_csv(sheet);
+                    const csv = XLSX.utils.sheet_to_csv(sheet, {
+    FS: ",",
+    RS: "\r\n",
+    blankrows: false
+});
+
                     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
 
                     if (sheetConfig.output.startsWith('pli_') && blob.size > 25 * 1024 * 1024) {
