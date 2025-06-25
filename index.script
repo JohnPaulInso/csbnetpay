@@ -228,22 +228,22 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 // Function to check if jonathan77 is logged in and show/hide the admin container
-function checkLoggedInUser() {
-    const loggedInUser = localStorage.getItem("loggedInUser");
+ function checkLoggedInUser() {
+        const loggedInUser = localStorage.getItem("loggedInUser");
+        const adminContainer = document.querySelector(".container-admin");
 
-    // Get the container element
-    const adminContainer = document.querySelector(".container-admin");
-
-    // Show the container only if jonathan77 is logged in
-    if (loggedInUser === "jonathan77") {
-        adminContainer.style.display = "block"; // Show the element
-    } else {
-        adminContainer.style.display = "none"; // Hide the element
+        if (loggedInUser === "jonathan77") {
+            adminContainer.style.display = "block";
+        } else {
+            adminContainer.style.display = "none";
+        }
     }
-}
 
-// Call this function on page load to check if jonathan77 is logged in
-checkLoggedInUser();
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js');
-    }
+    // Wait until DOM is ready before running the check
+    document.addEventListener("DOMContentLoaded", () => {
+        checkLoggedInUser();
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js');
+        }
+    });
