@@ -500,7 +500,37 @@
     </div>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
     function populateMonthDropdown() {
         const months = ["January", "February", "March", "April", "May", "June",
@@ -557,14 +587,12 @@
         const reader = new FileReader();
         const filesToDownload = [];
 
-        // Force loader to show 50% at 5 seconds
         const timeout50 = setTimeout(() => {
             progressBar.style.width = "50%";
             progressBar.setAttribute("aria-valuenow", 50);
             progressText.textContent = "Working on it (50%)...";
         }, 5000);
 
-        // Force loader to show 80% at 20 seconds
         const timeout80 = setTimeout(() => {
             progressBar.style.width = "80%";
             progressBar.setAttribute("aria-valuenow", 80);
@@ -577,10 +605,27 @@
                 const workbook = XLSX.read(data, { type: "array" });
 
                 const sheetsToProcess = [
-                    { names: ["NETPAY", "netpay", "netPay"], output: `${monthSelect.value}${yearSelect.value.slice(-2)}.csv` },
-                    { names: ["POS", "pos", "positive", "dedamt"], output: `pos_${monthSelect.value}${yearSelect.value.slice(-2)}.csv` },
-                    { names: ["ONQUEUE", "ONQ", "QUEQUE"], output: `onq_${monthSelect.value}${yearSelect.value.slice(-2)}.csv` },
-                    { names: ["PLI", "pli"], output: `pli_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`, clearColumns: ["A", "S", "T", "U", "V", "W", "X", "Y", "Z"] }
+                    {
+                        names: ["NETPAY", "netpay", "netPay"],
+                        output: `${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
+                        numberColumn: "H"
+                    },
+                    {
+                        names: ["POS", "pos", "positive", "dedamt"],
+                        output: `pos_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
+                        numberColumn: "N"
+                    },
+                    {
+                        names: ["ONQUEUE", "ONQ", "QUEQUE"],
+                        output: `onq_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
+                        numberColumn: "N"
+                    },
+                    {
+                        names: ["PLI", "pli"],
+                        output: `pli_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
+                        clearColumns: ["A", "S", "T", "U", "V", "W", "X", "Y", "Z"],
+                        numberColumn: "O"
+                    }
                 ];
 
                 const presentSheets = sheetsToProcess.filter(sheetConfig =>
@@ -610,11 +655,27 @@
                         }
                     }
 
+                    if (sheetConfig.numberColumn) {
+                        const range = XLSX.utils.decode_range(sheet["!ref"]);
+                        const colIndex = XLSX.utils.decode_col(sheetConfig.numberColumn);
+                        for (let row = range.s.r + 1; row <= range.e.r; row++) {
+                            const cellAddress = XLSX.utils.encode_cell({ c: colIndex, r: row });
+                            const cell = sheet[cellAddress];
+                            if (cell && typeof cell.v === 'string') {
+                                const numeric = parseFloat(cell.v.replace(/,/g, ''));
+                                if (!isNaN(numeric)) {
+                                    cell.v = numeric;
+                                    cell.t = 'n';
+                                }
+                            }
+                        }
+                    }
+
                     const csv = XLSX.utils.sheet_to_csv(sheet, {
-    FS: ",",
-    RS: "\r\n",
-    blankrows: false
-});
+                        FS: ",",
+                        RS: "\r\n",
+                        blankrows: false
+                    });
 
                     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
 
@@ -637,7 +698,6 @@
                 progressBar.setAttribute("aria-valuenow", 100);
                 progressText.textContent = "Conversion complete!";
 
-                // Show one download button for all files
                 const downloadBtn = document.createElement("button");
                 downloadBtn.className = "btn btn-success w-100 mt-3";
                 downloadBtn.textContent = "Download All Files";
@@ -675,12 +735,9 @@
 
     document.addEventListener("DOMContentLoaded", () => {
         populateMonthDropdown();
-        document.getElementById("yearSelect").value = "2025"; // Set default year
+        document.getElementById("yearSelect").value = "2025";
     });
 </script>
-
-
-
 
 
 
