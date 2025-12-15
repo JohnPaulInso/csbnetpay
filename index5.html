@@ -319,7 +319,7 @@ updateNetPayCell();
 
 <div style="margin-top: 10px;">
     
-    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+    <table style="width: 100%; border-collapse: collapse; text-align: left;" >
         
 
 
@@ -1274,7 +1274,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     
         const csvFilesNetpay = [
-            'feb25.csv'
+            'mar25.csv'
         ];
         
     document.getElementById('searchButtonNetpay').addEventListener('click', searchEmployeeNetpay);
@@ -1501,7 +1501,7 @@ function calculateAndDisplayTotal(totalNetPay) {
 
 
 const csvFilesPos = [
-    'pos_feb25.csv'
+    'pos_mar25.csv'
 ];
 
 document.getElementById('searchButtonPos').addEventListener('click', searchEmployeePos);
@@ -1774,7 +1774,7 @@ resultsMap.forEach((value, monthName) => {
 
 
     const csvFilesOnq = [
-        'onq_feb25.csv'
+        'onq_mar25.csv'
     ];
 
     document.getElementById('searchButtonOnq').addEventListener('click', searchEmployeeOnq);
@@ -2277,7 +2277,7 @@ document.addEventListener('DOMContentLoaded', calculateTotal);
 
 
 const csvFilesPLI = [
-    'pli_feb25.csv'
+    'pli_mar25.csv'
 ];
 
 document.getElementById('searchButtonPLI').addEventListener('click', searchEmployeePLI);
@@ -3018,7 +3018,7 @@ function calculatePayment() {
     
     
         const csvFilesLCS = [
-            'lcs_sep24.csv'
+            'lcs_feb25.csv'
         ];
     
         document.getElementById('searchButtonLCS').addEventListener('click', searchEmployeeLCS);
@@ -3121,28 +3121,28 @@ function calculatePayment() {
     for (let i = 1; i < csvData.length; i++) {
         const row = csvData[i];
         if (row.length < 4) continue;
-        const empno = row[34];
+        const empno = row[23];
         if (empno === document.getElementById('searchInputLCS').value.trim()) {
             employeeFound = true;
 
             const branch_name = row[1];
-            const custid = row[7];
-            const accountnumber = row[2];
-            const account_name = row[8];
-            const group_name = row[38];
-            const contact_no = row[46];
+            const custid = row[8];
+            const accountnumber = row[3];
+            const account_name = row[9];
+            const group_name = row[27];
+            const contact_no = row[37];
 
-            const ref_date = row[59];
+            const ref_date = row[52];
 
-            const loanamount = row[15];
-            const monthlyamort = row[32];
+            const loanamount = row[17];
+            const monthlyamort = row[21];
 
-            const endingbalance = row[16];
-            const accruedint = row[40];
-            const overdueint = row[20];
+            const endingbalance = row[18];
+            const accruedint = row[32];
+            const overdueint = row[31];
             const totalBalanceLCSLCS = endingbalance + accruedint + overdueint; // Calculate total balance
-            const adj_npl_bckt = row[63];
-            const dateGranted = row[13];
+            const adj_npl_bckt = row[57];
+            const dateGranted = row[15];
 
             // Scroll to the oldBalance input field
             oldBalanceInput.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -3209,16 +3209,16 @@ function calculatePayment() {
                 data.csvData.forEach((row, index) => {
                     if (index === 0) return; // Skip header row
     
-                    const empno = row[34];
+                    const empno = row[23];
                     if (empno === document.getElementById('searchInputLCS').value.trim()) {
-                        const loanAmount = parseFloat(row[15]) || 0;
-                        const monthlyAmort = parseFloat(row[32]) || 0;
-                        const endingBalance = parseFloat(row[16]) || 0;
-                        const accruedInt = parseFloat(row[40]) || 0;
-                        const overdueInt = parseFloat(row[20]) || 0;
+                        const loanAmount = parseFloat(row[17]) || 0;
+                        const monthlyAmort = parseFloat(row[21]) || 0;
+                        const endingBalance = parseFloat(row[18]) || 0;
+                        const accruedInt = parseFloat(row[32]) || 0;
+                        const overdueInt = parseFloat(row[31]) || 0;
                         const totalBal = endingBalance + accruedInt + overdueInt; // Adjust as needed
-                        const adjNplBckt = row[63] || '';
-                        const dateGranted = row[13] || '';
+                        const adjNplBckt = row[57] || '';
+                        const dateGranted = row[15] || '';
 
      // Accumulate totals
                 totalLoanAmountLCS += loanAmount;
@@ -3234,7 +3234,7 @@ function calculatePayment() {
     
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
-            <td>${row[2]}</td>
+            <td>${row[3]}</td>
                     <td>${dateGranted}</td> <!-- Display formatted Date Granted -->
                     <td>${loanAmount.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
                     <td>${monthlyAmort.toLocaleString('en-US', { style: 'currency', currency: 'PHP' })}</td>
@@ -3507,7 +3507,6 @@ function calculatePayment() {
 function logout() {
     // Clear the login-related data from localStorage
     localStorage.removeItem("loginTime");
-    localStorage.removeItem("employeeNumber"); // If you store employeeNumber or any other login info
 
     // Redirect to the login page
     window.location.href = "login/index.html";

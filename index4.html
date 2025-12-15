@@ -13,33 +13,81 @@
     
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Boldonse&family=Inter:wght@900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Boldonse&family=Inter:wght@900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
 
+<style>
+    .navbar {
+        background: hsl(0, 100%, 9%);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        padding: 0.8rem 1rem;
+        font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    .nav-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .nav-links {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    .nav-links::-webkit-scrollbar { display: none; }
+    .nav-link {
+        color: #aaa;
+        text-decoration: none;
+        padding: 0.6rem 1rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+        font-weight: 600;
+        font-size: 14px;
+        font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    .nav-link.active,
+    .nav-link:hover {
+        color: white;
+        background: rgba(255, 255, 255, 0.1);
+    }
+    .logout-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        color: white;
+        padding: 0.6rem 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 20px;
+    }
+    .logout-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.1);
+    }
+</style>
 
 </head>
 
 <body style="margin-bottom:200px">
 
-<nav style="background-color: hsl(0, 100%, 9%); position: sticky; top: 0; z-index: 1000; padding: 0.7rem 1rem; font-family: 'Inter', sans-serif;">
-    <div class="navbar-nav" style="color:#ddd;display: flex; justify-content: center;">
-        <div style="color:#ddd;display: flex; align-items: center;">
-            <a style="color:#aaa;" class="nav-item nav-link p-2" href="index.html"><b>NETPAY</b></a>
-            <a style="color:#aaa;" class="nav-item nav-link p-2" href="index2.html"><b>DEDAMT</b></a>
-            <a style="color:#aaa;" class="nav-item nav-link p-2" href="index3.html"><b>ONQ</b></a>
-            <a class="nav-item text-white nav-link p-2" href="index4.html"><b>PLI</b></a>
-            <a  style="color:#aaa;"  class="nav-item nav-link p-2" href="index5.html"><b>LE</b></a>
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="nav-links">
+            <a class="nav-link" href="index.html">NETPAY</a>
+            <a class="nav-link" href="index2.html">DEDAMT</a>
+            <a class="nav-link" href="index3.html">ONQ</a>
+            <a class="nav-link active" href="index4.html">PLI</a>
+            <a class="nav-link" href="index5.html">LE</a>
         </div>
-
-        <a href="javascript:void(0);" class="nav-item nav-link p-2 text-white" onclick="logout()" style="position: absolute; right: 10px; color: white; font-size: 1.5rem;">
-            <b>↪</b> <!-- Logout arrow icon -->
-        </a>
-
-        <!-- Reload Button with Emoji Icon -->
-<!-- <a href="javascript:void(0);" class="nav-item nav-link p-2 text-white" onclick="window.location.reload();" style="position: absolute; right: 10px; color: white; font-size: 1.5rem;">
-    <b>⟳</b>
-   </a> -->
-
-   
+        <button class="logout-btn" onclick="logout()">↪</button>
     </div>
 </nav>
 
@@ -338,7 +386,6 @@
           break;
         }
       }
-      localStorage.removeItem("employeeNumber");
     }
   });
 </script>

@@ -1,641 +1,1048 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Historical Netpay</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <title>Dedamt Positive</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="manifest" href="manifest.json">
     
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- Manifest & Icons -->
+    <link rel="manifest" href="/csbnetpay/manifest.json">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
-<link rel="icon" href="favicon.png" type="image/png" sizes="any">
+    <link rel="icon" href="favicon.png" type="image/png" sizes="any">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .results-section {
+            display: none;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            padding-bottom: 100px;
+        }
+
+        /* Navigation Styles */
+        .navbar {
+            background: #6b4600;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            padding: 0.8rem 1rem;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .nav-links::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-link {
+            color: #aaa;
+            text-decoration: none;
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .nav-link.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 20px;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
 
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Boldonse&family=Inter:wght@900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
+
+        .dedamt-hover {
+    position: relative;
+    cursor: pointer;
+}
+
+.dedamt-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 1.5rem;
+    background: #2d1e02;
+    color: #fff;
+    padding: 0.5rem;
+    border-radius: 8px;
+    font-size: 13px;
+    min-width: 160px;
+    z-index: 10;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+}
+
+.dedamt-dropdown div {
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+
+.dedamt-dropdown div:last-child {
+    border-bottom: none;
+}
+
+.dedamt-hover:hover .dedamt-dropdown {
+    display: block;
+}
+
+
+
+
+
+
+
+
+
+
+
+        /* Header Styles */
+        .page-header {
+            text-align: center;
+            margin: 2.5rem auto 2rem;
+            max-width: 600px;
+            padding: 0 1rem;
+        }
+
+        .page-header h1 {
+            color: #2c3e50;
+            font-weight: 800;
+            font-size: clamp(24px, 6vw, 36px);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        /* Search Card Styles */
+        .search-card {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Input Styles */
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-label {
+            display: block;
+            color: #495057;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            font-size: 14px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 0;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            color: #adb5bd;
+            font-size: 20px;
+            pointer-events: none;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 3rem 1rem 3rem;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            outline: none;
+        }
+
+        .form-input:hover {
+            border-color: #ced4da;
+        }
+
+        .form-input:focus {
+            border-color: hsl(39, 100%, 21%);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(165, 106, 0, 0.1);
+        }
+
+        .form-input:focus + .input-icon {
+            color: hsl(39, 100%, 21%);
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .mic-inside-input {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            color: hsl(39, 100%, 35%);
+            font-size: 1.15rem;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .mic-inside-input:hover {
+            color: hsl(39, 100%, 25%);
+        }
+
+        .mic-inside-input.listening {
+            color: #dc3545;
+        }
+
+        .listening-dots {
+            display: inline-flex;
+            gap: 2px;
+        }
+
+        .listening-dots span {
+            width: 4px;
+            height: 4px;
+            background: currentColor;
+            border-radius: 50%;
+            animation: dot-bounce 1.2s infinite ease-in-out;
+        }
+
+        .listening-dots span:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .listening-dots span:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        @keyframes dot-bounce {
+            0%, 80%, 100% {
+                transform: translateY(0);
+                opacity: 0.3;
+            }
+            40% {
+                transform: translateY(-6px);
+                opacity: 1;
+            }
+        }
+
+        .feedback-text {
+            margin-top: 4px;
+            font-size: 0.8rem;
+            color: hsl(39, 100%, 35%);
+            display: none;
+        }
+
+        /* Button Styles with Ripple Effect */
+        .btn {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-primary {
+            background: hsl(39, 100%, 21%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(165, 106, 0, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: hsl(39, 100%, 25%);
+            box-shadow: 0 6px 16px rgba(165, 106, 0, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+
+        /* Ripple Effect */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            transform: scale(0);
+            animation: ripple-animation 0.6s ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* Listening Overlay */
+        .listening-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 20vh;
+            z-index: 1050;
+            background: linear-gradient(to bottom, rgba(165, 106, 0, 0.5), transparent);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+
+        .listening-overlay.active {
+            opacity: 1;
+        }
+
+        /* Loading Indicator */
+        .loading-indicator {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .loading-indicator img {
+            max-width: 100px;
+        }
+
+        /* Results Section */
+        .results-section {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .employee-info {
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Mobile-Friendly Table Styles */
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .responsive-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+  
+        .responsive-table thead {
+            background: #463009;
+            color: white;
+        }
+
+        .responsive-table th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .responsive-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 14px;
+        }
+
+        .responsive-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .table-scroll-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        /* Helper Text */
+        .helper-text {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        /* Admin Section */
+        .admin-section {
+            max-width: 800px;
+            margin: 4rem auto 2rem;
+            padding: 0 1rem;
+        }
+
+        .admin-section + .admin-section {
+            margin-top: 1.5rem;
+        }
+
+        .admin-card {
+            background: #fdfdff;
+            color: #1f2937;
+            border-radius: 18px;
+            padding: 2.75rem 2.25rem 2.25rem;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .admin-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(165, 106, 0, 0.07), rgba(34, 197, 94, 0.06));
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        .admin-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .admin-card h5 {
+            font-size: 20px;
+            margin-bottom: 0.5rem;
+            color: #111827;
+        }
+
+        .admin-card p {
+            color: #4b5563;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 1rem;
+        }
+
+        .file-upload-wrapper {
+            position: relative;
+        }
+
+        .file-upload-label {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(120deg, #6b7280, #4b5563);
+            color: white;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .file-upload-label:hover {
+            background: linear-gradient(120deg, #4b5563, #374151);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-name {
+            display: block;
+            margin-top: 0.5rem;
+            font-size: 13px;
+            color: #adb5bd;
+        }
+
+        /* Responsive Utilities */
+        @media (max-width: 576px) {
+            .page-header {
+                margin: 1.5rem auto 1rem;
+            }
+
+            .admin-card {
+                padding: 1.5rem;
+            }
+        }
+
+        .container-admin {
+            display: none;
+        }
+    </style>
 </head>
 
-
-
-<nav style="background-color: hsl(39, 100%, 21%); position: sticky; top: 0; z-index: 1000; padding: 0.7rem 1rem;; font-family: 'Inter', sans-serif;">
-    <div class="navbar-nav" style="color:#ddd;display: flex; justify-content: center;">
-        <div style="color:#ddd;display: flex; align-items: center;">
-            <a style="color:#aaa;" class="nav-item nav-link p-2" href="index.html"><b>NETPAY</b></a>
-            <a  class="nav-item nav-link p-2 text-white" href="index2.html"><b>DEDAMT</b></a>
-            <a style="color:#aaa;"class="nav-item nav-link p-2" href="index3.html"><b>ONQ</b></a>
-            <a style="color:#aaa;" class="nav-item nav-link p-2" href="index4.html"><b>PLI</b></a>
-            <a style="color:#aaa;" class="nav-item nav-link p-2" href="index5.html"><b>LE</b></a>
-        </div>
-
-        <a href="javascript:void(0);" class="nav-item nav-link p-2 text-white" onclick="logout()" style="position: absolute; right: 10px; color: white; font-size: 1.5rem;">
-            <b>↪</b> <!-- Logout arrow icon -->
-        </a>
-
-        <!-- Reload Button with Emoji Icon -->
-<!-- <a href="javascript:void(0);" class="nav-item nav-link p-2 text-white" onclick="window.location.reload();" style="position: absolute; right: 10px; color: white; font-size: 1.5rem;">
-    <b>⟳</b>
-   </a> -->
-
-   
-    </div>
-</nav>
-
-
-
-
-
-
-
-
-
-
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        document.getElementById("searchButtonPos").addEventListener("click", function () {
-            var employeeNumber = document.getElementById("searchInputPos").value.trim();
-    
-            if (employeeNumber) {
-                localStorage.setItem("employeeNumber", employeeNumber); // ✅ Save employee number
-                console.log("✅ Employee Number Stored:", employeeNumber); // Debugging
-            } else {
-                console.log("❌ No Employee Number Entered.");
-            }
-        });
-    });
-    </script>
-    
-
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        var employeeNumber = localStorage.getItem("employeeNumber"); // Retrieve
-    
-        if (employeeNumber) {
-            console.log("✅ Retrieved Employee Number:", employeeNumber); // Debugging
-    
-            let searchInput = document.getElementById("searchInputPos"); // Your input field ID
-            if (searchInput) {
-                searchInput.value = employeeNumber; // ✅ Auto-fill input
-    
-                // ✅ Automatically trigger the search after a small delay
-                setTimeout(() => {
-                    document.getElementById("searchButtonPos").click();
-                }, 300);
-            }
-        } else {
-            console.log("❌ No Employee Number Found in localStorage.");
-        }
-    });
-    </script>
-    
-
-
-
-
-
-
-
-
-
-
-    
-            
-    
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-    <body style="margin-bottom:200px">
-        <div id="searchSection" class="container  mt-5">
-            
-            <h4 class="text-center pt-5 pb-3 mb-2" style="font-family: 'Inter', sans-serif; font-size: 30px; font-weight: 900;">
-                DEDAMT POSITIVE
-            </h4>
-            
-            <div class="row pt-2 px-2">
-                <div class="col-12 d-flex px-3"> <!-- Added px-3 for left & right padding -->
-            <input type="text" id="searchInputPos" class="form-control" placeholder="Employee Number..." style="flex-grow: 1;">
-        
-            <button id="searchButtonPos" class="btn btn-primary ml-2">Search</button>
-      
-      
-        </div>
-
-    
-
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- Microphone button and feedback -->
-<div class="container py-4">
-  <div class="d-flex flex-column align-items-center">
-    <button id="micBtn" class="btn btn-primary mb-3" style="min-width: 150px;">
-      <i class="bi bi-mic"></i><span class="ms-2">Start Speaking</span>
-    </button>
-    <div id="feedback" class="text-danger fw-semibold" style="min-height: 1.5em;"></div>
-  </div>
-</div>
-
-<!-- Listening overlay -->
-<div id="listeningOverlay" class="position-fixed top-0 start-0 w-100" style="height: 20vh; z-index: 1050; background: linear-gradient(to bottom, rgba(0, 123, 255, 0.5), transparent); opacity: 0; transition: opacity 0.5s ease; pointer-events: none;"></div>
-
-<script>
-  const micBtn = document.getElementById("micBtn");
-  const feedback = document.getElementById("feedback");
-  const listeningOverlay = document.getElementById("listeningOverlay");
-
-  // Load sound effects
-  const listeningSound = new Audio('listening.ogg');
-  const searchingSound = new Audio('searching.ogg');
-  listeningSound.preload = 'auto';
-  searchingSound.preload = 'auto';
-
-  function showFeedback(message) {
-    feedback.textContent = message;
-  }
-
-  function clearFeedback() {
-    feedback.textContent = "";
-  }
-
-  function showOverlay() {
-    listeningOverlay.style.opacity = "1";
-  }
-
-  function hideOverlay() {
-    listeningOverlay.style.opacity = "0";
-  }
-
-  function resetMicButton() {
-    micBtn.classList.remove("btn-danger");
-    micBtn.classList.add("btn-primary");
-    micBtn.innerHTML = '<i class="bi bi-mic"></i><span class="ms-2">Start Speaking</span>';
-    micBtn.disabled = false;
-    hideOverlay();
-  }
-
-  micBtn.addEventListener("click", () => {
-    listeningSound.play();  // Play immediately
-    micBtn.disabled = true;
-    startListening();
-  });
-
-  function startListening() {
-    clearFeedback();
-
-    if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
-      showFeedback("Sorry, your browser does not support speech recognition.");
-      resetMicButton();
-      return;
-    }
-
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = 'en-US';
-    recognition.interimResults = true;
-    recognition.continuous = true;
-
-    micBtn.classList.add("btn-danger");
-    micBtn.classList.remove("btn-primary");
-    micBtn.innerHTML = '<i class="bi bi-mic-fill"></i><span class="ms-2">Listening...</span>';
-
-    recognition.start();
-    showOverlay();
-
-    let finalTranscript = "";
-    let processingTimeout;
-
-    recognition.onresult = (event) => {
-      clearTimeout(processingTimeout);
-
-      let interimTranscript = "";
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
-        if (event.results[i].isFinal) {
-          finalTranscript += event.results[i][0].transcript;
-        } else {
-          interimTranscript += event.results[i][0].transcript;
-        }
-      }
-
-      const combinedTranscript = (finalTranscript + interimTranscript).toLowerCase().trim();
-
-      processingTimeout = setTimeout(() => {
-        searchingSound.play();
-        recognition.stop();
-        processCommand(combinedTranscript);
-      }, 3000); // 3 seconds pause timeout
-    };
-
-    recognition.onerror = (event) => {
-      showFeedback("Speech recognition error. Please try again.");
-      recognition.stop();
-      resetMicButton();
-    };
-
-    recognition.onend = () => {
-      resetMicButton();
-    };
-
-    function processCommand(speech) {
-      if (!speech) {
-        showFeedback("Didn't catch that. Please try again.");
-        return;
-      }
-
-      console.log("Processing speech:", speech);
-
-      const routes = [
-        {
-          keywords: ["netpay", "net pay", "net payment"],
-          file: "index.html",
-          inputId: "searchInputNetpay",
-        },
-        {
-          keywords: ["dedamt", "ded amount", "deduction amount", "positive", "deduction positive"],
-          file: "index2.html",
-          inputId: "searchInputPos",
-        },
-        {
-          keywords: ["onqueue", "on q", "on queue", "onq"],
-          file: "index3.html",
-          inputId: "searchInputOnq",
-        },
-        {
-          keywords: ["pli", "pli deduction"],
-          file: "index4.html",
-          inputId: "searchInputPLI",
-        }
-      ];
-
-      let matchedRoute = null;
-      let employeeNumber = "";
-
-      for (const route of routes) {
-        for (const keyword of route.keywords) {
-          if (speech.startsWith(keyword)) {
-            matchedRoute = route;
-            let afterKeyword = speech.substring(keyword.length).trim();
-            employeeNumber = afterKeyword.match(/\d+/g)?.join('') || "";
-            break;
-          }
-        }
-        if (matchedRoute) break;
-      }
-
-      if (matchedRoute) {
-        if (!employeeNumber) {
-          showFeedback("Please say the employee number after the keyword.");
-          return;
-        }
-
-        localStorage.setItem("employeeNumber", employeeNumber);
-
-        if (window.location.pathname.endsWith(matchedRoute.file)) {
-          const inputField = document.getElementById(matchedRoute.inputId);
-          if (inputField) {
-            inputField.value = employeeNumber;
-            clearFeedback();
-
-            // Reload the page to auto-trigger search
-            location.reload();
-          }
-        } else {
-          setTimeout(() => {
-            window.location.href = matchedRoute.file;
-          }, 500);
-        }
-      } else {
-        showFeedback("Command not recognized. Please try again.");
-      }
-    }
-  }
-
-  window.addEventListener("DOMContentLoaded", () => {
-    const employeeNumber = localStorage.getItem("employeeNumber");
-    if (employeeNumber) {
-      const possibleInputIds = ["searchInputNetpay", "searchInputPos", "searchInputOnq", "searchInputPLI"];
-      for (const id of possibleInputIds) {
-        const inputField = document.getElementById(id);
-        if (inputField) {
-          inputField.value = employeeNumber;
-          break;
-        }
-      }
-      localStorage.removeItem("employeeNumber");
-    }
-  });
-</script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<script>
-  window.addEventListener("DOMContentLoaded", () => {
-    const params = new URLSearchParams(window.location.search);
-    const emp = params.get("emp");       // Employee Number from URL
-    const inputId = params.get("inputId"); // input field id
-
-    if (emp && inputId) {
-      const input = document.getElementById(inputId);
-      if (input) {
-        input.value = emp;
-
-        // Trigger input event in case there are event listeners for searching
-        input.dispatchEvent(new Event("input"));
-
-        // Try to find a search button near the input and click it automatically
-        // Adjust this selector as per your actual form/button setup
-        let searchButton = input.closest("form")?.querySelector("button[type='submit']");
-        if (!searchButton) {
-          // fallback: try any button on page
-          searchButton = document.querySelector("button");
-        }
-        if (searchButton) {
-          searchButton.click();
-        }
-      }
-    }
-  });
-</script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        <!-- Loading GIF -->
-<div id="loadingIndicatorPos" style="display: none; text-align: center;">
-    <img src="loading.gif" alt="Loading..." style="max-width: 100px;">
-</div>
-
-    </div>
-</div>
-
-<br/>
-
-
-    <!-- Section to display employee details -->
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12 pt-2 px-3">
-                <h3 id="employeeInfoPos" class="text-white px-3"></h3>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-links">
+                <a class="nav-link" href="index.html">NETPAY</a>
+                <a class="nav-link active" href="index2.html">DEDAMT</a>
+                <a class="nav-link" href="index3.html">ONQ</a>
+                <a class="nav-link" href="index4.html">PLI</a>
+                <a class="nav-link" href="index5.html">LE</a>
             </div>
+            <button class="logout-btn" onclick="logout()">↪</button>
         </div>
-        <div class="row results rounded-bottom rounded-top px-1" id="resultspos">
+    </nav>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>DEDAMT POSITIVE</h1>
+    </div>
+
+    <!-- Search Section -->
+    <div class="search-card">
+        <div class="card">
+            <div class="input-group">
+                <label class="input-label" for="searchInputPos">Employee Number</label>
+                
+                <div class="input-wrapper">
+                    <div class="input-with-icon">
+                        <input
+                            type="text"
+                            id="searchInputPos"
+                            class="form-input"
+                            placeholder="Employee Number..."
+                            autocomplete="on"
+                        />
+
+                        
+                        <button type="button" id="micBtn" class="mic-inside-input">
+                            <i class="bi bi-mic-fill"></i>
+                        </button>
+                    </div>
+                    
+                    <i class="bi bi-search input-icon"></i>
+                </div>
+
+                <div id="feedback" class="feedback-text"></div>
+            </div>
+
+            <button id="searchButtonPos" class="btn btn-primary">
+                <i class="bi bi-search"></i>
+                Search Employee
+            </button>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicatorPos" class="loading-indicator">
+            <img src="loading.gif" alt="Loading...">
+        </div>
+    </div>
+
+    <!-- Listening Overlay -->
+    <div id="listeningOverlay" class="listening-overlay"></div>
+
+    <!-- Results Section -->
+    <div class="results-section">
+        <h3 id="employeeInfoPos" class="employee-info"></h3>
+        <div id="resultspos" class="table-container">
             <!-- Table will be dynamically inserted here -->
         </div>
     </div>
 
+    <!-- Admin Section -->
+    <div class="admin-section container-admin" style="display: none;">
+        <div class="admin-card">
+            <h5>Already have the Positive for <span style="color: #00c12d;" id="month-name"></span>?</h5>
+            <p>Please double check the month and year and make sure it's a CSV File. Example: <u id="example-file">pos_feb25.csv</u></p>
 
+            <div class="form-group">
+                <div class="file-upload-wrapper">
+                    <label for="fileInput" class="file-upload-label">Choose File</label>
+                    <input type="file" id="fileInput" class="file-input" onchange="updateFileName()">
+                    <small id="fileName" class="file-name">No file chosen</small>
+                </div>
+            </div>
 
-
-
-
-
-    <div class="container container-admin" style="padding-top:450px">
-        <div class="col-xs-12 pt-2 px-3 ">
-          <script>
-            // Function to get the previous month's name (3-letter abbreviation)
-             // Function to get the previous month's name (3-letter abbreviation)
-  function getPreviousMonth() {
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const currentDate = new Date();
-    const currentMonth = currentDate.getMonth(); // get the current month (0-11)
-    const previousMonthIndex = (currentMonth - 1 + 12) % 12; // Adjust for December to January wrap around
-    return months[previousMonthIndex];
-  }
-      
-  window.onload = function() {
-    const previousMonth = getPreviousMonth();
-    const previousMonthText = "pos_" + previousMonth.toLowerCase() + '25.csv'; // Add "pos_" before the file name
-    document.getElementById("month-name").textContent = previousMonth;
-    document.getElementById("example-file").textContent = previousMonthText; // Update the example file
-  }
-    
-            
-      // Function to reload the page after upload completion (simulate with a button click)
-      function onUploadComplete() {
-        // Simulating the upload completion
-        setTimeout(function() {
-          location.reload(); // Reload the page
-        }, 1000); // Wait for 1 second to simulate a complete upload
-      }
-          </script>
-      
-          <script>
-            function updateFileName() {
-              const fileInput = document.getElementById("fileInput");
-              const fileName = document.getElementById("fileName");
-              if (fileInput.files.length > 0) {
-                fileName.textContent = `Selected file: ${fileInput.files[0].name}`;
-              } else {
-                fileName.textContent = "No file chosen";
-              }
-            }
-          </script>
-      
-          <h5 style="color: white;font-size:22px" id="month-text">Already have the Positive for <span style="color: #00c12d; font-weight: bold;" id="month-name"></span>?</h5>
-          <p style="color: rgb(181, 181, 181);font-size:15px">Please double check the month and year and make sure it's a CSV File. Example: <u id="example-file">pos_feb25.csv</u></p>
-      
-          <div class="mb-3 col-md-6">
-            <label for="fileInput" class="btn btn-secondary btn-block">Choose File</label>
-            <input type="file" id="fileInput" class="form-control-file d-none" onchange="updateFileName()">
-            <small id="fileName" class="form-text text-muted">No file chosen</small>
-          </div>
-          <div class="mb-3 col-md-6">
-            <button onclick="uploadFile()" class="btn btn-success btn-block">Upload</button>
-          </div>
-      
-       
-      <script>
-        async function uploadFiles() {
-          const fileInput = document.getElementById("fileInput");
-          const files = fileInput.files;
-          if (!files.length) return alert("Please select at least one file.");
-      
-          alert("Uploading files to GitHub...");
-      
-          const repo = "csbnetpay"; 
-          const owner = "JohnPaulInso"; 
-      
-          // Split Token (Bypassing GitHub Detection)
-          const part1 = "ghp_";  
-          const part2 = "vnpu7K5e3lNEsKwMczRGTgPA35ER5R2odvye";
-          const token = part1 + part2; // Combine token parts
-      
-          const uploadPromises = Array.from(files).map(async (file) => {
-            return new Promise((resolve, reject) => {
-              const reader = new FileReader();
-              reader.readAsDataURL(file);
-              reader.onload = async () => {
-                const content = reader.result.split(",")[1]; 
-                const path = file.name; 
-                const message = `Upload ${file.name} via API`;
-      
-                const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-      
-                try {
-                  const response = await fetch(url, {
-                    method: "PUT",
-                    headers: {
-  "Authorization": `token ${token}`,
-  "Accept": "application/vnd.github.v3+json",
-  "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                      message: message,
-                      content: content
-                    })
-                  });
-      
-                  const result = await response.json();
-                  if (response.ok) {
-                    console.log(`Upload successful: ${file.name}`);
-                    resolve(file.name);
-                  } else {
-                    console.error(`Upload failed: ${file.name}`, result);
-                    reject(`Failed: ${file.name}`);
-                  }
-                } catch (error) {
-                  console.error(`Error uploading ${file.name}`, error);
-                  reject(`Error: ${file.name}`);
-                }
-              };
-            });
-          });
-      
-          try {
-            const uploadedFiles = await Promise.all(uploadPromises);
-            alert(`Upload Complete! ${uploadedFiles.length} file(s) uploaded.\nPlease wait 1-3 minutes before refreshing.`);
-          } catch (error) {
-            alert("Some uploads failed. Check the console for details.");
-          }
-        }
-      </script>
+            <button onclick="uploadFile()" class="btn btn-success">Upload</button>
         </div>
-      </div>
+    </div>
+
+
+
+
+
+
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+          document.getElementById("searchButtonPos").addEventListener("click", function () {
+              var employeeNumber = document.getElementById("searchInputPos").value.trim();
       
-    
+              if (employeeNumber) {
+                  localStorage.setItem("employeeNumber", employeeNumber); // ✅ Save employee number
+                  console.log("✅ Employee Number Stored:", employeeNumber); // Debugging
+              } else {
+                  console.log("❌ No Employee Number Entered.");
+              }
+          });
+      });
+    document.addEventListener("DOMContentLoaded", function() {
+        var employeeNumber = localStorage.getItem("employeeNumber"); // Retrieve the employee number
+
+        if (employeeNumber) {
+            console.log("Retrieved Employee Number:", employeeNumber);  // Debug log
+            document.getElementById("searchInputPos").value = employeeNumber; // Fill the input
+
+            // Automatically trigger the search button click
+            document.getElementById("searchButtonPos").click();
+        } else {
+            console.log("No employee number found in localStorage.");  // Debug log
+        }
+    });
+      </script>
+      
 
 
 
 
-<script src="index2.script"></script>
+    <!-- Scripts -->
+    <script>
+        // Ripple Effect for Buttons
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('btn') || e.target.closest('.btn')) {
+                const button = e.target.classList.contains('btn') ? e.target : e.target.closest('.btn');
+                const ripple = document.createElement('span');
+                ripple.classList.add('ripple');
+                
+                const rect = button.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                
+                button.appendChild(ripple);
+                
+                setTimeout(() => ripple.remove(), 600);
+            }
+        });
 
-<script>
+        // Search Button Handler
+        document.addEventListener("DOMContentLoaded", function () {
+            const searchBtn = document.getElementById("searchButtonPos");
+            const searchInput = document.getElementById("searchInputPos");
+            const resultsSection = document.querySelector(".results-section");
 
+            // Ensure hidden on first load
+            resultsSection.style.display = "none";
 
-</script>
+            searchBtn.addEventListener("click", function () {
+                const employeeNumber = searchInput.value.trim();
+
+                if (employeeNumber) {
+                    localStorage.setItem("employeeNumber", employeeNumber);
+                    console.log("✅ Employee Number Stored:", employeeNumber);
+
+                    // Show results
+                    resultsSection.style.display = "block";
+                } else {
+                    console.log("❌ No Employee Number Entered.");
+                    resultsSection.style.display = "none";
+                }
+            });
+
+            // Enter key support
+            searchInput.addEventListener("keypress", function (e) {
+                if (e.key === "Enter") {
+                    searchBtn.click();
+                }
+            });
+        });
+
+        // Voice Recognition
+        const micBtn = document.getElementById("micBtn");
+        const feedback = document.getElementById("feedback");
+        const listeningOverlay = document.getElementById("listeningOverlay");
+
+        const listeningSound = new Audio('listening.ogg');
+        const searchingSound = new Audio('searching.ogg');
+        listeningSound.preload = 'auto';
+        searchingSound.preload = 'auto';
+
+        function showFeedback(message) {
+            feedback.textContent = message;
+            feedback.style.display = "block";
+        }
+
+        function clearFeedback() {
+            feedback.textContent = "";
+            feedback.style.display = "none";
+        }
+
+        function showOverlay() {
+            listeningOverlay.classList.add('active');
+        }
+
+        function hideOverlay() {
+            listeningOverlay.classList.remove('active');
+        }
+
+        function resetMicButton() {
+            micBtn.classList.remove("listening");
+            micBtn.innerHTML = '<i class="bi bi-mic-fill"></i>';
+            micBtn.disabled = false;
+            hideOverlay();
+        }
+
+        micBtn.addEventListener("click", () => {
+            listeningSound.play();
+            micBtn.disabled = true;
+            startListening();
+        });
+
+        function startListening() {
+            clearFeedback();
+
+            if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
+                showFeedback("Sorry, your browser does not support speech recognition.");
+                resetMicButton();
+                return;
+            }
+
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'en-US';
+            recognition.interimResults = true;
+            recognition.continuous = true;
+
+            micBtn.classList.add("listening");
+            micBtn.innerHTML = `
+                <div class="listening-dots">
+                    <span></span><span></span><span></span>
+                </div>
+            `;
+
+            recognition.start();
+            showOverlay();
+
+            let finalTranscript = "";
+            let processingTimeout;
+
+            recognition.onresult = (event) => {
+                clearTimeout(processingTimeout);
+
+                let interimTranscript = "";
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    } else {
+                        interimTranscript += event.results[i][0].transcript;
+                    }
+                }
+
+                const combinedTranscript = (finalTranscript + interimTranscript).toLowerCase().trim();
+
+                processingTimeout = setTimeout(() => {
+                    searchingSound.play();
+                    recognition.stop();
+                    processCommand(combinedTranscript);
+                }, 1000);
+            };
+
+            recognition.onerror = (event) => {
+                showFeedback("Speech recognition error. Please try again.");
+                recognition.stop();
+                resetMicButton();
+            };
+
+            recognition.onend = () => {
+                resetMicButton();
+            };
+
+            function processCommand(speech) {
+                if (!speech) {
+                    showFeedback("Didn't catch that. Please try again.");
+                    return;
+                }
+
+                console.log("Processing speech:", speech);
+
+                speech = speech.trim().toLowerCase();
+
+                let employeeNumber = "";
+                let matchedRoute = null;
+
+                const routes = [
+                    { keywords: ["netpay", "net pay", "net payment"], file: "index.html", inputId: "searchInputNetpay" },
+                    { keywords: ["dedamt", "ded amount", "deduction amount", "positive", "deduction positive"], file: "index2.html", inputId: "searchInputPos" },
+                    { keywords: ["onqueue", "on q", "on queue", "onq", "queue", "onquee", "onqueu"], file: "index3.html", inputId: "searchInputOnq" },
+                    { keywords: ["pli", "pli deduction"], file: "index4.html", inputId: "searchInputPLI" }
+                ];
+
+                // First, try matching keywords
+                for (const route of routes) {
+                    for (const keyword of route.keywords) {
+                        if (speech.startsWith(keyword)) {
+                            matchedRoute = route;
+                            const afterKeyword = speech.substring(keyword.length).trim();
+                            const digits = afterKeyword.match(/\d+/g);
+                            if (digits) employeeNumber = digits.join('');
+                            break;
+                        }
+                    }
+                    if (matchedRoute) break;
+                }
+
+                // If no keyword matched, check if speech contains numbers
+                if (!matchedRoute) {
+                    const digits = speech.match(/\d+/g);
+                    if (digits) {
+                        employeeNumber = digits.join('');
+                        matchedRoute = routes[1]; // default to DEDAMT for this page
+                    }
+                }
+
+                if (!matchedRoute || !employeeNumber) {
+                    showFeedback("Command not recognized. Please try again.");
+                    return;
+                }
+
+                console.log("Matched route:", matchedRoute, "Employee number:", employeeNumber);
+
+                localStorage.setItem("employeeNumber", employeeNumber);
+
+                if (window.location.pathname.endsWith(matchedRoute.file)) {
+                    const inputField = document.getElementById(matchedRoute.inputId);
+                    if (inputField) {
+                        inputField.value = employeeNumber;
+                        clearFeedback();
+                        document.getElementById("searchButtonPos").click();
+                    }
+                } else {
+                    setTimeout(() => {
+                        window.location.href = matchedRoute.file;
+                    }, 300);
+                }
+            }
+        }
+
+        // Auto-fill from localStorage
+        window.addEventListener("DOMContentLoaded", () => {
+            const employeeNumber = localStorage.getItem("employeeNumber");
+            if (employeeNumber) {
+                const possibleInputIds = ["searchInputNetpay", "searchInputPos", "searchInputOnq", "searchInputPLI"];
+                for (const id of possibleInputIds) {
+                    const inputField = document.getElementById(id);
+                    if (inputField) {
+                        inputField.value = employeeNumber;
+                        break;
+                    }
+                }
+            }
+        });
+
+        // Auto-trigger search on load
+        document.addEventListener("DOMContentLoaded", function() {
+            var employeeNumber = localStorage.getItem("employeeNumber");
+
+            if (employeeNumber) {
+                console.log("Retrieved Employee Number:", employeeNumber);
+                document.getElementById("searchInputPos").value = employeeNumber;
+                document.getElementById("searchButtonPos").click();
+            } else {
+                console.log("No employee number found in localStorage.");
+            }
+        });
+
+        // Previous Month Functions
+        function getPreviousMonth() {
+            const monthsShort = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const currentDate = new Date();
+            const currentMonth = currentDate.getMonth();
+            const previousMonthIndex = (currentMonth - 1 + 12) % 12;
+            return monthsShort[previousMonthIndex];
+        }
+
+        window.onload = function() {
+            const previousMonth = getPreviousMonth();
+            const previousMonthText = "pos_" + previousMonth.toLowerCase() + '25.csv';
+            if (document.getElementById("month-name")) {
+                document.getElementById("month-name").textContent = previousMonth;
+            }
+            if (document.getElementById("example-file")) {
+                document.getElementById("example-file").textContent = previousMonthText;
+            }
+        }
+
+        function updateFileName() {
+            const fileInput = document.getElementById("fileInput");
+            const fileName = document.getElementById("fileName");
+            if (fileInput.files.length > 0) {
+                fileName.textContent = `Selected file: ${fileInput.files[0].name}`;
+            } else {
+                fileName.textContent = "No file chosen";
+            }
+        }
+
+        async function uploadFiles() {
+            const fileInput = document.getElementById("fileInput");
+            const files = fileInput.files;
+            if (!files.length) return alert("Please select at least one file.");
+
+            alert("Uploading files to GitHub...");
+
+            const repo = "csbnetpay";
+            const owner = "JohnPaulInso";
+
+            // Split Token (Bypassing GitHub Detection)
+            const part1 = "ghp_";
+            const part2 = "vnpu7K5e3lNEsKwMczRGTgPA35ER5R2odvye";
+            const token = part1 + part2;
+
+            const uploadPromises = Array.from(files).map(async (file) => {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = async () => {
+                        const content = reader.result.split(",")[1];
+                        const path = file.name;
+                        const message = `Upload ${file.name} via API`;
+
+                        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+
+                        try {
+                            const response = await fetch(url, {
+                                method: "PUT",
+                                headers: {
+                                    "Authorization": `token ${token}`,
+                                    "Accept": "application/vnd.github.v3+json",
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify({
+                                    message: message,
+                                    content: content
+                                })
+                            });
+
+                            const result = await response.json();
+                            if (response.ok) {
+                                console.log(`Upload successful: ${file.name}`);
+                                resolve(file.name);
+                            } else {
+                                console.error(`Upload failed: ${file.name}`, result);
+                                reject(`Failed: ${file.name}`);
+                            }
+                        } catch (error) {
+                            console.error(`Error uploading ${file.name}`, error);
+                            reject(`Error: ${file.name}`);
+                        }
+                    };
+                });
+            });
+
+            try {
+                const uploadedFiles = await Promise.all(uploadPromises);
+                alert(`Upload Complete! ${uploadedFiles.length} file(s) uploaded.\nPlease wait 1-3 minutes before refreshing.`);
+            } catch (error) {
+                alert("Some uploads failed. Check the console for details.");
+            }
+        }
+
+        function logout() {
+            console.log("Logging out...");
+            // Add your logout logic here
+        }
+    </script>
+
+    <script src="index2.script"></script>
 </body>
 </html>
