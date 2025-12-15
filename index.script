@@ -1,243 +1,272 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const prompt = document.getElementById('fullscreenPrompt');
+    document.addEventListener('DOMContentLoaded', () => {
+        const prompt = document.getElementById('fullscreenPrompt');
 
-    document.addEventListener('mousemove', () => {
-        prompt.style.display = 'block';
+        document.addEventListener('mousemove', () => {
+            if (prompt) prompt.style.display = 'block';
+        });
+
+        if (prompt) {
+            prompt.addEventListener('click', () => {
+                openFullscreen();
+                prompt.style.display = 'none';
+            });
+        }
     });
 
-    prompt.addEventListener('click', () => {
-        openFullscreen();
-        prompt.style.display = 'none';
-    });
-});
-
-function openFullscreen() {
-    const elem = document.documentElement;
-    if (elem.requestFullscreen) {
-        elem.requestFullscreen();
-    } else if (elem.mozRequestFullScreen) {
-        elem.mozRequestFullScreen();
-    } else if (elem.webkitRequestFullscreen) {
-        elem.webkitRequestFullscreen();
-    } else if (elem.msRequestFullscreen) {
-        elem.msRequestFullscreen();
-    }
-}
-
-const csvFilesNetpay = [
-    'dec25.csv', 'nov25.csv', 'oct25.csv', 'sep25.csv', 'aug25.csv', 'jul25.csv', 'jun25.csv', 'may25.csv', 
-    'apr25.csv', 'mar25.csv', 'feb25.csv', 'jan25.csv', 'dec24.csv', 'nov24.csv', 'oct24.csv', 'sep24.csv', 
-    'aug24.csv', 'jul24.csv', 'jun24.csv', 'may24.csv', 'apr24.csv', 'mar24.csv', 'feb24.csv'
-];
-
-document.getElementById('searchButtonNetpay').addEventListener('click', searchEmployeeNetpay);
-
-async function searchEmployeeNetpay() {
-    const searchInputNetpay = document.getElementById('searchInputNetpay').value.trim();
-    const loadingIndicatorNetpay = document.getElementById('loadingIndicatorNetpay');
-    const employeeInfoSectionNetpay = document.getElementById('employeeInfoNetpay');
-    const resultsSectionNetpay = document.getElementById('resultsNetpay');
-
-    if (!searchInputNetpay) {
-        alert('Please enter an employee number.');
-        return;
+    function openFullscreen() {
+        const elem = document.documentElement;
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+        } else if (elem.mozRequestFullScreen) {
+            elem.mozRequestFullScreen();
+        } else if (elem.webkitRequestFullscreen) {
+            elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) {
+            elem.msRequestFullscreen();
+        }
     }
 
-    // Reset display
-    resultsSectionNetpay.innerHTML = '';
-    employeeInfoSectionNetpay.innerHTML = '';
-    loadingIndicatorNetpay.style.display = 'block';
+    const csvFilesNetpay = [
+        'dec25.csv', 'nov25.csv', 'oct25.csv', 'sep25.csv', 'aug25.csv', 'jul25.csv', 'jun25.csv', 'may25.csv', 
+        'apr25.csv', 'mar25.csv', 'feb25.csv', 'jan25.csv', 'dec24.csv', 'nov24.csv', 'oct24.csv', 'sep24.csv', 
+        'aug24.csv', 'jul24.csv', 'jun24.csv', 'may24.csv', 'apr24.csv', 'mar24.csv', 'feb24.csv'
+    ];
 
-    // Filter available files
-    const availableFiles = await filterExistingFiles(csvFilesNetpay);
-    if (availableFiles.length === 0) {
-        alert('No available files found.');
+    document.getElementById('searchButtonNetpay').addEventListener('click', searchEmployeeNetpay);
+
+    async function searchEmployeeNetpay() {
+        const searchInputNetpay = document.getElementById('searchInputNetpay').value.trim();
+        const loadingIndicatorNetpay = document.getElementById('loadingIndicatorNetpay');
+        const employeeInfoSectionNetpay = document.getElementById('employeeInfoNetpay');
+        const resultsSectionNetpay = document.getElementById('resultsNetpay');
+
+        if (!searchInputNetpay) {
+            alert('Please enter an employee number.');
+            return;
+        }
+
+        // Reset display
+        resultsSectionNetpay.innerHTML = '';
+        employeeInfoSectionNetpay.innerHTML = '';
+        loadingIndicatorNetpay.style.display = 'block';
+
+        // Filter available files
+        const availableFiles = await filterExistingFiles(csvFilesNetpay);
+        if (availableFiles.length === 0) {
+            alert('No available files found.');
+            loadingIndicatorNetpay.style.display = 'none';
+            return;
+        }
+
+        // Fetch all available CSV data
+        let fetchedDataNet = await Promise.all(availableFiles.map(fetchCSVNetpay));
+
+        // Remove failed fetches
+        fetchedDataNet = fetchedDataNet.filter(data => data !== null);
+        
+        // Sort from latest to oldest
+        fetchedDataNet.sort((a, b) => b.date - a.date);
+
+        if (fetchedDataNet.length > 0) {
+            displayEmployeeInfoNetpay(fetchedDataNet[0].monthName, fetchedDataNet[0].csvData);
+            displayResultsTableNetpay(fetchedDataNet);
+        } else {
+            employeeInfoSectionNetpay.innerHTML = 'No data available for the most recent month.';
+        }
+
         loadingIndicatorNetpay.style.display = 'none';
-        return;
     }
 
-// Fetch all available CSV data
-let fetchedDataNet = await Promise.all(availableFiles.map(fetchCSVNetpay));
+    async function filterExistingFiles(fileList) {
+        const existingFiles = await Promise.all(fileList.map(async (file) => {
+            try {
+                const response = await fetch(file, { method: 'HEAD' });
+                return response.ok ? file : null;
+            } catch {
+                return null;
+            }
+        }));
 
-
-    // Remove failed fetches
-    fetchedDataNet = fetchedDataNet.filter(data => data !== null);
-    
-    // Sort from latest to oldest
-    fetchedDataNet.sort((a, b) => b.date - a.date);
-
-    if (fetchedDataNet.length > 0) {
-        displayEmployeeInfoNetpay(fetchedDataNet[0].monthName, fetchedDataNet[0].csvData);
-        displayResultsTableNetpay(fetchedDataNet);
-    } else {
-        employeeInfoSectionNetpay.innerHTML = 'No data available for the most recent month.';
+        return existingFiles.filter(file => file !== null);
     }
 
-    loadingIndicatorNetpay.style.display = 'none';
-}
-
-async function filterExistingFiles(fileList) {
-    const existingFiles = await Promise.all(fileList.map(async (file) => {
+    async function fetchCSVNetpay(csvFile) {
         try {
-            const response = await fetch(file, { method: 'HEAD' });
-            return response.ok ? file : null;
-        } catch {
+            const response = await fetch(csvFile);
+            if (!response.ok) throw new Error(`Unable to fetch ${csvFile}`);
+
+            const text = await response.text();
+            return {
+                monthName: getMonthNameFromCsvNetpay(csvFile),
+                csvData: parseCSVNetpay(text),
+                date: getDateFromCsvNetpay(csvFile)
+            };
+        } catch (error) {
+            console.error(`Error fetching data for ${csvFile}:`, error);
             return null;
         }
-    }));
-
-    return existingFiles.filter(file => file !== null);
-}
-
-async function fetchCSVNetpay(csvFile) {
-    try {
-        const response = await fetch(csvFile);
-        if (!response.ok) throw new Error(`Unable to fetch ${csvFile}`);
-
-        const text = await response.text();
-        return {
-            monthName: getMonthNameFromCsvNetpay(csvFile),
-            csvData: parseCSVNetpay(text),
-            date: getDateFromCsvNetpay(csvFile)
-        };
-    } catch (error) {
-        console.error(`Error fetching data for ${csvFile}:`, error);
-        return null;
     }
-}
 
-function getDateFromCsvNetpay(csvFile) {
-    const monthMap = { 'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'may': 4, 'jun': 5, 'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11 };
-    const monthPart = csvFile.slice(0, 3);
-    const yearPart = '20' + csvFile.slice(3, 5);
-    return new Date(yearPart, monthMap[monthPart]);
-}
+    function getDateFromCsvNetpay(csvFile) {
+        const monthMap = { 'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'may': 4, 'jun': 5, 'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11 };
+        const monthPart = csvFile.slice(0, 3);
+        const yearPart = '20' + csvFile.slice(3, 5);
+        return new Date(yearPart, monthMap[monthPart]);
+    }
 
-function getMonthNameFromCsvNetpay(csvFile) {
-    const monthMap = { 'jan': 'January', 'feb': 'February', 'mar': 'March', 'apr': 'April', 'may': 'May', 'jun': 'June', 'jul': 'July', 'aug': 'August', 'sep': 'September', 'oct': 'October', 'nov': 'November', 'dec': 'December' };
-    const monthPart = csvFile.slice(0, 3);
-    const yearPart = '20' + csvFile.slice(3, 5);
-    return `${monthMap[monthPart]} ${yearPart}`;
-}
+    function getMonthNameFromCsvNetpay(csvFile) {
+        const monthMap = { 'jan': 'January', 'feb': 'February', 'mar': 'March', 'apr': 'April', 'may': 'May', 'jun': 'June', 'jul': 'July', 'aug': 'August', 'sep': 'September', 'oct': 'October', 'nov': 'November', 'dec': 'December' };
+        const monthPart = csvFile.slice(0, 3);
+        const yearPart = '20' + csvFile.slice(3, 5);
+        return `${monthMap[monthPart]} ${yearPart}`;
+    }
 
-function parseCSVNetpay(data) {
-    return data.trim().split('\n').map(row => row.split(','));
-}
+    function parseCSVNetpay(data) {
+        return data.trim().split('\n').map(row => row.split(','));
+    }
 
-function displayEmployeeInfoNetpay(monthName, csvData) {
-    const employeeInfoSectionNetpay = document.getElementById('employeeInfoNetpay');
-    const searchEmpNo = document.getElementById('searchInputNetpay').value.trim();
-    let employeeFound = false;
+    function displayEmployeeInfoNetpay(monthName, csvData) {
+        const employeeInfoSectionNetpay = document.getElementById('employeeInfoNetpay');
+        const searchEmpNo = document.getElementById('searchInputNetpay').value.trim();
+        let employeeFound = false;
 
-    for (let i = 1; i < csvData.length; i++) {
-        const row = csvData[i];
-        if (row.length < 4) continue;
-        const empno = row[3];
+        for (let i = 1; i < csvData.length; i++) {
+            const row = csvData[i];
+            if (row.length < 4) continue;
+            const empno = row[3];
+            const fname = row[4];
+            const mi = row[5];
+            const lname = row[6];
 
-        if (empno === searchEmpNo) {
-            employeeFound = true;
-            employeeInfoSectionNetpay.innerHTML = `
-                <strong>NAME:</strong><b style="color:orange"> ${row[4]} ${row[5]} ${row[6]}</b><br/>
-                <strong>EMPNO:</strong><b style="color:orange"> ${empno} </b><br/>
-                <strong>DIV / STA:</strong><b style="color:orange"> ${row[1]} / ${row[2]}</b><br/>
-            `;
-            break;
+            if (empno === searchEmpNo) {
+                employeeFound = true;
+                employeeInfoSectionNetpay.innerHTML = `
+                    <strong>NAME:</strong><b style="color:orange"> ${fname} ${mi} ${lname}</b><br/>
+                    <strong>EMPNO:</strong><b style="color:orange"> ${empno} </b><br/>
+                    <strong>DIV / STA:</strong><b style="color:orange"> ${row[1]} / ${row[2]}</b><br/>
+                `;
+                break;
+            }
+        }
+
+        if (!employeeFound) {
+            employeeInfoSectionNetpay.innerHTML = 'Employee ID not found in latest month.';
         }
     }
 
-    if (!employeeFound) {
-        employeeInfoSectionNetpay.innerHTML = 'Employee ID not found in latest month.';
-    }
-}
+    function displayResultsTableNetpay(fetchedDataNet) {
+        const resultsSectionNetpay = document.getElementById('resultsNetpay');
+        const searchEmpNo = document.getElementById('searchInputNetpay').value.trim();
 
-function displayResultsTableNetpay(fetchedDataNet) {
-    const resultsSectionNetpay = document.getElementById('resultsNetpay');
-    const searchEmpNo = document.getElementById('searchInputNetpay').value.trim();
+        // Create table container with responsive wrapper
+        const tableContainer = document.createElement('div');
+        tableContainer.classList.add('table-container');
 
-    const table = document.createElement('table');
-    table.classList.add('table', 'table-borderless', 'text-white');
+        const tableWrapper = document.createElement('div');
+        tableWrapper.classList.add('table-scroll-wrapper');
 
-    table.innerHTML = `
-        <thead>
-            <tr>
-                <th class="font-weight-bold">MONTH</th>
-                <th class="font-weight-bold">TAKEHOME</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    `;
+        const table = document.createElement('table');
+        table.classList.add('responsive-table');
 
-    const tbody = table.querySelector('tbody');
+        table.innerHTML = `
+            <thead>
+                <tr>
+                    <th>MONTH</th>
+                    <th>TAKE HOME</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        `;
 
-    fetchedDataNet.forEach(data => {
-        data.csvData.forEach(row => {
-            if (row.length < 4) return;
+        const tbody = table.querySelector('tbody');
 
-            const empno = row[3];
-            if (empno === searchEmpNo) {
-                const takehome = parseFloat(row[7]).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
+        fetchedDataNet.forEach(data => {
+            data.csvData.forEach(row => {
+                if (row.length < 4) return;
 
-                const rowElement = document.createElement('tr');
-                rowElement.innerHTML = `<td>${data.monthName}</td><td><b>${takehome}</b></td>`;
-                tbody.appendChild(rowElement);
-            }
+                const empno = row[3];
+                if (empno === searchEmpNo) {
+                    const takehome = parseFloat(row[7]).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
+
+                    const rowElement = document.createElement('tr');
+                    
+                    // Create cells with data-label for mobile responsiveness
+                    const monthCell = document.createElement('td');
+                    monthCell.setAttribute('data-label', 'MONTH');
+                    monthCell.textContent = data.monthName;
+
+                    const takehomeCell = document.createElement('td');
+                    takehomeCell.setAttribute('data-label', 'TAKEHOME');
+                    takehomeCell.innerHTML = `<b>${takehome}</b>`;
+                    takehomeCell.classList.add('number-cell');
+
+                    rowElement.appendChild(monthCell);
+                    rowElement.appendChild(takehomeCell);
+                    tbody.appendChild(rowElement);
+                }
+            });
         });
+
+        tableWrapper.appendChild(table);
+        tableContainer.appendChild(tableWrapper);
+        resultsSectionNetpay.appendChild(tableContainer);
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const loginTime = localStorage.getItem("loginTime");
+
+        // Check if the login time exists and if the session has expired (4 hours)
+        if (!loginTime || (new Date().getTime() - loginTime) > 3 * 60 * 60 * 1000) {
+            // Redirect to login page if no login session or session expired
+            window.location.href = "login/index.html";
+        }
     });
 
-    resultsSectionNetpay.appendChild(table);
-}
+    // Function to handle logout
+    function logout() {
+        // Clear the login-related data from localStorage
+        localStorage.removeItem("loginTime");
+        localStorage.removeItem("employeeNumber"); // If you store employeeNumber or any other login info
 
-
-
-
-
-
-
-        document.addEventListener("DOMContentLoaded", function() {
-            const loginTime = localStorage.getItem("loginTime");
-
-            // Check if the login time exists and if the session has expired (4 hours)
-            if (!loginTime || (new Date().getTime() - loginTime) > 3 * 60 * 60 * 1000) {
-                // Redirect to login page if no login session or session expired
-                window.location.href = "login/index.html";
-            }
-        });
-
-// Function to handle logout
-function logout() {
-    // Clear the login-related data from localStorage
-    localStorage.removeItem("loginTime");
-    localStorage.removeItem("employeeNumber"); // If you store employeeNumber or any other login info
-
-    // Redirect to the login page
-    window.location.href = "login/index.html";
-}
-
-// Check if logged in (this part remains unchanged from your original code)
-document.addEventListener("DOMContentLoaded", function() {
-    const loginTime = localStorage.getItem("loginTime");
-
-    // Check if the login time exists and if the session has expired (4 hours)
-    if (!loginTime || (new Date().getTime() - loginTime) > 3 * 60 * 60 * 1000) {
-        // Redirect to login page if no login session or session expired
+        // Redirect to the login page
         window.location.href = "login/index.html";
     }
-});
 
+    // Check if logged in (this part remains unchanged from your original code)
+    document.addEventListener("DOMContentLoaded", function() {
+        const loginTime = localStorage.getItem("loginTime");
 
-
-
-// Function to check if jonathan77 is logged in and show/hide the admin container
- function checkLoggedInUser() {
-        const loggedInUser = localStorage.getItem("loggedInUser");
-        const adminContainer = document.querySelector(".container-admin");
-
-        if (loggedInUser === "jonathan77") {
-            adminContainer.style.display = "block";
-        } else {
-            adminContainer.style.display = "none";
+        // Check if the login time exists and if the session has expired (4 hours)
+        if (!loginTime || (new Date().getTime() - loginTime) > 3 * 60 * 60 * 1000) {
+            // Redirect to login page if no login session or session expired
+            window.location.href = "login/index.html";
         }
+    });
+
+document.addEventListener("DOMContentLoaded", () => {
+    checkLoggedInUser();
+
+    // Other DOM ready stuff here
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('service-worker.js');
     }
+});window.onload = () => {
+    checkLoggedInUser();
+};
+
+function checkLoggedInUser() {
+    const loggedInUser = localStorage.getItem("loggedInUser")?.trim();
+    const adminContainers = document.querySelectorAll(".container-admin");
+
+    console.log(adminContainers); // Check if elements are found
+
+    if (loggedInUser === "jonathan77") {
+        adminContainers.forEach(container => container.style.display = "block");
+    } else {
+        adminContainers.forEach(container => container.style.display = "none");
+    }
+}
+
 
     // Wait until DOM is ready before running the check
     document.addEventListener("DOMContentLoaded", () => {
@@ -247,3 +276,4 @@ document.addEventListener("DOMContentLoaded", function() {
             navigator.serviceWorker.register('service-worker.js');
         }
     });
+

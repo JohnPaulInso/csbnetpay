@@ -1,290 +1,201 @@
+// =====================================================================
+// INDEX 2 SCRIPT – DEDAMT POSITIVE (FIXED)
+// =====================================================================
 
-// =====================================================================================================
-// INDEX 2 =============================================================================================
-// =====================================================================================================
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const prompt = document.getElementById('fullscreenPrompt');
-
-        // Show the prompt when the mouse moves
-        document.addEventListener('mousemove', () => {
-            prompt.style.display = 'block';
-        });
-
-        // Enter fullscreen when the prompt is clicked
-        prompt.addEventListener('click', () => {
-            openFullscreen();
-            prompt.style.display = 'none'; // Hide prompt after entering full-screen
-        });
-    });
-
-    function openFullscreen() {
-        const elem = document.documentElement;
-        if (elem.requestFullscreen) {
-            elem.requestFullscreen();
-        } else if (elem.mozRequestFullScreen) {
-            elem.mozRequestFullScreen();
-        } else if (elem.webkitRequestFullscreen) {
-            elem.webkitRequestFullscreen();
-        } else if (elem.msRequestFullscreen) {
-            elem.msRequestFullscreen();
-        }
+// ---------------- SESSION CHECK ----------------
+document.addEventListener("DOMContentLoaded", () => {
+    const loginTime = localStorage.getItem("loginTime");
+    if (!loginTime || (Date.now() - loginTime) > 3 * 60 * 60 * 1000) {
+        window.location.href = "login/index.html";
     }
+});
 
+// ---------------- ADMIN VISIBILITY ----------------
+function checkLoggedInUser() {
+    const adminContainer = document.querySelector(".container-admin");
+    if (!adminContainer) return;
 
+    adminContainer.style.display =
+        localStorage.getItem("loggedInUser") === "jonathan77"
+            ? "block"
+            : "none";
+}
+checkLoggedInUser();
 
-const csvFilesPos = [
-    'pos_dec25.csv', 'pos_nov25.csv', 'pos_oct25.csv', 'pos_sep25.csv', 'pos_aug25.csv', 
-    'pos_jul25.csv', 'pos_jun25.csv', 'pos_may25.csv', 'pos_apr25.csv', 'pos_mar25.csv', 
-    'pos_feb25.csv', 'pos_jan25.csv', 'pos_dec24.csv', 'pos_nov24.csv', 'pos_oct24.csv',  'pos_sep24.csv', 'pos_aug24.csv', 'pos_jul24.csv', 'pos_jun24.csv', 'pos_may24.csv', 'pos_apr24.csv', 'pos_mar24.csv',
-    'pos_feb24.csv', 'pos_jan24.csv', 'pos_dec23.csv', 'pos_nov23.csv', 'pos_oct23.csv', 'pos_sep23.csv'
-];
+// ---------------- SEARCH BUTTON ----------------
+document
+    .getElementById("searchButtonPos")
+    .addEventListener("click", searchEmployeePos);
 
-document.getElementById('searchButtonPos').addEventListener('click', searchEmployeePos);
-
-
+// ---------------- SEARCH LOGIC ----------------
 function searchEmployeePos() {
-    const loadingIndicatorPos = document.getElementById('loadingIndicatorPos');
+    const empNo = document.getElementById("searchInputPos").value.trim();
+    if (!empNo) return;
 
-    // Show loader while fetching
-    loadingIndicatorPos.style.display = 'block';
+    const loader = document.getElementById("loadingIndicatorPos");
+    loader.style.display = "block";
 
-    const monthNames = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
-    let fileNames = [];
+    const monthNames = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+    const files = [];
 
-    // Include all months from March 2024 - December 2025
     for (let year = 2024; year <= 2025; year++) {
-        for (let i = (year === 2024 ? 2 : 0); i < 12; i++) { // Start from March in 2024
-            let fileName = `pos_${monthNames[i]}${year % 100}.csv`;
-            fileNames.push(fileName);
+        for (let m = (year === 2024 ? 2 : 0); m < 12; m++) {
+            files.push(`pos_${monthNames[m]}${year % 100}.csv`);
         }
     }
 
-    console.log("Generated file names:", fileNames);
-
-    // Fetch all these files
-    Promise.all(fileNames.map(fetchCSVPos))
+    Promise.all(files.map(fetchCSVPos))
         .then(results => {
-            let fetchedDataPos = results.filter(data => data !== null); // Remove failed fetches
-            
-            if (fetchedDataPos.length === 0) {
-                alert('No valid data found in the provided files.');
+            const valid = results.filter(Boolean);
+            if (!valid.length) {
+                alert("No data found.");
                 return;
             }
 
-            // Sort by date (descending)
-            fetchedDataPos.sort((a, b) => b.date - a.date);
+            valid.sort((a, b) => b.date - a.date);
 
-            // ❌ Remove this to display all fetched months
-            // fetchedDataPos = fetchedDataPos.slice(0, 12);
-
-            console.log("Sorted fetched data:", fetchedDataPos.map(d => d.monthName));
-
-            // Hide loader after fetching
-            loadingIndicatorPos.style.display = 'none';
-
-            // Display latest month data
-            displayEmployeeInfoPos(fetchedDataPos[0].monthName, fetchedDataPos[0].csvData);
-            displayResultsTablePos(fetchedDataPos);
+            displayEmployeeInfoPos(valid);
+            displayResultsTablePos(valid);
         })
-        .catch(error => {
-            console.error('Error fetching files:', error);
-            // Hide loader in case of error
-            loadingIndicatorPos.style.display = 'none';
-        });
+        .finally(() => loader.style.display = "none");
 }
 
-
-
-
-
-function fetchCSVPos(csvFile) {
-    return new Promise((resolve, reject) => {
-        const monthName = getMonthNameFromCsvPos(csvFile);
-        const date = getDateFromCsvPos(csvFile);
-
-        console.log(`Fetching file: ${csvFile}, Parsed Date: ${date}`);
-
-        fetch(csvFile)
-            .then(response => {
-                if (!response.ok) {
-                    console.warn(`Skipping ${csvFile}: Fetch failed with status ${response.status}`);
-                    resolve(null);
-                    return;
-                }
-                return response.text();
-            })
-            .then(text => {
-                if (!text) {
-                    resolve(null);
-                    return;
-                }
-                console.log(`Fetched ${csvFile} successfully`);
-                const csvData = parseCSVPos(text);
-                resolve({ monthName, csvData, date });
-            })
-            .catch(error => {
-                console.error(`Fetch error for ${csvFile}:`, error);
-                resolve(null);
-            });
-    });
+// ---------------- FETCH CSV ----------------
+function fetchCSVPos(file) {
+    return fetch(file)
+        .then(r => (r.ok ? r.text() : null))
+        .then(text => {
+            if (!text) return null;
+            return {
+                monthName: getMonthNameFromCsvPos(file),
+                date: getDateFromCsvPos(file),
+                csvData: parseCSVPos(text)
+            };
+        })
+        .catch(() => null);
 }
 
+// ---------------- DATE HELPERS ----------------
+function getDateFromCsvPos(file) {
+    const m = file.match(/pos_([a-z]{3})(\d{2})/);
+    if (!m) return null;
+    const map = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+    return new Date(2000 + +m[2], map[m[1]], 1);
+}
 
-
-function getDateFromCsvPos(csvFile) {
-    const match = csvFile.match(/pos_([a-z]{3})(\d{2})\.csv$/);
-    if (!match) return null;
-
-    const monthMap = {
-        'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'may': 4, 'jun': 5,
-        'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11
+function getMonthNameFromCsvPos(file) {
+    const map = {
+        jan:"January",feb:"February",mar:"March",apr:"April",
+        may:"May",jun:"June",jul:"July",aug:"August",
+        sep:"September",oct:"October",nov:"November",dec:"December"
     };
-
-    const monthPart = match[1]; // e.g., "feb"
-    const yearPart = parseInt('20' + match[2]); // e.g., "25" -> "2025"
-    const monthIndex = monthMap[monthPart];
-
-    return new Date(yearPart, monthIndex, 1); // Return as a Date object for proper sorting
+    const m = file.match(/pos_([a-z]{3})(\d{2})/);
+    return `${map[m[1]]} 20${m[2]}`;
 }
 
-
-function getMonthNameFromCsvPos(csvFile) {
-    const fileName = csvFile.replace('pos_', ''); // Remove 'pos_' prefix
-    const monthMap = {
-        'jan': 'January', 'feb': 'February', 'mar': 'March', 'apr': 'April', 'may': 'May', 'jun': 'June',
-        'jul': 'July', 'aug': 'August', 'sep': 'September', 'oct': 'October', 'nov': 'November', 'dec': 'December'
-    };
-    const monthPart = fileName.slice(0, 3);
-    const yearPart = '20' + fileName.slice(3, 5);
-    return `${monthMap[monthPart]} ${yearPart}`;
-}
-
+// ---------------- CSV PARSE ----------------
 function parseCSVPos(data) {
-    const rows = data.trim().split('\n');
-    return rows.map(row => row.split(','));
+    return data.trim().split("\n").map(r => r.split(","));
 }
 
-function displayEmployeeInfoPos(monthName, csvData) {
-    const employeeInfoSectionPos = document.getElementById('employeeInfoPos');
-    let employeeFound = false;
+// ---------------- EMPLOYEE INFO (FIXED NAME) ----------------
+function displayEmployeeInfoPos(allData) {
+    const empNo = document.getElementById("searchInputPos").value.trim();
+    const info = document.getElementById("employeeInfoPos");
 
-    for (let i = 1; i < csvData.length; i++) {
-        const row = csvData[i];
-        if (row.length < 4) continue;
-        const empno = row[3];
-        if (empno === document.getElementById('searchInputPos').value.trim()) {
-            employeeFound = true;
+    for (const file of allData) {
+        for (let i = 1; i < file.csvData.length; i++) {
+            const row = file.csvData[i];
+            if (row[3] === empNo) {
+                const fname = row[4] || "";
+                const mi = row[5] || "";
+                const lname = row[6] || "";
+                const div = row[1];
+                const sta = row[2];
 
-            const div = row[1];
-            const sta = row[2];
-            const fname = row[4];
-            const mi = row[5];
-            const lname = row[6];
-
-            employeeInfoSectionPos.innerHTML = `
-                <strong>NAME:</strong><b style="color:orange"> ${fname} ${mi} ${lname}</b><br/>
-                <strong>EMPNO:</strong><b style="color:orange">   ${empno} </b><br/>
-                <strong>DIV / STA:</strong><b style="color:orange"> ${div} / ${sta}</b><br/>
-            `;
-            break;
+                info.innerHTML = `
+                    <strong>NAME:</strong>
+                    <span style="color:orange;font-weight:700">
+                        ${fname} ${mi} ${lname}
+                    </span><br>
+                    <strong>EMPNO:</strong>
+                    <span style="color:orange;font-weight:700">${empNo}</span><br>
+                    <strong>DIV / STA:</strong>
+                    <span style="color:orange;font-weight:700">${div} / ${sta}</span>
+                `;
+                return;
+            }
         }
     }
-
-    if (!employeeFound) {
-        employeeInfoSectionPos.innerHTML = 'Employee ID not found in latest month.';
-    }
+    info.textContent = "Employee not found.";
 }
 
+// ---------------- TABLE (PURPLE STYLE + DROPDOWN) ----------------
+function displayResultsTablePos(allData) {
+    const empNo = document.getElementById("searchInputPos").value.trim();
+    const container = document.getElementById("resultspos");
+    container.innerHTML = "";
 
-function displayResultsTablePos(fetchedDataPos) {
-    const resultsSectionPos = document.getElementById('resultspos');
-    
-    // Create a table with a single header row
-    const table = document.createElement('table');
-    table.classList.add('table', 'table-borderless', 'text-white');
+    const map = new Map();
 
-    const thead = document.createElement('thead');
-    const headerRow = document.createElement('tr');
-    headerRow.innerHTML = `
-        <th class="font-weight-bold">MONTH</th>
-        <th class="font-weight-bold">DEDAMT</th>
-    `;
-    thead.appendChild(headerRow);
-    table.appendChild(thead);
+    allData.forEach(file => {
+        file.csvData.forEach((row, i) => {
+            if (i === 0 || row[3] !== empNo) return;
+            const amt = parseFloat(row[13]) || 0;
 
-    const tbody = document.createElement('tbody');
-    const resultsMap = new Map(); // To store sums and details for dropdown
-
-    fetchedDataPos.forEach(data => {
-        data.csvData.forEach((row, index) => {
-            if (index === 0) return; // Skip header row
-            if (row.length < 4) return; // Skip malformed rows
-
-            const empno = row[3];
-            if (empno === document.getElementById('searchInputPos').value.trim()) {
-                const monthName = data.monthName;
-                const dedamt = parseFloat(row[13]);
-                
-                // Accumulate amounts
-                if (!resultsMap.has(monthName)) {
-                    resultsMap.set(monthName, { sum: 0, details: [] });
-                }
-                const entry = resultsMap.get(monthName);
-                entry.sum += dedamt;
-                entry.details.push(dedamt.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' }));
-            }
+            if (!map.has(file.monthName)) map.set(file.monthName, []);
+            map.get(file.monthName).push(amt);
         });
     });
 
-    // Add aggregated results to the table
-    resultsMap.forEach((value, monthName) => {
-        const totalDedAmt = value.sum.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
-        
-        const rowElement = document.createElement('tr');
-        rowElement.innerHTML = `
-            <td>${monthName}</td>
-            <td>
-                <div class="position-relative">
-                    <u><b class="sum-amount" style="cursor: pointer;">${totalDedAmt}</b></u>
-                    <div class="dropdown-menu" id="dropdownPos" style="color:white; display: none; position: absolute; z-index: 1;">
-                        ${value.details.map(detail => `<div  id="dropdownitem" class="dropdown-item">${detail}</div>`).join('')}
+    const table = document.createElement("table");
+    table.className = "responsive-table";
+    table.innerHTML = `
+        <thead style="background:#463009;color:white">
+            <tr>
+                <th>MONTH</th>
+                <th style="text-align:right">DEDAMT</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    `;
+
+    const tbody = table.querySelector("tbody");
+
+    map.forEach((vals, month) => {
+        const sum = vals.reduce((a,b)=>a+b,0);
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${month}</td>
+            <td style="text-align:right">
+                <span class="dedamt-hover">
+                    <u><b>${sum.toLocaleString("en-PH",{style:"currency",currency:"PHP"})}</b></u>
+                    <div class="dedamt-dropdown">
+                        ${vals.map(v=>`<div>${v.toLocaleString("en-PH",{style:"currency",currency:"PHP"})}</div>`).join("")}
                     </div>
-                </div>
+                </span>
             </td>
         `;
-        
-        // Add hover event listeners
-        const sumAmount = rowElement.querySelector('.sum-amount');
-        const dropdownMenu = rowElement.querySelector('.dropdown-menu');
-
-        sumAmount.addEventListener('mouseenter', () => {
-            dropdownMenu.style.display = 'block';
-        });
-
-        sumAmount.addEventListener('mouseleave', () => {
-            dropdownMenu.style.display = 'none';
-        });
-
-        tbody.appendChild(rowElement);
+        tbody.appendChild(tr);
     });
 
-    if (tbody.children.length > 0) {
-        table.appendChild(tbody);
-        resultsSectionPos.appendChild(table);
-    }
+    container.appendChild(table);
+}
+
+// ---------------- LOGOUT ----------------
+function logout() {
+    localStorage.removeItem("loginTime");
+    localStorage.removeItem("employeeNumber");
+    window.location.href = "login/index.html";
 }
 
 
-        document.addEventListener("DOMContentLoaded", function() {
-            const loginTime = localStorage.getItem("loginTime");
 
-            // Check if the login time exists and if the session has expired (4 hours)
-            if (!loginTime || (new Date().getTime() - loginTime) > 3 * 60 * 60 * 1000) {
-                // Redirect to login page if no login session or session expired
-                window.location.href = "login/index.html";
-            }
-        });
+
+
+
+
+
 
 // Function to handle logout
 function logout() {
