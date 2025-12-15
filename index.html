@@ -622,7 +622,6 @@ function getFemaleVoice() {
     // Prefer voices that have "female" or "Google UK English Female" etc.
     return voices.find(v => /female/i.test(v.name)) || voices[0];
 }
-
 function readEmployeeResults() {
     stopTTS(); // stop any previous reading
 
@@ -630,38 +629,55 @@ function readEmployeeResults() {
     const tableEl = document.querySelector("#resultsNetpay table");
     if (!infoEl || !tableEl) return;
 
-    // Build text
-    let speechText = infoEl.textContent + ". ";
+    // === Read NAME only first ===
+    const nameMatch = infoEl.textContent.match(/NAME:\s*(.+)/i);
+    const nameText = nameMatch ? nameMatch[1].trim() : "";
 
+    if (!nameText) return;
+
+    // First utterance: NAME only
+    const nameUtterance = new SpeechSynthesisUtterance(nameText);
+    nameUtterance.voice = getFemaleVoice();
+    nameUtterance.rate = 1;
+    nameUtterance.pitch = 1;
+
+    // Second utterance: table content
     const headers = Array.from(tableEl.querySelectorAll("thead th")).map(th => th.textContent);
     const rows = tableEl.querySelectorAll("tbody tr");
 
+    let tableSpeech = "";
     rows.forEach(row => {
         const cells = Array.from(row.querySelectorAll("td"));
         cells.forEach((cell, index) => {
-            speechText += `${headers[index]}: ${cell.textContent}. `;
+            tableSpeech += `${headers[index]}: ${cell.textContent}. `;
         });
     });
 
-    // Create utterance
-    currentUtterance = new SpeechSynthesisUtterance(speechText);
-    currentUtterance.voice = getFemaleVoice();
-    currentUtterance.rate = 1;
-    currentUtterance.pitch = 1;
+    const tableUtterance = new SpeechSynthesisUtterance(tableSpeech);
+    tableUtterance.voice = getFemaleVoice();
+    tableUtterance.rate = 1;
+    tableUtterance.pitch = 1;
 
-    // Show floating indicators
+    // Show floating TTS indicators
     const floating = document.getElementById("ttsFloating");
     const stopBtn = document.getElementById("stopTTS");
     floating.style.display = "block";
     stopBtn.style.display = "block";
 
-    currentUtterance.onend = () => {
+    // When nameUtterance ends, start tableUtterance
+    nameUtterance.onend = () => {
+        speechSynthesis.speak(tableUtterance);
+    };
+
+    tableUtterance.onend = () => {
         floating.style.display = "none";
         stopBtn.style.display = "none";
         currentUtterance = null;
     };
 
-    speechSynthesis.speak(currentUtterance);
+    // Speak name first
+    currentUtterance = nameUtterance;
+    speechSynthesis.speak(nameUtterance);
 }
 
 // Stop TTS function
