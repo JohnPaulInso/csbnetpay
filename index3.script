@@ -1,25 +1,22 @@
-
-
-
 // =====================================================================================================
-// INDEX 3 =============================================================================================
+// INDEX 3 - ON QUEUE ==================================================================================
 // =====================================================================================================
-
-
 
 document.addEventListener('DOMContentLoaded', () => {
     const prompt = document.getElementById('fullscreenPrompt');
 
     // Show the prompt when the mouse moves
-    document.addEventListener('mousemove', () => {
-        prompt.style.display = 'block';
-    });
+    if (prompt) {
+        document.addEventListener('mousemove', () => {
+            prompt.style.display = 'block';
+        });
 
-    // Enter fullscreen when the prompt is clicked
-    prompt.addEventListener('click', () => {
-        openFullscreen();
-        prompt.style.display = 'none'; // Hide prompt after entering full-screen
-    });
+        // Enter fullscreen when the prompt is clicked
+        prompt.addEventListener('click', () => {
+            openFullscreen();
+            prompt.style.display = 'none';
+        });
+    }
 });
 
 function openFullscreen() {
@@ -44,10 +41,8 @@ const csvFilesOnq = [
     'onq_feb25.csv', 'onq_jan25.csv'
 ];
 
-// Get only the most recent file
-const latestFile = csvFilesOnq[0];
-
 document.getElementById('searchButtonOnq').addEventListener('click', searchEmployeeOnq);
+
 function searchEmployeeOnq() {
     const searchInputOnq = document.getElementById('searchInputOnq').value.trim();
     const loadingIndicatorOnq = document.getElementById('loadingIndicatorOnq');
@@ -119,7 +114,6 @@ function findMostRecentFile() {
     });
 }
 
-
 function fetchCSVOnq(csvFile) {
     return new Promise((resolve, reject) => {
         const monthName = getMonthNameFromCsvOnq(csvFile);
@@ -177,7 +171,7 @@ function displayEmployeeInfoOnq(monthName, csvData) {
 
             employeeInfoSectionOnq.innerHTML = `
                 <strong>NAME:</strong><b style="color:orange"> ${fname} ${mi} ${lname}</b><br/>
-                <strong>EMPNO:</strong><b style="color:orange">   ${empno} </b><br/>
+                <strong>EMPNO:</strong><b style="color:orange"> ${empno} </b><br/>
                 <strong>DIV / STA:</strong><b style="color:orange"> ${div} / ${sta}</b><br/>
             `;
             break;
@@ -185,104 +179,156 @@ function displayEmployeeInfoOnq(monthName, csvData) {
     }
 
     if (!employeeFound) {
-        employeeInfoSectionOnq.innerHTML = 'Employee ID not found in latest month.';
+        employeeInfoSectionOnq.innerHTML = 'Employee not found.';
     }
 }
 
+function displayResultsTableOnq(fetchedDataOnq) {
+    const resultsSectionOnq = document.getElementById('resultsonq');
+    
+    // Create table container with responsive wrapper
+    const tableContainer = document.createElement('div');
+    tableContainer.classList.add('table-container');
 
-    function displayResultsTableOnq(fetchedDataOnq) {
-        const resultsSectionOnq = document.getElementById('resultsonq');
-        
-        const table = document.createElement('table');
-        table.classList.add('table', 'table-borderless', 'text-white');
+    const tableWrapper = document.createElement('div');
+    tableWrapper.classList.add('table-scroll-wrapper');
 
-        const thead = document.createElement('thead');
-        const headerRow = document.createElement('tr');
-        headerRow.innerHTML = `
-            <th class="font-weight-bold">MONTH</th>
-            <th class="font-weight-bold">DEDAMT</th>
-        `;
-        thead.appendChild(headerRow);
-        table.appendChild(thead);
+    const table = document.createElement('table');
+    table.classList.add('responsive-table');
 
-        const tbody = document.createElement('tbody');
-        const resultsMap = new Map();
-
-        fetchedDataOnq.forEach(data => {
-            data.csvData.forEach((row, index) => {
-                if (index === 0) return;
-
-                const empno = row[3];
-                if (empno === document.getElementById('searchInputOnq').value.trim()) {
-                    const monthName = data.monthName;
-                    const dedamt = parseFloat(row[13]);
-                    
-                    if (!resultsMap.has(monthName)) {
-                        resultsMap.set(monthName, { sum: 0, details: [] });
-                    }
-
-                    const dedcode = row[7];
-                    const effyy = row[9];
-                    const effmm = convertMonth(row[10]); // Convert month number
-                    const termyy = row[11];
-                    const termmm = convertMonth(row[12]); // Convert month number
-                    const policyno = row[15];
-
-                    const entry = resultsMap.get(monthName);
-                    entry.sum += dedamt;
-                    entry.details.push({ dedcode, policyno, effyy, effmm, termyy, termmm, dedamt });
-                }
-            });
-        });
-
-        resultsMap.forEach((data, monthName) => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${monthName}</td>
-                    <!-- <td>₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td> -->
-                <td id="totalAmount">₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td> <!-- Start with ₱0.00 -->
-
-
-            `;
-            tbody.appendChild(row);
-            const detailRow = document.createElement('tr');
-    const detailCell = document.createElement('td');
-    detailCell.setAttribute('colspan', 2);
-    detailCell.innerHTML = `
-    <table class="table table-sm text-white" style="font-size:10px">
+    table.innerHTML = `
         <thead>
             <tr>
-                <th>/</th>
-                <th>PLI</th>
-                <th>EFF</th>
-                <th>TERM</th>
-                <th>DEDAMT</th>
-                <th>POLICYNO</th>
+                <th style="padding-left: 1rem;">MONTH</th>
+                <th style="padding-right: 1rem; text-align: right;">DEDAMT</th>
             </tr>
         </thead>
-        <tbody>
-            ${data.details.map(d => `
-                <tr>
-                    <td><input type="checkbox" class="dedamt-checkbox" data-dedamt="${d.dedamt}" checked /></td>
-                    <td>${d.dedcode.toString().padStart(5, '0')}</td>
-                    <td>${d.effmm.toString().padStart(2, '0')}/${d.effyy}</td>
-                    <td>${d.termmm.toString().padStart(2, '0')}/${d.termyy}</td>
-                    <td><b>₱${d.dedamt.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</b></td>
-                    <td>${d.policyno}</td>
-                </tr>
-            `).join('')}
-        </tbody>
-    </table>
-`;
+        <tbody></tbody>
+    `;
 
+    const tbody = table.querySelector('tbody');
+    const resultsMap = new Map();
 
+    fetchedDataOnq.forEach(data => {
+        data.csvData.forEach((row, index) => {
+            if (index === 0) return;
 
+            const empno = row[3];
+            if (empno === document.getElementById('searchInputOnq').value.trim()) {
+                const monthName = data.monthName;
+                const dedamt = parseFloat(row[13]);
+                
+                if (!resultsMap.has(monthName)) {
+                    resultsMap.set(monthName, { sum: 0, details: [] });
+                }
 
+                const dedcode = row[7];
+                const effyy = row[9];
+                const effmm = convertMonth(row[10]); // Convert month number
+                const termyy = row[11];
+                const termmm = convertMonth(row[12]); // Convert month number
+                const policyno = row[15];
 
+                const entry = resultsMap.get(monthName);
+                entry.sum += dedamt;
+                entry.details.push({ dedcode, policyno, effyy, effmm, termyy, termmm, dedamt });
+            }
+        });
+    });
 
+    resultsMap.forEach((data, monthName) => {
+        const monthRow = document.createElement('tr');
+        
+        const monthCell = document.createElement('td');
+        monthCell.setAttribute('data-label', 'MONTH');
+        monthCell.textContent = monthName;
+        monthCell.style.paddingLeft = '1rem';
 
-function calculateTotal() {
+        const dedamtCell = document.createElement('td');
+        dedamtCell.setAttribute('data-label', 'DEDAMT');
+        dedamtCell.innerHTML = `<b id="totalAmount-${monthName.replace(/\s/g, '-')}">₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</b>`;
+        dedamtCell.classList.add('number-cell');
+        dedamtCell.style.textAlign = 'right';
+        dedamtCell.style.paddingRight = '1rem';
+
+        monthRow.appendChild(monthCell);
+        monthRow.appendChild(dedamtCell);
+        tbody.appendChild(monthRow);
+
+        // Create detail row
+        const detailRow = document.createElement('tr');
+        detailRow.classList.add('detail-row');
+        const detailCell = document.createElement('td');
+        detailCell.setAttribute('colspan', '2');
+        detailCell.style.padding = '0';
+        
+        // Create inner table for details
+        const detailTableHtml = `
+            <div class="detail-table-wrapper" style="padding: 0.75rem; background: transparent; overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                <table class="detail-table" style="width: 100%; min-width: 180px; background: white; border: 1px solid rgba(0, 100, 26, 0.15); border-radius: 6px; overflow: hidden; border-collapse: collapse;">
+                    <thead>
+                        <tr>
+                            <th style="text-align: center; width: 20px !important; min-width: 20px !important; max-width: 20px !important; padding: 0.5rem 0 !important;"></th>
+                            <th style="width: 60px; padding: 0.5rem 0.4rem !important;">PLI</th>
+                            <th style="width: 75px; padding: 0.5rem 0.4rem !important;">EFF</th>
+                            <th style="width: 75px; padding: 0.5rem 0.4rem !important;">TERM</th>
+                            <th style="width: 95px; text-align: right; padding: 0.5rem 0.5rem !important;">DEDAMT</th>
+                            <th style="width: 75px; padding: 0.5rem 0.4rem !important;">POLICYNO</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.details.map((d, idx) => `
+                            <tr style="background: ${idx % 2 === 0 ? 'white' : 'rgba(0, 100, 26, 0.02)'};">
+                                <td style="text-align: center; width: 20px !important; min-width: 20px !important; max-width: 20px !important; padding: 0.5rem 0 !important; line-height: 1;">
+                                    <input type="checkbox" class="dedamt-checkbox" 
+                                           data-dedamt="${d.dedamt}" 
+                                           data-month="${monthName.replace(/\s/g, '-')}" 
+                                           checked 
+                                           style="cursor: pointer; width: 12px; height: 12px; margin: 0 auto; padding: 0; accent-color: #00641a; display: block; vertical-align: middle;" />
+                                </td>
+                                <td style="padding: 0.5rem 0.4rem !important;">${d.dedcode.toString().padStart(5, '0')}</td>
+                                <td style="padding: 0.5rem 0.4rem !important;">${d.effmm.toString().padStart(2, '0')}/${d.effyy}</td>
+                                <td style="padding: 0.5rem 0.4rem !important;">${d.termmm.toString().padStart(2, '0')}/${d.termyy}</td>
+                                <td style="text-align: right; font-weight: 700; color: #00641a; padding: 0.5rem 0.5rem !important;">₱${d.dedamt.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                <td style="font-size: 0.7rem; padding: 0.5rem 0.4rem !important;">${d.policyno}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+        
+        detailCell.innerHTML = detailTableHtml;
+        detailRow.appendChild(detailCell);
+        tbody.appendChild(detailRow);
+    });
+
+    tableWrapper.appendChild(table);
+    tableContainer.appendChild(tableWrapper);
+    resultsSectionOnq.appendChild(tableContainer);
+
+    // Add event listeners for checkboxes after table is created
+    setupCheckboxListeners();
+}
+
+function setupCheckboxListeners() {
     const checkboxes = document.querySelectorAll('.dedamt-checkbox');
+    
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const month = this.dataset.month;
+            calculateTotal(month);
+        });
+    });
+
+    // Calculate initial totals
+    const months = new Set();
+    checkboxes.forEach(cb => months.add(cb.dataset.month));
+    months.forEach(month => calculateTotal(month));
+}
+
+function calculateTotal(month) {
+    const checkboxes = document.querySelectorAll(`.dedamt-checkbox[data-month="${month}"]`);
     let total = 0;
 
     checkboxes.forEach(checkbox => {
@@ -292,97 +338,62 @@ function calculateTotal() {
     });
 
     // Update the total display
-    const totalDisplay = document.querySelector('#totalAmount');
-    totalDisplay.innerText = `₱${total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+    const totalDisplay = document.getElementById(`totalAmount-${month}`);
+    if (totalDisplay) {
+        totalDisplay.textContent = `₱${total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+    }
 }
 
-// Event listener for checkbox changes
-document.addEventListener('change', (event) => {
-    if (event.target.classList.contains('dedamt-checkbox')) {
-        calculateTotal();
-    }
-});
-
-// Initial calculation on page load
-document.addEventListener('DOMContentLoaded', calculateTotal);
-
-
-
-
-
-
-
-
-    detailRow.appendChild(detailCell);
-    tbody.appendChild(detailRow);
-
-        });
-
-        table.appendChild(tbody);
-        resultsSectionOnq.appendChild(table);
-    }
-
-    function convertMonth(monthNumber) {
-        const monthNames = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
-        return monthNames[parseInt(monthNumber, 10) - 1];
-    }
-
-
-
-
-
-
-
-    
-
-        document.addEventListener("DOMContentLoaded", function() {
-            const loginTime = localStorage.getItem("loginTime");
-
-            // Check if the login time exists and if the session has expired (4 hours)
-            if (!loginTime || (new Date().getTime() - loginTime) > 3 * 60 * 60 * 1000) {
-                // Redirect to login page if no login session or session expired
-                window.location.href = "login/index.html";
-            }
-        });
-
-// Function to handle logout
-function logout() {
-    // Clear the login-related data from localStorage
-    localStorage.removeItem("loginTime");
-    localStorage.removeItem("employeeNumber"); // If you store employeeNumber or any other login info
-
-    // Redirect to the login page
-    window.location.href = "login/index.html";
+function convertMonth(monthNumber) {
+    const monthNames = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
+    return monthNames[parseInt(monthNumber, 10) - 1];
 }
 
-// Check if logged in (this part remains unchanged from your original code)
+// Session and login management
 document.addEventListener("DOMContentLoaded", function() {
     const loginTime = localStorage.getItem("loginTime");
 
-    // Check if the login time exists and if the session has expired (4 hours)
+    // Check if the login time exists and if the session has expired (3 hours)
     if (!loginTime || (new Date().getTime() - loginTime) > 3 * 60 * 60 * 1000) {
         // Redirect to login page if no login session or session expired
         window.location.href = "login/index.html";
     }
 });
 
+// Function to handle logout
+function logout() {
+    // Clear the login-related data from localStorage
+    localStorage.removeItem("loginTime");
+    localStorage.removeItem("employeeNumber");
 
-
+    // Redirect to the login page
+    window.location.href = "login/index.html";
+}
 
 // Function to check if jonathan77 is logged in and show/hide the admin container
 function checkLoggedInUser() {
-    const loggedInUser = localStorage.getItem("loggedInUser");
+    const loggedInUser = localStorage.getItem("loggedInUser")?.trim();
+    const adminContainers = document.querySelectorAll(".container-admin");
 
-    // Get the container element
-    const adminContainer = document.querySelector(".container-admin");
+    console.log("Logged in user:", loggedInUser);
+    console.log("Admin containers found:", adminContainers.length);
 
-    // Show the container only if jonathan77 is logged in
     if (loggedInUser === "jonathan77") {
-        adminContainer.style.display = "block"; // Show the element
+        adminContainers.forEach(container => container.style.display = "block");
     } else {
-        adminContainer.style.display = "none"; // Hide the element
+        adminContainers.forEach(container => container.style.display = "none");
     }
 }
 
-// Call this function on page load to check if jonathan77 is logged in
-checkLoggedInUser();
+// Wait until DOM is ready before running the check
+document.addEventListener("DOMContentLoaded", () => {
+    checkLoggedInUser();
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('service-worker.js');
+    }
+});
+
+window.onload = () => {
+    checkLoggedInUser();
+};

@@ -159,7 +159,7 @@
 
         /* Small title above header */
         .page-subtitle {
-            text-align: center;
+            text-align: left;
             margin: 1.5rem auto 0.25rem;
             padding: 0 1rem;
             color: #6c757d;
@@ -241,12 +241,20 @@
             outline: none;
         }
 
+
+
+        
+        /* Card Green Accents */
+        .card {
+            border-top: 3px solid #6b4600 !important;
+        }
+
         .form-input:hover {
             border-color: #ced4da;
         }
 
         .form-input:focus {
-            border-color: hsl(39, 100%, 21%);
+            border-color: #6b4600;
             background: white;
             box-shadow: 0 0 0 4px rgba(165, 106, 0, 0.1);
         }
@@ -604,6 +612,36 @@
         .container-admin {
             display: none;
         }
+
+
+
+
+        /* Employee info styling - Purple Theme */
+        .employee-info {
+    color: #333;
+    font-size: 1.2rem;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #482e10;
+    margin-bottom: 1rem;
+}
+
+.employee-info strong {
+    color: #482e10;
+}
+
+.employee-info b {
+    color: #f39c10 !important;
+}
+
+
+
+
+
+
+
+
+
     </style>
 </head>
 
@@ -622,15 +660,15 @@
         </div>
     </nav>
 
-    <!-- Small Title Above Header -->
-    <div class="page-subtitle">
-        Employee Deduction Information
+
+
+    <div class="page-header" style="position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: center;">
+        <div style="align-items: left !important" class="page-subtitle">Employee Deduction</div>
+        <div style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
+            <h1 style="margin: 0; align-items: center;">DEDAMT POSITIVE</h1>
+        </div>
     </div>
 
-    <!-- Page Header -->
-    <div class="page-header">
-        <h1>DEDAMT POSITIVE</h1>
-    </div>
 
     <!-- Search Section -->
     <div class="search-card">

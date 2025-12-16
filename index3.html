@@ -1,624 +1,872 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Historical Netpay</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="styles.css">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="manifest" href="manifest.json">
     
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- Manifest & Icons -->
+    <link rel="manifest" href="/csbnetpay/manifest.json">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
-<link rel="icon" href="favicon.png" type="image/png" sizes="any">
+    <link rel="icon" href="favicon.png" type="image/png" sizes="any">
 
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Boldonse&family=Inter:wght@900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-
-</head>
-
-
-<body style="margin-bottom:200px">
-
-<nav style="background-color: hsl(144, 100%, 21%); position: sticky; top: 0; z-index: 1000; padding: 0.7rem 1rem; font-family: 'Inter', sans-serif;">
-    <div class="navbar-nav" style="color:#ddd;display: flex; justify-content: center;">
-        <div style="color:#ddd;display: flex; align-items: center;">
-            <a style="color:#aaa;" class="nav-item nav-link p-2" href="index.html"><b>NETPAY</b></a>
-            <a style="color:#aaa;"class="nav-item nav-link p-2" href="index2.html"><b>DEDAMT</b></a>
-            <a class="nav-item nav-link p-2 text-white" href="index3.html"><b>ONQ</b></a>
-            <a style="color:#aaa;" class="nav-item nav-link p-2" href="index4.html"><b>PLI</b></a>
-            <a style="color:#aaa;" class="nav-item nav-link p-2" href="index5.html"><b>LE</b></a>
-        </div>
-
-        <a href="javascript:void(0);" class="nav-item nav-link p-2 text-white" onclick="logout()" style="position: absolute; right: 10px; color: white; font-size: 1.5rem;">
-            <b>↪</b> <!-- Logout arrow icon -->
-        </a>
-
-        <!-- Reload Button with Emoji Icon -->
-<!-- <a href="javascript:void(0);" class="nav-item nav-link p-2 text-white" onclick="window.location.reload();" style="position: absolute; right: 10px; color: white; font-size: 1.5rem;">
-    <b>⟳</b>
-   </a> -->
-
-   
-    </div>
-</nav>
+    <link rel="stylesheet" href="index.css">
+    
+    <style>
+        /* Override to Green Theme */
     
 
-<div id="searchSection" class="container mt-5">
-    
-    <div translate="no">    
-        <h4 class="text-center pt-5 pb-3 mb-2" style="font-family: 'Inter', sans-serif; font-size: 30px; font-weight: 900;">
-            ON QUEUE RESULTS
-        </h4>
-    </div>
-    
-
-    <div class="row pt-2 px-2">
-        <div class="col-12 d-flex px-3"> <!-- Added px-3 for left & right padding -->
-            <input type="text" id="searchInputOnq" class="form-control" placeholder="Employee Number..." style="flex-grow: 1;">
-            <button id="searchButtonOnq" class="btn btn-primary ml-2">Search</button>
-        </div>
-        <!-- Loading GIF -->
-        <div id="loadingIndicatorOnq" style="display: none; text-align: center;">
-            <img src="loading.gif" alt="Loading..." style="max-width: 100px;">
-        </div>
-    </div>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- Microphone button and feedback -->
-<div class="container py-4">
-  <div class="d-flex flex-column align-items-center">
-    <button id="micBtn" class="btn btn-primary mb-3" style="min-width: 150px;">
-      <i class="bi bi-mic"></i><span class="ms-2">Start Speaking</span>
-    </button>
-    <div id="feedback" class="text-danger fw-semibold" style="min-height: 1.5em;"></div>
-  </div>
-</div>
-
-<!-- Listening overlay -->
-<div id="listeningOverlay" class="position-fixed top-0 start-0 w-100" style="height: 20vh; z-index: 1050; background: linear-gradient(to bottom, rgba(0, 123, 255, 0.5), transparent); opacity: 0; transition: opacity 0.5s ease; pointer-events: none;"></div>
-
-<script>
-  const micBtn = document.getElementById("micBtn");
-  const feedback = document.getElementById("feedback");
-  const listeningOverlay = document.getElementById("listeningOverlay");
-
-  // Load sound effects
-  const listeningSound = new Audio('listening.ogg');
-  const searchingSound = new Audio('searching.ogg');
-  listeningSound.preload = 'auto';
-  searchingSound.preload = 'auto';
-
-  function showFeedback(message) {
-    feedback.textContent = message;
-  }
-
-  function clearFeedback() {
-    feedback.textContent = "";
-  }
-
-  function showOverlay() {
-    listeningOverlay.style.opacity = "1";
-  }
-
-  function hideOverlay() {
-    listeningOverlay.style.opacity = "0";
-  }
-
-  function resetMicButton() {
-    micBtn.classList.remove("btn-danger");
-    micBtn.classList.add("btn-primary");
-    micBtn.innerHTML = '<i class="bi bi-mic"></i><span class="ms-2">Start Speaking</span>';
-    micBtn.disabled = false;
-    hideOverlay();
-  }
-
-  micBtn.addEventListener("click", () => {
-    listeningSound.play();  // Play immediately
-    micBtn.disabled = true;
-    startListening();
-  });
-
-  function startListening() {
-    clearFeedback();
-
-    if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
-      showFeedback("Sorry, your browser does not support speech recognition.");
-      resetMicButton();
-      return;
-    }
-
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = 'en-US';
-    recognition.interimResults = true;
-    recognition.continuous = true;
-
-    micBtn.classList.add("btn-danger");
-    micBtn.classList.remove("btn-primary");
-    micBtn.innerHTML = '<i class="bi bi-mic-fill"></i><span class="ms-2">Listening...</span>';
-
-    recognition.start();
-    showOverlay();
-
-    let finalTranscript = "";
-    let processingTimeout;
-
-    recognition.onresult = (event) => {
-      clearTimeout(processingTimeout);
-
-      let interimTranscript = "";
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
-        if (event.results[i].isFinal) {
-          finalTranscript += event.results[i][0].transcript;
-        } else {
-          interimTranscript += event.results[i][0].transcript;
-        }
-      }
-
-      const combinedTranscript = (finalTranscript + interimTranscript).toLowerCase().trim();
-
-      processingTimeout = setTimeout(() => {
-        searchingSound.play();
-        recognition.stop();
-        processCommand(combinedTranscript);
-      }, 3000); // 3 seconds pause timeout
-    };
-
-    recognition.onerror = (event) => {
-      showFeedback("Speech recognition error. Please try again.");
-      recognition.stop();
-      resetMicButton();
-    };
-
-    recognition.onend = () => {
-      resetMicButton();
-    };
-
-    function processCommand(speech) {
-      if (!speech) {
-        showFeedback("Didn't catch that. Please try again.");
-        return;
-      }
-
-      console.log("Processing speech:", speech);
-
-      const routes = [
-        {
-          keywords: ["netpay", "net pay", "net payment"],
-          file: "index.html",
-          inputId: "searchInputNetpay",
-        },
-        {
-          keywords: ["dedamt", "ded amount", "deduction amount", "positive", "deduction positive"],
-          file: "index2.html",
-          inputId: "searchInputPos",
-        },
-        {
-          keywords: ["onqueue", "on q", "on queue", "onq"],
-          file: "index3.html",
-          inputId: "searchInputOnq",
-        },
-        {
-          keywords: ["pli", "pli deduction"],
-          file: "index4.html",
-          inputId: "searchInputPLI",
-        }
-      ];
-
-      let matchedRoute = null;
-      let employeeNumber = "";
-
-      for (const route of routes) {
-        for (const keyword of route.keywords) {
-          if (speech.startsWith(keyword)) {
-            matchedRoute = route;
-            let afterKeyword = speech.substring(keyword.length).trim();
-            employeeNumber = afterKeyword.match(/\d+/g)?.join('') || "";
-            break;
-          }
-        }
-        if (matchedRoute) break;
-      }
-
-      if (matchedRoute) {
-        if (!employeeNumber) {
-          showFeedback("Please say the employee number after the keyword.");
-          return;
+        /* Navbar Green Theme */
+        .navbar {
+            background: linear-gradient(135deg, #00641a 0%, #004d13 100%) !important;
         }
 
-        localStorage.setItem("employeeNumber", employeeNumber);
-
-        if (window.location.pathname.endsWith(matchedRoute.file)) {
-          const inputField = document.getElementById(matchedRoute.inputId);
-          if (inputField) {
-            inputField.value = employeeNumber;
-            clearFeedback();
-
-            // Reload the page to auto-trigger search
-            location.reload();
-          }
-        } else {
-          setTimeout(() => {
-            window.location.href = matchedRoute.file;
-          }, 500);
+        .nav-link.active {
+            color: #ffffff !important;
+            background: rgba(255, 255, 255, 0.15) !important;
         }
-      } else {
-        showFeedback("Command not recognized. Please try again.");
-      }
-    }
-  }
 
-  window.addEventListener("DOMContentLoaded", () => {
-    const employeeNumber = localStorage.getItem("employeeNumber");
-    if (employeeNumber) {
-      const possibleInputIds = ["searchInputNetpay", "searchInputPos", "searchInputOnq", "searchInputPLI"];
-      for (const id of possibleInputIds) {
-        const inputField = document.getElementById(id);
-        if (inputField) {
-          inputField.value = employeeNumber;
-          break;
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1) !important;
+            color: #ffffff !important;
         }
-      }
-    }
-  });
-</script>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<br/>
-
-
-
-<!-- Section to display employee details -->
-<div class="container">
-    <div class="row">
-        <div class="col-md-12 pt-2 px-3">
-            <h3 id="employeeInfoOnq" class="text-white px-3"></h3>
-        </div>
-    </div>
-    <div class="row results rounded-bottom rounded-top px-1" id="resultsonq">
-        <!-- Table will be dynamically inserted here -->
-    </div>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<script>
-  window.addEventListener("DOMContentLoaded", () => {
-    const params = new URLSearchParams(window.location.search);
-    const query = params.get("query");
-    const inputId = params.get("input");
-
-    if (query && inputId) {
-      const input = document.getElementById(inputId);
-      if (input) {
-        input.value = query;
-        input.dispatchEvent(new Event("input"));
-
-        // Try submitting with Enter key or button click
-        const form = input.closest("form");
-        if (form) {
-          const event = new KeyboardEvent("keydown", { key: "Enter", bubbles: true });
-          input.dispatchEvent(event);
-        } else {
-          const button = document.querySelector("button[type='submit'], button");
-          if (button) button.click();
+        /* Button Green Theme */
+        .btn-primary {
+            background: linear-gradient(135deg, #00641a 0%, #007d21 100%) !important;
+            border: none !important;
         }
-      }
-    }
-  });
-</script>
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #007d21 0%, #00a62d 100%) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 100, 26, 0.3) !important;
+        }
+
+        /* Page Header - Keep Original Style */
+        .page-header {
+            /* Remove green background override */
+        }
+
+        .page-subtitle {
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            color: rgba(0, 100, 26, 0.7) !important;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        /* Card Green Accents */
+        .card {
+            border-top: 3px solid #00641a !important;
+        }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div class="container container-admin" style="padding-top:450px">
-    <div class="col-xs-12 pt-2 px-3 ">
-      <script>
-        // Function to get the previous month's name (3-letter abbreviation)
-         // Function to get the previous month's name (3-letter abbreviation)
-function getPreviousMonth() {
-const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-const currentDate = new Date();
-const currentMonth = currentDate.getMonth(); // get the current month (0-11)
-const previousMonthIndex = (currentMonth - 1 + 12) % 12; // Adjust for December to January wrap around
-return months[previousMonthIndex];
-}
-  
-window.onload = function() {
-const previousMonth = getPreviousMonth();
-const previousMonthText = "onq_" + previousMonth.toLowerCase() + '25.csv'; // Add "pos_" before the file name
-document.getElementById("month-name").textContent = previousMonth;
-document.getElementById("example-file").textContent = previousMonthText; // Update the example file
-}
 
         
-  // Function to reload the page after upload completion (simulate with a button click)
-  function onUploadComplete() {
-    // Simulating the upload completion
-    setTimeout(function() {
-      location.reload(); // Reload the page
-    }, 1000); // Wait for 1 second to simulate a complete upload
-  }
-      </script>
-  
-      <script>
-        function updateFileName() {
-          const fileInput = document.getElementById("fileInput");
-          const fileName = document.getElementById("fileName");
-          if (fileInput.files.length > 0) {
-            fileName.textContent = `Selected file: ${fileInput.files[0].name}`;
-          } else {
-            fileName.textContent = "No file chosen";
-          }
+        .form-input:hover {
+            border-color: #ced4da;
         }
-      </script>
-  
-      <h5 style="color: white;font-size:22px" id="month-text">Already have the Onqueue for <span style="color: #00c12d; font-weight: bold;" id="month-name"></span>?</h5>
-      <p style="color: rgb(181, 181, 181);font-size:15px">Please double check the month and year and make sure it's a CSV File. Example: <u id="example-file">onq_feb25.csv</u></p>
-  
-      <div class="mb-3 col-md-6">
-        <label for="fileInput" class="btn btn-secondary btn-block">Choose File</label>
-        <input type="file" id="fileInput" class="form-control-file d-none" onchange="updateFileName()">
-        <small id="fileName" class="form-text text-muted">No file chosen</small>
-      </div>
-      <div class="mb-3 col-md-6">
-        <button onclick="uploadFile()" class="btn btn-success btn-block">Upload</button>
-      </div>
-  
-      <script>
-        async function uploadFiles() {
-          const fileInput = document.getElementById("fileInput");
-          const files = fileInput.files;
-          if (!files.length) return alert("Please select at least one file.");
-      
-          alert("Uploading files to GitHub...");
-      
-          const repo = "csbnetpay"; 
-          const owner = "JohnPaulInso"; 
-      
-          // Split Token (Bypassing GitHub Detection)
-          const part1 = "ghp_";  
-          const part2 = "vnpu7K5e3lNEsKwMczRGTgPA35ER5R2odvye";
-          const token = part1 + part2; // Combine token parts
-      
-          const uploadPromises = Array.from(files).map(async (file) => {
-            return new Promise((resolve, reject) => {
-              const reader = new FileReader();
-              reader.readAsDataURL(file);
-              reader.onload = async () => {
-                const content = reader.result.split(",")[1]; 
-                const path = file.name; 
-                const message = `Upload ${file.name} via API`;
-      
-                const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-      
-                try {
-                  const response = await fetch(url, {
-                    method: "PUT",
-                    headers: {
-  "Authorization": `token ${token}`,
-  "Accept": "application/vnd.github.v3+json",
-  "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                      message: message,
-                      content: content
-                    })
-                  });
-      
-                  const result = await response.json();
-                  if (response.ok) {
-                    console.log(`Upload successful: ${file.name}`);
-                    resolve(file.name);
-                  } else {
-                    console.error(`Upload failed: ${file.name}`, result);
-                    reject(`Failed: ${file.name}`);
-                  }
-                } catch (error) {
-                  console.error(`Error uploading ${file.name}`, error);
-                  reject(`Error: ${file.name}`);
-                }
-              };
-            });
-          });
-      
-          try {
-            const uploadedFiles = await Promise.all(uploadPromises);
-            alert(`Upload Complete! ${uploadedFiles.length} file(s) uploaded.\nPlease wait 1-3 minutes before refreshing.`);
-          } catch (error) {
-            alert("Some uploads failed. Check the console for details.");
-          }
+
+        .form-input:focus {
+            border-color: #00641a;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(0, 165, 36, 0.1);
         }
-      </script>
+
+        .form-input:focus + .input-icon {
+          color: #00641a !important;
+        }
+
+        .input-icon {
+            color: #00641a !important;
+        }
+
+        /* Table Styles */
+        .responsive-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: transparent;
+            font-size: 0.85rem;
+        }
+
+        .responsive-table thead {
+            background: linear-gradient(135deg, #00641a 0%, #007d21 100%);
+        }
+
+        .responsive-table thead th {
+            color: white;
+            font-weight: 600; 
+            text-align: left;
+            font-size: 0.85rem;
+            border-bottom: 2px solid #00c12d;
+        }
+
+        .responsive-table tbody tr {
+            border-bottom: 1px solid rgba(0, 193, 45, 0.1);
+            transition: background-color 0.2s ease;
+        }
+
+        .responsive-table tbody tr:hover {
+            background-color: rgba(0, 100, 26, 0.05);
+        }
+
+        .responsive-table tbody td {
+            color: #333;
+            font-size: 0.85rem;
+        }
+
+        .detail-table {
+            font-size: 0.75rem !important;
+        }
+
+        .detail-table thead {
+            background: linear-gradient(135deg, #004d13 0%, #00641a 100%) !important;
+        }
+
+        .detail-table thead th {
+            font-size: 0.75rem !important;
+            color: white;
+            font-weight: 500;
+        }
+
+        .detail-table tbody td {
+            font-size: 0.75rem !important;
+            color: #333;
+        }
+
+        .detail-table tbody tr:hover {
+            background-color: rgba(0, 193, 45, 0.08);
+        }
+
+        .detail-row td {
+            background: rgba(0, 100, 26, 0.02) !important;
+        }
+
+        .number-cell {
+            font-weight: 600;
+            color: #00641a;
+        }
+
+        /* Prevent text selection from triggering mobile search */
+        table td, table th {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+            -webkit-touch-callout: none;
+        }
+
+        /* Loading indicator */
+        .loading-indicator {
+            color: #00641a;
+        }
+
+        /* Feedback text */
+        .feedback-text {
+            color: #00641a;
+        }
+
+        /* Admin section green theme */
+        .admin-card__eyebrow {
+            color: #00c12d !important;
+        }
+
+        .summary-chip {
+            background: #00641a !important;
+            color: white !important;
+        }
+
+        .status-dot.ready {
+            background: #00c12d !important;
+        }
+
+        /* Mic button */
+        .mic-inside-input {
+            color: #00641a !important;
+        }
+
+        .mic-inside-input:hover {
+            background: rgba(0, 100, 26, 0.1) !important;
+        }
+
+        /* Listening animation dots */
+        .listening-dots span {
+            background-color: #00c12d !important;
+        }
+
+        @media (max-width: 768px) {
+            .page-subtitle {
+                font-size: 0.65rem;
+                margin-bottom: 0.35rem;
+            }
+
+            .responsive-table {
+                font-size: 0.8rem;
+            }
+
+            .responsive-table thead th,
+            .responsive-table tbody td {
+                font-size: 0.8rem;
+            }
+
+            .detail-table {
+                font-size: 0.7rem !important;
+            }
+
+            .detail-table thead th,
+            .detail-table tbody td {
+                font-size: 0.7rem !important;
+            }
+        }
+
+        /* Compact table layout - Enable horizontal scrolling */
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table-scroll-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Detail table container with horizontal scroll */
+        .detail-table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 0.75rem 0;
+        }
+
+        .responsive-table th:first-child,
+        .responsive-table td:first-child {
+            min-width: 120px;
+        }
+
+        .responsive-table th:last-child,
+        .responsive-table td:last-child {
+            min-width: 100px;
+            text-align: right;
+        }
+
+        .detail-table {
+            min-width: 500px; /* Ensure table doesn't get too compressed */
+        }
+
+        .detail-table th,
+        .detail-table td {
+            white-space: nowrap;
+        }
+
+        /* Force checkbox column to be minimal */
+        .detail-table th:first-child,
+        .detail-table td:first-child {
+            width: 20px !important;
+            min-width: 20px !important;
+            max-width: 20px !important;
+        }
+
+        .detail-table input[type="checkbox"] {
+            width: 12px !important;
+            height: 12px !important;
+            margin: 0 auto !important;
+            padding: 0 !important;
+        }
+  
+
+        /* Employee info styling - Purple Theme */
+        .employee-info {
+    color: #333;
+    font-size: 1.2rem;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #10481b;
+    margin-bottom: 1rem;
+}
+
+.employee-info strong {
+    color: #104813;
+}
+
+.employee-info b {
+    color: #f39c10 !important;
+}
+
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-links">
+                <a class="nav-link" href="index.html">NETPAY</a>
+                <a class="nav-link" href="index2.html">DEDAMT</a>
+                <a class="nav-link active" href="index3.html">ONQ</a>
+                <a class="nav-link" href="index4.html">PLI</a>
+                <a class="nav-link" href="index5.html">LE</a>
+            </div>
+            <button class="logout-btn" onclick="logout()">↪</button>
+        </div>
+    </nav>
+
+    <div class="page-header" style="position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: center;">
+        <div class="page-subtitle">Payroll Management System</div>
+        <div style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
+            <h1 style="margin: 0;">ON QUEUE RESULTS</h1>
+        </div>
     </div>
-  </div>
-  
 
+    <!-- Search Section -->
+    <div class="search-card">
+        <div class="card">
+            <div class="input-group">
+                <label class="input-label" for="searchInputOnq">Employee Number</label>
 
+                <div class="input-wrapper">
+                    <div class="input-with-icon">
+                        <input
+                            type="text"
+                            id="searchInputOnq"
+                            class="form-input"
+                            placeholder="Employee Number..."
+                            autocomplete="on"
+                        />
+                        <button type="button" id="micBtn" class="mic-inside-input">
+                            <i class="bi bi-mic-fill"></i>
+                        </button>
+                    </div>
+                    <i class="bi bi-search input-icon"></i>
+                </div>
 
+                <div id="feedback" class="feedback-text"></div>
+            </div>
+            
+            <button id="searchButtonOnq" class="btn btn-primary">
+                <i class="bi bi-search"></i>
+                Search Employee
+            </button>
+        </div>
 
+        <!-- Loading Indicator -->
+        <div id="loadingIndicatorOnq" class="loading-indicator">
+            <img src="loading.gif" alt="Loading...">
+        </div>
+    </div>
 
+    <!-- Listening Overlay -->
+    <div id="listeningOverlay" class="listening-overlay"></div>
 
+    <!-- Results Section -->
+    <div class="results-section">
+        <h3 id="employeeInfoOnq" class="employee-info"></h3>
+        <div id="resultsonq" class="table-container">
+            <!-- Table will be dynamically inserted here -->
+        </div>
+    </div>
 
+    <!-- Admin Section (Upload) -->
+    <div class="admin-section container-admin" style="display: none;">
+        <div class="admin-card">
+            <div class="admin-card__header">
+                <div>
+                    <div class="admin-card__eyebrow">Admin · OnQueue uploader</div>
+                    <h5>Upload Latest OnQueue File</h5>
+                    <p>Upload a CSV file for the OnQueue deductions.</p>
+                </div>
+                <div class="summary-chip">Uploading</div>
+            </div>
 
+            <div class="admin-grid">
+                <div class="admin-card__body">
+                    <div class="form-group" style="margin-bottom: 0.5rem;">
+                        <div class="file-upload-wrapper drop-zone">
+                            <label for="fileInput" class="file-upload-label">Choose CSV File</label>
+                            <input type="file" id="fileInput" class="file-input" accept=".csv" onchange="updateFileName()">
+                            <small id="fileName" class="file-name">No file chosen</small>
+                            <div class="file-hint">Select your OnQueue CSV file. Example: <u id="example-file">onq_feb25.csv</u></div>
+                        </div>
+                    </div>
 
+                    <div class="convert-actions">
+                        <button id="uploadButton" class="btn btn-primary" onclick="uploadFile()">
+                            <span id="buttonText">UPLOAD</span>
+                            <span id="buttonSpinner" class="spinner"></span>
+                        </button>
+                        <div class="convert-hint">Upload the OnQueue CSV file for <span style="color: #00c12d; font-weight: bold;" id="month-name"></span>.</div>
+                    </div>
+                </div>
 
+                <div class="upload-summary-card">
+                    <div class="summary-header">
+                        <div>
+                            <div class="summary-eyebrow">Upload cart</div>
+                            <h6 style="margin: 0;">What you'll process</h6>
+                        </div>
+                        <div class="summary-chip">Live</div>
+                    </div>
+                    <div class="summary-list">
+                        <div class="summary-item">
+                            <div>
+                                <div class="summary-label">File</div>
+                                <div class="summary-value" id="cartFile">No file chosen</div>
+                            </div>
+                            <span class="status-dot idle" id="cartFileStatus"></span>
+                        </div>
+                    </div>
+                    <div class="summary-footer">
+                        <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#16a34a;"></span>
+                        <span>Keep this green by selecting a file.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <script>
+        let isSearching = false; // Flag to prevent double-clicking
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        document.getElementById("searchButtonOnq").addEventListener("click", function () {
-            var employeeNumber = document.getElementById("searchInputOnq").value.trim();
-    
+        document.addEventListener("DOMContentLoaded", function () {
+            const searchBtn = document.getElementById("searchButtonOnq");
+            const searchInput = document.getElementById("searchInputOnq");
+            
+            searchBtn.addEventListener("click", function () {
+                // Prevent double-clicking
+                if (isSearching) {
+                    console.log("Search already in progress...");
+                    return;
+                }
+
+                var employeeNumber = searchInput.value.trim();
+        
+                if (employeeNumber) {
+                    isSearching = true;
+                    
+                    // Disable button and show loading state
+                    searchBtn.disabled = true;
+                    searchBtn.style.opacity = "0.5";
+                    searchBtn.style.cursor = "not-allowed";
+                    
+                    localStorage.setItem("employeeNumber", employeeNumber);
+                    console.log("✅ Employee Number Stored:", employeeNumber);
+                    
+                    // Re-enable after search completes
+                    setTimeout(() => {
+                        isSearching = false;
+                        searchBtn.disabled = false;
+                        searchBtn.style.opacity = "1";
+                        searchBtn.style.cursor = "pointer";
+                        
+                        // Show results section after search completes
+                        const resultsSection = document.querySelector(".results-section");
+                        if (resultsSection) {
+                            resultsSection.style.display = "block";
+                        }
+                    }, 2000);
+                } else {
+                    console.log("❌ No Employee Number Entered.");
+                }
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", function() {
+            var employeeNumber = localStorage.getItem("employeeNumber");
+
             if (employeeNumber) {
-                localStorage.setItem("employeeNumber", employeeNumber); // ✅ Save employee number
-                console.log("✅ Employee Number Stored:", employeeNumber); // Debugging
+                console.log("Retrieved Employee Number:", employeeNumber);
+                const searchInput = document.getElementById("searchInputOnq");
+                const searchBtn = document.getElementById("searchButtonOnq");
+                
+                if (searchInput && searchBtn) {
+                    searchInput.value = employeeNumber;
+                    
+                    // Small delay to ensure DOM is fully ready
+                    setTimeout(() => {
+                        searchBtn.click();
+                    }, 100);
+                }
             } else {
-                console.log("❌ No Employee Number Entered.");
+                console.log("No employee number found in localStorage.");
             }
         });
-    });
-    document.addEventListener("DOMContentLoaded", function() {
-        var employeeNumber = localStorage.getItem("employeeNumber"); // Retrieve the employee number
+    </script>
 
-        if (employeeNumber) {
-            console.log("Retrieved Employee Number:", employeeNumber);  // Debug log
-            document.getElementById("searchInputOnq").value = employeeNumber; // Fill the input
+    <!-- Scripts -->
+    <script>
+        // Ripple Effect for Buttons
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('btn') || e.target.closest('.btn')) {
+                const button = e.target.classList.contains('btn') ? e.target : e.target.closest('.btn');
+                const ripple = document.createElement('span');
+                ripple.classList.add('ripple');
+                
+                const rect = button.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                
+                button.appendChild(ripple);
+                
+                setTimeout(() => ripple.remove(), 600);
+            }
+        });
 
-            // Automatically trigger the search button click
-            document.getElementById("searchButtonOnq").click();
-        } else {
-            console.log("No employee number found in localStorage.");  // Debug log
+        // Search Button Handler
+        document.addEventListener("DOMContentLoaded", function () {
+            const searchBtn = document.getElementById("searchButtonOnq");
+            const searchInput = document.getElementById("searchInputOnq");
+            const resultsSection = document.querySelector(".results-section");
+
+            // Ensure hidden on first load
+            resultsSection.style.display = "none";
+
+            searchBtn.addEventListener("click", function () {
+                const employeeNumber = searchInput.value.trim();
+
+                if (employeeNumber) {
+                    localStorage.setItem("employeeNumber", employeeNumber);
+                    console.log("✅ Employee Number Stored:", employeeNumber);
+
+                    // Show results
+                    resultsSection.style.display = "block";
+                } else {
+                    console.log("❌ No Employee Number Entered.");
+                    resultsSection.style.display = "none";
+                }
+            });
+
+            // Enter key support
+            searchInput.addEventListener("keypress", function (e) {
+                if (e.key === "Enter") {
+                    searchBtn.click();
+                }
+            });
+        });
+
+        // Voice Recognition
+        const micBtn = document.getElementById("micBtn");
+        const feedback = document.getElementById("feedback");
+        const listeningOverlay = document.getElementById("listeningOverlay");
+
+        const listeningSound = new Audio('listening.ogg');
+        const searchingSound = new Audio('searching.ogg');
+        listeningSound.preload = 'auto';
+        searchingSound.preload = 'auto';
+
+        function showFeedback(message) {
+            feedback.textContent = message;
+            feedback.style.display = "block";
         }
-    });
-</script>
 
-<script src="index3.script"></script>
+        function clearFeedback() {
+            feedback.textContent = "";
+            feedback.style.display = "none";
+        }
 
-<script>
+        function showOverlay() {
+            listeningOverlay.classList.add('active');
+        }
 
-</script>
+        function hideOverlay() {
+            listeningOverlay.classList.remove('active');
+        }
+
+        function resetMicButton() {
+            micBtn.classList.remove("listening");
+            micBtn.innerHTML = '<i class="bi bi-mic-fill"></i>';
+            micBtn.disabled = false;
+            hideOverlay();
+        }
+
+        micBtn.addEventListener("click", () => {
+            listeningSound.play();
+            micBtn.disabled = true;
+            startListening();
+        });
+
+        function startListening() {
+            clearFeedback();
+
+            if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
+                showFeedback("Sorry, your browser does not support speech recognition.");
+                resetMicButton();
+                return;
+            }
+
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'en-US';
+            recognition.interimResults = true;
+            recognition.continuous = true;
+
+            micBtn.classList.add("listening");
+            micBtn.innerHTML = `
+                <div class="listening-dots">
+                    <span></span><span></span><span></span>
+                </div>
+            `;
+
+            recognition.start();
+            showOverlay();
+
+            let finalTranscript = "";
+            let processingTimeout;
+
+            recognition.onresult = (event) => {
+                clearTimeout(processingTimeout);
+
+                let interimTranscript = "";
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    } else {
+                        interimTranscript += event.results[i][0].transcript;
+                    }
+                }
+
+                const combinedTranscript = (finalTranscript + interimTranscript).toLowerCase().trim();
+
+                processingTimeout = setTimeout(() => {
+                    searchingSound.play();
+                    recognition.stop();
+                    processCommand(combinedTranscript);
+                }, 1000);
+            };
+
+            recognition.onerror = (event) => {
+                showFeedback("Speech recognition error. Please try again.");
+                recognition.stop();
+                resetMicButton();
+            };
+
+            recognition.onend = () => {
+                resetMicButton();
+            };
+
+            function processCommand(speech) {
+                if (!speech) {
+                    showFeedback("Didn't catch that. Please try again.");
+                    return;
+                }
+
+                console.log("Processing speech:", speech);
+
+                speech = speech.trim().toLowerCase();
+
+                let employeeNumber = "";
+                let matchedRoute = null;
+
+                const routes = [
+                    { keywords: ["netpay", "net pay", "net payment"], file: "index.html", inputId: "searchInputNetpay" },
+                    { keywords: ["dedamt", "ded amount", "deduction amount", "positive", "deduction positive"], file: "index2.html", inputId: "searchInputPos" },
+                    { keywords: ["onqueue", "on q", "on queue", "onq", "queue", "onquee", "onqueu"], file: "index3.html", inputId: "searchInputOnq" },
+                    { keywords: ["pli", "pli deduction"], file: "index4.html", inputId: "searchInputPLI" }
+                ];
+
+                // First, try matching keywords
+                for (const route of routes) {
+                    for (const keyword of route.keywords) {
+                        if (speech.startsWith(keyword)) {
+                            matchedRoute = route;
+                            const afterKeyword = speech.substring(keyword.length).trim();
+                            const digits = afterKeyword.match(/\d+/g);
+                            if (digits) employeeNumber = digits.join('');
+                            break;
+                        }
+                    }
+                    if (matchedRoute) break;
+                }
+
+                // If no keyword matched, check if speech contains numbers
+                if (!matchedRoute) {
+                    const digits = speech.match(/\d+/g);
+                    if (digits) {
+                        employeeNumber = digits.join('');
+                        matchedRoute = routes[2]; // default to ONQ
+                    }
+                }
+
+                if (!matchedRoute || !employeeNumber) {
+                    showFeedback("Command not recognized. Please try again.");
+                    return;
+                }
+
+                console.log("Matched route:", matchedRoute, "Employee number:", employeeNumber);
+
+                localStorage.setItem("employeeNumber", employeeNumber);
+
+                if (window.location.pathname.endsWith(matchedRoute.file)) {
+                    const inputField = document.getElementById(matchedRoute.inputId);
+                    if (inputField) {
+                        inputField.value = "";
+                        inputField.value = employeeNumber;
+                        clearFeedback();
+                        
+                        if (!isSearching) {
+                            document.getElementById("searchButtonOnq").click();
+                        }
+                    }
+                } else {
+                    setTimeout(() => {
+                        window.location.href = matchedRoute.file;
+                    }, 300);
+                }
+            }
+        }
+
+        // Auto-fill from localStorage
+        window.addEventListener("DOMContentLoaded", () => {
+            const employeeNumber = localStorage.getItem("employeeNumber");
+            if (employeeNumber) {
+                const possibleInputIds = ["searchInputNetpay", "searchInputPos", "searchInputOnq", "searchInputPLI"];
+                for (const id of possibleInputIds) {
+                    const inputField = document.getElementById(id);
+                    if (inputField) {
+                        inputField.value = employeeNumber;
+                        break;
+                    }
+                }
+            }
+        });
+
+        // Admin file upload functions
+        function getPreviousMonth() {
+            const monthsShort = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const monthsFull = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const currentDate = new Date();
+            const currentMonth = currentDate.getMonth();
+            const previousMonthIndex = (currentMonth - 1 + 12) % 12;
+            return { short: monthsShort[previousMonthIndex], full: monthsFull[previousMonthIndex] };
+        }
+
+        function updateFileName() {
+            const fileInput = document.getElementById("fileInput");
+            const fileName = document.getElementById("fileName");
+            const cartFile = document.getElementById("cartFile");
+            const cartFileStatus = document.getElementById("cartFileStatus");
+            
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                fileName.textContent = `Selected file: ${file.name}`;
+                cartFile.textContent = file.name;
+                cartFileStatus?.classList.add("ready");
+                cartFileStatus?.classList.remove("idle");
+            } else {
+                fileName.textContent = "No file chosen";
+                cartFile.textContent = "No file chosen";
+                cartFileStatus?.classList.remove("ready");
+                cartFileStatus?.classList.add("idle");
+            }
+        }
+
+        async function uploadFile() {
+            const fileInput = document.getElementById("fileInput");
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert("Please select a file.");
+                return;
+            }
+
+            alert("Uploading file to GitHub...");
+
+            const repo = "csbnetpay"; 
+            const owner = "JohnPaulInso"; 
+            
+            // Split Token (Bypassing GitHub Detection)
+            const part1 = "ghp_";  
+            const part2 = "vnpu7K5e3lNEsKwMczRGTgPA35ER5R2odvye";
+            const token = part1 + part2;
+
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = async () => {
+                    const content = reader.result.split(",")[1]; 
+                    const path = file.name; 
+                    const message = `Upload ${file.name} via API`;
+
+                    const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+
+                    try {
+                        const response = await fetch(url, {
+                            method: "PUT",
+                            headers: {
+                                "Authorization": `token ${token}`,
+                                "Accept": "application/vnd.github.v3+json",
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                message: message,
+                                content: content
+                            })
+                        });
+
+                        const result = await response.json();
+                        if (response.ok) {
+                            alert(`Upload successful: ${file.name}\nPlease wait 1-3 minutes before refreshing.`);
+                            resolve(file.name);
+                        } else {
+                            alert(`Upload failed: ${file.name}`);
+                            reject(`Failed: ${file.name}`);
+                        }
+                    } catch (error) {
+                        alert(`Error uploading ${file.name}`);
+                        reject(`Error: ${file.name}`);
+                    }
+                };
+            });
+        }
+
+        // Initialize admin sections when DOM is ready
+        document.addEventListener("DOMContentLoaded", function() {
+            const previousMonth = getPreviousMonth();
+            const previousMonthText = 'onq_' + previousMonth.short.toLowerCase() + '25.csv';
+            const monthNameEl = document.getElementById("month-name");
+            const exampleFileEl = document.getElementById("example-file");
+            
+            if (monthNameEl) {
+                monthNameEl.textContent = previousMonth.full;
+            }
+            if (exampleFileEl) {
+                exampleFileEl.textContent = previousMonthText;
+            }
+        });
+
+        function logout() {
+            console.log("Logging out...");
+            localStorage.removeItem("loginTime");
+            localStorage.removeItem("employeeNumber");
+            window.location.href = "login/index.html";
+        }
+
+        // Auto-trigger search on load
+        document.addEventListener("DOMContentLoaded", function() {
+            var employeeNumber = localStorage.getItem("employeeNumber");
+
+            if (employeeNumber) {
+                console.log("Retrieved Employee Number:", employeeNumber);
+                document.getElementById("searchInputOnq").value = employeeNumber;
+                document.getElementById("searchButtonOnq").click();
+            } else {
+                console.log("No employee number found in localStorage.");
+            }
+        });
+    </script>
+
+    <script src="index3.script"></script>
 
 </body>
 </html>
