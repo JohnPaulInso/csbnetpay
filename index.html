@@ -21,19 +21,31 @@
     <link rel="stylesheet" href="index.css">
     
     <style>
+        /* Prevent text selection from triggering mobile search */
+        table td, table th {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+            -webkit-touch-callout: none;
+        }
 
+        /* Page subtitle style */
+        .page-subtitle {
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            color: rgba(79, 38, 131, 0.7);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
 
-
-
-
-
-
-
-
-
-
-
-
+        @media (max-width: 768px) {
+            .page-subtitle {
+                font-size: 0.65rem;
+                margin-bottom: 0.35rem;
+            }
+        }
     </style>
 </head>
 
@@ -59,18 +71,18 @@
 
 
 
-        <div class="page-header" style="position: relative; display: flex; align-items: center; justify-content: space-between;">
-            <h1 style="margin: 0; ;">HISTORICAL NETPAY</h1>
+        <div class="page-header" style="position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: center;">
+            <div class="page-subtitle">Payroll Management System</div>
+            <div style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
+                <h1 style="margin: 0;">HISTORICAL NETPAY</h1>
         
-           
-
-            <label class="switch">
-                <input type="checkbox" id="ttsSwitch" checked>
-                <span class="slider round">
-                  <i class="bi bi-volume-up-fill icon"></i>
-                </span>
-              </label>
-
+                <label class="switch">
+                    <input type="checkbox" id="ttsSwitch" checked>
+                    <span class="slider round">
+                      <i class="bi bi-volume-up-fill icon"></i>
+                    </span>
+                </label>
+            </div>
         </div>
         
         
@@ -326,32 +338,73 @@
 
 
 <script>
+    let isSearching = false; // Flag to prevent double-clicking
+
     document.addEventListener("DOMContentLoaded", function () {
-        document.getElementById("searchButtonNetpay").addEventListener("click", function () {
-            var employeeNumber = document.getElementById("searchInputNetpay").value.trim();
+        const searchBtn = document.getElementById("searchButtonNetpay");
+        const searchInput = document.getElementById("searchInputNetpay");
+        
+        searchBtn.addEventListener("click", function () {
+            // Prevent double-clicking
+            if (isSearching) {
+                console.log("Search already in progress...");
+                return;
+            }
+
+            var employeeNumber = searchInput.value.trim();
     
             if (employeeNumber) {
-                localStorage.setItem("employeeNumber", employeeNumber); // ✅ Save employee number
-                console.log("✅ Employee Number Stored:", employeeNumber); // Debugging
+                isSearching = true;
+                
+                // Disable button and show loading state
+                searchBtn.disabled = true;
+                searchBtn.style.opacity = "0.5";
+                searchBtn.style.cursor = "not-allowed";
+                
+                localStorage.setItem("employeeNumber", employeeNumber);
+                console.log("✅ Employee Number Stored:", employeeNumber);
+                
+                // Re-enable after search completes
+                // The index.script will handle the actual search
+                setTimeout(() => {
+                    isSearching = false;
+                    searchBtn.disabled = false;
+                    searchBtn.style.opacity = "1";
+                    searchBtn.style.cursor = "pointer";
+                    
+                    // Show results section after search completes
+                    const resultsSection = document.querySelector(".results-section");
+                    if (resultsSection) {
+                        resultsSection.style.display = "block";
+                    }
+                }, 2000);
             } else {
                 console.log("❌ No Employee Number Entered.");
             }
         });
     });
+
     document.addEventListener("DOMContentLoaded", function() {
-        var employeeNumber = localStorage.getItem("employeeNumber"); // Retrieve the employee number
+        var employeeNumber = localStorage.getItem("employeeNumber");
 
         if (employeeNumber) {
-            console.log("Retrieved Employee Number:", employeeNumber);  // Debug log
-            document.getElementById("searchInputNetpay").value = employeeNumber; // Fill the input
-
-            // Automatically trigger the search button click
-            document.getElementById("searchButtonNetpay").click();
+            console.log("Retrieved Employee Number:", employeeNumber);
+            const searchInput = document.getElementById("searchInputNetpay");
+            const searchBtn = document.getElementById("searchButtonNetpay");
+            
+            if (searchInput && searchBtn) {
+                searchInput.value = employeeNumber;
+                
+                // Small delay to ensure DOM is fully ready
+                setTimeout(() => {
+                    searchBtn.click();
+                }, 100);
+            }
         } else {
-            console.log("No employee number found in localStorage.");  // Debug log
+            console.log("No employee number found in localStorage.");
         }
     });
-    </script>
+</script>
     
 
 
@@ -402,7 +455,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Wait a bit for table to populate (if populated asynchronously)
         setTimeout(() => {
-            readEmployeeResults(); // <-- this will read the results aloud
+            readEmployeeResults();
         }, 3000); 
     } else {
         console.log("❌ No Employee Number Entered.");
@@ -584,9 +637,15 @@ micBtn.innerHTML = `
     if (window.location.pathname.endsWith(matchedRoute.file)) {
         const inputField = document.getElementById(matchedRoute.inputId);
         if (inputField) {
+            // Clear the input first before setting new value
+            inputField.value = "";
             inputField.value = employeeNumber;
             clearFeedback();
-            document.getElementById("searchButtonNetpay").click();
+            
+            // Prevent double search if already searching
+            if (!isSearching) {
+                document.getElementById("searchButtonNetpay").click();
+            }
         }
     } else {
         setTimeout(() => {
@@ -710,7 +769,6 @@ if (speechSynthesis.onvoiceschanged !== undefined) {
     speechSynthesis.onvoiceschanged = () => { getFemaleVoice(); };
 }
 // After results appear
-// After results appear
 setTimeout(() => {
     if (autoReadDisabled) return;
     const table = document.querySelector("#resultsNetpay table");
@@ -819,25 +877,35 @@ setTimeout(() => {
             return { short: monthsShort[previousMonthIndex], full: monthsFull[previousMonthIndex] };
         }
 
-        window.onload = function() {
+        // Initialize admin sections when DOM is ready
+        document.addEventListener("DOMContentLoaded", function() {
+            // Populate month dropdown
             populateMonthDropdown();
+            
+            // Set previous month display
             const previousMonth = getPreviousMonth();
             const previousMonthText = previousMonth.short.toLowerCase() + '25.csv';
-            if (document.getElementById("month-name")) {
-                document.getElementById("month-name").textContent = previousMonth.full;
+            const monthNameEl = document.getElementById("month-name");
+            const exampleFileEl = document.getElementById("example-file");
+            
+            if (monthNameEl) {
+                monthNameEl.textContent = previousMonth.full;
             }
-            if (document.getElementById("example-file")) {
-                document.getElementById("example-file").textContent = previousMonthText;
+            if (exampleFileEl) {
+                exampleFileEl.textContent = previousMonthText;
             }
+            
+            // Add event listeners
             const monthSelect = document.getElementById("monthSelect");
             const yearSelect = document.getElementById("yearSelect");
             const abstractInput = document.getElementById("abstractFileInput");
 
-            monthSelect?.addEventListener("change", refreshUploadCart);
-            yearSelect?.addEventListener("change", refreshUploadCart);
-            abstractInput?.addEventListener("change", refreshUploadCart);
+            if (monthSelect) monthSelect.addEventListener("change", refreshUploadCart);
+            if (yearSelect) yearSelect.addEventListener("change", refreshUploadCart);
+            if (abstractInput) abstractInput.addEventListener("change", refreshUploadCart);
+            
             refreshUploadCart();
-        }
+        });
 
         async function convertExcelToCSV() {
             const monthSelect = document.getElementById("monthSelect");
@@ -888,28 +956,29 @@ setTimeout(() => {
                     const workbook = XLSX.read(data, { type: "array" });
 
                     const sheetsToProcess = [
-                        {
-                            names: ["NETPAY", "netpay", "netPay"],
-                            output: `${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
-                            numberColumn: "H"
-                        },
-                        {
-                            names: ["POS", "pos", "positive", "dedamt"],
-                            output: `pos_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
-                            numberColumn: "N"
-                        },
-                        {
-                            names: ["ONQUEUE", "ONQ", "QUEQUE"],
-                            output: `onq_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
-                            numberColumn: "N"
-                        },
-                        {
-                            names: ["PLI", "pli"],
-                            output: `pli_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
-                            clearColumns: ["A", "S", "T", "U", "V", "W", "X", "Y", "Z"],
-                            numberColumn: "O"
-                        }
-                    ];
+    {
+        names: ["NETPAY", "Net Pay", "netpay", "net", "NETPAY"],
+        output: `${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
+        numberColumn: "H"
+    },
+    {
+        names: ["POS", "pos", "positive", "dedamt", "CSB", "CSB DEDNS"],
+        output: `pos_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
+        numberColumn: "N"
+    },
+    {
+        names: ["ONQUEUE", "ONQ", "QUEQUE", "ON QUEUE", "ALL ON QUEUE"],
+        output: `onq_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
+        numberColumn: "N"
+    },
+    {
+        names: ["PLI", "pli", "ALL PLIs"],
+        output: `pli_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
+        clearColumns: ["A", "S", "T", "U", "V", "W", "X", "Y", "Z"],
+        numberColumn: "O"
+    }
+];
+
 
                     const presentSheets = sheetsToProcess.filter(sheetConfig =>
                         Object.keys(workbook.Sheets).some(name => sheetConfig.names.includes(name))

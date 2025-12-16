@@ -34,23 +34,26 @@
             background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
             min-height: 100vh;
             padding-bottom: 100px;
+            opacity: 0;
+            animation: fadeIn 0.3s ease-in forwards;
         }
 
-
-
-
-
-
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
 
         /* Remove tap highlight color on mobile */
-.navbar a,
-.navbar button,
-.nav-link,
-.btn {
-    -webkit-tap-highlight-color: transparent; /* iOS Safari & Android */
-    outline: none; /* remove focus outline */
-}
-
+        .navbar a,
+        .navbar button,
+        .nav-link,
+        .btn {
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
 
         /* Navigation Styles */
         .navbar {
@@ -121,56 +124,55 @@
             transform: scale(1.1);
         }
 
-
-
-
         .dedamt-hover {
-    position: relative;
-    cursor: pointer;
-}
+            position: relative;
+            cursor: pointer;
+        }
 
-.dedamt-dropdown {
-    display: none;
-    position: absolute;
-    right: 0;
-    top: 1.5rem;
-    background: #2d1e02;
-    color: #fff;
-    padding: 0.5rem;
-    border-radius: 8px;
-    font-size: 13px;
-    min-width: 160px;
-    z-index: 10;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-}
+        .dedamt-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 1.5rem;
+            background: #2d1e02;
+            color: #fff;
+            padding: 0.5rem;
+            border-radius: 8px;
+            font-size: 13px;
+            min-width: 160px;
+            z-index: 10;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+        }
 
-.dedamt-dropdown div {
-    padding: 4px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.15);
-}
+        .dedamt-dropdown div {
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+        }
 
-.dedamt-dropdown div:last-child {
-    border-bottom: none;
-}
+        .dedamt-dropdown div:last-child {
+            border-bottom: none;
+        }
 
-.dedamt-hover:hover .dedamt-dropdown {
-    display: block;
-}
+        .dedamt-hover:hover .dedamt-dropdown {
+            display: block;
+        }
 
-
-
-
-
-
-
-
-
-
+        /* Small title above header */
+        .page-subtitle {
+            text-align: center;
+            margin: 1.5rem auto 0.25rem;
+            padding: 0 1rem;
+            color: #6c757d;
+            font-size: clamp(11px, 2.5vw, 13px);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
 
         /* Header Styles */
         .page-header {
             text-align: center;
-            margin: 2.5rem auto 2rem;
+            margin: 0 auto 2rem;
             max-width: 600px;
             padding: 0 1rem;
         }
@@ -347,14 +349,21 @@
             box-shadow: 0 4px 12px rgba(165, 106, 0, 0.3);
         }
 
-        .btn-primary:hover {
+        .btn-primary:hover:not(:disabled) {
             background: hsl(39, 100%, 25%);
             box-shadow: 0 6px 16px rgba(165, 106, 0, 0.4);
             transform: translateY(-2px);
         }
 
-        .btn-primary:active {
+        .btn-primary:active:not(:disabled) {
             transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            background: #bbb;
+            cursor: not-allowed;
+            box-shadow: none;
+            opacity: 0.6;
         }
 
         .btn-secondary {
@@ -443,9 +452,10 @@
         .responsive-table {
             width: 100%;
             border-collapse: collapse;
+            user-select: text;
+            -webkit-user-select: text;
         }
 
-  
         .responsive-table thead {
             background: #463009;
             color: white;
@@ -471,6 +481,17 @@
         .table-scroll-wrapper {
             width: 100%;
             overflow-x: auto;
+        }
+
+        /* Remove search suggestion on number selection */
+        .responsive-table td::selection {
+            background: #a56a00;
+            color: white;
+        }
+
+        .responsive-table td::-moz-selection {
+            background: #a56a00;
+            color: white;
         }
 
         /* Helper Text */
@@ -568,7 +589,11 @@
         /* Responsive Utilities */
         @media (max-width: 576px) {
             .page-header {
-                margin: 1.5rem auto 1rem;
+                margin: 0 auto 1rem;
+            }
+
+            .page-subtitle {
+                margin: 1rem auto 0.25rem;
             }
 
             .admin-card {
@@ -596,6 +621,11 @@
             <button class="logout-btn" onclick="logout()">↪</button>
         </div>
     </nav>
+
+    <!-- Small Title Above Header -->
+    <div class="page-subtitle">
+        Employee Deduction Information
+    </div>
 
     <!-- Page Header -->
     <div class="page-header">
@@ -646,7 +676,7 @@
     <div id="listeningOverlay" class="listening-overlay"></div>
 
     <!-- Results Section -->
-    <div class="results-section">
+    <div class="results-section" id="resultsSection">
         <h3 id="employeeInfoPos" class="employee-info"></h3>
         <div id="resultspos" class="table-container">
             <!-- Table will be dynamically inserted here -->
@@ -671,50 +701,18 @@
         </div>
     </div>
 
-
-
-
-
-
-
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-          document.getElementById("searchButtonPos").addEventListener("click", function () {
-              var employeeNumber = document.getElementById("searchInputPos").value.trim();
-      
-              if (employeeNumber) {
-                  localStorage.setItem("employeeNumber", employeeNumber); // ✅ Save employee number
-                  console.log("✅ Employee Number Stored:", employeeNumber); // Debugging
-              } else {
-                  console.log("❌ No Employee Number Entered.");
-              }
-          });
-      });
-    document.addEventListener("DOMContentLoaded", function() {
-        var employeeNumber = localStorage.getItem("employeeNumber"); // Retrieve the employee number
-
-        if (employeeNumber) {
-            console.log("Retrieved Employee Number:", employeeNumber);  // Debug log
-            document.getElementById("searchInputPos").value = employeeNumber; // Fill the input
-
-            // Automatically trigger the search button click
-            document.getElementById("searchButtonPos").click();
-        } else {
-            console.log("No employee number found in localStorage.");  // Debug log
-        }
-    });
-      </script>
-      
-
-
-
-
     <!-- Scripts -->
     <script>
+        let isSearching = false; // Prevent double search
+
         // Ripple Effect for Buttons
         document.addEventListener('click', function(e) {
             if (e.target.classList.contains('btn') || e.target.closest('.btn')) {
                 const button = e.target.classList.contains('btn') ? e.target : e.target.closest('.btn');
+                
+                // Skip if button is disabled
+                if (button.disabled) return;
+                
                 const ripple = document.createElement('span');
                 ripple.classList.add('ripple');
                 
@@ -733,24 +731,50 @@
             }
         });
 
-        // Search Button Handler
+        // Search Button Handler with double-click prevention
         document.addEventListener("DOMContentLoaded", function () {
             const searchBtn = document.getElementById("searchButtonPos");
             const searchInput = document.getElementById("searchInputPos");
-            const resultsSection = document.querySelector(".results-section");
+            const resultsSection = document.getElementById("resultsSection");
 
             // Ensure hidden on first load
             resultsSection.style.display = "none";
 
-            searchBtn.addEventListener("click", function () {
+            searchBtn.addEventListener("click", function (e) {
+                e.preventDefault();
+                
+                // Prevent double-click
+                if (isSearching) {
+                    console.log("⚠️ Already searching, please wait...");
+                    return;
+                }
+
                 const employeeNumber = searchInput.value.trim();
 
                 if (employeeNumber) {
+                    isSearching = true;
+                    
+                    // Disable button and change appearance
+                    searchBtn.disabled = true;
+                    searchBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Searching...';
+                    
                     localStorage.setItem("employeeNumber", employeeNumber);
                     console.log("✅ Employee Number Stored:", employeeNumber);
 
-                    // Show results
-                    resultsSection.style.display = "block";
+                    // Clear previous results before new search
+                    const resultsContainer = document.getElementById("resultspos");
+                    resultsContainer.innerHTML = "";
+
+                    // Simulate search delay (replace with your actual search logic)
+                    setTimeout(() => {
+                        // Show results
+                        resultsSection.style.display = "block";
+                        
+                        // Re-enable button
+                        searchBtn.disabled = false;
+                        searchBtn.innerHTML = '<i class="bi bi-search"></i> Search Employee';
+                        isSearching = false;
+                    }, 1000); // Adjust timeout as needed for your search
                 } else {
                     console.log("❌ No Employee Number Entered.");
                     resultsSection.style.display = "none";
@@ -760,9 +784,21 @@
             // Enter key support
             searchInput.addEventListener("keypress", function (e) {
                 if (e.key === "Enter") {
-                    searchBtn.click();
+                    e.preventDefault();
+                    if (!isSearching) {
+                        searchBtn.click();
+                    }
                 }
             });
+
+            // Auto-trigger search on load if employee number exists
+            const employeeNumber = localStorage.getItem("employeeNumber");
+            if (employeeNumber) {
+                console.log("Retrieved Employee Number:", employeeNumber);
+                searchInput.value = employeeNumber;
+                // Trigger search automatically
+                searchBtn.click();
+            }
         });
 
         // Voice Recognition
@@ -774,6 +810,9 @@
         const searchingSound = new Audio('searching.ogg');
         listeningSound.preload = 'auto';
         searchingSound.preload = 'auto';
+
+        let recognition = null;
+        let isListening = false;
 
         function showFeedback(message) {
             feedback.textContent = message;
@@ -798,11 +837,18 @@
             micBtn.innerHTML = '<i class="bi bi-mic-fill"></i>';
             micBtn.disabled = false;
             hideOverlay();
+            isListening = false;
         }
 
         micBtn.addEventListener("click", () => {
+            if (isListening) {
+                console.log("Already listening...");
+                return;
+            }
+            
             listeningSound.play();
             micBtn.disabled = true;
+            isListening = true;
             startListening();
         });
 
@@ -815,10 +861,10 @@
                 return;
             }
 
-            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
             recognition.lang = 'en-US';
             recognition.interimResults = true;
-            recognition.continuous = true;
+            recognition.continuous = false; // Changed to false to prevent concatenation
 
             micBtn.classList.add("listening");
             micBtn.innerHTML = `
@@ -836,7 +882,10 @@
             recognition.onresult = (event) => {
                 clearTimeout(processingTimeout);
 
+                // Reset finalTranscript for each new result to prevent concatenation
+                finalTranscript = "";
                 let interimTranscript = "";
+                
                 for (let i = event.resultIndex; i < event.results.length; ++i) {
                     if (event.results[i].isFinal) {
                         finalTranscript += event.results[i][0].transcript;
@@ -921,7 +970,9 @@
                     if (inputField) {
                         inputField.value = employeeNumber;
                         clearFeedback();
-                        document.getElementById("searchButtonPos").click();
+                        if (!isSearching) {
+                            document.getElementById("searchButtonPos").click();
+                        }
                     }
                 } else {
                     setTimeout(() => {
@@ -943,19 +994,6 @@
                         break;
                     }
                 }
-            }
-        });
-
-        // Auto-trigger search on load
-        document.addEventListener("DOMContentLoaded", function() {
-            var employeeNumber = localStorage.getItem("employeeNumber");
-
-            if (employeeNumber) {
-                console.log("Retrieved Employee Number:", employeeNumber);
-                document.getElementById("searchInputPos").value = employeeNumber;
-                document.getElementById("searchButtonPos").click();
-            } else {
-                console.log("No employee number found in localStorage.");
             }
         });
 

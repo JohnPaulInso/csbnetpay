@@ -150,7 +150,7 @@
         }
 
         if (!employeeFound) {
-            employeeInfoSectionNetpay.innerHTML = 'Employee ID not found in latest month.';
+            employeeInfoSectionNetpay.innerHTML = 'Employee not found.';
         }
     }
 
@@ -276,4 +276,3 @@ function checkLoggedInUser() {
             navigator.serviceWorker.register('service-worker.js');
         }
     });
-
