@@ -186,6 +186,9 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         ttsSwitch.addEventListener('change', () => {
             localStorage.setItem('ttsEnabled', ttsSwitch.checked);
+            if (!ttsSwitch.checked) {
+                window.speechSynthesis.cancel();
+            }
         });
     }
 });
@@ -331,7 +334,7 @@ async function displayEmployeeInfoPLI(monthName, csvData) {
                         <i class="bi bi-person-fill"></i>
                     </div>
                     <div class="profile-title">
-                        <h3>${fname} ${mi} ${lname}</h3>
+                        <h3>${fname}&nbsp;&nbsp;${mi}&nbsp;&nbsp;${lname}</h3>
                         <span>Employee</span>
                     </div>
                 </div>

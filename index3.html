@@ -619,7 +619,7 @@
             const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
             recognition.lang = 'en-US';
             recognition.interimResults = true;
-            recognition.continuous = true;
+            recognition.continuous = false; // Changed to false to prevent spamming/duplication
 
             micBtn.classList.add("listening");
             micBtn.innerHTML = `
@@ -631,6 +631,10 @@
             recognition.start();
             showOverlay();
 
+            // Clear the search input field immediately when starting to listen
+            const inputField = document.getElementById('searchInputOnq');
+            if (inputField) inputField.value = "";
+
             let finalTranscript = "";
             let processingTimeout;
 
@@ -638,21 +642,35 @@
                 clearTimeout(processingTimeout);
 
                 let interimTranscript = "";
+                // Reset transients because we are not cumulative anymore in the loop
+                let currentFinal = "";
+
                 for (let i = event.resultIndex; i < event.results.length; ++i) {
                     if (event.results[i].isFinal) {
-                        finalTranscript += event.results[i][0].transcript;
+                        currentFinal += event.results[i][0].transcript;
                     } else {
                         interimTranscript += event.results[i][0].transcript;
                     }
                 }
 
+                // If we got a final result, append it to what we already have overall
+                if (currentFinal) finalTranscript += currentFinal;
+
                 const combinedTranscript = (finalTranscript + interimTranscript).toLowerCase().trim();
+
+                // Live feedback: show what we're hearing in the input field
+                if (inputField) {
+                    const digitsOnly = combinedTranscript.match(/\d+/g);
+                    if (digitsOnly) {
+                        inputField.value = digitsOnly.join('');
+                    }
+                }
 
                 processingTimeout = setTimeout(() => {
                     searchingSound.play();
                     recognition.stop();
                     processCommand(combinedTranscript);
-                }, 1000);
+                }, 2000); // 2s delay for slow speech accessibility
             };
 
             recognition.onerror = (event) => {

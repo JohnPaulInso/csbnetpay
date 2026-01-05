@@ -147,6 +147,9 @@
             }
             ttsSwitch.addEventListener('change', () => {
                 localStorage.setItem('ttsEnabled', ttsSwitch.checked);
+                if (!ttsSwitch.checked) {
+                    window.speechSynthesis.cancel();
+                }
             });
         }
     });
@@ -233,6 +236,14 @@
                 utterance.pitch = 1.15; // Higher pitch for feminine tone
                 utterance.volume = 0.85; // Slightly reduced volume
                 
+                // Manage TTS Stop Button Visibility (if exists)
+                const fab = document.getElementById('ttsStopFab');
+                if (fab) {
+                    utterance.onstart = () => fab.classList.add('show');
+                    utterance.onend = () => fab.classList.remove('show');
+                    utterance.onerror = () => fab.classList.remove('show');
+                }
+
                 window.speechSynthesis.speak(utterance);
             };
 
@@ -307,7 +318,7 @@
                             <i class="bi bi-person-fill"></i>
                         </div>
                         <div class="profile-title">
-                            <h3>${fname} ${mi} ${lname}</h3>
+                            <h3>${fname}&nbsp;&nbsp;${mi}&nbsp;&nbsp;${lname}</h3>
                             <span>Employee</span>
                         </div>
                     </div>

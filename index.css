@@ -1141,12 +1141,29 @@ input:checked+.slider .icon {
     font-size: 24px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     cursor: pointer;
-    z-index: 1000;
-    transition: all 0.3s ease;
-    border: none;
+    z-index: 10000;
+    /* Extremely high to ensure visibility */
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    border: 2px solid white;
+    /* More visible border */
     opacity: 0;
     pointer-events: none;
     transform: scale(0.8);
+    animation: fab-pulse 2s infinite;
+}
+
+@keyframes fab-pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(79, 38, 131, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 15px rgba(79, 38, 131, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(79, 38, 131, 0);
+    }
 }
 
 .tts-stop-fab.show {
