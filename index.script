@@ -202,6 +202,14 @@
         }
     }
 
+    // Helper for Title Case (reusable)
+    const toTitleCase = (str) => {
+        if (!str) return '';
+        return str.replace(/\w\S*/g, (txt) => {
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        });
+    };
+
     function speakText(text) {
         const ttsSwitch = document.getElementById('ttsSwitch');
         const ttsEnabled = ttsSwitch ? ttsSwitch.checked : (localStorage.getItem('ttsEnabled') === 'true');
@@ -234,7 +242,7 @@
                 
                 utterance.rate = 0.95; // Slightly slower for clarity
                 utterance.pitch = 1.15; // Higher pitch for feminine tone
-                utterance.volume = 0.7; // Adjusted volume as requested
+                utterance.volume = 0.7; // User requested 0.7 volume
                 
                 // Manage TTS Stop Button Visibility (if exists)
                 const fab = document.getElementById('ttsStopFab');
@@ -287,8 +295,6 @@
                     });
                 };
                 
-                // ... (rest of function as is, just skipping the speakText call)
-
                 // ... (rest of function as is, just skipping the speakText call)
 
                 // Look up extra details map
@@ -442,9 +448,9 @@
                         speechLines.push(`${data.monthName}. Take home, ${takehomeVal.toFixed(2)} pesos`);
                     }
                     if (!empNameForSpeech) {
-                        const cleanFname = toTitleCase(row[4] || '');
-                        const cleanLname = toTitleCase(row[6] || '');
-                        empNameForSpeech = `${cleanFname} ${cleanLname}`; // Fname Lname (Title Case for TTS)
+                        const rawFname = row[4] || "";
+                        const rawLname = row[6] || "";
+                        empNameForSpeech = toTitleCase(`${rawFname} ${rawLname}`); // Use Title Case for natural speech
                     }
 
                     const rowElement = document.createElement('tr');
