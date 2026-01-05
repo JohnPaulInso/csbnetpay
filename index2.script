@@ -183,7 +183,7 @@ function speakText(text) {
         
         utterance.rate = 0.95;
         utterance.pitch = 1.15;
-        utterance.volume = 0.85;
+        utterance.volume = 0.7; // Adjusted volume
         
         window.speechSynthesis.speak(utterance);
     };

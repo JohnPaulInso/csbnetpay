@@ -234,7 +234,7 @@
                 
                 utterance.rate = 0.95; // Slightly slower for clarity
                 utterance.pitch = 1.15; // Higher pitch for feminine tone
-                utterance.volume = 0.85; // Slightly reduced volume
+                utterance.volume = 0.7; // Adjusted volume as requested
                 
                 // Manage TTS Stop Button Visibility (if exists)
                 const fab = document.getElementById('ttsStopFab');
@@ -289,12 +289,7 @@
                 
                 // ... (rest of function as is, just skipping the speakText call)
 
-                // Helper for Title Case
-                const toTitleCase = (str) => {
-                    return str.replace(/\w\S*/g, (txt) => {
-                        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-                    });
-                };
+                // ... (rest of function as is, just skipping the speakText call)
 
                 // Look up extra details map
                 const extra = customerMap.get(empno) || {};
@@ -447,7 +442,9 @@
                         speechLines.push(`${data.monthName}. Take home, ${takehomeVal.toFixed(2)} pesos`);
                     }
                     if (!empNameForSpeech) {
-                        empNameForSpeech = `${row[4]} ${row[6]}`; // Fname Lname
+                        const cleanFname = toTitleCase(row[4] || '');
+                        const cleanLname = toTitleCase(row[6] || '');
+                        empNameForSpeech = `${cleanFname} ${cleanLname}`; // Fname Lname (Title Case for TTS)
                     }
 
                     const rowElement = document.createElement('tr');
