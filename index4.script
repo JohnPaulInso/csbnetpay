@@ -200,23 +200,25 @@ async function fetchCustomerData() {
         const text = await response.text();
         
         const rows = text.split('\n');
-        for (let i = 2; i < rows.length; i++) {
-            const row = rows[i];
+        const dataStartIndex = 2;
+
+        for (let i = dataStartIndex; i < rows.length; i++) {
+            const row = rows[i].trim();
             if (!row) continue;
             
-            const matches = row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
-            if (!matches || matches.length < 3) continue;
+            const parts = row.split(',');
+            if (parts.length < 3) continue;
 
             const clean = (val) => val ? val.replace(/^"|"$/g, '').trim() : '';
 
-            const empNum = clean(matches[2]); 
+            const empNum = clean(parts[2]); 
             
             if (empNum) {
                  customerMap.set(empNum, {
-                    branch: clean(matches[0]),
-                    account: clean(matches[1]),
-                    address: clean(matches[3]),
-                    phone: clean(matches[4])
+                    branch: clean(parts[0]),
+                    account: clean(parts[1]),
+                    address: clean(parts[3]),
+                    phone: clean(parts[4])
                 });
             }
         }
@@ -227,6 +229,14 @@ async function fetchCustomerData() {
         customerDataLoaded = true;
     }
 }
+
+// Helper for Title Case (reusable)
+const toTitleCase = (str) => {
+    if (!str) return '';
+    return str.replace(/\w\S*/g, (txt) => {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+};
 
 function speakText(text) {
     const ttsSwitch = document.getElementById('ttsSwitch');
@@ -255,7 +265,7 @@ function speakText(text) {
         
         utterance.rate = 0.95;
         utterance.pitch = 1.15;
-        utterance.volume = 0.85;
+        utterance.volume = 0.7; // User requested 0.7 volume
         
         window.speechSynthesis.speak(utterance);
     };
@@ -289,6 +299,14 @@ async function displayEmployeeInfoPLI(monthName, csvData) {
             const mi = row[6];
             const lname = row[7];
 
+            // Announce name once
+            const empNoField = document.getElementById('searchInputPLI').value.trim();
+            if (window.lastSpokenEmpNo !== empNoField) {
+                const fullName = toTitleCase(`${fname} ${mi} ${lname}`.replace(/\s+/g, ' ').trim());
+                speakText(`Results for ${fullName}`);
+                window.lastSpokenEmpNo = empNoField;
+            }
+
             // Add copy toast if not present
             if (!document.querySelector('.copy-toast')) {
                 const toast = document.createElement('div');
@@ -302,13 +320,6 @@ async function displayEmployeeInfoPLI(monthName, csvData) {
                     const toast = document.querySelector('.copy-toast');
                     toast.classList.add('show');
                     setTimeout(() => toast.classList.remove('show'), 2000);
-                });
-            };
-
-            // Helper for Title Case
-            const toTitleCase = (str) => {
-                return str.replace(/\w\S*/g, (txt) => {
-                    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
                 });
             };
 
@@ -362,7 +373,7 @@ async function displayEmployeeInfoPLI(monthName, csvData) {
                     <div class="profile-item ${extra.address ? '' : 'inactive'}">
                         <div class="profile-icon"><i class="bi bi-mortarboard-fill"></i></div>
                         <div class="profile-details">
-                            <span class="label">SCHOOL ADDRESS</span>
+                            <span class="label">HOME ADDRESS</span>
                             <span class="value" style="font-size: 13px;">${formattedAddress}</span>
                         </div>
                         <div class="profile-action" ${mapsUrl ? `onclick="window.open('${mapsUrl}', '_blank')"` : ''} style="${mapsUrl ? 'cursor:pointer;' : ''}">

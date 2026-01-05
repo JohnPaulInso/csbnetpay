@@ -134,9 +134,11 @@
 
     // Global mapping for customer info
     let customerMap = new Map();
+    let customerDataLoaded = false;
+    let customerDataPromise = null;
 
     document.addEventListener("DOMContentLoaded", function() {
-        fetchCustomerData();
+        customerDataPromise = fetchCustomerData();
         
         // Sync TTS switch with localStorage
         const ttsSwitch = document.getElementById('ttsSwitch');
@@ -155,50 +157,41 @@
     });
 
     async function fetchCustomerData() {
-        console.log("Fetching customer_information.csv..."); // Debug log
+        console.log("Fetching customer_information.csv...");
         try {
             const response = await fetch('customer_information.csv');
             if (!response.ok) throw new Error("Failed to load customer info");
             const text = await response.text();
             
-            // Basic CSV parsing
             const rows = text.split('\n');
-            // Skip header, start from index 1 (or 0 if no header, but file has header at line 2)
-            // Lines 1 and 2 are headers/meta, data starts at line 3? 
-            // Based on view_file: Line 1 is numbers, Line 2 is headers. Data starts Line 3.
-            for (let i = 2; i < rows.length; i++) {
-                const row = rows[i];
+            const dataStartIndex = 2; // Data starts at line 3 (index 2)
+
+            for (let i = dataStartIndex; i < rows.length; i++) {
+                const row = rows[i].trim();
                 if (!row) continue;
                 
-                // Handle potential CSV quote escaping if simple split fails, but simple split might suffice for now
-                // Using a regex for better CSV handling just in case of commas in address
-                // Matches: "quoted field" OR unquoted_field
-                const matches = row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
-                if (!matches || matches.length < 3) continue;
+                // Fast CSV parser (split by comma, then remove quotes)
+                const parts = row.split(',');
+                if (parts.length < 3) continue;
 
                 const clean = (val) => val ? val.replace(/^"|"$/g, '').trim() : '';
 
-                // Mapping based on User Indices (Updated):
-                // A (0): Branch
-                // B (1): Account
-                // C (2): Emp Num
-                // D (3): Address (Previously E)
-                // E (4): Phone (Previously F)
-                const empNum = clean(matches[2]); 
+                const empNum = clean(parts[2]); 
                 
                 if (empNum) {
                      customerMap.set(empNum, {
-                        branch: clean(matches[0]),
-                        account: clean(matches[1]),
-                        address: clean(matches[3]),
-                        phone: clean(matches[4])
+                        branch: clean(parts[0]),
+                        account: clean(parts[1]),
+                        address: clean(parts[3]),
+                        phone: clean(parts[4])
                     });
                 }
             }
             console.log("Customer data loaded via CSV. Total entries:", customerMap.size);
-
         } catch(err) {
             console.error("Error loading customer CSV:", err);
+        } finally {
+            customerDataLoaded = true;
         }
     }
 
@@ -263,10 +256,16 @@
         }
     }
 
-    function displayEmployeeInfoNetpay(monthName, csvData) {
+    async function displayEmployeeInfoNetpay(monthName, csvData) {
         const employeeInfoSectionNetpay = document.getElementById('employeeInfoNetpay');
-        const searchEmpNo = document.getElementById('searchInputNetpay').value.trim();
         let employeeFound = false;
+
+        // Ensure customer data is synchronized
+        if (!customerDataLoaded) {
+            await customerDataPromise;
+        }
+
+        const searchEmpNo = document.getElementById('searchInputNetpay').value.trim();
 
         for (let i = 1; i < csvData.length; i++) {
             const row = csvData[i];
@@ -350,7 +349,7 @@
                         <div class="profile-item ${extra.address ? '' : 'inactive'}">
                             <div class="profile-icon"><i class="bi bi-mortarboard-fill"></i></div>
                             <div class="profile-details">
-                                <span class="label">SCHOOL ADDRESS</span>
+                                <span class="label">HOME ADDRESS</span>
                                 <span class="value" style="font-size: 13px;">${formattedAddress}</span>
                             </div>
                             <div class="profile-action" ${mapsUrl ? `onclick="window.open('${mapsUrl}', '_blank')"` : ''} style="${mapsUrl ? 'cursor:pointer;' : ''}">

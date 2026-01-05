@@ -1007,8 +1007,8 @@ input:checked+.slider .icon {
     font-weight: 400;
 }
 
-/* Specific icons colors - Ensure Purple */
-.profile-icon i {
+/* Specific icons colors - Ensure Purple as default, but NOT for themed cards */
+.profile-card:not(.theme-gold):not(.theme-green):not(.theme-red) .profile-icon i {
     color: #5e3b8e;
 }
 
@@ -1122,9 +1122,7 @@ input:checked+.slider .icon {
     color: #1b5e20 !important;
 }
 
-.profile-card.theme-red .profile-action i {
-    color: #600e12 !important;
-}
+
 
 /* Floating Stop TTS Button */
 .tts-stop-fab {
