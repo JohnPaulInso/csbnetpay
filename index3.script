@@ -355,7 +355,7 @@ async function displayEmployeeInfoOnq(monthName, csvData) {
                     </div>
 
                     <div class="profile-item ${extra.address ? '' : 'inactive'}">
-                        <div class="profile-icon"><i class="bi bi-mortarboard-fill"></i></div>
+                        <div class="profile-icon"><i class="bi bi-house-door-fill"></i></div>
                         <div class="profile-details">
                             <span class="label">HOME ADDRESS</span>
                             <span class="value" style="font-size: 13px;">${formattedAddress}</span>
