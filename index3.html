@@ -896,6 +896,25 @@
 
     <script src="index3.script"></script>
 
+    <footer class="app-footer">
+        Developed by John Paul Inso | <span id="appVersion">v1.0.0</span>
+    </footer>
+
+    <script>
+        async function updateVersionDisplay() {
+            try {
+                const response = await fetch('version.json?t=' + Date.now());
+                const data = await response.json();
+                const versionEl = document.getElementById('appVersion');
+                if (versionEl) {
+                    versionEl.textContent = `v${data.version}.${data.build}`;
+                }
+            } catch (err) {
+                console.log("Versioning unavailable");
+            }
+        }
+        updateVersionDisplay();
+    </script>
 </body>
 
 </html>
