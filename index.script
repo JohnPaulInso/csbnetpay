@@ -122,7 +122,126 @@
     }
 
     function parseCSVNetpay(data) {
-        return data.trim().split('\n').map(row => row.split(','));
+        // Robust CSV parsing to handle commas inside quotes
+        const rows = data.trim().split('\n');
+        return rows.map(row => {
+            const matches = row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
+            return matches ? matches.map(val => val.replace(/^"|"$/g, '').trim()) : [];
+        });
+    }
+
+
+
+    // Global mapping for customer info
+    let customerMap = new Map();
+
+    document.addEventListener("DOMContentLoaded", function() {
+        fetchCustomerData();
+        
+        // Sync TTS switch with localStorage
+        const ttsSwitch = document.getElementById('ttsSwitch');
+        if (ttsSwitch) {
+            const savedState = localStorage.getItem('ttsEnabled');
+            if (savedState !== null) {
+                ttsSwitch.checked = (savedState === 'true');
+            }
+            ttsSwitch.addEventListener('change', () => {
+                localStorage.setItem('ttsEnabled', ttsSwitch.checked);
+            });
+        }
+    });
+
+    async function fetchCustomerData() {
+        console.log("Fetching customer_information.csv..."); // Debug log
+        try {
+            const response = await fetch('customer_information.csv');
+            if (!response.ok) throw new Error("Failed to load customer info");
+            const text = await response.text();
+            
+            // Basic CSV parsing
+            const rows = text.split('\n');
+            // Skip header, start from index 1 (or 0 if no header, but file has header at line 2)
+            // Lines 1 and 2 are headers/meta, data starts at line 3? 
+            // Based on view_file: Line 1 is numbers, Line 2 is headers. Data starts Line 3.
+            for (let i = 2; i < rows.length; i++) {
+                const row = rows[i];
+                if (!row) continue;
+                
+                // Handle potential CSV quote escaping if simple split fails, but simple split might suffice for now
+                // Using a regex for better CSV handling just in case of commas in address
+                // Matches: "quoted field" OR unquoted_field
+                const matches = row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
+                if (!matches || matches.length < 3) continue;
+
+                const clean = (val) => val ? val.replace(/^"|"$/g, '').trim() : '';
+
+                // Mapping based on User Indices (Updated):
+                // A (0): Branch
+                // B (1): Account
+                // C (2): Emp Num
+                // D (3): Address (Previously E)
+                // E (4): Phone (Previously F)
+                const empNum = clean(matches[2]); 
+                
+                if (empNum) {
+                     customerMap.set(empNum, {
+                        branch: clean(matches[0]),
+                        account: clean(matches[1]),
+                        address: clean(matches[3]),
+                        phone: clean(matches[4])
+                    });
+                }
+            }
+            console.log("Customer data loaded via CSV. Total entries:", customerMap.size);
+
+        } catch(err) {
+            console.error("Error loading customer CSV:", err);
+        }
+    }
+
+    function speakText(text) {
+        const ttsSwitch = document.getElementById('ttsSwitch');
+        const ttsEnabled = ttsSwitch ? ttsSwitch.checked : (localStorage.getItem('ttsEnabled') === 'true');
+        if (ttsEnabled && 'speechSynthesis' in window) {
+            const speak = () => {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                const voices = window.speechSynthesis.getVoices();
+                
+                // Prioritize high-quality female voices
+                // 1. Google en-US Female (best quality)
+                // 2. Microsoft voices (Zira, etc.)
+                // 3. Any voice with "female" in name
+                // 4. Fallback to en-US voices
+                const voice = voices.find(v => 
+                    (v.name.includes('Google') && v.name.includes('US') && v.name.includes('Female')) ||
+                    v.name.includes('Google US English')
+                ) || voices.find(v => 
+                    v.name.includes('Zira') || v.name.includes('Microsoft Zira')
+                ) || voices.find(v => 
+                    v.name.toLowerCase().includes('female') && v.lang.startsWith('en')
+                ) || voices.find(v => 
+                    v.lang === 'en-US' && !v.name.includes('Male')
+                );
+                
+                if (voice) {
+                    utterance.voice = voice;
+                    console.log('Using voice:', voice.name); // Debug
+                }
+                
+                utterance.rate = 0.95; // Slightly slower for clarity
+                utterance.pitch = 1.15; // Higher pitch for feminine tone
+                utterance.volume = 0.85; // Slightly reduced volume
+                
+                window.speechSynthesis.speak(utterance);
+            };
+
+            if (window.speechSynthesis.getVoices().length === 0) {
+                 window.speechSynthesis.onvoiceschanged = speak;
+            } else {
+                speak();
+            }
+        }
     }
 
     function displayEmployeeInfoNetpay(monthName, csvData) {
@@ -140,10 +259,129 @@
 
             if (empno === searchEmpNo) {
                 employeeFound = true;
+                
+                // Add copy toast if not present
+                if (!document.querySelector('.copy-toast')) {
+                    const toast = document.createElement('div');
+                    toast.className = 'copy-toast';
+                    toast.textContent = 'Copied to clipboard';
+                    document.body.appendChild(toast);
+                }
+
+                window.copyToClipboard = function(text) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        const toast = document.querySelector('.copy-toast');
+                        toast.classList.add('show');
+                        setTimeout(() => toast.classList.remove('show'), 2000);
+                    });
+                };
+                
+                // ... (rest of function as is, just skipping the speakText call)
+
+                // Helper for Title Case
+                const toTitleCase = (str) => {
+                    return str.replace(/\w\S*/g, (txt) => {
+                        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+                    });
+                };
+
+                // Look up extra details map
+                const extra = customerMap.get(empno) || {};
+                
+                // Format Address
+                const rawAddress = extra.address || '';
+                const formattedAddress = rawAddress ? toTitleCase(rawAddress) : 'Not available';
+                const mapsUrl = rawAddress ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(formattedAddress)}` : '';
+                
+                // Format Phone
+                const phoneVal = extra.phone || '';
+                const formattedPhone = phoneVal ? (phoneVal.startsWith('0') ? phoneVal : '0' + phoneVal) : 'Not available';
+                const dialPhone = phoneVal ? (phoneVal.startsWith('0') ? phoneVal : '0' + phoneVal) : '';
+
+                // Apply card class to the container itself
+                employeeInfoSectionNetpay.className = 'profile-card';
+
                 employeeInfoSectionNetpay.innerHTML = `
-                    <strong>NAME:</strong><b style="color:orange"> ${fname} ${mi} ${lname}</b><br/>
-                    <strong>EMPNO:</strong><b style="color:orange"> ${empno} </b><br/>
-                    <strong>DIV / STA:</strong><b style="color:orange"> ${row[1]} / ${row[2]}</b><br/>
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        <div class="profile-title">
+                            <h3>${fname} ${mi} ${lname}</h3>
+                            <span>Employee</span>
+                        </div>
+                    </div>
+    
+                    <div class="profile-list">
+                        <!-- Employee Number -->
+                        <div class="profile-item">
+                            <div class="profile-icon"><i class="bi bi-person-badge-fill"></i></div>
+                            <div class="profile-details">
+                                <span class="label">EMPLOYEE NUMBER</span>
+                                <span class="value">${empno}</span>
+                            </div>
+                            <div class="profile-action" onclick="copyToClipboard('${empno}')" title="Copy">
+                                <i class="bi bi-copy" style="-webkit-text-stroke: 1px;"></i>
+                            </div>
+                        </div>
+
+                        <!-- Division / Station -->
+                        <div class="profile-item">
+                            <div class="profile-icon"><i class="bi bi-building-fill"></i></div>
+                            <div class="profile-details">
+                                <span class="label">DIVISION / STATION</span>
+                                <span class="value">${row[1]} / ${row[2]}</span>
+                            </div>
+                        </div>
+
+                        <!-- School Address -->
+                        <div class="profile-item ${extra.address ? '' : 'inactive'}">
+                            <div class="profile-icon"><i class="bi bi-mortarboard-fill"></i></div>
+                            <div class="profile-details">
+                                <span class="label">SCHOOL ADDRESS</span>
+                                <span class="value" style="font-size: 13px;">${formattedAddress}</span>
+                            </div>
+                            <div class="profile-action" ${mapsUrl ? `onclick="window.open('${mapsUrl}', '_blank')"` : ''} style="${mapsUrl ? 'cursor:pointer;' : ''}">
+                                <i class="bi bi-geo-alt-fill"></i>
+                            </div>
+                        </div>
+
+                        <!-- Branch -->
+                         <div class="profile-item ${extra.branch ? '' : 'inactive'}">
+                            <div class="profile-icon"><i class="bi bi-buildings-fill"></i></div>
+                            <div class="profile-details">
+                                <span class="label">BRANCH</span>
+                                <span class="value">${extra.branch || 'Not available'}</span>
+                            </div>
+                        </div>
+
+                        <!-- Account Number -->
+                        <div class="profile-item ${extra.account ? '' : 'inactive'}">
+                             <div class="profile-icon"><i class="bi bi-wallet-fill"></i></div>
+                            <div class="profile-details">
+                                <span class="label">ACCOUNT NUMBER</span>
+                                <span class="value">${extra.account || 'Not available'}</span>
+                            </div>
+                            ${extra.account ? `
+                            <div class="profile-action" onclick="copyToClipboard('${extra.account}')" title="Copy">
+                                <i class="bi bi-copy" style="-webkit-text-stroke: 1px;"></i>
+                            </div>
+                            ` : ''}
+                        </div>
+
+                         <!-- Phone Number -->
+                        <div class="profile-item ${extra.phone ? '' : 'inactive'}">
+                             <div class="profile-icon"><i class="bi bi-telephone-fill"></i></div>
+                            <div class="profile-details">
+                                <span class="label">PHONE NUMBER</span>
+                                <span class="value">${formattedPhone}</span>
+                            </div>
+                            <div class="profile-action" ${dialPhone ? `onclick="window.location.href='tel:${dialPhone}'" style="cursor:pointer"` : ''}>
+                                <i class="bi bi-telephone-fill"></i>
+                            </div>
+                        </div>
+
+                    </div>
                 `;
                 break;
             }
@@ -171,8 +409,8 @@
         table.innerHTML = `
             <thead>
                 <tr>
-                    <th>MONTH</th>
-                    <th>TAKE HOME</th>
+                    <th><i class="bi bi-calendar3"></i> MONTH</th>
+                    <th><i class="bi bi-cash"></i> TAKE HOME</th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -180,13 +418,26 @@
 
         const tbody = table.querySelector('tbody');
 
+        let speechLines = [];
+        let empNameForSpeech = '';
+
         fetchedDataNet.forEach(data => {
             data.csvData.forEach(row => {
                 if (row.length < 4) return;
 
                 const empno = row[3];
                 if (empno === searchEmpNo) {
-                    const takehome = parseFloat(row[7]).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
+                    const cleanAmount = (row[7] || '0').replace(/[",]/g, '');
+                    const takehomeVal = parseFloat(cleanAmount);
+                    const takehome = takehomeVal.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
+                    
+                    // Capture speech data (First 6 rows)
+                    if (speechLines.length < 6) {
+                        speechLines.push(`${data.monthName}. Take home, ${takehomeVal.toFixed(2)} pesos`);
+                    }
+                    if (!empNameForSpeech) {
+                        empNameForSpeech = `${row[4]} ${row[6]}`; // Fname Lname
+                    }
 
                     const rowElement = document.createElement('tr');
                     
@@ -210,6 +461,12 @@
         tableWrapper.appendChild(table);
         tableContainer.appendChild(tableWrapper);
         resultsSectionNetpay.appendChild(tableContainer);
+
+        // Trigger Speech if data found
+        if (empNameForSpeech && speechLines.length > 0) {
+            const finalSpeech = `${empNameForSpeech}. ${speechLines.join('. ')}.`;
+            setTimeout(() => speakText(finalSpeech), 500);
+        }
     }
 
     document.addEventListener("DOMContentLoaded", function() {

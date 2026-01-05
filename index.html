@@ -1,28 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Historical Netpay</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    
+
     <!-- Manifest & Icons -->
     <link rel="manifest" href="/csbnetpay/manifest.json">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="icon" href="favicon.png" type="image/png" sizes="any">
 
     <link rel="stylesheet" href="index.css">
-    
+
     <style>
         /* Prevent text selection from triggering mobile search */
-        table td, table th {
+        table td,
+        table th {
             -webkit-user-select: text;
             -moz-user-select: text;
             -ms-user-select: text;
@@ -49,71 +52,69 @@
 
 
         /* Employee info styling - Purple Theme */
-.employee-info {
-    color: #333;
-    font-size: 1.2rem;
-    padding: 1rem;
-    border-radius: 8px;
-    border-left: 4px solid #4F2683;
-    margin-bottom: 1rem;
-}
+        .employee-info {
+            color: #333;
+            font-size: 1.2rem;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #4F2683;
+            margin-bottom: 1rem;
+        }
 
-.employee-info strong {
-    color: #4F2683;
-}
+        .employee-info strong {
+            color: #4F2683;
+        }
 
-.employee-info b {
-    color: #f39c10 !important;
-}
+        .employee-info b {
+            color: #f39c10 !important;
+        }
 
 
         /* Card Green Accents */
         .card {
             border-top: 3px solid #4F2683 !important;
         }
-
-
-
     </style>
 </head>
 
 <body>
-        <!-- Navigation -->
-        <nav class="navbar">
-            <div class="nav-container">
-                <div class="nav-links">
-                    <a class="nav-link active" href="index.html">NETPAY</a>
-                    <a class="nav-link" href="index2.html">DEDAMT</a>
-                    <a class="nav-link" href="index3.html">ONQ</a>
-                    <a class="nav-link" href="index4.html">PLI</a>
-                    <a class="nav-link" href="index5.html">LE</a>
-                </div>
-                <button class="logout-btn" onclick="logout()">↪</button>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-links">
+                <a class="nav-link active" href="index.html">NETPAY</a>
+                <a class="nav-link" href="index2.html">DEDAMT</a>
+                <a class="nav-link" href="index3.html">ONQ</a>
+                <a class="nav-link" href="index4.html">PLI</a>
+                <a class="nav-link" href="index5.html">LE</a>
             </div>
-        </nav>
-
-        
-        
-
-        
-
-
-
-        <div class="page-header" style="position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: center;">
-            <div class="page-subtitle">Payroll Management System</div>
-            <div style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
-                <h1 style="margin: 0;">HISTORICAL NETPAY</h1>
-        
-                <label class="switch">
-                    <input type="checkbox" id="ttsSwitch" checked>
-                    <span class="slider round">
-                      <i class="bi bi-volume-up-fill icon"></i>
-                    </span>
-                </label>
-            </div>
+            <button class="logout-btn" onclick="logout()">↪</button>
         </div>
-        
-        
+    </nav>
+
+
+
+
+
+
+
+
+    <div class="page-header"
+        style="position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: center;">
+        <div class="page-subtitle">Payroll Management System</div>
+        <div style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
+            <h1 style="margin: 0;">HISTORICAL NETPAY</h1>
+
+            <label class="switch">
+                <input type="checkbox" id="ttsSwitch" checked>
+                <span class="slider round">
+                    <i class="bi bi-volume-up-fill icon"></i>
+                </span>
+            </label>
+        </div>
+    </div>
+
+
 
 
 
@@ -128,36 +129,31 @@
 
 
                 <div class="input-wrapper">
-                    
-                  
-           <div class="input-with-icon">
-    <input
-        type="text"
-        id="searchInputNetpay"
-        class="form-input"
-        placeholder="Employee Number..."
-        autocomplete="on"
-    />
+
+
+                    <div class="input-with-icon">
+                        <input type="text" id="searchInputNetpay" class="form-input" placeholder="Employee Number..."
+                            autocomplete="on" />
 
 
 
-    <button type="button" id="micBtn" class="mic-inside-input">
-        <i class="bi bi-mic-fill"></i>
-    </button>
-</div>
+                        <button type="button" id="micBtn" class="mic-inside-input">
+                            <i class="bi bi-mic-fill"></i>
+                        </button>
+                    </div>
 
 
 
 
-                    
+
                     <i class="bi bi-search input-icon"></i>
-                    
 
 
-                    
+
+
                 </div>
 
-<div id="feedback" class="feedback-text"></div>
+                <div id="feedback" class="feedback-text"></div>
 
             </div>
             <button id="searchButtonNetpay" class="btn btn-primary">
@@ -192,12 +188,12 @@
         </div>
     </div>
 
-    
 
 
 
 
-    
+
+
 
     <!-- Admin Section (Upload) -->
     <div class="admin-section container-admin" style="display: none;">
@@ -207,7 +203,8 @@
                 <div>
                     <div class="admin-card__eyebrow">Admin · Abstract uploader</div>
                     <h5>Upload Latest Abstract</h5>
-                    <p>Select the month and year, then upload an .xlsx file with NETPAY, POS, ONQUEUE, and PLI sheets.</p>
+                    <p>Select the month and year, then upload an .xlsx file with NETPAY, POS, ONQUEUE, and PLI sheets.
+                    </p>
                 </div>
                 <div class="summary-chip">Uploading</div>
             </div>
@@ -233,7 +230,8 @@
                     <div class="form-group" style="margin-bottom: 0.5rem;">
                         <div class="file-upload-wrapper drop-zone">
                             <label for="abstractFileInput" class="file-upload-label">Choose .xlsx File</label>
-                            <input type="file" id="abstractFileInput" class="file-input" accept=".xlsx" onchange="updateAbstractFileName()">
+                            <input type="file" id="abstractFileInput" class="file-input" accept=".xlsx"
+                                onchange="updateAbstractFileName()">
                             <small id="abstractFileName" class="file-name">No file chosen</small>
                             <div class="file-hint">Drag & drop or click to select your abstract file.</div>
                         </div>
@@ -291,33 +289,35 @@
                         </div>
                     </div>
                     <div class="summary-footer">
-                        <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#16a34a;"></span>
+                        <span
+                            style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#16a34a;"></span>
                         <span>Keep this green by picking month, year, and file.</span>
                     </div>
                 </div>
             </div>
         </div>
-        </div>
+    </div>
     </div>
 
     <!-- Another Admin Section -->
     <div class="admin-section container-admin" style="display: none;">
         <div class="admin-chip">
-        <div class="admin-card">
-            <h5>Already have the Netpay for <span style="color: #00c12d;" id="month-name"></span>?</h5>
-            <p>Please double check the month and year and make sure it's a CSV File. Example: <u id="example-file">feb25.csv</u></p>
+            <div class="admin-card">
+                <h5>Already have the Netpay for <span style="color: #00c12d;" id="month-name"></span>?</h5>
+                <p>Please double check the month and year and make sure it's a CSV File. Example: <u
+                        id="example-file">feb25.csv</u></p>
 
-            <div class="form-group" style="margin-bottom: 1rem;">
-                <div class="upload-chip">
-                    <div class="file-upload-wrapper">
-                        <label for="fileInput" class="file-upload-label">Choose File</label>
-                        <input type="file" id="fileInput" class="file-input" onchange="updateFileName()">
-                        <small id="fileName" class="file-name">No file chosen</small>
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <div class="upload-chip">
+                        <div class="file-upload-wrapper">
+                            <label for="fileInput" class="file-upload-label">Choose File</label>
+                            <input type="file" id="fileInput" class="file-input" onchange="updateFileName()">
+                            <small id="fileName" class="file-name">No file chosen</small>
+                        </div>
+                        <button onclick="uploadFile()" class="btn btn-success">Upload</button>
                     </div>
-                    <button onclick="uploadFile()" class="btn btn-success">Upload</button>
                 </div>
             </div>
-        </div>
         </div>
     </div>
 
@@ -325,8 +325,8 @@
 
 
 
-<!-- Floating Speaking Indicator -->
-<div id="ttsFloating" style="
+    <!-- Floating Speaking Indicator -->
+    <div id="ttsFloating" style="
     position: fixed;
     bottom: 20px;
     right: 20px;
@@ -340,10 +340,10 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     cursor: pointer;
 ">
-</div>
+    </div>
 
-<!-- Stop TTS Button -->
-<button id="stopTTS" style="
+    <!-- Stop TTS Button -->
+    <button id="stopTTS" style="
     position: fixed;
     bottom: 20px;
     right: 20px;
@@ -365,75 +365,75 @@
 
 
 
-<script>
-    let isSearching = false; // Flag to prevent double-clicking
+    <script>
+        let isSearching = false; // Flag to prevent double-clicking
 
-    document.addEventListener("DOMContentLoaded", function () {
-        const searchBtn = document.getElementById("searchButtonNetpay");
-        const searchInput = document.getElementById("searchInputNetpay");
-        
-        searchBtn.addEventListener("click", function () {
-            // Prevent double-clicking
-            if (isSearching) {
-                console.log("Search already in progress...");
-                return;
-            }
+        document.addEventListener("DOMContentLoaded", function () {
+            const searchBtn = document.getElementById("searchButtonNetpay");
+            const searchInput = document.getElementById("searchInputNetpay");
 
-            var employeeNumber = searchInput.value.trim();
-    
+            searchBtn.addEventListener("click", function () {
+                // Prevent double-clicking
+                if (isSearching) {
+                    console.log("Search already in progress...");
+                    return;
+                }
+
+                var employeeNumber = searchInput.value.trim();
+
+                if (employeeNumber) {
+                    isSearching = true;
+
+                    // Disable button and show loading state
+                    searchBtn.disabled = true;
+                    searchBtn.style.opacity = "0.5";
+                    searchBtn.style.cursor = "not-allowed";
+
+                    localStorage.setItem("employeeNumber", employeeNumber);
+                    console.log("✅ Employee Number Stored:", employeeNumber);
+
+                    // Re-enable after search completes
+                    // The index.script will handle the actual search
+                    setTimeout(() => {
+                        isSearching = false;
+                        searchBtn.disabled = false;
+                        searchBtn.style.opacity = "1";
+                        searchBtn.style.cursor = "pointer";
+
+                        // Show results section after search completes
+                        const resultsSection = document.querySelector(".results-section");
+                        if (resultsSection) {
+                            resultsSection.style.display = "block";
+                        }
+                    }, 2000);
+                } else {
+                    console.log("❌ No Employee Number Entered.");
+                }
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var employeeNumber = localStorage.getItem("employeeNumber");
+
             if (employeeNumber) {
-                isSearching = true;
-                
-                // Disable button and show loading state
-                searchBtn.disabled = true;
-                searchBtn.style.opacity = "0.5";
-                searchBtn.style.cursor = "not-allowed";
-                
-                localStorage.setItem("employeeNumber", employeeNumber);
-                console.log("✅ Employee Number Stored:", employeeNumber);
-                
-                // Re-enable after search completes
-                // The index.script will handle the actual search
-                setTimeout(() => {
-                    isSearching = false;
-                    searchBtn.disabled = false;
-                    searchBtn.style.opacity = "1";
-                    searchBtn.style.cursor = "pointer";
-                    
-                    // Show results section after search completes
-                    const resultsSection = document.querySelector(".results-section");
-                    if (resultsSection) {
-                        resultsSection.style.display = "block";
-                    }
-                }, 2000);
+                console.log("Retrieved Employee Number:", employeeNumber);
+                const searchInput = document.getElementById("searchInputNetpay");
+                const searchBtn = document.getElementById("searchButtonNetpay");
+
+                if (searchInput && searchBtn) {
+                    searchInput.value = employeeNumber;
+
+                    // Small delay to ensure DOM is fully ready
+                    setTimeout(() => {
+                        searchBtn.click();
+                    }, 100);
+                }
             } else {
-                console.log("❌ No Employee Number Entered.");
+                console.log("No employee number found in localStorage.");
             }
         });
-    });
+    </script>
 
-    document.addEventListener("DOMContentLoaded", function() {
-        var employeeNumber = localStorage.getItem("employeeNumber");
-
-        if (employeeNumber) {
-            console.log("Retrieved Employee Number:", employeeNumber);
-            const searchInput = document.getElementById("searchInputNetpay");
-            const searchBtn = document.getElementById("searchButtonNetpay");
-            
-            if (searchInput && searchBtn) {
-                searchInput.value = employeeNumber;
-                
-                // Small delay to ensure DOM is fully ready
-                setTimeout(() => {
-                    searchBtn.click();
-                }, 100);
-            }
-        } else {
-            console.log("No employee number found in localStorage.");
-        }
-    });
-</script>
-    
 
 
     <!-- Scripts -->
@@ -441,70 +441,70 @@
 
     <script>
         // Ripple Effect for Buttons
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (e.target.classList.contains('btn') || e.target.closest('.btn')) {
                 const button = e.target.classList.contains('btn') ? e.target : e.target.closest('.btn');
                 const ripple = document.createElement('span');
                 ripple.classList.add('ripple');
-                
+
                 const rect = button.getBoundingClientRect();
                 const size = Math.max(rect.width, rect.height);
                 const x = e.clientX - rect.left - size / 2;
                 const y = e.clientY - rect.top - size / 2;
-                
+
                 ripple.style.width = ripple.style.height = size + 'px';
                 ripple.style.left = x + 'px';
                 ripple.style.top = y + 'px';
-                
+
                 button.appendChild(ripple);
-                
+
                 setTimeout(() => ripple.remove(), 600);
             }
         });
 
         // Search Button Handler
-document.addEventListener("DOMContentLoaded", function () {
-    const searchBtn = document.getElementById("searchButtonNetpay");
-    const searchInput = document.getElementById("searchInputNetpay");
-    const resultsSection = document.querySelector(".results-section");
+        document.addEventListener("DOMContentLoaded", function () {
+            const searchBtn = document.getElementById("searchButtonNetpay");
+            const searchInput = document.getElementById("searchInputNetpay");
+            const resultsSection = document.querySelector(".results-section");
 
-    // Ensure hidden on first load
-    resultsSection.style.display = "none";
+            // Ensure hidden on first load
+            resultsSection.style.display = "none";
 
- searchBtn.addEventListener("click", function () {
-    const employeeNumber = searchInput.value.trim();
+            searchBtn.addEventListener("click", function () {
+                const employeeNumber = searchInput.value.trim();
 
-    if (employeeNumber) {
-        localStorage.setItem("employeeNumber", employeeNumber);
-        console.log("✅ Employee Number Stored:", employeeNumber);
+                if (employeeNumber) {
+                    localStorage.setItem("employeeNumber", employeeNumber);
+                    console.log("✅ Employee Number Stored:", employeeNumber);
 
-        // Show results
-        resultsSection.style.display = "block";
+                    // Show results
+                    resultsSection.style.display = "block";
 
-        // Wait a bit for table to populate (if populated asynchronously)
-        setTimeout(() => {
-            readEmployeeResults();
-        }, 3000); 
-    } else {
-        console.log("❌ No Employee Number Entered.");
-        resultsSection.style.display = "none";
-    }
-});
+                    // Wait a bit for table to populate (if populated asynchronously)
+                    setTimeout(() => {
+                        readEmployeeResults();
+                    }, 3000);
+                } else {
+                    console.log("❌ No Employee Number Entered.");
+                    resultsSection.style.display = "none";
+                }
+            });
 
-function stopReading() {
-    if (window.speechSynthesis.speaking) {
-        window.speechSynthesis.cancel();
-    }
-}
+            function stopReading() {
+                if (window.speechSynthesis.speaking) {
+                    window.speechSynthesis.cancel();
+                }
+            }
 
 
-    // Enter key support
-    searchInput.addEventListener("keypress", function (e) {
-        if (e.key === "Enter") {
-            searchBtn.click();
-        }
-    });
-});
+            // Enter key support
+            searchInput.addEventListener("keypress", function (e) {
+                if (e.key === "Enter") {
+                    searchBtn.click();
+                }
+            });
+        });
 
         // Voice Recognition
         const micBtn = document.getElementById("micBtn");
@@ -516,15 +516,15 @@ function stopReading() {
         listeningSound.preload = 'auto';
         searchingSound.preload = 'auto';
 
-      function showFeedback(message) {
-    feedback.textContent = message;
-    feedback.style.display = "block";
-}
+        function showFeedback(message) {
+            feedback.textContent = message;
+            feedback.style.display = "block";
+        }
 
-function clearFeedback() {
-    feedback.textContent = "";
-    feedback.style.display = "none";
-}
+        function clearFeedback() {
+            feedback.textContent = "";
+            feedback.style.display = "none";
+        }
 
 
         function showOverlay() {
@@ -535,13 +535,13 @@ function clearFeedback() {
             listeningOverlay.classList.remove('active');
         }
 
-  function resetMicButton() {
-    micBtn.classList.remove("listening");
-    micBtn.innerHTML = '<i class="bi bi-mic-fill"></i>';
-    micBtn.disabled = false;
-    hideOverlay();
-}
-  
+        function resetMicButton() {
+            micBtn.classList.remove("listening");
+            micBtn.innerHTML = '<i class="bi bi-mic-fill"></i>';
+            micBtn.disabled = false;
+            hideOverlay();
+        }
+
 
         micBtn.addEventListener("click", () => {
             listeningSound.play();
@@ -563,8 +563,8 @@ function clearFeedback() {
             recognition.interimResults = true;
             recognition.continuous = true;
 
-micBtn.classList.add("listening");
-micBtn.innerHTML = `
+            micBtn.classList.add("listening");
+            micBtn.innerHTML = `
     <div class="listening-dots">
         <span></span><span></span><span></span>
     </div>
@@ -611,199 +611,199 @@ micBtn.innerHTML = `
 
 
             function processCommand(speech) {
-    if (!speech) {
-        showFeedback("Didn't catch that. Please try again.");
-        return;
-    }
+                if (!speech) {
+                    showFeedback("Didn't catch that. Please try again.");
+                    return;
+                }
 
-    console.log("Processing speech:", speech);
+                console.log("Processing speech:", speech);
 
-    speech = speech.trim().toLowerCase();
+                speech = speech.trim().toLowerCase();
 
-    let employeeNumber = "";
-    let matchedRoute = null;
+                let employeeNumber = "";
+                let matchedRoute = null;
 
-    const routes = [
-        { keywords: ["netpay", "net pay", "net payment"], file: "index.html", inputId: "searchInputNetpay" },
-        { keywords: ["dedamt", "ded amount", "deduction amount", "positive", "deduction positive"], file: "index2.html", inputId: "searchInputPos" },
-        { keywords: ["onqueue", "on q", "on queue", "onq", "queue", "onquee", "onqueu"], file: "index3.html", inputId: "searchInputOnq" },
-        { keywords: ["pli", "pli deduction"], file: "index4.html", inputId: "searchInputPLI" }
-    ];
+                const routes = [
+                    { keywords: ["netpay", "net pay", "net payment"], file: "index.html", inputId: "searchInputNetpay" },
+                    { keywords: ["dedamt", "ded amount", "deduction amount", "positive", "deduction positive"], file: "index2.html", inputId: "searchInputPos" },
+                    { keywords: ["onqueue", "on q", "on queue", "onq", "queue", "onquee", "onqueu"], file: "index3.html", inputId: "searchInputOnq" },
+                    { keywords: ["pli", "pli deduction"], file: "index4.html", inputId: "searchInputPLI" }
+                ];
 
-    // First, try matching keywords
-    for (const route of routes) {
-        for (const keyword of route.keywords) {
-            if (speech.startsWith(keyword)) {
-                matchedRoute = route;
-                const afterKeyword = speech.substring(keyword.length).trim();
-                const digits = afterKeyword.match(/\d+/g);
-                if (digits) employeeNumber = digits.join('');
-                break;
+                // First, try matching keywords
+                for (const route of routes) {
+                    for (const keyword of route.keywords) {
+                        if (speech.startsWith(keyword)) {
+                            matchedRoute = route;
+                            const afterKeyword = speech.substring(keyword.length).trim();
+                            const digits = afterKeyword.match(/\d+/g);
+                            if (digits) employeeNumber = digits.join('');
+                            break;
+                        }
+                    }
+                    if (matchedRoute) break;
+                }
+
+                // If no keyword matched, check if speech contains numbers
+                if (!matchedRoute) {
+                    const digits = speech.match(/\d+/g);
+                    if (digits) {
+                        employeeNumber = digits.join('');
+                        matchedRoute = routes[0]; // default to NETPAY
+                    }
+                }
+
+                if (!matchedRoute || !employeeNumber) {
+                    showFeedback("Command not recognized. Please try again.");
+                    return;
+                }
+
+                console.log("Matched route:", matchedRoute, "Employee number:", employeeNumber);
+
+                localStorage.setItem("employeeNumber", employeeNumber);
+
+                if (window.location.pathname.endsWith(matchedRoute.file)) {
+                    const inputField = document.getElementById(matchedRoute.inputId);
+                    if (inputField) {
+                        // Clear the input first before setting new value
+                        inputField.value = "";
+                        inputField.value = employeeNumber;
+                        clearFeedback();
+
+                        // Prevent double search if already searching
+                        if (!isSearching) {
+                            document.getElementById("searchButtonNetpay").click();
+                        }
+                    }
+                } else {
+                    setTimeout(() => {
+                        window.location.href = matchedRoute.file;
+                    }, 300);
+                }
             }
+
         }
-        if (matchedRoute) break;
-    }
 
-    // If no keyword matched, check if speech contains numbers
-    if (!matchedRoute) {
-        const digits = speech.match(/\d+/g);
-        if (digits) {
-            employeeNumber = digits.join('');
-            matchedRoute = routes[0]; // default to NETPAY
+
+
+
+
+
+
+        let currentUtterance = null;
+        let autoReadDisabled = false; // gate to stop auto TTS when user interacts
+
+        function disableAutoRead() {
+            autoReadDisabled = true;
+            stopTTS();
         }
-    }
 
-    if (!matchedRoute || !employeeNumber) {
-        showFeedback("Command not recognized. Please try again.");
-        return;
-    }
+        // If the page was reloaded, don't auto-read results
+        const navEntry = performance.getEntriesByType("navigation")[0];
+        if (navEntry && navEntry.type === "reload") {
+            disableAutoRead();
+        }
 
-    console.log("Matched route:", matchedRoute, "Employee number:", employeeNumber);
+        function getFemaleVoice() {
+            const voices = speechSynthesis.getVoices();
+            // Prefer voices that have "female" or "Google UK English Female" etc.
+            return voices.find(v => /female/i.test(v.name)) || voices[0];
+        }
+        function readEmployeeResults() {
+            stopTTS(); // stop any previous reading
 
-    localStorage.setItem("employeeNumber", employeeNumber);
+            const infoEl = document.getElementById("employeeInfoNetpay");
+            const tableEl = document.querySelector("#resultsNetpay table");
+            if (!infoEl || !tableEl) return;
 
-    if (window.location.pathname.endsWith(matchedRoute.file)) {
-        const inputField = document.getElementById(matchedRoute.inputId);
-        if (inputField) {
-            // Clear the input first before setting new value
-            inputField.value = "";
-            inputField.value = employeeNumber;
-            clearFeedback();
-            
-            // Prevent double search if already searching
-            if (!isSearching) {
-                document.getElementById("searchButtonNetpay").click();
+            // === Read NAME only first ===
+            const nameMatch = infoEl.textContent.match(/NAME:\s*(.+)/i);
+            const nameText = nameMatch ? nameMatch[1].trim() : "";
+
+            if (!nameText) return;
+
+            // First utterance: NAME only
+            const nameUtterance = new SpeechSynthesisUtterance(nameText);
+            nameUtterance.voice = getFemaleVoice();
+            nameUtterance.rate = 1;
+            nameUtterance.pitch = 1;
+
+            // Second utterance: table content
+            const headers = Array.from(tableEl.querySelectorAll("thead th")).map(th => th.textContent);
+            const rows = tableEl.querySelectorAll("tbody tr");
+
+            let tableSpeech = "";
+            rows.forEach(row => {
+                const cells = Array.from(row.querySelectorAll("td"));
+                cells.forEach((cell, index) => {
+                    tableSpeech += `${headers[index]}: ${cell.textContent}. `;
+                });
+            });
+
+            const tableUtterance = new SpeechSynthesisUtterance(tableSpeech);
+            tableUtterance.voice = getFemaleVoice();
+            tableUtterance.rate = 1;
+            tableUtterance.pitch = 1;
+
+            // Show floating TTS indicators
+            const floating = document.getElementById("ttsFloating");
+            const stopBtn = document.getElementById("stopTTS");
+            floating.style.display = "block";
+            stopBtn.style.display = "block";
+
+            // When nameUtterance ends, start tableUtterance
+            nameUtterance.onend = () => {
+                speechSynthesis.speak(tableUtterance);
+            };
+
+            tableUtterance.onend = () => {
+                floating.style.display = "none";
+                stopBtn.style.display = "none";
+                currentUtterance = null;
+            };
+
+            // Speak name first
+            currentUtterance = nameUtterance;
+            speechSynthesis.speak(nameUtterance);
+        }
+
+        // Stop TTS function
+        function stopTTS() {
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
             }
-        }
-    } else {
-        setTimeout(() => {
-            window.location.href = matchedRoute.file;
-        }, 300);
-    }
-}
-
+            const floating = document.getElementById("ttsFloating");
+            const stopBtn = document.getElementById("stopTTS");
+            floating.style.display = "none";
+            stopBtn.style.display = "none";
+            currentUtterance = null;
         }
 
+        // Stop button click
+        document.getElementById("stopTTS").addEventListener("click", stopTTS);
 
-
-
-
-
-
-let currentUtterance = null;
-let autoReadDisabled = false; // gate to stop auto TTS when user interacts
-
-function disableAutoRead() {
-    autoReadDisabled = true;
-    stopTTS();
-}
-
-// If the page was reloaded, don't auto-read results
-const navEntry = performance.getEntriesByType("navigation")[0];
-if (navEntry && navEntry.type === "reload") {
-    disableAutoRead();
-}
-
-function getFemaleVoice() {
-    const voices = speechSynthesis.getVoices();
-    // Prefer voices that have "female" or "Google UK English Female" etc.
-    return voices.find(v => /female/i.test(v.name)) || voices[0];
-}
-function readEmployeeResults() {
-    stopTTS(); // stop any previous reading
-
-    const infoEl = document.getElementById("employeeInfoNetpay");
-    const tableEl = document.querySelector("#resultsNetpay table");
-    if (!infoEl || !tableEl) return;
-
-    // === Read NAME only first ===
-    const nameMatch = infoEl.textContent.match(/NAME:\s*(.+)/i);
-    const nameText = nameMatch ? nameMatch[1].trim() : "";
-
-    if (!nameText) return;
-
-    // First utterance: NAME only
-    const nameUtterance = new SpeechSynthesisUtterance(nameText);
-    nameUtterance.voice = getFemaleVoice();
-    nameUtterance.rate = 1;
-    nameUtterance.pitch = 1;
-
-    // Second utterance: table content
-    const headers = Array.from(tableEl.querySelectorAll("thead th")).map(th => th.textContent);
-    const rows = tableEl.querySelectorAll("tbody tr");
-
-    let tableSpeech = "";
-    rows.forEach(row => {
-        const cells = Array.from(row.querySelectorAll("td"));
-        cells.forEach((cell, index) => {
-            tableSpeech += `${headers[index]}: ${cell.textContent}. `;
+        // Stop reading if user clicks into any input-like control
+        document.addEventListener("focusin", (event) => {
+            if (event.target.matches("input, textarea, select")) {
+                disableAutoRead();
+            }
         });
-    });
 
-    const tableUtterance = new SpeechSynthesisUtterance(tableSpeech);
-    tableUtterance.voice = getFemaleVoice();
-    tableUtterance.rate = 1;
-    tableUtterance.pitch = 1;
+        // Stop lingering speech on reloads
+        window.addEventListener("pageshow", () => stopTTS());
 
-    // Show floating TTS indicators
-    const floating = document.getElementById("ttsFloating");
-    const stopBtn = document.getElementById("stopTTS");
-    floating.style.display = "block";
-    stopBtn.style.display = "block";
-
-    // When nameUtterance ends, start tableUtterance
-    nameUtterance.onend = () => {
-        speechSynthesis.speak(tableUtterance);
-    };
-
-    tableUtterance.onend = () => {
-        floating.style.display = "none";
-        stopBtn.style.display = "none";
-        currentUtterance = null;
-    };
-
-    // Speak name first
-    currentUtterance = nameUtterance;
-    speechSynthesis.speak(nameUtterance);
-}
-
-// Stop TTS function
-function stopTTS() {
-    if (speechSynthesis.speaking) {
-        speechSynthesis.cancel();
-    }
-    const floating = document.getElementById("ttsFloating");
-    const stopBtn = document.getElementById("stopTTS");
-    floating.style.display = "none";
-    stopBtn.style.display = "none";
-    currentUtterance = null;
-}
-
-// Stop button click
-document.getElementById("stopTTS").addEventListener("click", stopTTS);
-
-// Stop reading if user clicks into any input-like control
-document.addEventListener("focusin", (event) => {
-    if (event.target.matches("input, textarea, select")) {
-        disableAutoRead();
-    }
-});
-
-// Stop lingering speech on reloads
-window.addEventListener("pageshow", () => stopTTS());
-
-// Ensure voices are loaded
-if (speechSynthesis.onvoiceschanged !== undefined) {
-    speechSynthesis.onvoiceschanged = () => { getFemaleVoice(); };
-}
-// After results appear
-setTimeout(() => {
-    if (autoReadDisabled) return;
-    const table = document.querySelector("#resultsNetpay table");
-    if (table) {
-        readEmployeeResults();
-    }
-}, 500); 
+        // Ensure voices are loaded
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = () => { getFemaleVoice(); };
+        }
+        // After results appear
+        setTimeout(() => {
+            if (autoReadDisabled) return;
+            const table = document.querySelector("#resultsNetpay table");
+            if (table) {
+                readEmployeeResults();
+            }
+        }, 500);
 
 
 
@@ -906,23 +906,23 @@ setTimeout(() => {
         }
 
         // Initialize admin sections when DOM is ready
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             // Populate month dropdown
             populateMonthDropdown();
-            
+
             // Set previous month display
             const previousMonth = getPreviousMonth();
             const previousMonthText = previousMonth.short.toLowerCase() + '25.csv';
             const monthNameEl = document.getElementById("month-name");
             const exampleFileEl = document.getElementById("example-file");
-            
+
             if (monthNameEl) {
                 monthNameEl.textContent = previousMonth.full;
             }
             if (exampleFileEl) {
                 exampleFileEl.textContent = previousMonthText;
             }
-            
+
             // Add event listeners
             const monthSelect = document.getElementById("monthSelect");
             const yearSelect = document.getElementById("yearSelect");
@@ -931,7 +931,7 @@ setTimeout(() => {
             if (monthSelect) monthSelect.addEventListener("change", refreshUploadCart);
             if (yearSelect) yearSelect.addEventListener("change", refreshUploadCart);
             if (abstractInput) abstractInput.addEventListener("change", refreshUploadCart);
-            
+
             refreshUploadCart();
         });
 
@@ -984,28 +984,28 @@ setTimeout(() => {
                     const workbook = XLSX.read(data, { type: "array" });
 
                     const sheetsToProcess = [
-    {
-        names: ["NETPAY", "Net Pay", "netpay", "net", "NETPAY"],
-        output: `${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
-        numberColumn: "H"
-    },
-    {
-        names: ["POS", "pos", "positive", "dedamt", "CSB", "CSB DEDNS"],
-        output: `pos_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
-        numberColumn: "N"
-    },
-    {
-        names: ["ONQUEUE", "ONQ", "QUEQUE", "ON QUEUE", "ALL ON QUEUE"],
-        output: `onq_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
-        numberColumn: "N"
-    },
-    {
-        names: ["PLI", "pli", "ALL PLIs"],
-        output: `pli_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
-        clearColumns: ["A", "S", "T", "U", "V", "W", "X", "Y", "Z"],
-        numberColumn: "O"
-    }
-];
+                        {
+                            names: ["NETPAY", "Net Pay", "netpay", "net", "NETPAY"],
+                            output: `${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
+                            numberColumn: "H"
+                        },
+                        {
+                            names: ["POS", "pos", "positive", "dedamt", "CSB", "CSB DEDNS"],
+                            output: `pos_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
+                            numberColumn: "N"
+                        },
+                        {
+                            names: ["ONQUEUE", "ONQ", "QUEQUE", "ON QUEUE", "ALL ON QUEUE"],
+                            output: `onq_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
+                            numberColumn: "N"
+                        },
+                        {
+                            names: ["PLI", "pli", "ALL PLIs"],
+                            output: `pli_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
+                            clearColumns: ["A", "S", "T", "U", "V", "W", "X", "Y", "Z"],
+                            numberColumn: "O"
+                        }
+                    ];
 
 
                     const presentSheets = sheetsToProcess.filter(sheetConfig =>
@@ -1119,7 +1119,7 @@ setTimeout(() => {
         }
 
         // Auto-trigger search on load
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             var employeeNumber = localStorage.getItem("employeeNumber");
 
             if (employeeNumber) {
@@ -1141,69 +1141,92 @@ setTimeout(() => {
 
 
 
-<script>
-    // =============================
-    // TTS Switch & Toggle Handling
-    // =============================
+    <script>
+        // =============================
+        // TTS Switch & Toggle Handling
+        // =============================
 
-    const ttsSwitch = document.getElementById("ttsSwitch");
-    const icon = document.querySelector(".slider .icon");
+        const ttsSwitch = document.getElementById("ttsSwitch");
+        const icon = document.querySelector(".slider .icon");
 
-    // Load saved state from localStorage
-    let savedTTS = localStorage.getItem("ttsEnabled");
-    let ttsEnabled = savedTTS === null ? true : savedTTS === "true"; // default ON
+        // Load saved state from localStorage
+        let savedTTS = localStorage.getItem("ttsEnabled");
+        let ttsEnabled = savedTTS === null ? true : savedTTS === "true"; // default ON
 
-    // Initialize switch and icon
-    ttsSwitch.checked = ttsEnabled;
-    icon.className = ttsEnabled ? "bi bi-volume-up-fill icon" : "bi bi-volume-mute-fill icon";
+        // Initialize switch and icon
+        ttsSwitch.checked = ttsEnabled;
+        icon.className = ttsEnabled ? "bi bi-volume-up-fill icon" : "bi bi-volume-mute-fill icon";
 
-    // Listen for switch changes
-    ttsSwitch.addEventListener("change", () => {
-        ttsEnabled = ttsSwitch.checked;
-        localStorage.setItem("ttsEnabled", ttsEnabled); // save state
+        // Listen for switch changes
+        ttsSwitch.addEventListener("change", () => {
+            ttsEnabled = ttsSwitch.checked;
+            localStorage.setItem("ttsEnabled", ttsEnabled); // save state
 
-        if (ttsEnabled) {
-            icon.className = "bi bi-volume-up-fill icon";
-            console.log("TTS ON");
-        } else {
-            icon.className = "bi bi-volume-mute-fill icon";
-            console.log("TTS OFF");
-            stopTTS(); // stop ongoing speech immediately
-        }
-    });
-
-    // Optional separate toggle button (if you have one)
-    const ttsToggleBtn = document.getElementById("ttsToggleBtn");
-    if (ttsToggleBtn) {
-        ttsToggleBtn.innerHTML = ttsEnabled ? '<i class="bi bi-volume-up-fill"></i>' : '<i class="bi bi-volume-mute-fill"></i>';
-        ttsToggleBtn.addEventListener("click", () => {
-            ttsEnabled = !ttsEnabled;
-            localStorage.setItem("ttsEnabled", ttsEnabled);
-            ttsSwitch.checked = ttsEnabled;
-            icon.className = ttsEnabled ? "bi bi-volume-up-fill icon" : "bi bi-volume-mute-fill icon";
-            ttsToggleBtn.innerHTML = ttsEnabled ? '<i class="bi bi-volume-up-fill"></i>' : '<i class="bi bi-volume-mute-fill"></i>';
-            if (!ttsEnabled) stopTTS();
+            if (ttsEnabled) {
+                icon.className = "bi bi-volume-up-fill icon";
+                console.log("TTS ON");
+            } else {
+                icon.className = "bi bi-volume-mute-fill icon";
+                console.log("TTS OFF");
+                stopTTS(); // stop ongoing speech immediately
+            }
         });
-    }
 
-    // =============================
-    // Wrap TTS function to respect toggle
-    // =============================
-    const originalReadEmployeeResults = readEmployeeResults;
-    readEmployeeResults = function() {
-        if (!ttsEnabled) return; // do nothing if TTS is off
-        originalReadEmployeeResults();
-    };
+        // Optional separate toggle button (if you have one)
+        const ttsToggleBtn = document.getElementById("ttsToggleBtn");
+        if (ttsToggleBtn) {
+            ttsToggleBtn.innerHTML = ttsEnabled ? '<i class="bi bi-volume-up-fill"></i>' : '<i class="bi bi-volume-mute-fill"></i>';
+            ttsToggleBtn.addEventListener("click", () => {
+                ttsEnabled = !ttsEnabled;
+                localStorage.setItem("ttsEnabled", ttsEnabled);
+                ttsSwitch.checked = ttsEnabled;
+                icon.className = ttsEnabled ? "bi bi-volume-up-fill icon" : "bi bi-volume-mute-fill icon";
+                ttsToggleBtn.innerHTML = ttsEnabled ? '<i class="bi bi-volume-up-fill"></i>' : '<i class="bi bi-volume-mute-fill"></i>';
+                if (!ttsEnabled) stopTTS();
+            });
+        }
 
-    function gatedReadEmployeeResults() {
-        if (!ttsEnabled) return;
-        readEmployeeResults();
-    }
-</script>
+        // =============================
+        // Wrap TTS function to respect toggle
+        // =============================
+        const originalReadEmployeeResults = readEmployeeResults;
+        readEmployeeResults = function () {
+            if (!ttsEnabled) return; // do nothing if TTS is off
+            originalReadEmployeeResults();
+        };
+
+        function gatedReadEmployeeResults() {
+            if (!ttsEnabled) return;
+            readEmployeeResults();
+        }
+    </script>
 
 
 
-<script src="index.script"></script>
+    <!-- Floating TTS Stop Button -->
+    <button id="ttsStopFab" class="tts-stop-fab" title="Stop Text to Speech" onclick="stopTTS()">
+        <i class="bi bi-stop-circle-fill"></i>
+    </button>
 
+    <script>
+        // Manage TTS Stop Button Visibility
+        function stopTTS() {
+            window.speechSynthesis.cancel();
+            document.getElementById('ttsStopFab').classList.remove('show');
+        }
+
+        // Periodically check if speaking to show/hide the FAB
+        setInterval(() => {
+            const fab = document.getElementById('ttsStopFab');
+            if (window.speechSynthesis.speaking) {
+                fab.classList.add('show');
+            } else {
+                fab.classList.remove('show');
+            }
+        }, 500);
+    </script>
+
+    <script src="index.script"></script>
 </body>
+
 </html>

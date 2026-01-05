@@ -169,9 +169,109 @@ function parseCSVPLI(data) {
     return rows.map(row => row.split(','));
 }
 
-function displayEmployeeInfoPLI(monthName, csvData) {
+// Global mapping for customer info
+let customerMap = new Map();
+let customerDataLoaded = false;
+let customerDataPromise = fetchCustomerData();
+
+document.addEventListener("DOMContentLoaded", function() {
+    // Initial fetch started at top level
+    
+    // Sync TTS switch with localStorage
+    const ttsSwitch = document.getElementById('ttsSwitch');
+    if (ttsSwitch) {
+        const savedState = localStorage.getItem('ttsEnabled');
+        if (savedState !== null) {
+            ttsSwitch.checked = (savedState === 'true');
+        }
+        ttsSwitch.addEventListener('change', () => {
+            localStorage.setItem('ttsEnabled', ttsSwitch.checked);
+        });
+    }
+});
+
+async function fetchCustomerData() {
+    try {
+        const response = await fetch('customer_information.csv');
+        if (!response.ok) throw new Error("Failed to load customer info");
+        const text = await response.text();
+        
+        const rows = text.split('\n');
+        for (let i = 2; i < rows.length; i++) {
+            const row = rows[i];
+            if (!row) continue;
+            
+            const matches = row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
+            if (!matches || matches.length < 3) continue;
+
+            const clean = (val) => val ? val.replace(/^"|"$/g, '').trim() : '';
+
+            const empNum = clean(matches[2]); 
+            
+            if (empNum) {
+                 customerMap.set(empNum, {
+                    branch: clean(matches[0]),
+                    account: clean(matches[1]),
+                    address: clean(matches[3]),
+                    phone: clean(matches[4])
+                });
+            }
+        }
+        console.log("Customer data loaded. Total entries:", customerMap.size);
+    } catch(err) {
+        console.error("Error loading customer CSV:", err);
+    } finally {
+        customerDataLoaded = true;
+    }
+}
+
+function speakText(text) {
+    const ttsSwitch = document.getElementById('ttsSwitch');
+    const ttsEnabled = ttsSwitch ? ttsSwitch.checked : (localStorage.getItem('ttsEnabled') === 'true');
+    if (!ttsEnabled || !('speechSynthesis' in window)) return;
+    
+    const speak = () => {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        const voices = window.speechSynthesis.getVoices();
+        
+        const voice = voices.find(v => 
+            (v.name.includes('Google') && v.name.includes('US') && v.name.includes('Female')) ||
+            v.name.includes('Google US English')
+        ) || voices.find(v => 
+            v.name.includes('Zira') || v.name.includes('Microsoft Zira')
+        ) || voices.find(v => 
+            v.name.toLowerCase().includes('female') && v.lang.startsWith('en')
+        ) || voices.find(v => 
+            v.lang === 'en-US' && !v.name.includes('Male')
+        );
+        
+        if (voice) {
+            utterance.voice = voice;
+        }
+        
+        utterance.rate = 0.95;
+        utterance.pitch = 1.15;
+        utterance.volume = 0.85;
+        
+        window.speechSynthesis.speak(utterance);
+    };
+
+    if (window.speechSynthesis.getVoices().length === 0) {
+         window.speechSynthesis.onvoiceschanged = speak;
+    } else {
+        speak();
+    }
+}
+
+async function displayEmployeeInfoPLI(monthName, csvData) {
     const employeeInfoSectionPLI = document.getElementById('employeeInfoPLI');
     let employeeFound = false;
+
+    // Wait for customer data if not yet loaded
+    if (!customerDataLoaded) {
+        await customerDataPromise;
+    }
 
     for (let i = 1; i < csvData.length; i++) {
         const row = csvData[i];
@@ -186,10 +286,119 @@ function displayEmployeeInfoPLI(monthName, csvData) {
             const mi = row[6];
             const lname = row[7];
 
+            // Add copy toast if not present
+            if (!document.querySelector('.copy-toast')) {
+                const toast = document.createElement('div');
+                toast.className = 'copy-toast';
+                toast.textContent = 'Copied to clipboard';
+                document.body.appendChild(toast);
+            }
+
+            window.copyToClipboard = function(text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    const toast = document.querySelector('.copy-toast');
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 2000);
+                });
+            };
+
+            // Helper for Title Case
+            const toTitleCase = (str) => {
+                return str.replace(/\w\S*/g, (txt) => {
+                    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+                });
+            };
+
+            // Look up extra details
+            const extra = customerMap.get(empno) || {};
+            
+            // Format Address
+            const rawAddress = extra.address || '';
+            const formattedAddress = rawAddress ? toTitleCase(rawAddress) : 'Not available';
+            const mapsUrl = rawAddress ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(formattedAddress)}` : '';
+            
+            // Format Phone
+            const phoneVal = extra.phone || '';
+            const formattedPhone = phoneVal ? (phoneVal.startsWith('0') ? phoneVal : '0' + phoneVal) : 'Not available';
+            const dialPhone = phoneVal ? (phoneVal.startsWith('0') ? phoneVal : '0' + phoneVal) : '';
+
+            // Apply card class and theme
+            employeeInfoSectionPLI.className = 'profile-card theme-red';
+
             employeeInfoSectionPLI.innerHTML = `
-                <strong>NAME:</strong><b style="color:orange"> ${fname} ${mi} ${lname}</b><br/>
-                <strong>EMPNO:</strong><b style="color:orange">   ${empno} </b><br/>
-                <strong>DIV / STA:</strong><b style="color:orange"> ${div} / ${sta}</b><br/>
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    <div class="profile-title">
+                        <h3>${fname} ${mi} ${lname}</h3>
+                        <span>Employee</span>
+                    </div>
+                </div>
+
+                <div class="profile-list">
+                    <div class="profile-item">
+                        <div class="profile-icon"><i class="bi bi-person-badge-fill"></i></div>
+                        <div class="profile-details">
+                            <span class="label">EMPLOYEE NUMBER</span>
+                            <span class="value">${empno}</span>
+                        </div>
+                        <div class="profile-action" onclick="copyToClipboard('${empno}')" title="Copy">
+                            <i class="bi bi-copy" style="-webkit-text-stroke: 1px;"></i>
+                        </div>
+                    </div>
+
+                    <div class="profile-item">
+                        <div class="profile-icon"><i class="bi bi-building-fill"></i></div>
+                        <div class="profile-details">
+                            <span class="label">DIVISION / STATION</span>
+                            <span class="value">${div} / ${sta}</span>
+                        </div>
+                    </div>
+
+                    <div class="profile-item ${extra.address ? '' : 'inactive'}">
+                        <div class="profile-icon"><i class="bi bi-mortarboard-fill"></i></div>
+                        <div class="profile-details">
+                            <span class="label">SCHOOL ADDRESS</span>
+                            <span class="value" style="font-size: 13px;">${formattedAddress}</span>
+                        </div>
+                        <div class="profile-action" ${mapsUrl ? `onclick="window.open('${mapsUrl}', '_blank')"` : ''} style="${mapsUrl ? 'cursor:pointer;' : ''}">
+                            <i class="bi bi-geo-alt-fill"></i>
+                        </div>
+                    </div>
+
+                    <div class="profile-item ${extra.branch ? '' : 'inactive'}">
+                        <div class="profile-icon"><i class="bi bi-buildings-fill"></i></div>
+                        <div class="profile-details">
+                            <span class="label">BRANCH</span>
+                            <span class="value">${extra.branch || 'Not available'}</span>
+                        </div>
+                    </div>
+
+                    <div class="profile-item ${extra.account ? '' : 'inactive'}">
+                         <div class="profile-icon"><i class="bi bi-wallet-fill"></i></div>
+                        <div class="profile-details">
+                            <span class="label">ACCOUNT NUMBER</span>
+                            <span class="value">${extra.account || 'Not available'}</span>
+                        </div>
+                        ${extra.account ? `
+                        <div class="profile-action" onclick="copyToClipboard('${extra.account}')" title="Copy">
+                            <i class="bi bi-copy" style="-webkit-text-stroke: 1px;"></i>
+                        </div>
+                        ` : ''}
+                    </div>
+
+                     <div class="profile-item ${extra.phone ? '' : 'inactive'}">
+                         <div class="profile-icon"><i class="bi bi-telephone-fill"></i></div>
+                        <div class="profile-details">
+                            <span class="label">PHONE NUMBER</span>
+                            <span class="value">${formattedPhone}</span>
+                        </div>
+                        <div class="profile-action" ${dialPhone ? `onclick="window.location.href='tel:${dialPhone}'" style="cursor:pointer"` : ''}>
+                            <i class="bi bi-telephone-fill"></i>
+                        </div>
+                    </div>
+                </div>
             `;
             break;
         }
@@ -204,13 +413,13 @@ function displayResultsTablePLI(fetchedDataPLI) {
     const resultsSectionPLI = document.getElementById('resultsPLI');
     
     const table = document.createElement('table');
-    table.classList.add('table', 'table-borderless', 'text-white');
+    table.classList.add('responsive-table');
 
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
     headerRow.innerHTML = `
-        <th class="font-weight-bold">MONTH</th>
-        <th class="font-weight-bold">DEDAMTPLI</th>
+        <th style="padding-left: 1rem;"><i class="bi bi-calendar3"></i> MONTH</th>
+        <th style="padding-right: 0.5rem; text-align: left;"><i class="bi bi-cash"></i> DEDAMTPLI</th>
     `;
     thead.appendChild(headerRow);
     table.appendChild(thead);
@@ -248,9 +457,9 @@ function displayResultsTablePLI(fetchedDataPLI) {
     resultsMap.forEach((data, monthName) => {
         const row = document.createElement('tr');
         row.innerHTML = `
-         <td>${monthName}</td>
-                    <!-- <td>₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td> -->
-                <td id="totalAmountPLI">₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td> <!-- Start with ₱0.00 -->
+         <td style="padding-left: 1rem;">${monthName}</td>
+            <!-- <td>₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td> -->
+        <td id="totalAmountPLI" style="padding-right: 0.2rem; font-weight:700; text-align: left;">₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td> <!-- Start with ₱0.00 -->
 
         `;
         tbody.appendChild(row);
@@ -258,32 +467,36 @@ function displayResultsTablePLI(fetchedDataPLI) {
 const detailCell = document.createElement('td');
 detailCell.setAttribute('colspan', 2);
 detailCell.innerHTML = `
-    <table class="table table-sm text-white" style="font-size:10px">
-        <thead>
-            <tr style="font-size:9px">
-                <th>/</th>
-                <th>PLI</th>
-                <th>EFF</th>
-                <th>TERMI</th>
-                <th>DEDAMTPLI</th>
-                <th>POLICYNO</th>
-            </tr>
-        </thead>
-        <tbody>
-            ${data.details.map(d => `
-                <tr>
-                    <td><input type="checkbox" class="dedamtpli-checkbox" data-dedamtpli="${d.dedamtpli}" checked /></td>
-                   <td>${d.dedcode.toString().padStart(5, '0')}</td>
-
-                   <td>${d.effmm.toString().padStart(2, '0')}/${d.effyy}</td>
-                   <td>${d.termmm.toString().padStart(2, '0')}/${d.termyy}</td>
-                   
-                    <td><b>₱${d.dedamtpli.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</b></td>
-                    <td style="font-size:9px">${d.policyno}</td>
+    <div class="detail-table-wrapper" style="padding: 0.5rem; background: transparent; overflow-x: auto; -webkit-overflow-scrolling: touch;">
+        <table class="detail-table" style="width: 100%; min-width: 260px; background: white; border: 1px solid rgba(96, 14, 18, 0.15); border-radius: 6px; overflow: hidden; border-collapse: collapse;">
+            <thead>
+                <tr style="font-size:6px; background: #600e12; color: white; text-transform: uppercase;">
+                    <th style="font-size: 12px; text-align: center; width: 16px !important; min-width: 16px !important; max-width: 16px !important; padding: 0.3rem 0 !important;">/</th>
+                    <th style="font-size: 12px;width: 35px; padding: 0rem 0rem !important;">PLI</th>
+                    <th style="font-size: 12px;width: 50px; padding: 0rem 0rem !important;">EFF</th>
+                    <th style="font-size: 12px;width: 50px; padding: 0rem 0rem !important;">TERM</th>
+                    <th style="font-size: 12px;width: 65px; text-align: left; padding: 0rem 0rem !important;">DEDAMT</th>
+                    <th style="font-size: 12px;width: 45px; padding: 0rem 0rem !important;">POL #</th>
                 </tr>
-            `).join('')}
-        </tbody>
-    </table>
+            </thead>
+            <tbody style="font-size: 7px;">
+                ${data.details.map((d, idx) => `
+                    <tr style="background: ${idx % 2 === 0 ? 'white' : 'rgba(96, 14, 18, 0.02)'};">
+                        <td style="text-align: center; width: 16px !important; min-width: 16px !important; max-width: 16px !important; padding: 0.3rem 0 !important; line-height: 1;">
+                            <input type="checkbox" class="dedamtpli-checkbox" data-dedamtpli="${d.dedamtpli}" checked style="cursor: pointer; width: 11px; height: 11px; margin: 0 auto; padding: 0; accent-color: #600e12; display: block; vertical-align: middle;" />
+                        </td>
+                        <td style="font-size: 12px; padding: 0rem 0.2rem !important;">${d.dedcode.toString().padStart(5, '0')}</td>
+
+                        <td style="font-size: 12px; padding: 0rem 0.2rem !important;">${d.effmm.toString().padStart(2, '0')}/${d.effyy}</td>
+                        <td style="font-size: 12px; padding: 0rem 0.2rem !important;">${d.termmm.toString().padStart(2, '0')}/${d.termyy}</td>
+                    
+                        <td style="font-size: 12px; text-align: left; font-weight: 700; color: #600e12; padding: 0.3rem 0.3rem !important;">₱${d.dedamtpli.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
+                        <td style="font-size: 12px; padding: 0.3rem 0.3rem !important; overflow: hidden; text-overflow: ellipsis; ">${d.policyno}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    </div>
 `;
 
 

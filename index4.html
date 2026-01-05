@@ -1,647 +1,485 @@
 <!DOCTYPE html>
-<html >
+<html lang="en">
+
 <head>
-    <title>Historical Netpay</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="styles.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="manifest" href="manifest.json">
-    
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-<link rel="icon" href="favicon.png" type="image/png" sizes="any">
+  <meta charset="UTF-8">
+  <title>Historical Netpay - PLI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Boldonse&family=Inter:wght@900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
 
-<style>
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+  <!-- Manifest & Icons -->
+  <link rel="manifest" href="/csbnetpay/manifest.json">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="icon" href="favicon.png" type="image/png" sizes="any">
+
+  <link rel="stylesheet" href="index.css">
+
+  <style>
+    /* Red Theme Overrides */
     .navbar {
-        background: hsl(0, 100%, 9%);
-        position: sticky;
-        top: 0;
-        z-index: 1000;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        padding: 0.8rem 1rem;
-        font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #600e12;
+      /* Dark Red */
     }
-    .nav-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-    .nav-links {
-        display: flex;
-        gap: 0.5rem;
-        align-items: center;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-    }
-    .nav-links::-webkit-scrollbar { display: none; }
-    .nav-link {
-        color: #aaa;
-        text-decoration: none;
-        padding: 0.6rem 1rem;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-        white-space: nowrap;
-        font-weight: 600;
-        font-size: 14px;
-        font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    }
-    .nav-link.active,
-    .nav-link:hover {
-        color: white;
-        background: rgba(255, 255, 255, 0.1);
-    }
-    .logout-btn {
-        background: rgba(255, 255, 255, 0.1);
-        border: none;
-        color: white;
-        padding: 0.6rem 1rem;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-size: 20px;
-    }
-    .logout-btn:hover {
-        background: rgba(255, 255, 255, 0.2);
-        transform: scale(1.1);
-    }
-</style>
 
+    .employee-info {
+      border-left: 4px solid #600e12;
+    }
+
+    .employee-info strong {
+      color: #600e12;
+    }
+
+    .card {
+      border-top: 3px solid #600e12 !important;
+    }
+
+    .form-input:focus {
+      border-color: #600e12;
+      box-shadow: 0 0 0 4px rgba(96, 14, 18, 0.1);
+    }
+
+    .form-input:focus+.input-icon {
+      color: #600e12;
+    }
+
+    .btn-primary {
+      background: #600e12;
+      box-shadow: 0 4px 12px rgba(96, 14, 18, 0.3);
+    }
+
+    .btn-primary:hover {
+      background: #7a1318;
+      /* Slightly lighter dark red */
+      box-shadow: 0 6px 16px rgba(96, 14, 18, 0.4);
+    }
+
+    .page-subtitle {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      color: rgba(96, 14, 18, 0.7);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+
+    .responsive-table thead {
+      background: #600e12;
+    }
+
+    /* Prevent text selection from triggering mobile search */
+    table td,
+    table th {
+      -webkit-user-select: text;
+      -moz-user-select: text;
+      -ms-user-select: text;
+      user-select: text;
+      -webkit-touch-callout: none;
+    }
+
+    @media (max-width: 768px) {
+      .page-subtitle {
+        font-size: 0.65rem;
+        margin-bottom: 0.35rem;
+      }
+    }
+
+    /* Table overrides for Index 4 logic if needed */
+    .table-borderless th,
+    .table-borderless td {
+      border: none;
+    }
+
+    .mic-inside-input {
+      color: #600e12 !important;
+    }
+  </style>
 </head>
 
-<body style="margin-bottom:200px">
-
-<nav class="navbar">
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
     <div class="nav-container">
-        <div class="nav-links">
-            <a class="nav-link" href="index.html">NETPAY</a>
-            <a class="nav-link" href="index2.html">DEDAMT</a>
-            <a class="nav-link" href="index3.html">ONQ</a>
-            <a class="nav-link active" href="index4.html">PLI</a>
-            <a class="nav-link" href="index5.html">LE</a>
-        </div>
-        <button class="logout-btn" onclick="logout()">↪</button>
+      <div class="nav-links">
+        <a class="nav-link" href="index.html">NETPAY</a>
+        <a class="nav-link" href="index2.html">DEDAMT</a>
+        <a class="nav-link" href="index3.html">ONQ</a>
+        <a class="nav-link active" href="index4.html">PLI</a>
+        <a class="nav-link" href="index5.html">LE</a>
+      </div>
+      <button class="logout-btn" onclick="logout()">↪</button>
     </div>
-</nav>
+  </nav>
 
-    
+  <div class="page-header"
+    style="position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: center;">
+    <div class="page-subtitle">Payroll Management System</div>
+    <div style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
+      <h1 style="margin: 0;">PLI DEDUCTION RESULT</h1>
 
-<div id="searchSection" class="container mt-5">
-
-    <div translate="no">   
-    <h4 class="text-center pt-5 pb-3 mb-2" translate="no" style="font-family: 'Inter', sans-serif; font-size: 30px; font-weight: 900;">
-        PLI DEDUCTION RESULT
-    </h4>
-</div>
-
-    <div class="row pt-2 px-2">
-        <div class="col-12 d-flex px-3"> <!-- Added px-3 for left & right padding -->
-            <input type="text" id="searchInputPLI" class="form-control" placeholder="Employee Number..." style="flex-grow: 1;">
-            <button id="searchButtonPLI" class="btn btn-primary ml-2">Search</button>
-        </div>
-        <!-- Loading GIF -->
-        <div id="loadingIndicatorPLI" style="display: none; text-align: center;">
-            <img src="loading.gif" alt="Loading..." style="max-width: 100px;">
-        </div>
+      <label class="switch">
+        <input type="checkbox" id="ttsSwitch" checked>
+        <span class="slider round">
+          <i class="bi bi-volume-up-fill icon"></i>
+        </span>
+      </label>
     </div>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- Microphone button and feedback -->
-<div class="container py-4">
-  <div class="d-flex flex-column align-items-center">
-    <button id="micBtn" class="btn btn-primary mb-3" style="min-width: 150px;">
-      <i class="bi bi-mic"></i><span class="ms-2">Start Speaking</span>
-    </button>
-    <div id="feedback" class="text-danger fw-semibold" style="min-height: 1.5em;"></div>
   </div>
-</div>
 
-<!-- Listening overlay -->
-<div id="listeningOverlay" class="position-fixed top-0 start-0 w-100" style="height: 20vh; z-index: 1050; background: linear-gradient(to bottom, rgba(0, 123, 255, 0.5), transparent); opacity: 0; transition: opacity 0.5s ease; pointer-events: none;"></div>
+  <!-- Search Section -->
+  <div class="search-card">
+    <div class="card">
+      <div class="input-group">
+        <label class="input-label" for="searchInputPLI">Employee Number</label>
+        <div class="input-wrapper">
+          <div class="input-with-icon">
+            <input type="text" id="searchInputPLI" class="form-input" placeholder="Employee Number..."
+              autocomplete="on" />
+            <button type="button" id="micBtn" class="mic-inside-input">
+              <i class="bi bi-mic-fill"></i>
+            </button>
+          </div>
+          <i class="bi bi-search input-icon"></i>
+        </div>
+        <div id="feedback" class="feedback-text"></div>
+      </div>
+      <button id="searchButtonPLI" class="btn btn-primary">
+        <i class="bi bi-search"></i>
+        Search Employee
+      </button>
+    </div>
 
-<script>
-  const micBtn = document.getElementById("micBtn");
-  const feedback = document.getElementById("feedback");
-  const listeningOverlay = document.getElementById("listeningOverlay");
+    <!-- Loading Indicator -->
+    <div id="loadingIndicatorPLI" class="loading-indicator">
+      <img src="loading.gif" alt="Loading...">
+    </div>
+  </div>
 
-  // Load sound effects
-  const listeningSound = new Audio('listening.ogg');
-  const searchingSound = new Audio('searching.ogg');
-  listeningSound.preload = 'auto';
-  searchingSound.preload = 'auto';
+  <!-- Listening Overlay -->
+  <div id="listeningOverlay" class="listening-overlay"></div>
 
-  function showFeedback(message) {
-    feedback.textContent = message;
-  }
+  <!-- Results Section -->
+  <div class="results-section" id="resultsSection" style="display:block;">
+    <h3 id="employeeInfoPLI" class="employee-info" style="min-height: 20px;"></h3>
+    <div id="resultsPLI" class="table-container">
+      <!-- Table will be dynamically inserted here -->
+    </div>
+  </div>
 
-  function clearFeedback() {
-    feedback.textContent = "";
-  }
+  <!-- Admin Section (Upload) -->
+  <div class="admin-section container-admin" style="display: none;">
+    <div class="admin-card">
+      <div class="admin-card__header">
+        <div>
+          <div class="admin-card__eyebrow">Admin · Upload</div>
+          <h5>Already have the PLI Deduction for <span style="color: #00c12d;" id="month-name"></span>?</h5>
+          <p>Please double check the month and year and make sure it's a CSV File. Example: <u
+              id="example-file">pli_feb25.csv</u></p>
+        </div>
+      </div>
 
-  function showOverlay() {
-    listeningOverlay.style.opacity = "1";
-  }
+      <div class="form-group" style="margin-bottom: 1rem;">
+        <div class="file-upload-wrapper drop-zone">
+          <label for="fileInput" class="file-upload-label">Choose File</label>
+          <input type="file" id="fileInput" class="file-input" onchange="updateFileName()">
+          <small id="fileName" class="file-name">No file chosen</small>
+        </div>
+        <button onclick="uploadFiles()" class="btn btn-success" style="margin-top: 1rem;">Upload</button>
+      </div>
+    </div>
+  </div>
 
-  function hideOverlay() {
-    listeningOverlay.style.opacity = "0";
-  }
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-  function resetMicButton() {
-    micBtn.classList.remove("btn-danger");
-    micBtn.classList.add("btn-primary");
-    micBtn.innerHTML = '<i class="bi bi-mic"></i><span class="ms-2">Start Speaking</span>';
-    micBtn.disabled = false;
-    hideOverlay();
-  }
+  <script>
+    // Ripple Effect
+    document.addEventListener('click', function (e) {
+      if (e.target.classList.contains('btn') || e.target.closest('.btn')) {
+        const button = e.target.classList.contains('btn') ? e.target : e.target.closest('.btn');
+        const ripple = document.createElement('span');
+        ripple.classList.add('ripple');
+        const rect = button.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        button.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 600);
+      }
+    });
 
-  micBtn.addEventListener("click", () => {
-    listeningSound.play();  // Play immediately
-    micBtn.disabled = true;
-    startListening();
-  });
+    // Search Trigger Logic
+    document.addEventListener("DOMContentLoaded", function () {
+      const searchBtn = document.getElementById("searchButtonPLI");
+      const searchInput = document.getElementById("searchInputPLI");
 
-  function startListening() {
-    clearFeedback();
+      // Enter key support
+      searchInput.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          searchBtn.click();
+        }
+      });
 
-    if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
-      showFeedback("Sorry, your browser does not support speech recognition.");
-      resetMicButton();
-      return;
+      // LocalStorage logic
+      searchBtn.addEventListener("click", function () {
+        var employeeNumber = searchInput.value.trim();
+        if (employeeNumber) {
+          localStorage.setItem("employeeNumber", employeeNumber);
+        }
+      });
+
+      var storedEmpNum = localStorage.getItem("employeeNumber");
+      if (storedEmpNum) {
+        searchInput.value = storedEmpNum;
+        // Auto-click for immediate search on load
+        setTimeout(() => {
+          searchBtn.click();
+        }, 100);
+      }
+    });
+
+    // Voice Recognition (Integrated)
+    const micBtn = document.getElementById("micBtn");
+    const feedback = document.getElementById("feedback");
+    const listeningOverlay = document.getElementById("listeningOverlay");
+
+    const listeningSound = new Audio('listening.ogg');
+    const searchingSound = new Audio('searching.ogg');
+
+    function showFeedback(message) {
+      feedback.textContent = message;
+      feedback.style.display = "block";
     }
 
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = 'en-US';
-    recognition.interimResults = true;
-    recognition.continuous = true;
+    function clearFeedback() {
+      feedback.textContent = "";
+      feedback.style.display = "none";
+    }
 
-    micBtn.classList.add("btn-danger");
-    micBtn.classList.remove("btn-primary");
-    micBtn.innerHTML = '<i class="bi bi-mic-fill"></i><span class="ms-2">Listening...</span>';
+    function showOverlay() {
+      listeningOverlay.classList.add('active');
+    }
 
-    recognition.start();
-    showOverlay();
+    function hideOverlay() {
+      listeningOverlay.classList.remove('active');
+    }
 
-    let finalTranscript = "";
-    let processingTimeout;
+    function resetMicButton() {
+      micBtn.classList.remove("listening");
+      micBtn.innerHTML = '<i class="bi bi-mic-fill"></i>';
+      micBtn.disabled = false;
+      hideOverlay();
+    }
 
-    recognition.onresult = (event) => {
-      clearTimeout(processingTimeout);
+    micBtn.addEventListener("click", () => {
+      listeningSound.play();
+      micBtn.disabled = true;
+      startListening();
+    });
 
-      let interimTranscript = "";
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
-        if (event.results[i].isFinal) {
-          finalTranscript += event.results[i][0].transcript;
-        } else {
-          interimTranscript += event.results[i][0].transcript;
-        }
-      }
-
-      const combinedTranscript = (finalTranscript + interimTranscript).toLowerCase().trim();
-
-      processingTimeout = setTimeout(() => {
-        searchingSound.play();
-        recognition.stop();
-        processCommand(combinedTranscript);
-      }, 3000); // 3 seconds pause timeout
-    };
-
-    recognition.onerror = (event) => {
-      showFeedback("Speech recognition error. Please try again.");
-      recognition.stop();
-      resetMicButton();
-    };
-
-    recognition.onend = () => {
-      resetMicButton();
-    };
-
-    function processCommand(speech) {
-      if (!speech) {
-        showFeedback("Didn't catch that. Please try again.");
+    function startListening() {
+      clearFeedback();
+      if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
+        showFeedback("Sorry, your browser does not support speech recognition.");
+        resetMicButton();
         return;
       }
 
-      console.log("Processing speech:", speech);
-
-      const routes = [
-        {
-          keywords: ["netpay", "net pay", "net payment"],
-          file: "index.html",
-          inputId: "searchInputNetpay",
-        },
-        {
-          keywords: ["dedamt", "ded amount", "deduction amount", "positive", "deduction positive"],
-          file: "index2.html",
-          inputId: "searchInputPos",
-        },
-        {
-          keywords: ["onqueue", "on q", "on queue", "onq"],
-          file: "index3.html",
-          inputId: "searchInputOnq",
-        },
-        {
-          keywords: ["pli", "pli deduction"],
-          file: "index4.html",
-          inputId: "searchInputPLI",
-        }
-      ];
-
-      let matchedRoute = null;
-      let employeeNumber = "";
-
-      for (const route of routes) {
-        for (const keyword of route.keywords) {
-          if (speech.startsWith(keyword)) {
-            matchedRoute = route;
-            let afterKeyword = speech.substring(keyword.length).trim();
-            employeeNumber = afterKeyword.match(/\d+/g)?.join('') || "";
-            break;
-          }
-        }
-        if (matchedRoute) break;
-      }
-
-      if (matchedRoute) {
-        if (!employeeNumber) {
-          showFeedback("Please say the employee number after the keyword.");
-          return;
-        }
-
-        localStorage.setItem("employeeNumber", employeeNumber);
-
-        if (window.location.pathname.endsWith(matchedRoute.file)) {
-          const inputField = document.getElementById(matchedRoute.inputId);
-          if (inputField) {
-            inputField.value = employeeNumber;
-            clearFeedback();
-
-            // Reload the page to auto-trigger search
-            location.reload();
-          }
-        } else {
-          setTimeout(() => {
-            window.location.href = matchedRoute.file;
-          }, 500);
-        }
-      } else {
-        showFeedback("Command not recognized. Please try again.");
-      }
-    }
-  }
-
-  window.addEventListener("DOMContentLoaded", () => {
-    const employeeNumber = localStorage.getItem("employeeNumber");
-    if (employeeNumber) {
-      const possibleInputIds = ["searchInputNetpay", "searchInputPos", "searchInputOnq", "searchInputPLI"];
-      for (const id of possibleInputIds) {
-        const inputField = document.getElementById(id);
-        if (inputField) {
-          inputField.value = employeeNumber;
-          break;
-        }
-      }
-    }
-  });
-</script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- Section to display employee details -->
-<div class="container">
-    <div class="row">
-        <div class="col-md-12 pt-2 px-3">
-            <h3 id="employeeInfoPLI" class="text-white px-3"></h3>
-        </div>
-    </div>
-    <div class="row results rounded-bottom rounded-top" id="resultsPLI">
-        <!-- Table will be dynamically inserted here -->
-    </div>
-</div>
-
-
-
-
-
-<div class="container container-admin" style="padding-top:450px">
-    <div class="col-xs-12 pt-2 px-3 ">
-      <script>
-        // Function to get the previous month's name (3-letter abbreviation)
-         // Function to get the previous month's name (3-letter abbreviation)
-function getPreviousMonth() {
-const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-const currentDate = new Date();
-const currentMonth = currentDate.getMonth(); // get the current month (0-11)
-const previousMonthIndex = (currentMonth - 1 + 12) % 12; // Adjust for December to January wrap around
-return months[previousMonthIndex];
-}
-  
-window.onload = function() {
-const previousMonth = getPreviousMonth();
-const previousMonthText = "pli_" + previousMonth.toLowerCase() + '25.csv'; // Add "pos_" before the file name
-document.getElementById("month-name").textContent = previousMonth;
-document.getElementById("example-file").textContent = previousMonthText; // Update the example file
-}
-
-        
-  // Function to reload the page after upload completion (simulate with a button click)
-  function onUploadComplete() {
-    // Simulating the upload completion
-    setTimeout(function() {
-      location.reload(); // Reload the page
-    }, 1000); // Wait for 1 second to simulate a complete upload
-  }
-      </script>
-  
-      <script>
-        function updateFileName() {
-          const fileInput = document.getElementById("fileInput");
-          const fileName = document.getElementById("fileName");
-          if (fileInput.files.length > 0) {
-            fileName.textContent = `Selected file: ${fileInput.files[0].name}`;
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'en-US';
+      recognition.interimResults = true;
+      recognition.continuous = true;
+
+      micBtn.classList.add("listening");
+      micBtn.innerHTML = '<div class="listening-dots"><span></span><span></span><span></span></div>';
+
+      recognition.start();
+      showOverlay();
+
+      let finalTranscript = "";
+      let processingTimeout;
+
+      recognition.onresult = (event) => {
+        clearTimeout(processingTimeout);
+        let interimTranscript = "";
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
           } else {
-            fileName.textContent = "No file chosen";
+            interimTranscript += event.results[i][0].transcript;
           }
         }
-      </script>
-  
-      <h5 style="color: white;font-size:22px" id="month-text">Already have the PLI Deduction for <span style="color: #00c12d; font-weight: bold;" id="month-name"></span>?</h5>
-      <p style="color: rgb(181, 181, 181);font-size:15px">Please double check the month and year and make sure it's a CSV File. Example: <u id="example-file">pli_feb25.csv</u></p>
-  
-      <div class="mb-3 col-md-6">
-        <label for="fileInput" class="btn btn-secondary btn-block">Choose File</label>
-        <input type="file" id="fileInput" class="form-control-file d-none" onchange="updateFileName()">
-        <small id="fileName" class="form-text text-muted">No file chosen</small>
-      </div>
-      <div class="mb-3 col-md-6">
-        <button onclick="uploadFile()" class="btn btn-success btn-block ">Upload</button>
-      </div>
-  
-      <script>
-        async function uploadFiles() {
-          const fileInput = document.getElementById("fileInput");
-          const files = fileInput.files;
-          if (!files.length) return alert("Please select at least one file.");
-      
-          alert("Uploading files to GitHub...");
-      
-          const repo = "csbnetpay"; 
-          const owner = "JohnPaulInso"; 
-      
-          // Split Token (Bypassing GitHub Detection)
-          const part1 = "ghp_";  
-          const part2 = "vnpu7K5e3lNEsKwMczRGTgPA35ER5R2odvye";
-          const token = part1 + part2; // Combine token parts
-      
-          const uploadPromises = Array.from(files).map(async (file) => {
-            return new Promise((resolve, reject) => {
-              const reader = new FileReader();
-              reader.readAsDataURL(file);
-              reader.onload = async () => {
-                const content = reader.result.split(",")[1]; 
-                const path = file.name; 
-                const message = `Upload ${file.name} via API`;
-      
-                const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-      
-                try {
-                  const response = await fetch(url, {
-                    method: "PUT",
-                    headers: {
-  "Authorization": `token ${token}`,
-  "Accept": "application/vnd.github.v3+json",
-  "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                      message: message,
-                      content: content
-                    })
-                  });
-      
-                  const result = await response.json();
-                  if (response.ok) {
-                    console.log(`Upload successful: ${file.name}`);
-                    resolve(file.name);
-                  } else {
-                    console.error(`Upload failed: ${file.name}`, result);
-                    reject(`Failed: ${file.name}`);
-                  }
-                } catch (error) {
-                  console.error(`Error uploading ${file.name}`, error);
-                  reject(`Error: ${file.name}`);
-                }
-              };
-            });
-          });
-      
-          try {
-            const uploadedFiles = await Promise.all(uploadPromises);
-            alert(`Upload Complete! ${uploadedFiles.length} file(s) uploaded.\nPlease wait 1-3 minutes before refreshing.`);
-          } catch (error) {
-            alert("Some uploads failed. Check the console for details.");
-          }
-        }
-      </script>
-    </div>
-  </div>
-  
+        const combinedTranscript = (finalTranscript + interimTranscript).toLowerCase().trim();
 
+        processingTimeout = setTimeout(() => {
+          searchingSound.play();
+          recognition.stop();
+          processCommand(combinedTranscript);
+        }, 1000);
+      };
 
+      recognition.onerror = () => {
+        showFeedback("Error. Try again.");
+        recognition.stop();
+        resetMicButton();
+      };
 
+      recognition.onend = () => {
+        resetMicButton();
+      };
 
+      function processCommand(speech) {
+        if (!speech) return;
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        document.getElementById("searchButtonPLI").addEventListener("click", function () {
-            var employeeNumber = document.getElementById("searchInputPLI").value.trim();
-    
-            if (employeeNumber) {
-                localStorage.setItem("employeeNumber", employeeNumber); // ✅ Save employee number
-                console.log("✅ Employee Number Stored:", employeeNumber); // Debugging
-            } else {
-                console.log("❌ No Employee Number Entered.");
+        const routes = [
+          { keywords: ["netpay", "net pay"], file: "index.html", inputId: "searchInputNetpay" },
+          { keywords: ["dedamt", "ded amount"], file: "index2.html", inputId: "searchInputPos" },
+          { keywords: ["onqueue", "on q", "onq"], file: "index3.html", inputId: "searchInputOnq" },
+          { keywords: ["pli"], file: "index4.html", inputId: "searchInputPLI" }
+        ];
+
+        let matchedRoute = null;
+        let employeeNumber = "";
+
+        // Logic to extract number and route (simplified from original)
+        for (const route of routes) {
+          for (const keyword of route.keywords) {
+            if (speech.startsWith(keyword)) {
+              matchedRoute = route;
+              const afterKeyword = speech.substring(keyword.length).trim();
+              const digits = afterKeyword.match(/\d+/g);
+              if (digits) employeeNumber = digits.join('');
+              break;
             }
-        });
-    });
-    </script>
-    
-
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        var employeeNumber = localStorage.getItem("employeeNumber"); // Retrieve the employee number
-
-        if (employeeNumber) {
-            console.log("Retrieved Employee Number:", employeeNumber);  // Debug log
-            document.getElementById("searchInputPLI").value = employeeNumber; // Fill the input
-
-            // Automatically trigger the search button click
-            document.getElementById("searchButtonPLI").click();
-        } else {
-            console.log("No employee number found in localStorage.");  // Debug log
+          }
+          if (matchedRoute) break;
         }
-    });
-</script>
 
-<script src="index4.script"></script>
+        if (!matchedRoute) {
+          const digits = speech.match(/\d+/g);
+          if (digits) {
+            employeeNumber = digits.join('');
+            matchedRoute = routes[3]; // Default to PLI if we are on PLI page? Or just search current page if no route found?
+            // Let's stick to simple logic: if no route but number, assume current page search
+            document.getElementById("searchInputPLI").value = employeeNumber;
+            document.getElementById("searchButtonPLI").click();
+            return;
+          }
+        }
 
-<script>
-</script>
+        if (matchedRoute) {
+          localStorage.setItem("employeeNumber", employeeNumber);
+          if (window.location.pathname.endsWith(matchedRoute.file)) {
+            document.getElementById("searchInputPLI").value = employeeNumber;
+            document.getElementById("searchButtonPLI").click();
+          } else {
+            window.location.href = matchedRoute.file;
+          }
+        } else {
+          showFeedback("Not recognized.");
+        }
+      }
+    }
+  </script>
 
+  <script>
+    // Admin Upload Script (Adapted)
+    function getPreviousMonth() {
+      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const currentDate = new Date();
+      const currentMonth = currentDate.getMonth();
+      const previousMonthIndex = (currentMonth - 1 + 12) % 12;
+      return months[previousMonthIndex];
+    }
+
+    window.onload = function () {
+      const previousMonth = getPreviousMonth();
+      const previousMonthText = "pli_" + previousMonth.toLowerCase() + '25.csv';
+      const monthNameEl = document.getElementById("month-name");
+      const exampleFileEl = document.getElementById("example-file");
+      if (monthNameEl) monthNameEl.textContent = previousMonth;
+      if (exampleFileEl) exampleFileEl.textContent = previousMonthText;
+
+      // Also trigger checkLoggedInUser if it's not called elsewhere (it is in index4.script)
+    }
+
+    function updateFileName() {
+      const fileInput = document.getElementById("fileInput");
+      const fileName = document.getElementById("fileName");
+      if (fileInput.files.length > 0) {
+        fileName.textContent = `Selected file: ${fileInput.files[0].name}`;
+      } else {
+        fileName.textContent = "No file chosen";
+      }
+    }
+
+    async function uploadFiles() {
+      const fileInput = document.getElementById("fileInput");
+      const files = fileInput.files;
+      if (!files.length) return alert("Please select at least one file.");
+
+      alert("Uploading files to GitHub...");
+
+      const repo = "csbnetpay";
+      const owner = "JohnPaulInso";
+      const part1 = "ghp_";
+      const part2 = "vnpu7K5e3lNEsKwMczRGTgPA35ER5R2odvye";
+      const token = part1 + part2;
+
+      const uploadPromises = Array.from(files).map(async (file) => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = async () => {
+            const content = reader.result.split(",")[1];
+            const path = file.name;
+            const message = `Upload ${file.name} via API`;
+            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+
+            try {
+              const response = await fetch(url, {
+                method: "PUT",
+                headers: {
+                  "Authorization": `token ${token}`,
+                  "Accept": "application/vnd.github.v3+json",
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ message: message, content: content })
+              });
+              if (response.ok) {
+                resolve(file.name);
+              } else {
+                reject(`Failed: ${file.name}`);
+              }
+            } catch (error) {
+              reject(`Error: ${file.name}`);
+            }
+          };
+        });
+      });
+
+      try {
+        const uploadedFiles = await Promise.all(uploadPromises);
+        alert(`Upload Complete! ${uploadedFiles.length} file(s) uploaded.`);
+        setTimeout(function () { location.reload(); }, 1000);
+      } catch (error) {
+        alert("Some uploads failed.");
+      }
+    }
+  </script>
+
+  <!-- Main Logic Script -->
+  <script src="index4.script"></script>
 </body>
+
 </html>

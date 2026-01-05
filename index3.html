@@ -1,28 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Historical Netpay</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    
+
     <!-- Manifest & Icons -->
     <link rel="manifest" href="/csbnetpay/manifest.json">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="icon" href="favicon.png" type="image/png" sizes="any">
 
     <link rel="stylesheet" href="index.css">
-    
+
     <style>
         /* Override to Green Theme */
-    
+
 
         /* Navbar Green Theme */
         .navbar {
@@ -72,7 +74,7 @@
 
 
 
-        
+
         .form-input:hover {
             border-color: #ced4da;
         }
@@ -83,8 +85,8 @@
             box-shadow: 0 0 0 4px rgba(0, 165, 36, 0.1);
         }
 
-        .form-input:focus + .input-icon {
-          color: #00641a !important;
+        .form-input:focus+.input-icon {
+            color: #00641a !important;
         }
 
         .input-icon {
@@ -105,7 +107,7 @@
 
         .responsive-table thead th {
             color: white;
-            font-weight: 600; 
+            font-weight: 600;
             text-align: left;
             font-size: 0.85rem;
             border-bottom: 2px solid #00c12d;
@@ -158,7 +160,8 @@
         }
 
         /* Prevent text selection from triggering mobile search */
-        table td, table th {
+        table td,
+        table th {
             -webkit-user-select: text;
             -moz-user-select: text;
             -ms-user-select: text;
@@ -259,7 +262,8 @@
         }
 
         .detail-table {
-            min-width: 500px; /* Ensure table doesn't get too compressed */
+            min-width: 500px;
+            /* Ensure table doesn't get too compressed */
         }
 
         .detail-table th,
@@ -281,26 +285,25 @@
             margin: 0 auto !important;
             padding: 0 !important;
         }
-  
+
 
         /* Employee info styling - Purple Theme */
         .employee-info {
-    color: #333;
-    font-size: 1.2rem;
-    padding: 1rem;
-    border-radius: 8px;
-    border-left: 4px solid #10481b;
-    margin-bottom: 1rem;
-}
+            color: #333;
+            font-size: 1.2rem;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #10481b;
+            margin-bottom: 1rem;
+        }
 
-.employee-info strong {
-    color: #104813;
-}
+        .employee-info strong {
+            color: #104813;
+        }
 
-.employee-info b {
-    color: #f39c10 !important;
-}
-
+        .employee-info b {
+            color: #f39c10 !important;
+        }
     </style>
 </head>
 
@@ -319,10 +322,18 @@
         </div>
     </nav>
 
-    <div class="page-header" style="position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: center;">
+    <div class="page-header"
+        style="position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: center;">
         <div class="page-subtitle">Payroll Management System</div>
         <div style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
             <h1 style="margin: 0;">ON QUEUE RESULTS</h1>
+
+            <label class="switch">
+                <input type="checkbox" id="ttsSwitch" checked>
+                <span class="slider round">
+                    <i class="bi bi-volume-up-fill icon"></i>
+                </span>
+            </label>
         </div>
     </div>
 
@@ -334,13 +345,8 @@
 
                 <div class="input-wrapper">
                     <div class="input-with-icon">
-                        <input
-                            type="text"
-                            id="searchInputOnq"
-                            class="form-input"
-                            placeholder="Employee Number..."
-                            autocomplete="on"
-                        />
+                        <input type="text" id="searchInputOnq" class="form-input" placeholder="Employee Number..."
+                            autocomplete="on" />
                         <button type="button" id="micBtn" class="mic-inside-input">
                             <i class="bi bi-mic-fill"></i>
                         </button>
@@ -350,7 +356,7 @@
 
                 <div id="feedback" class="feedback-text"></div>
             </div>
-            
+
             <button id="searchButtonOnq" class="btn btn-primary">
                 <i class="bi bi-search"></i>
                 Search Employee
@@ -368,7 +374,7 @@
 
     <!-- Results Section -->
     <div class="results-section">
-        <h3 id="employeeInfoOnq" class="employee-info"></h3>
+        <div id="employeeInfoOnq"></div>
         <div id="resultsonq" class="table-container">
             <!-- Table will be dynamically inserted here -->
         </div>
@@ -391,9 +397,11 @@
                     <div class="form-group" style="margin-bottom: 0.5rem;">
                         <div class="file-upload-wrapper drop-zone">
                             <label for="fileInput" class="file-upload-label">Choose CSV File</label>
-                            <input type="file" id="fileInput" class="file-input" accept=".csv" onchange="updateFileName()">
+                            <input type="file" id="fileInput" class="file-input" accept=".csv"
+                                onchange="updateFileName()">
                             <small id="fileName" class="file-name">No file chosen</small>
-                            <div class="file-hint">Select your OnQueue CSV file. Example: <u id="example-file">onq_feb25.csv</u></div>
+                            <div class="file-hint">Select your OnQueue CSV file. Example: <u
+                                    id="example-file">onq_feb25.csv</u></div>
                         </div>
                     </div>
 
@@ -402,7 +410,8 @@
                             <span id="buttonText">UPLOAD</span>
                             <span id="buttonSpinner" class="spinner"></span>
                         </button>
-                        <div class="convert-hint">Upload the OnQueue CSV file for <span style="color: #00c12d; font-weight: bold;" id="month-name"></span>.</div>
+                        <div class="convert-hint">Upload the OnQueue CSV file for <span
+                                style="color: #00c12d; font-weight: bold;" id="month-name"></span>.</div>
                     </div>
                 </div>
 
@@ -424,7 +433,8 @@
                         </div>
                     </div>
                     <div class="summary-footer">
-                        <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#16a34a;"></span>
+                        <span
+                            style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#16a34a;"></span>
                         <span>Keep this green by selecting a file.</span>
                     </div>
                 </div>
@@ -438,7 +448,7 @@
         document.addEventListener("DOMContentLoaded", function () {
             const searchBtn = document.getElementById("searchButtonOnq");
             const searchInput = document.getElementById("searchInputOnq");
-            
+
             searchBtn.addEventListener("click", function () {
                 // Prevent double-clicking
                 if (isSearching) {
@@ -447,25 +457,25 @@
                 }
 
                 var employeeNumber = searchInput.value.trim();
-        
+
                 if (employeeNumber) {
                     isSearching = true;
-                    
+
                     // Disable button and show loading state
                     searchBtn.disabled = true;
                     searchBtn.style.opacity = "0.5";
                     searchBtn.style.cursor = "not-allowed";
-                    
+
                     localStorage.setItem("employeeNumber", employeeNumber);
                     console.log("✅ Employee Number Stored:", employeeNumber);
-                    
+
                     // Re-enable after search completes
                     setTimeout(() => {
                         isSearching = false;
                         searchBtn.disabled = false;
                         searchBtn.style.opacity = "1";
                         searchBtn.style.cursor = "pointer";
-                        
+
                         // Show results section after search completes
                         const resultsSection = document.querySelector(".results-section");
                         if (resultsSection) {
@@ -478,17 +488,17 @@
             });
         });
 
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             var employeeNumber = localStorage.getItem("employeeNumber");
 
             if (employeeNumber) {
                 console.log("Retrieved Employee Number:", employeeNumber);
                 const searchInput = document.getElementById("searchInputOnq");
                 const searchBtn = document.getElementById("searchButtonOnq");
-                
+
                 if (searchInput && searchBtn) {
                     searchInput.value = employeeNumber;
-                    
+
                     // Small delay to ensure DOM is fully ready
                     setTimeout(() => {
                         searchBtn.click();
@@ -503,23 +513,23 @@
     <!-- Scripts -->
     <script>
         // Ripple Effect for Buttons
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (e.target.classList.contains('btn') || e.target.closest('.btn')) {
                 const button = e.target.classList.contains('btn') ? e.target : e.target.closest('.btn');
                 const ripple = document.createElement('span');
                 ripple.classList.add('ripple');
-                
+
                 const rect = button.getBoundingClientRect();
                 const size = Math.max(rect.width, rect.height);
                 const x = e.clientX - rect.left - size / 2;
                 const y = e.clientY - rect.top - size / 2;
-                
+
                 ripple.style.width = ripple.style.height = size + 'px';
                 ripple.style.left = x + 'px';
                 ripple.style.top = y + 'px';
-                
+
                 button.appendChild(ripple);
-                
+
                 setTimeout(() => ripple.remove(), 600);
             }
         });
@@ -713,7 +723,7 @@
                         inputField.value = "";
                         inputField.value = employeeNumber;
                         clearFeedback();
-                        
+
                         if (!isSearching) {
                             document.getElementById("searchButtonOnq").click();
                         }
@@ -756,7 +766,7 @@
             const fileName = document.getElementById("fileName");
             const cartFile = document.getElementById("cartFile");
             const cartFileStatus = document.getElementById("cartFileStatus");
-            
+
             if (fileInput.files.length > 0) {
                 const file = fileInput.files[0];
                 fileName.textContent = `Selected file: ${file.name}`;
@@ -774,7 +784,7 @@
         async function uploadFile() {
             const fileInput = document.getElementById("fileInput");
             const file = fileInput.files[0];
-            
+
             if (!file) {
                 alert("Please select a file.");
                 return;
@@ -782,11 +792,11 @@
 
             alert("Uploading file to GitHub...");
 
-            const repo = "csbnetpay"; 
-            const owner = "JohnPaulInso"; 
-            
+            const repo = "csbnetpay";
+            const owner = "JohnPaulInso";
+
             // Split Token (Bypassing GitHub Detection)
-            const part1 = "ghp_";  
+            const part1 = "ghp_";
             const part2 = "vnpu7K5e3lNEsKwMczRGTgPA35ER5R2odvye";
             const token = part1 + part2;
 
@@ -794,8 +804,8 @@
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = async () => {
-                    const content = reader.result.split(",")[1]; 
-                    const path = file.name; 
+                    const content = reader.result.split(",")[1];
+                    const path = file.name;
                     const message = `Upload ${file.name} via API`;
 
                     const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
@@ -831,12 +841,12 @@
         }
 
         // Initialize admin sections when DOM is ready
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             const previousMonth = getPreviousMonth();
             const previousMonthText = 'onq_' + previousMonth.short.toLowerCase() + '25.csv';
             const monthNameEl = document.getElementById("month-name");
             const exampleFileEl = document.getElementById("example-file");
-            
+
             if (monthNameEl) {
                 monthNameEl.textContent = previousMonth.full;
             }
@@ -853,7 +863,7 @@
         }
 
         // Auto-trigger search on load
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             var employeeNumber = localStorage.getItem("employeeNumber");
 
             if (employeeNumber) {
@@ -869,4 +879,5 @@
     <script src="index3.script"></script>
 
 </body>
+
 </html>
