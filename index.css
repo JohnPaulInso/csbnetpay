@@ -1180,3 +1180,21 @@ input:checked+.slider .icon {
 .tts-stop-fab i {
     color: white !important;
 }
+
+/* App Footer */
+.app-footer {
+    text-align: center;
+    padding: 2rem 0 1rem;
+    color: #6c757d;
+    opacity: 0.5;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    user-select: none;
+    pointer-events: none;
+    width: 100%;
+}
+
+.app-footer .version-tag {
+    margin-left: 5px;
+    font-weight: 600;
+}
