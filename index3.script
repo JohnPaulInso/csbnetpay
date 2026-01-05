@@ -189,19 +189,20 @@ async function fetchCustomerData() {
             const row = rows[i].trim();
             if (!row) continue;
             
-            const parts = row.split(',');
-            if (parts.length < 3) continue;
+            // Robust CSV parser (handles commas in quotes)
+            const matches = row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
+            if (!matches || matches.length < 3) continue;
 
             const clean = (val) => val ? val.replace(/^"|"$/g, '').trim() : '';
 
-            const empNum = clean(parts[2]); 
+            const empNum = clean(matches[2]); 
             
             if (empNum) {
                  customerMap.set(empNum, {
-                    branch: clean(parts[0]),
-                    account: clean(parts[1]),
-                    address: clean(parts[3]),
-                    phone: clean(parts[4])
+                    branch: clean(matches[0]),
+                    account: clean(matches[1]),
+                    address: clean(matches[3]),
+                    phone: clean(matches[4])
                 });
             }
         }
