@@ -28,11 +28,66 @@ document
     .addEventListener("click", searchEmployeePos);
 
 // ---------------- SEARCH LOGIC ----------------
+let isSearchingPos = false;
+
 function searchEmployeePos() {
+    if (isSearchingPos) return;
+
     const empNo = document.getElementById("searchInputPos").value.trim();
     if (!empNo) return;
 
+    const searchBtn = document.getElementById("searchButtonPos");
+    const resultsSection = document.getElementById("resultsSection");
+    const micBtn = document.getElementById("micBtn");
     const loader = document.getElementById("loadingIndicatorPos");
+    const resultsContainer = document.getElementById("resultspos");
+    const employeeInfoSection = document.getElementById("employeeInfoPos");
+
+    // Start search state
+    isSearchingPos = true;
+    searchBtn.disabled = true;
+    if (micBtn) micBtn.disabled = true;
+    searchBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Searching...';
+    localStorage.setItem("employeeNumber", empNo);
+
+    // Reset display early to avoid duplicates
+    if (resultsContainer) resultsContainer.innerHTML = "";
+    if (employeeInfoSection) employeeInfoSection.innerHTML = "";
+
+    const updateUISearchComplete = () => {
+        searchBtn.disabled = false;
+        if (micBtn) micBtn.disabled = false;
+        searchBtn.innerHTML = '<i class="bi bi-search"></i> Search Employee';
+        isSearchingPos = false;
+        if (resultsSection) resultsSection.style.display = "block";
+        loader.style.display = "none";
+    };
+
+    // Check for cached results in sessionStorage with 5-minute TTL
+    const cacheKey = `cache_dedamt_${empNo}`;
+    const cachedItem = sessionStorage.getItem(cacheKey);
+
+    if (cachedItem) {
+        try {
+            const { data, timestamp } = JSON.parse(cachedItem);
+            const isExpired = !timestamp || (Date.now() - timestamp) > 300000; // 5 minutes (300,000 ms)
+
+            if (!isExpired) {
+                console.log("✅ Using cached results for DEDAMT (cached within 5m):", empNo);
+                displayEmployeeInfoPos(data);
+                displayResultsTablePos(data);
+                updateUISearchComplete();
+                return;
+            } else {
+                console.log("⌛ Cache expired for DEDAMT, fetching fresh data...");
+                sessionStorage.removeItem(cacheKey);
+            }
+        } catch (e) {
+            console.error("Cache parsing error:", e);
+            sessionStorage.removeItem(cacheKey);
+        }
+    }
+
     loader.style.display = "block";
 
     const monthNames = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
@@ -54,10 +109,34 @@ function searchEmployeePos() {
 
             valid.sort((a, b) => b.date - a.date);
 
-            displayEmployeeInfoPos(valid);
-            displayResultsTablePos(valid);
+            // Filter valid data to only include rows for this employee to minimize cache size
+            const filteredResults = valid.map(data => ({
+                monthName: data.monthName,
+                date: data.date,
+                csvData: data.csvData.filter((row, idx) => idx === 0 || row[3] === empNo) // idx 0 is header
+            })).filter(data => data.csvData.length > 1); // Only keep months where employee was found
+
+            if (filteredResults.length > 0) {
+                // Store in cache with 5-minute TTL
+                const cacheData = {
+                    data: filteredResults,
+                    timestamp: Date.now()
+                };
+                sessionStorage.setItem(cacheKey, JSON.stringify(cacheData));
+                
+                displayEmployeeInfoPos(filteredResults);
+                displayResultsTablePos(filteredResults);
+            } else {
+                showErrorCard(employeeInfoSection, 'Employee not found in any available records.');
+            }
         })
-        .finally(() => loader.style.display = "none");
+        .catch(err => {
+            console.error("Search failed:", err);
+            showErrorCard(employeeInfoSection, 'An error occurred during search.');
+        })
+        .finally(() => {
+            updateUISearchComplete();
+        });
 }
 
 // ---------------- FETCH CSV ----------------
@@ -112,12 +191,41 @@ document.addEventListener("DOMContentLoaded", function() {
         if (savedState !== null) {
             ttsSwitch.checked = (savedState === 'true');
         }
+        
         ttsSwitch.addEventListener('change', () => {
-            localStorage.setItem('ttsEnabled', ttsSwitch.checked);
-            if (!ttsSwitch.checked) {
+            const isEnabled = ttsSwitch.checked;
+            localStorage.setItem('ttsEnabled', isEnabled);
+            
+            const icon = ttsSwitch.nextElementSibling.querySelector('.icon');
+            if (icon) {
+                icon.className = isEnabled ? "bi bi-volume-up-fill icon" : "bi bi-volume-mute-fill icon";
+            }
+
+            if (!isEnabled) {
                 window.speechSynthesis.cancel();
             }
         });
+    }
+
+    // Enter key support
+    const searchInput = document.getElementById('searchInputPos');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                searchEmployeePos();
+            }
+        });
+    }
+
+    // Auto-search if employee number is saved
+    const savedEmpNo = localStorage.getItem("employeeNumber");
+    if (savedEmpNo) {
+        const input = document.getElementById('searchInputPos');
+        if (input) {
+            input.value = savedEmpNo;
+            searchEmployeePos();
+        }
     }
 });
 
@@ -404,32 +512,12 @@ function displayResultsTablePos(allData) {
     container.appendChild(table);
 }
 
-// ---------------- LOGOUT ----------------
+// Function to handle logout
 function logout() {
     localStorage.removeItem("loginTime");
     localStorage.removeItem("employeeNumber");
     window.location.href = "login/index.html";
 }
-
-
-
-
-
-
-
-
-
-// Function to handle logout
-function logout() {
-    // Clear the login-related data from localStorage
-    localStorage.removeItem("loginTime");
-    localStorage.removeItem("employeeNumber"); // If you store employeeNumber or any other login info
-
-    // Redirect to the login page
-    window.location.href = "login/index.html";
-}
-
-// Check if logged in (this part remains unchanged from your original code)
 document.addEventListener("DOMContentLoaded", function() {
     const loginTime = localStorage.getItem("loginTime");
 

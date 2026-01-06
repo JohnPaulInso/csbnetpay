@@ -34,47 +34,127 @@
 
     document.getElementById('searchButtonNetpay').addEventListener('click', searchEmployeeNetpay);
 
+    let isSearchingNet = false;
+
     async function searchEmployeeNetpay() {
+        if (isSearchingNet) return;
+
         const searchInputNetpay = document.getElementById('searchInputNetpay').value.trim();
         const loadingIndicatorNetpay = document.getElementById('loadingIndicatorNetpay');
         const employeeInfoSectionNetpay = document.getElementById('employeeInfoNetpay');
         const resultsSectionNetpay = document.getElementById('resultsNetpay');
+        const searchBtn = document.getElementById('searchButtonNetpay');
+        const resultsSectionElement = document.querySelector('.results-section');
 
         if (!searchInputNetpay) {
             alert('Please enter an employee number.');
             return;
         }
 
-        // Reset display
-        resultsSectionNetpay.innerHTML = '';
-        employeeInfoSectionNetpay.innerHTML = '';
+        const micBtn = document.getElementById('micBtn');
+
+        // Start search state
+        isSearchingNet = true;
+        searchBtn.disabled = true;
+        if (micBtn) micBtn.disabled = true;
+        searchBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Searching...';
+        localStorage.setItem("employeeNumber", searchInputNetpay);
+
+        // Reset display early to avoid duplicates
+        if (resultsSectionNetpay) resultsSectionNetpay.innerHTML = '';
+        if (employeeInfoSectionNetpay) employeeInfoSectionNetpay.innerHTML = '';
+
+        const updateUISearchComplete = () => {
+            searchBtn.disabled = false;
+            if (micBtn) micBtn.disabled = false;
+            searchBtn.innerHTML = '<i class="bi bi-search"></i> Search Employee';
+            isSearchingNet = false;
+            if (resultsSectionElement) resultsSectionElement.style.display = 'block';
+            loadingIndicatorNetpay.style.display = 'none';
+        };
+
+        // Check for cached results in sessionStorage with 5-minute TTL
+        const cacheKey = `cache_netpay_${searchInputNetpay}`;
+        const cachedItem = sessionStorage.getItem(cacheKey);
+        
+        if (cachedItem) {
+            try {
+                const { data, timestamp } = JSON.parse(cachedItem);
+                const isExpired = !timestamp || (Date.now() - timestamp) > 300000; // 5 minutes (300,000 ms)
+
+                if (!isExpired) {
+                    console.log("✅ Using cached results for NETPAY (cached within 5m):", searchInputNetpay);
+                    displayEmployeeInfoNetpay(data.latestMonthName, data.latestMonthData);
+                    displayResultsTableNetpay(data.allFilteredResults);
+                    updateUISearchComplete();
+                    return;
+                } else {
+                    console.log("⌛ Cache expired for NETPAY, fetching fresh data...");
+                    sessionStorage.removeItem(cacheKey);
+                }
+            } catch (e) {
+                console.error("Cache parsing error:", e);
+                sessionStorage.removeItem(cacheKey);
+            }
+        }
+
         loadingIndicatorNetpay.style.display = 'block';
 
         // Filter available files
         const availableFiles = await filterExistingFiles(csvFilesNetpay);
         if (availableFiles.length === 0) {
             alert('No available files found.');
-            loadingIndicatorNetpay.style.display = 'none';
+            updateUISearchComplete();
             return;
         }
 
         // Fetch all available CSV data
-        let fetchedDataNet = await Promise.all(availableFiles.map(fetchCSVNetpay));
+        try {
+            let fetchedDataNet = await Promise.all(availableFiles.map(fetchCSVNetpay));
 
-        // Remove failed fetches
-        fetchedDataNet = fetchedDataNet.filter(data => data !== null);
-        
-        // Sort from latest to oldest
-        fetchedDataNet.sort((a, b) => b.date - a.date);
+            // Remove failed fetches
+            fetchedDataNet = fetchedDataNet.filter(data => data !== null);
+            
+            // Sort from latest to oldest
+            fetchedDataNet.sort((a, b) => b.date - a.date);
 
-        if (fetchedDataNet.length > 0) {
-            displayEmployeeInfoNetpay(fetchedDataNet[0].monthName, fetchedDataNet[0].csvData);
-            displayResultsTableNetpay(fetchedDataNet);
-        } else {
-            employeeInfoSectionNetpay.innerHTML = 'No data available for the most recent month.';
+            if (fetchedDataNet.length > 0) {
+                // Filter fetched data to only include rows for this employee to minimize cache size
+                const filteredResults = fetchedDataNet.map(data => ({
+                    monthName: data.monthName,
+                    csvData: data.csvData.filter((row, idx) => idx === 0 || row[3] === searchInputNetpay), // idx 0 is header
+                    date: data.date
+                })).filter(data => data.csvData.length > 1); // Only keep months where employee was found
+
+                if (filteredResults.length > 0) {
+                    const cachePayload = {
+                        latestMonthName: filteredResults[0].monthName,
+                        latestMonthData: filteredResults[0].csvData,
+                        allFilteredResults: filteredResults
+                    };
+                    // Store in cache with 5-minute TTL
+                    const cacheData = {
+                        data: cachePayload,
+                        timestamp: Date.now()
+                    };
+                    sessionStorage.setItem(cacheKey, JSON.stringify(cacheData));
+                    
+                    displayEmployeeInfoNetpay(filteredResults[0].monthName, filteredResults[0].csvData);
+                    displayResultsTableNetpay(filteredResults);
+                } else {
+                    showErrorCard(employeeInfoSectionNetpay, 'Employee not found in any available records.');
+                    if (resultsSectionNetpay) resultsSectionNetpay.innerHTML = '';
+                }
+            } else {
+                showErrorCard(employeeInfoSectionNetpay, 'No data available.');
+                if (resultsSectionNetpay) resultsSectionNetpay.innerHTML = '';
+            }
+        } catch (error) {
+            console.error("Search failed:", error);
+            showErrorCard(employeeInfoSectionNetpay, 'An error occurred during search.');
+        } finally {
+            updateUISearchComplete();
         }
-
-        loadingIndicatorNetpay.style.display = 'none';
     }
 
     async function filterExistingFiles(fileList) {
@@ -551,6 +631,27 @@ function checkLoggedInUser() {
     // Wait until DOM is ready before running the check
     document.addEventListener("DOMContentLoaded", () => {
         checkLoggedInUser();
+
+        // Auto-search if employee number is saved
+        const savedEmpNo = localStorage.getItem("employeeNumber");
+        if (savedEmpNo) {
+            const input = document.getElementById('searchInputNetpay');
+            if (input) {
+                input.value = savedEmpNo;
+                searchEmployeeNetpay();
+            }
+        }
+
+        // Enter key support
+        const searchInput = document.getElementById('searchInputNetpay');
+        if (searchInput) {
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    searchEmployeeNetpay();
+                }
+            });
+        }
 
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('service-worker.js');

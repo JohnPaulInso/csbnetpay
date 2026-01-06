@@ -46,19 +46,70 @@ const csvFilesPLI = [
 
 document.getElementById('searchButtonPLI').addEventListener('click', searchEmployeePLI);
 
+let isSearchingPLI = false;
+
 async function searchEmployeePLI() {
+    if (isSearchingPLI) return;
+
     const searchInputPLI = document.getElementById('searchInputPLI').value.trim();
     const loadingIndicatorPLI = document.getElementById('loadingIndicatorPLI');
+    const resultsSectionPLI = document.getElementById('resultsPLI');
+    const employeeInfoSectionPLI = document.getElementById('employeeInfoPLI');
+    const searchBtnPLI = document.getElementById('searchButtonPLI');
+    const resultsSectionElement = document.getElementById('resultsSection');
 
     if (!searchInputPLI) {
         alert('Please enter an employee number.');
         return;
     }
 
-    const resultsSectionPLI = document.getElementById('resultsPLI');
-    const employeeInfoSectionPLI = document.getElementById('employeeInfoPLI');
-    resultsSectionPLI.innerHTML = ''; // Clear previous results
-    employeeInfoSectionPLI.innerHTML = ''; // Clear previous employee info
+    const micBtn = document.getElementById('micBtn');
+
+    // Start search state
+    isSearchingPLI = true;
+    searchBtnPLI.disabled = true;
+    if (micBtn) micBtn.disabled = true;
+    searchBtnPLI.innerHTML = '<i class="bi bi-hourglass-split"></i> Searching...';
+    localStorage.setItem("employeeNumber", searchInputPLI);
+
+    // Reset display early to avoid duplicates
+    if (resultsSectionPLI) resultsSectionPLI.innerHTML = '';
+    if (employeeInfoSectionPLI) employeeInfoSectionPLI.innerHTML = '';
+
+    const updateUISearchComplete = () => {
+        searchBtnPLI.disabled = false;
+        if (micBtn) micBtn.disabled = false;
+        searchBtnPLI.innerHTML = '<i class="bi bi-search"></i> Search Employee';
+        isSearchingPLI = false;
+        if (resultsSectionElement) resultsSectionElement.style.display = 'block';
+        loadingIndicatorPLI.style.display = 'none';
+    };
+
+    // Check for cached results in sessionStorage with 5-minute TTL
+    const cacheKey = `cache_pli_${searchInputPLI}`;
+    const cachedItem = sessionStorage.getItem(cacheKey);
+
+    if (cachedItem) {
+        try {
+            const { data, timestamp } = JSON.parse(cachedItem);
+            const isExpired = !timestamp || (Date.now() - timestamp) > 300000; // 5 minutes
+
+            if (!isExpired) {
+                console.log("✅ Using cached results for PLI (cached within 5m):", searchInputPLI);
+                displayEmployeeInfoPLI(data.monthName, data.csvData);
+                displayResultsTablePLI([data]);
+                updateUISearchComplete();
+                return;
+            } else {
+                console.log("⌛ Cache expired for PLI, fetching fresh data...");
+                sessionStorage.removeItem(cacheKey);
+            }
+        } catch (e) {
+            console.error("Cache parsing error:", e);
+            sessionStorage.removeItem(cacheKey);
+        }
+    }
+
     loadingIndicatorPLI.style.display = 'block'; // Show loading indicator
 
     // **Find the most recent available file**
@@ -69,7 +120,7 @@ async function searchEmployeePLI() {
 
     if (sortedFilesPLI.length === 0) {
         alert('No available data files found.');
-        loadingIndicatorPLI.style.display = 'none';
+        updateUISearchComplete();
         return;
     }
 
@@ -86,7 +137,7 @@ async function searchEmployeePLI() {
 
     if (!latestFilePLI) {
         console.log('No existing files found.');
-        loadingIndicatorPLI.style.display = 'none';
+        updateUISearchComplete();
         return;
     }
 
@@ -98,15 +149,34 @@ async function searchEmployeePLI() {
                 alert('No valid data found in the latest file.');
                 return;
             }
-            displayEmployeeInfoPLI(data.monthName, data.csvData);
-            displayResultsTablePLI([data]); // Pass as an array
+
+            // Filter CSV data to only include rows for this employee
+            const filteredCsvData = data.csvData.filter((row, idx) => idx === 0 || row[3] === searchInputPLI);
+
+            if (filteredCsvData.length > 1) {
+                const cachePayload = {
+                    monthName: data.monthName,
+                    csvData: filteredCsvData
+                };
+                // Store in cache with 5-minute TTL
+                const cacheData = {
+                    data: cachePayload,
+                    timestamp: Date.now()
+                };
+                sessionStorage.setItem(cacheKey, JSON.stringify(cacheData));
+
+                displayEmployeeInfoPLI(data.monthName, filteredCsvData);
+                displayResultsTablePLI([cachePayload]);
+            } else {
+                showErrorCard(employeeInfoSectionPLI, 'Employee not found in latest records.');
+            }
         })
         .catch(error => {
             console.error('Error fetching CSV data:', error);
             alert('Error fetching data. Check the console for details.');
         })
         .finally(() => {
-            loadingIndicatorPLI.style.display = 'none'; // Hide loading indicator
+            updateUISearchComplete();
         });
 }
 
@@ -184,12 +254,41 @@ document.addEventListener("DOMContentLoaded", function() {
         if (savedState !== null) {
             ttsSwitch.checked = (savedState === 'true');
         }
+        
         ttsSwitch.addEventListener('change', () => {
-            localStorage.setItem('ttsEnabled', ttsSwitch.checked);
-            if (!ttsSwitch.checked) {
+            const isEnabled = ttsSwitch.checked;
+            localStorage.setItem('ttsEnabled', isEnabled);
+            
+            const icon = ttsSwitch.nextElementSibling.querySelector('.icon');
+            if (icon) {
+                icon.className = isEnabled ? "bi bi-volume-up-fill icon" : "bi bi-volume-mute-fill icon";
+            }
+
+            if (!isEnabled) {
                 window.speechSynthesis.cancel();
             }
         });
+    }
+
+    // Enter key support
+    const searchInput = document.getElementById('searchInputPLI');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                searchEmployeePLI();
+            }
+        });
+    }
+
+    // Auto-search if employee number is saved
+    const savedEmpNo = localStorage.getItem("employeeNumber");
+    if (savedEmpNo) {
+        const input = document.getElementById('searchInputPLI');
+        if (input) {
+            input.value = savedEmpNo;
+            searchEmployeePLI();
+        }
     }
 });
 

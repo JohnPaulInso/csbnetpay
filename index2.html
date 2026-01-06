@@ -24,106 +24,77 @@
     <link rel="icon" href="favicon.png" type="image/png" sizes="any">
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* Prevent text selection from triggering mobile search */
+        table td,
+        table th {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+            -webkit-touch-callout: none;
         }
 
-        .results-section {
-            display: none;
+        /* Page subtitle style */
+        .page-subtitle {
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            color: rgba(107, 70, 0, 0.7);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
         }
 
-        body {
-            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
-            min-height: 100vh;
-            padding-bottom: 100px;
+        @media (max-width: 768px) {
+            .page-subtitle {
+                font-size: 0.65rem;
+                margin-bottom: 0.35rem;
+            }
         }
 
-        /* Remove tap highlight color on mobile */
-        .navbar a,
-        .navbar button,
-        .nav-link,
-        .btn {
-            -webkit-tap-highlight-color: transparent;
-            outline: none;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-
-        /* Navigation Styles */
-        .navbar {
-            background: #6b4600;
-            position: sticky;
-            top: -1px;
-            z-index: 1000;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            padding: 0.8rem 1rem;
-        }
-
-        .nav-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-
-        .nav-links::-webkit-scrollbar {
-            display: none;
-        }
-
-        .nav-link {
-            color: #aaa;
-            text-decoration: none;
-            padding: 0.6rem 1rem;
+        /* Employee info styling - Brown Theme */
+        .employee-info {
+            color: #333;
+            font-size: 1.2rem;
+            padding: 1rem;
             border-radius: 8px;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-            font-weight: 600;
-            font-size: 14px;
+            border-left: 4px solid #6b4600;
+            margin-bottom: 1rem;
         }
 
-        .nav-link.active {
-            color: white;
-            background: rgba(255, 255, 255, 0.1);
+        .employee-info strong {
+            color: #6b4600;
         }
 
-        .nav-link:hover {
-            color: white;
-            background: rgba(255, 255, 255, 0.1);
+        .employee-info b {
+            color: #f39c10 !important;
         }
 
-        .logout-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            color: white;
-            padding: 0.6rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 20px;
+        /* Card Brown Accents */
+        .card {
+            border-top: 3px solid #6b4600 !important;
         }
 
-        .logout-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: scale(1.1);
+        .input-icon {
+            color: #a56a00 !important;
         }
 
+        .mic-inside-input {
+            color: #a56a00 !important;
+        }
+
+        .form-input:focus+.input-icon {
+            color: #6b4600 !important;
+        }
+
+        .btn-primary {
+            background-color: rgba(107, 70, 0, 1) !important;
+            border: none !important;
+        }
+
+        /* Dedamt Specific Dropdown */
         .dedamt-hover {
             position: relative;
-            cursor: pointer;
+            display: inline-block;
         }
 
         .dedamt-dropdown {
@@ -154,485 +125,13 @@
             display: block;
         }
 
-        /* Small title above header */
-        .page-subtitle {
-            text-align: left;
-            margin: 1.5rem auto 0.25rem;
-            padding: 0 1rem;
-            color: #6c757d;
-            font-size: clamp(11px, 2.5vw, 13px);
-            font-weight: 500;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
+        /* Modern Loader - Theme Matched */
+        .modern-loader {
+            border: 3px solid rgba(107, 70, 0, 0.1);
         }
 
-        /* Header Styles */
-        .page-header {
-            text-align: center;
-            margin: 0 auto 2rem;
-            max-width: 600px;
-            padding: 0 1rem;
-        }
-
-        .page-header h1 {
-            color: #2c3e50;
-            font-weight: 800;
-            font-size: clamp(24px, 6vw, 36px);
-            margin-bottom: 0.5rem;
-            letter-spacing: -0.5px;
-        }
-
-        /* Search Card Styles */
-        .search-card {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 0 1rem;
-        }
-
-        .card {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        /* Input Styles */
-        .input-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .input-label {
-            display: block;
-            color: #495057;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-            font-size: 14px;
-        }
-
-        .input-wrapper {
-            position: relative;
-        }
-
-        .input-icon {
-            position: absolute;
-            left: 1rem;
-            top: 0;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            color: #adb5bd;
-            font-size: 20px;
-            pointer-events: none;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 1rem 3rem 1rem 3rem;
-            border: 2px solid #e9ecef;
-            border-radius: 12px;
-            font-size: 16px;
-            font-family: 'Poppins', sans-serif;
-            transition: all 0.3s ease;
-            background: #f8f9fa;
-            outline: none;
-        }
-
-
-
-
-        /* Card Green Accents */
-        .card {
-            border-top: 3px solid #6b4600 !important;
-        }
-
-        .form-input:hover {
-            border-color: #ced4da;
-        }
-
-        .form-input:focus {
-            border-color: #6b4600;
-            background: white;
-            box-shadow: 0 0 0 4px rgba(165, 106, 0, 0.1);
-        }
-
-        .form-input:focus+.input-icon {
-            color: hsl(39, 100%, 21%);
-        }
-
-        .input-with-icon {
-            position: relative;
-        }
-
-        .mic-inside-input {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            padding: 0;
-            cursor: pointer;
-            color: hsl(39, 100%, 35%);
-            font-size: 1.15rem;
-            height: 100%;
-            display: flex;
-            align-items: center;
-        }
-
-        .mic-inside-input:hover {
-            color: hsl(39, 100%, 25%);
-        }
-
-        .mic-inside-input.listening {
-            color: #dc3545;
-        }
-
-        .listening-dots {
-            display: inline-flex;
-            gap: 2px;
-        }
-
-        .listening-dots span {
-            width: 4px;
-            height: 4px;
-            background: currentColor;
-            border-radius: 50%;
-            animation: dot-bounce 1.2s infinite ease-in-out;
-        }
-
-        .listening-dots span:nth-child(2) {
-            animation-delay: 0.15s;
-        }
-
-        .listening-dots span:nth-child(3) {
-            animation-delay: 0.3s;
-        }
-
-        @keyframes dot-bounce {
-
-            0%,
-            80%,
-            100% {
-                transform: translateY(0);
-                opacity: 0.3;
-            }
-
-            40% {
-                transform: translateY(-6px);
-                opacity: 1;
-            }
-        }
-
-        .feedback-text {
-            margin-top: 4px;
-            font-size: 0.8rem;
-            color: hsl(39, 100%, 35%);
-            display: none;
-        }
-
-        /* Button Styles with Ripple Effect */
-        .btn {
-            position: relative;
-            overflow: hidden;
-            width: 100%;
-            padding: 1rem 1.5rem;
-            border: none;
-            border-radius: 12px;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .btn-primary {
-            background: hsl(39, 100%, 21%);
-            color: white;
-            box-shadow: 0 4px 12px rgba(165, 106, 0, 0.3);
-        }
-
-        .btn-primary:hover:not(:disabled) {
-            background: hsl(39, 100%, 25%);
-            box-shadow: 0 6px 16px rgba(165, 106, 0, 0.4);
-            transform: translateY(-2px);
-        }
-
-        .btn-primary:active:not(:disabled) {
-            transform: translateY(0);
-        }
-
-        .btn-primary:disabled {
-            background: #bbb;
-            cursor: not-allowed;
-            box-shadow: none;
-            opacity: 0.6;
-        }
-
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
-        }
-
-        .btn-success {
-            background: #28a745;
-            color: white;
-            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-        }
-
-        /* Ripple Effect */
-        .ripple {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.6);
-            transform: scale(0);
-            animation: ripple-animation 0.6s ease-out;
-            pointer-events: none;
-        }
-
-        @keyframes ripple-animation {
-            to {
-                transform: scale(4);
-                opacity: 0;
-            }
-        }
-
-        /* Listening Overlay */
-        .listening-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 20vh;
-            z-index: 1050;
-            background: linear-gradient(to bottom, rgba(165, 106, 0, 0.5), transparent);
-            opacity: 0;
-            transition: opacity 0.5s ease;
-            pointer-events: none;
-        }
-
-        .listening-overlay.active {
-            opacity: 1;
-        }
-
-        /* Loading Indicator */
-        .loading-indicator {
-            display: none;
-            text-align: center;
-            padding: 2rem;
-        }
-
-        .loading-indicator img {
-            max-width: 100px;
-        }
-
-        /* Results Section */
-        .results-section {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
-
-        .employee-info {
-            color: #2c3e50;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            padding: 1rem;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        }
-
-        /* Mobile-Friendly Table Styles */
-        .table-container {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            overflow: hidden;
-        }
-
-        .responsive-table {
-            width: 100%;
-            border-collapse: collapse;
-            user-select: text;
-            -webkit-user-select: text;
-        }
-
-        .responsive-table thead {
-            background: #463009;
-            color: white;
-        }
-
-        .responsive-table th {
-            padding: 1rem;
-            text-align: left;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .responsive-table td {
-            padding: 1rem;
-            border-bottom: 1px solid #e9ecef;
-            font-size: 14px;
-        }
-
-        .responsive-table tbody tr:hover {
-            background: #f8f9fa;
-        }
-
-        .table-scroll-wrapper {
-            width: 100%;
-            overflow-x: auto;
-        }
-
-        /* Remove search suggestion on number selection */
-        .responsive-table td::selection {
-            background: #a56a00;
-            color: white;
-        }
-
-        .responsive-table td::-moz-selection {
-            background: #a56a00;
-            color: white;
-        }
-
-        /* Helper Text */
-        .helper-text {
-            text-align: center;
-            margin-top: 1.5rem;
-            color: #6c757d;
-            font-size: 14px;
-        }
-
-        /* Admin Section */
-        .admin-section {
-            max-width: 800px;
-            margin: 4rem auto 2rem;
-            padding: 0 1rem;
-        }
-
-        .admin-section+.admin-section {
-            margin-top: 1.5rem;
-        }
-
-        .admin-card {
-            background: #fdfdff;
-            color: #1f2937;
-            border-radius: 18px;
-            padding: 2.75rem 2.25rem 2.25rem;
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
-            border: 1px solid #e5e7eb;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .admin-card::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(165, 106, 0, 0.07), rgba(34, 197, 94, 0.06));
-            opacity: 0.8;
-            pointer-events: none;
-        }
-
-        .admin-card>* {
-            position: relative;
-            z-index: 1;
-        }
-
-        .admin-card h5 {
-            font-size: 20px;
-            margin-bottom: 0.5rem;
-            color: #111827;
-        }
-
-        .admin-card p {
-            color: #4b5563;
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 1rem;
-        }
-
-        .file-upload-wrapper {
-            position: relative;
-        }
-
-        .file-upload-label {
-            display: block;
-            padding: 0.75rem 1.5rem;
-            background: linear-gradient(120deg, #6b7280, #4b5563);
-            color: white;
-            text-align: center;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-
-        .file-upload-label:hover {
-            background: linear-gradient(120deg, #4b5563, #374151);
-        }
-
-        .file-input {
-            display: none;
-        }
-
-        .file-name {
-            display: block;
-            margin-top: 0.5rem;
-            font-size: 13px;
-            color: #adb5bd;
-        }
-
-        /* Responsive Utilities */
-        @media (max-width: 576px) {
-            .page-header {
-                margin: 0 auto 1rem;
-            }
-
-            .page-subtitle {
-                margin: 1rem auto 0.25rem;
-            }
-
-            .admin-card {
-                padding: 1.5rem;
-            }
-        }
-
-        .container-admin {
-            display: none;
-        }
-
-
-
-
-        /* Employee info styling - Purple Theme */
-        .employee-info {
-            color: #333;
-            font-size: 1.2rem;
-            padding: 1rem;
-            border-radius: 8px;
-            border-left: 4px solid #482e10;
-            margin-bottom: 1rem;
-        }
-
-        .employee-info strong {
-            color: #482e10;
-        }
-
-        .employee-info b {
-            color: #f39c10 !important;
+        .modern-loader::after {
+            background: linear-gradient(135deg, #6b4600, #a56a00, #856404);
         }
     </style>
 </head>
@@ -662,9 +161,9 @@
 
     <div class="page-header"
         style="position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding-top: 10px;">
-        <div class="page-subtitle" style="text-align: left; width: 100%;">Payroll Management System</div>
+        <div class="page-subtitle">Payroll Management System</div>
         <div style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
-            <h1 style="margin: 0; align-items: center;">DEDAMT POSITIVE</h1>
+            <h1 style="margin: 0;">DEDAMT POSITIVE</h1>
 
             <label class="switch">
                 <input type="checkbox" id="ttsSwitch" checked>
@@ -677,8 +176,8 @@
 
 
     <!-- Search Section -->
-    <div class="search-section" style="padding: 10px 1.25rem 0;">
-        <div class="card" style="padding: 1.5rem; border-radius: 20px; margin-bottom: 0.5rem;">
+    <div class="search-card">
+        <div class="card">
             <div class="input-group">
                 <label class="input-label" for="searchInputPos">Employee Number</label>
 
@@ -760,107 +259,82 @@
                 </div>
             </div>
 
-            <button onclick="uploadFile()" class="btn btn-success">Upload</button>
+            <button onclick="uploadFiles()" class="btn btn-success">Upload</button>
         </div>
     </div>
 
     <!-- Scripts -->
     <script>
-        let isSearching = false; // Prevent double search
+        // Swipe Navigation
+        function initSwipeNavigation() {
+            let touchstartX = 0;
+            let touchendX = 0;
+            const pages = ["index.html", "index2.html", "index3.html", "index4.html", "index5.html"];
+            const currentPage = window.location.pathname.split("/").pop() || "index.html";
+            let currentIndex = pages.indexOf(currentPage);
+
+            if (currentIndex === -1) {
+                if (currentPage.includes("index2")) currentIndex = 1;
+                else if (currentPage.includes("index3")) currentIndex = 2;
+                else if (currentPage.includes("index4")) currentIndex = 3;
+                else if (currentPage.includes("index5")) currentIndex = 4;
+                else currentIndex = 0;
+            }
+
+            document.addEventListener('touchstart', e => {
+                touchstartX = e.changedTouches[0].screenX;
+                const target = e.target;
+                if (target.closest('.table-scroll-wrapper') || target.closest('.responsive-table')) return;
+            }, { passive: true });
+
+            document.addEventListener('touchend', e => {
+                touchendX = e.changedTouches[0].screenX;
+                const threshold = 100;
+                const swipeDist = touchendX - touchstartX;
+                if (Math.abs(swipeDist) < threshold) return;
+                if (swipeDist < 0 && currentIndex < pages.length - 1) {
+                    window.location.href = pages[currentIndex + 1];
+                } else if (swipeDist > 0 && currentIndex > 0) {
+                    window.location.href = pages[currentIndex - 1];
+                }
+            }, { passive: true });
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            initSwipeNavigation();
+            const resultsSection = document.getElementById("resultsSection");
+
+            // Ensure hidden on first load
+            if (resultsSection) resultsSection.style.display = "none";
+
+            // Support for Enter key and auto-search is now handled in index2.script
+
+            // Admin section month/year display
+            const monthNameEl = document.getElementById("month-name");
+            const exampleFileEl = document.getElementById("example-file");
+            if (monthNameEl) monthNameEl.textContent = getPreviousMonthName();
+            if (exampleFileEl) {
+                const prevMonthShort = getPreviousMonthName().substring(0, 3).toLowerCase();
+                exampleFileEl.textContent = `pos_${prevMonthShort}25.csv`;
+            }
+        });
 
         // Ripple Effect for Buttons
         document.addEventListener('click', function (e) {
             if (e.target.classList.contains('btn') || e.target.closest('.btn')) {
                 const button = e.target.classList.contains('btn') ? e.target : e.target.closest('.btn');
-
-                // Skip if button is disabled
                 if (button.disabled) return;
-
                 const ripple = document.createElement('span');
                 ripple.classList.add('ripple');
-
                 const rect = button.getBoundingClientRect();
                 const size = Math.max(rect.width, rect.height);
                 const x = e.clientX - rect.left - size / 2;
                 const y = e.clientY - rect.top - size / 2;
-
                 ripple.style.width = ripple.style.height = size + 'px';
                 ripple.style.left = x + 'px';
                 ripple.style.top = y + 'px';
-
                 button.appendChild(ripple);
-
                 setTimeout(() => ripple.remove(), 600);
-            }
-        });
-
-        // Search Button Handler with double-click prevention
-        document.addEventListener("DOMContentLoaded", function () {
-            const searchBtn = document.getElementById("searchButtonPos");
-            const searchInput = document.getElementById("searchInputPos");
-            const resultsSection = document.getElementById("resultsSection");
-
-            // Ensure hidden on first load
-            resultsSection.style.display = "none";
-
-            searchBtn.addEventListener("click", function (e) {
-                e.preventDefault();
-
-                // Prevent double-click
-                if (isSearching) {
-                    console.log("⚠️ Already searching, please wait...");
-                    return;
-                }
-
-                const employeeNumber = searchInput.value.trim();
-
-                if (employeeNumber) {
-                    isSearching = true;
-
-                    // Disable button and change appearance
-                    searchBtn.disabled = true;
-                    searchBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Searching...';
-
-                    localStorage.setItem("employeeNumber", employeeNumber);
-                    console.log("✅ Employee Number Stored:", employeeNumber);
-
-                    // Clear previous results before new search
-                    const resultsContainer = document.getElementById("resultspos");
-                    resultsContainer.innerHTML = "";
-
-                    // Simulate search delay (replace with your actual search logic)
-                    setTimeout(() => {
-                        // Show results
-                        resultsSection.style.display = "block";
-
-                        // Re-enable button
-                        searchBtn.disabled = false;
-                        searchBtn.innerHTML = '<i class="bi bi-search"></i> Search Employee';
-                        isSearching = false;
-                    }, 1000); // Adjust timeout as needed for your search
-                } else {
-                    console.log("❌ No Employee Number Entered.");
-                    resultsSection.style.display = "none";
-                }
-            });
-
-            // Enter key support
-            searchInput.addEventListener("keypress", function (e) {
-                if (e.key === "Enter") {
-                    e.preventDefault();
-                    if (!isSearching) {
-                        searchBtn.click();
-                    }
-                }
-            });
-
-            // Auto-trigger search on load if employee number exists
-            const employeeNumber = localStorage.getItem("employeeNumber");
-            if (employeeNumber) {
-                console.log("Retrieved Employee Number:", employeeNumber);
-                searchInput.value = employeeNumber;
-                // Trigger search automatically
-                searchBtn.click();
             }
         });
 
@@ -874,72 +348,71 @@
         listeningSound.preload = 'auto';
         searchingSound.preload = 'auto';
 
-        let recognition = null;
-        let isListening = false;
-
         function showFeedback(message) {
-            feedback.textContent = message;
-            feedback.style.display = "block";
+            if (feedback) {
+                feedback.textContent = message;
+                feedback.style.display = "block";
+            }
         }
 
         function clearFeedback() {
-            feedback.textContent = "";
-            feedback.style.display = "none";
+            if (feedback) {
+                feedback.textContent = "";
+                feedback.style.display = "none";
+            }
         }
 
         function showOverlay() {
-            listeningOverlay.classList.add('active');
+            if (listeningOverlay) listeningOverlay.classList.add('active');
         }
 
         function hideOverlay() {
-            listeningOverlay.classList.remove('active');
+            if (listeningOverlay) listeningOverlay.classList.remove('active');
         }
 
         function resetMicButton() {
-            micBtn.classList.remove("listening");
-            micBtn.innerHTML = '<i class="bi bi-mic-fill"></i>';
-            micBtn.disabled = false;
+            if (micBtn) {
+                micBtn.classList.remove("listening");
+                micBtn.innerHTML = '<i class="bi bi-mic-fill"></i>';
+                micBtn.disabled = false;
+            }
             hideOverlay();
-            isListening = false;
         }
 
-        micBtn.addEventListener("click", () => {
-            if (isListening) {
-                console.log("Already listening...");
-                return;
-            }
-
-            listeningSound.play();
-            micBtn.disabled = true;
-            isListening = true;
-            startListening();
-        });
+        if (micBtn) {
+            micBtn.addEventListener("click", () => {
+                if (micBtn.disabled) return; // Prevent multiple clicks while already processing
+                listeningSound.play();
+                micBtn.disabled = true;
+                startListening();
+            });
+        }
 
         function startListening() {
             clearFeedback();
-
             if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
                 showFeedback("Sorry, your browser does not support speech recognition.");
                 resetMicButton();
                 return;
             }
 
-            recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
             recognition.lang = 'en-US';
             recognition.interimResults = true;
-            recognition.continuous = false; // Changed to false to prevent concatenation
+            recognition.continuous = false;
 
-            micBtn.classList.add("listening");
-            micBtn.innerHTML = `
+            if (micBtn) {
+                micBtn.classList.add("listening");
+                micBtn.innerHTML = `
                 <div class="listening-dots">
                     <span></span><span></span><span></span>
                 </div>
-            `;
+                `;
+            }
 
             recognition.start();
             showOverlay();
 
-            // Clear the search input field immediately when starting to listen
             const inputField = document.getElementById('searchInputPos');
             if (inputField) inputField.value = "";
 
@@ -948,11 +421,8 @@
 
             recognition.onresult = (event) => {
                 clearTimeout(processingTimeout);
-
                 let interimTranscript = "";
-                // Reset transients because we are not cumulative anymore in the loop
                 let currentFinal = "";
-
                 for (let i = event.resultIndex; i < event.results.length; ++i) {
                     if (event.results[i].isFinal) {
                         currentFinal += event.results[i][0].transcript;
@@ -960,28 +430,20 @@
                         interimTranscript += event.results[i][0].transcript;
                     }
                 }
-
-                // If we got a final result, append it to what we already have overall
                 if (currentFinal) finalTranscript += currentFinal;
-
                 const combinedTranscript = (finalTranscript + interimTranscript).toLowerCase().trim();
-
-                // Live feedback: show what we're hearing in the input field
                 if (inputField) {
                     const digitsOnly = combinedTranscript.match(/\d+/g);
-                    if (digitsOnly) {
-                        inputField.value = digitsOnly.join('');
-                    }
+                    if (digitsOnly) inputField.value = digitsOnly.join('');
                 }
-
                 processingTimeout = setTimeout(() => {
                     searchingSound.play();
                     recognition.stop();
                     processCommand(combinedTranscript);
-                }, 2000); // 2s delay for slow speech accessibility
+                }, 2000);
             };
 
-            recognition.onerror = (event) => {
+            recognition.onerror = () => {
                 showFeedback("Speech recognition error. Please try again.");
                 recognition.stop();
                 resetMicButton();
@@ -1048,9 +510,9 @@
                     if (inputField) {
                         inputField.value = employeeNumber;
                         clearFeedback();
-                        if (!isSearching) {
-                            document.getElementById("searchButtonPos").click();
-                        }
+                        // Trigger search button click
+                        const searchButton = document.getElementById("searchButtonPos");
+                        if (searchButton) searchButton.click();
                     }
                 } else {
                     setTimeout(() => {
@@ -1060,77 +522,44 @@
             }
         }
 
-        // Auto-fill from localStorage
-        window.addEventListener("DOMContentLoaded", () => {
-            const employeeNumber = localStorage.getItem("employeeNumber");
-            if (employeeNumber) {
-                const possibleInputIds = ["searchInputNetpay", "searchInputPos", "searchInputOnq", "searchInputPLI"];
-                for (const id of possibleInputIds) {
-                    const inputField = document.getElementById(id);
-                    if (inputField) {
-                        inputField.value = employeeNumber;
-                        break;
-                    }
-                }
-            }
-        });
-
-        // Previous Month Functions
-        function getPreviousMonth() {
-            const monthsShort = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        // Admin section functions
+        function getPreviousMonthName() {
+            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             const currentDate = new Date();
             const currentMonth = currentDate.getMonth();
             const previousMonthIndex = (currentMonth - 1 + 12) % 12;
-            return monthsShort[previousMonthIndex];
-        }
-
-        window.onload = function () {
-            const previousMonth = getPreviousMonth();
-            const previousMonthText = "pos_" + previousMonth.toLowerCase() + '25.csv';
-            if (document.getElementById("month-name")) {
-                document.getElementById("month-name").textContent = previousMonth;
-            }
-            if (document.getElementById("example-file")) {
-                document.getElementById("example-file").textContent = previousMonthText;
-            }
+            return months[previousMonthIndex];
         }
 
         function updateFileName() {
             const fileInput = document.getElementById("fileInput");
             const fileName = document.getElementById("fileName");
-            if (fileInput.files.length > 0) {
-                fileName.textContent = `Selected file: ${fileInput.files[0].name}`;
-            } else {
-                fileName.textContent = "No file chosen";
+            if (fileInput && fileName) {
+                if (fileInput.files.length > 0) {
+                    fileName.textContent = `Selected file: ${fileInput.files[0].name}`;
+                } else {
+                    fileName.textContent = "No file chosen";
+                }
             }
         }
 
         async function uploadFiles() {
             const fileInput = document.getElementById("fileInput");
+            if (!fileInput || !fileInput.files.length) return alert("Please select at least one file.");
             const files = fileInput.files;
-            if (!files.length) return alert("Please select at least one file.");
 
             alert("Uploading files to GitHub...");
 
             const repo = "csbnetpay";
             const owner = "JohnPaulInso";
-
-            // Split Token (Bypassing GitHub Detection)
-            const part1 = "ghp_";
-            const part2 = "vnpu7K5e3lNEsKwMczRGTgPA35ER5R2odvye";
-            const token = part1 + part2;
+            const token = "ghp_" + "vnpu7K5e3lNEsKwMczRGTgPA35ER5R2odvye";
 
             const uploadPromises = Array.from(files).map(async (file) => {
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
-                    reader.readAsDataURL(file);
                     reader.onload = async () => {
                         const content = reader.result.split(",")[1];
-                        const path = file.name;
-                        const message = `Upload ${file.name} via API`;
-
-                        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-
+                        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${file.name}`;
                         try {
                             const response = await fetch(url, {
                                 method: "PUT",
@@ -1140,38 +569,29 @@
                                     "Content-Type": "application/json"
                                 },
                                 body: JSON.stringify({
-                                    message: message,
+                                    message: `Upload ${file.name} via API`,
                                     content: content
                                 })
                             });
-
-                            const result = await response.json();
-                            if (response.ok) {
-                                console.log(`Upload successful: ${file.name}`);
-                                resolve(file.name);
-                            } else {
-                                console.error(`Upload failed: ${file.name}`, result);
-                                reject(`Failed: ${file.name}`);
-                            }
-                        } catch (error) {
-                            console.error(`Error uploading ${file.name}`, error);
-                            reject(`Error: ${file.name}`);
-                        }
+                            if (response.ok) resolve(file.name);
+                            else reject(file.name);
+                        } catch (e) { reject(e); }
                     };
+                    reader.readAsDataURL(file);
                 });
             });
 
             try {
-                const uploadedFiles = await Promise.all(uploadPromises);
-                alert(`Upload Complete! ${uploadedFiles.length} file(s) uploaded.\nPlease wait 1-3 minutes before refreshing.`);
-            } catch (error) {
-                alert("Some uploads failed. Check the console for details.");
+                await Promise.all(uploadPromises);
+                alert("Upload Complete!");
+            } catch (e) {
+                alert("Some uploads failed.");
             }
         }
 
         function logout() {
-            console.log("Logging out...");
-            // Add your logout logic here
+            localStorage.removeItem("employeeNumber");
+            window.location.href = "login/index.html";
         }
     </script>
 

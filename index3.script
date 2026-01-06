@@ -43,25 +43,76 @@ const csvFilesOnq = [
 
 document.getElementById('searchButtonOnq').addEventListener('click', searchEmployeeOnq);
 
+let isSearchingOnq = false;
+
 function searchEmployeeOnq() {
+    if (isSearchingOnq) return;
+
     const searchInputOnq = document.getElementById('searchInputOnq').value.trim();
     const loadingIndicatorOnq = document.getElementById('loadingIndicatorOnq');
+    const resultsSectionOnq = document.getElementById('resultsonq');
+    const employeeInfoSectionOnq = document.getElementById('employeeInfoOnq');
+    const searchBtnOnq = document.getElementById('searchButtonOnq');
+    const resultsSectionElement = document.querySelector('.results-section');
 
     if (!searchInputOnq) {
         alert('Please enter an employee number.');
         return;
     }
 
-    const resultsSectionOnq = document.getElementById('resultsonq');
-    const employeeInfoSectionOnq = document.getElementById('employeeInfoOnq');
-    resultsSectionOnq.innerHTML = ''; // Clear previous results
-    employeeInfoSectionOnq.innerHTML = ''; // Clear previous employee info
+    const micBtn = document.getElementById('micBtn');
+
+    // Start search state
+    isSearchingOnq = true;
+    searchBtnOnq.disabled = true;
+    if (micBtn) micBtn.disabled = true;
+    searchBtnOnq.innerHTML = '<i class="bi bi-hourglass-split"></i> Searching...';
+    localStorage.setItem("employeeNumber", searchInputOnq);
+
+    // Reset display early to avoid duplicates
+    if (resultsSectionOnq) resultsSectionOnq.innerHTML = '';
+    if (employeeInfoSectionOnq) employeeInfoSectionOnq.innerHTML = '';
+
+    const updateUISearchComplete = () => {
+        searchBtnOnq.disabled = false;
+        if (micBtn) micBtn.disabled = false;
+        searchBtnOnq.innerHTML = '<i class="bi bi-search"></i> Search Employee';
+        isSearchingOnq = false;
+        if (resultsSectionElement) resultsSectionElement.style.display = 'block';
+        loadingIndicatorOnq.style.display = 'none';
+    };
+
+    // Check for cached results in sessionStorage with 5-minute TTL
+    const cacheKey = `cache_onq_${searchInputOnq}`;
+    const cachedItem = sessionStorage.getItem(cacheKey);
+
+    if (cachedItem) {
+        try {
+            const { data, timestamp } = JSON.parse(cachedItem);
+            const isExpired = !timestamp || (Date.now() - timestamp) > 300000; // 5 minutes
+
+            if (!isExpired) {
+                console.log("✅ Using cached results for ONQ (cached within 5m):", searchInputOnq);
+                displayEmployeeInfoOnq(data.monthName, data.csvData);
+                displayResultsTableOnq([data]);
+                updateUISearchComplete();
+                return;
+            } else {
+                console.log("⌛ Cache expired for ONQ, fetching fresh data...");
+                sessionStorage.removeItem(cacheKey);
+            }
+        } catch (e) {
+            console.error("Cache parsing error:", e);
+            sessionStorage.removeItem(cacheKey);
+        }
+    }
+
     loadingIndicatorOnq.style.display = 'block'; // Show loading indicator
 
     findMostRecentFile().then(mostRecentFile => {
         if (!mostRecentFile) {
             alert('No available files found.');
-            loadingIndicatorOnq.style.display = 'none';
+            updateUISearchComplete();
             return;
         }
 
@@ -72,15 +123,33 @@ function searchEmployeeOnq() {
                     return;
                 }
 
-                displayEmployeeInfoOnq(data.monthName, data.csvData);
-                displayResultsTableOnq([data]); // Pass only the most recent available file
+                // Filter CSV data to only include rows for this employee
+                const filteredCsvData = data.csvData.filter((row, idx) => idx === 0 || row[3] === searchInputOnq);
+
+                if (filteredCsvData.length > 1) {
+                    const cachePayload = {
+                        monthName: data.monthName,
+                        csvData: filteredCsvData
+                    };
+                    // Store in cache with 5-minute TTL
+                    const cacheData = {
+                        data: cachePayload,
+                        timestamp: Date.now()
+                    };
+                    sessionStorage.setItem(cacheKey, JSON.stringify(cacheData));
+
+                    displayEmployeeInfoOnq(data.monthName, filteredCsvData);
+                    displayResultsTableOnq([cachePayload]);
+                } else {
+                    showErrorCard(employeeInfoSectionOnq, 'Employee not found in latest records.');
+                }
             })
             .catch(error => {
                 console.error('Error fetching CSV data:', error);
                 alert('Error fetching data. Check the console for more details.');
             })
             .finally(() => {
-                loadingIndicatorOnq.style.display = 'none'; // Hide loading indicator
+                updateUISearchComplete();
             });
     });
 }
@@ -167,12 +236,41 @@ document.addEventListener("DOMContentLoaded", function() {
         if (savedState !== null) {
             ttsSwitch.checked = (savedState === 'true');
         }
+        
         ttsSwitch.addEventListener('change', () => {
-            localStorage.setItem('ttsEnabled', ttsSwitch.checked);
-            if (!ttsSwitch.checked) {
+            const isEnabled = ttsSwitch.checked;
+            localStorage.setItem('ttsEnabled', isEnabled);
+            
+            const icon = ttsSwitch.nextElementSibling.querySelector('.icon');
+            if (icon) {
+                icon.className = isEnabled ? "bi bi-volume-up-fill icon" : "bi bi-volume-mute-fill icon";
+            }
+
+            if (!isEnabled) {
                 window.speechSynthesis.cancel();
             }
         });
+    }
+
+    // Enter key support
+    const searchInput = document.getElementById('searchInputOnq');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                searchEmployeeOnq();
+            }
+        });
+    }
+
+    // Auto-search if employee number is saved
+    const savedEmpNo = localStorage.getItem("employeeNumber");
+    if (savedEmpNo) {
+        const input = document.getElementById('searchInputOnq');
+        if (input) {
+            input.value = savedEmpNo;
+            searchEmployeeOnq();
+        }
     }
 });
 
