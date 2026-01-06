@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Historical Netpay</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -54,13 +54,11 @@
         /* Employee info styling - Purple Theme */
         .employee-info {
             color: #333;
-            font-size: 1.1rem;
-            /* Reduced from 1.2rem */
-            padding: 0.75rem;
-            /* Reduced from 1rem */
+            font-size: 1.2rem;
+            padding: 1rem;
             border-radius: 8px;
             border-left: 4px solid #4F2683;
-            margin-bottom: 0.75rem;
+            margin-bottom: 1rem;
         }
 
         .employee-info strong {
@@ -79,7 +77,13 @@
     </style>
 </head>
 
-<body>
+<body style="--theme-color: #4F2683; --theme-rgb: 79, 38, 131;">
+    <header class="mobile-header">
+        <img src="citysavings_logo.png" alt="CitySavings"
+            style="height: 24px; width: auto; filter: brightness(0) invert(1);">
+        <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button>
+    </header>
+
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
@@ -90,7 +94,7 @@
                 <a class="nav-link" href="index4.html">PLI</a>
                 <a class="nav-link" href="index5.html">LE</a>
             </div>
-            <button class="logout-btn" onclick="logout()">↪</button>
+            <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button>
         </div>
     </nav>
 
@@ -102,7 +106,7 @@
 
 
     <div class="page-header"
-        style="position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: center;">
+        style="position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding-top: 10px;">
         <div class="page-subtitle">Payroll Management System</div>
         <div style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
             <h1 style="margin: 0;">HISTORICAL NETPAY</h1>
@@ -175,15 +179,15 @@
 
         <!-- Loading Indicator -->
         <div id="loadingIndicatorNetpay" class="loading-indicator">
-            <img src="loading.gif" alt="Loading...">
+            <div class="modern-loader" style="align-items: center;"></div>
         </div>
     </div>
 
     <!-- Listening Overlay -->
-    <div id="listeningOverlay" class="listening-overlay"></div>
+    <div id=" listeningOverlay" class="listening-overlay"></div>
 
     <!-- Results Section -->
-    <div class="results-section">
+    <div class="results-section" style="display: none;">
         <h3 id="employeeInfoNetpay" class="employee-info"></h3>
         <div id="resultsNetpay" class="table-container">
             <!-- Table will be dynamically inserted here -->
@@ -205,7 +209,8 @@
                 <div>
                     <div class="admin-card__eyebrow">Admin · Abstract uploader</div>
                     <h5>Upload Latest Abstract</h5>
-                    <p>Select the month and year, then upload an .xlsx file with NETPAY, POS, ONQUEUE, and PLI sheets.
+                    <p>Select the month and year, then upload an .xlsx file with NETPAY, POS, ONQUEUE, and PLI
+                        sheets.
                     </p>
                 </div>
                 <div class="summary-chip">Uploading</div>
@@ -247,7 +252,8 @@
                         <div class="convert-hint">Convert to CSV before distributing to your team.</div>
                     </div>
 
-                    <small id="pliWarning" class="warning-text">Take note: Recheck the PLI file exceeding 25 MB</small>
+                    <small id="pliWarning" class="warning-text">Take note: Recheck the PLI file exceeding 25
+                        MB</small>
 
                     <div id="progressContainer" class="progress-container">
                         <div class="progress">
@@ -301,7 +307,29 @@
     </div>
     </div>
 
-    <!-- Another Admin Section -->
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav" style="--theme-color: #4F2683; --theme-rgb: 79, 38, 131;">
+        <a href="index.html" class="bottom-nav-link active">
+            <i class="bi bi-wallet2"></i>
+            <span>NETPAY</span>
+        </a>
+        <a href="index2.html" class="bottom-nav-link">
+            <i class="bi bi-cash-stack"></i>
+            <span>DEDAMT</span>
+        </a>
+        <a href="index3.html" class="bottom-nav-link">
+            <i class="bi bi-hourglass-split"></i>
+            <span>ONQ</span>
+        </a>
+        <a href="index4.html" class="bottom-nav-link">
+            <i class="bi bi-file-earmark-text"></i>
+            <span>PLI</span>
+        </a>
+        <a href="index5.html" class="bottom-nav-link">
+            <i class="bi bi-calculator"></i>
+            <span>LE</span>
+        </a>
+    </div>
     <div class="admin-section container-admin" style="display: none;">
         <div class="admin-chip">
             <div class="admin-card">
@@ -403,10 +431,10 @@
                         searchBtn.style.cursor = "pointer";
 
                         // Show results section after search completes
-                        const resultsSection = document.querySelector(".results-section");
-                        if (resultsSection) {
-                            resultsSection.style.display = "block";
-                        }
+                        // const resultsSection = document.querySelector(".results-section");
+                        // if (resultsSection) {
+                        //     resultsSection.style.display = "block";
+                        // }
                     }, 2000);
                 } else {
                     console.log("❌ No Employee Number Entered.");

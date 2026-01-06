@@ -68,9 +68,13 @@
         fetchedDataNet.sort((a, b) => b.date - a.date);
 
         if (fetchedDataNet.length > 0) {
+            const resultsContainer = document.querySelector(".results-section");
+            if (resultsContainer) resultsContainer.style.display = "block";
             displayEmployeeInfoNetpay(fetchedDataNet[0].monthName, fetchedDataNet[0].csvData);
             displayResultsTableNetpay(fetchedDataNet);
         } else {
+            const resultsContainer = document.querySelector(".results-section");
+            if (resultsContainer) resultsContainer.style.display = "block";
             employeeInfoSectionNetpay.innerHTML = 'No data available for the most recent month.';
         }
 
@@ -399,13 +403,23 @@
         }
 
         if (!employeeFound) {
-            employeeInfoSectionNetpay.innerHTML = 'Employee not found.';
+            showErrorCard(employeeInfoSectionNetpay, 'Employee ID not found in latest month.');
         }
     }
 
     function displayResultsTableNetpay(fetchedDataNet) {
         const resultsSectionNetpay = document.getElementById('resultsNetpay');
         const searchEmpNo = document.getElementById('searchInputNetpay').value.trim();
+        
+        // First check if the employee exists in ANY of the data
+        const hasResults = fetchedDataNet.some(data => 
+            data.csvData.some(row => row.length >= 4 && row[3] === searchEmpNo)
+        );
+
+        if (!hasResults) {
+            resultsSectionNetpay.innerHTML = ''; // Ensure results section is empty if no data
+            return;
+        }
 
         // Create table container with responsive wrapper
         const tableContainer = document.createElement('div');
@@ -546,3 +560,14 @@ function checkLoggedInUser() {
             navigator.serviceWorker.register('service-worker.js');
         }
     });
+
+    // Helper to show premium error card
+    function showErrorCard(container, message) {
+        container.innerHTML = `
+            <div class="error-card">
+                <i class="bi bi-exclamation-circle-fill"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        container.className = ''; // Remove profile-card class if present
+    }

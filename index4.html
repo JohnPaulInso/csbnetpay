@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Historical Netpay - PLI</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -103,7 +103,14 @@
   </style>
 </head>
 
-<body>
+<body style="--theme-color: #600e12; --theme-rgb: 96, 14, 18;">
+  <!-- Mobile Header -->
+  <header class="mobile-header">
+    <img src="citysavings_logo.png" alt="CitySavings"
+      style="height: 24px; width: auto; filter: brightness(0) invert(1);">
+    <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button>
+  </header>
+
   <!-- Navigation -->
   <nav class="navbar">
     <div class="nav-container">
@@ -114,12 +121,12 @@
         <a class="nav-link active" href="index4.html">PLI</a>
         <a class="nav-link" href="index5.html">LE</a>
       </div>
-      <button class="logout-btn" onclick="logout()">↪</button>
+      <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button>
     </div>
   </nav>
 
   <div class="page-header"
-    style="position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: center;">
+    style="position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding-top: 10px;">
     <div class="page-subtitle">Payroll Management System</div>
     <div style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
       <h1 style="margin: 0;">PLI DEDUCTION RESULT</h1>
@@ -171,6 +178,30 @@
     <div id="resultsPLI" class="table-container">
       <!-- Table will be dynamically inserted here -->
     </div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav" style="--theme-color: #600e12; --theme-rgb: 96, 14, 18;">
+    <a href="index.html" class="bottom-nav-link">
+      <i class="bi bi-wallet2"></i>
+      <span>NETPAY</span>
+    </a>
+    <a href="index2.html" class="bottom-nav-link">
+      <i class="bi bi-cash-stack"></i>
+      <span>DEDAMT</span>
+    </a>
+    <a href="index3.html" class="bottom-nav-link">
+      <i class="bi bi-hourglass-split"></i>
+      <span>ONQ</span>
+    </a>
+    <a href="index4.html" class="bottom-nav-link active">
+      <i class="bi bi-file-earmark-text"></i>
+      <span>PLI</span>
+    </a>
+    <a href="index5.html" class="bottom-nav-link">
+      <i class="bi bi-calculator"></i>
+      <span>LE</span>
+    </a>
   </div>
 
   <!-- Admin Section (Upload) -->

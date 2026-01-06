@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Dedamt Positive</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -228,12 +228,10 @@
 
         .form-input {
             width: 100%;
-            padding: 0.75rem 2.5rem 0.75rem 2.5rem;
-            /* Reduced from 1rem 3rem */
+            padding: 1rem 3rem 1rem 3rem;
             border: 2px solid #e9ecef;
             border-radius: 12px;
-            font-size: 15px;
-            /* Reduced from 16px */
+            font-size: 16px;
             font-family: 'Poppins', sans-serif;
             transition: all 0.3s ease;
             background: #f8f9fa;
@@ -338,8 +336,7 @@
             position: relative;
             overflow: hidden;
             width: 100%;
-            padding: 0.75rem 1.25rem;
-            /* Reduced from 1rem 1.5rem */
+            padding: 1rem 1.5rem;
             border: none;
             border-radius: 12px;
             font-family: 'Poppins', sans-serif;
@@ -446,10 +443,8 @@
         .employee-info {
             color: #2c3e50;
             font-weight: 600;
-            margin-bottom: 0.75rem;
-            /* Reduced from 1rem */
-            padding: 0.75rem;
-            /* Reduced from 1rem */
+            margin-bottom: 1rem;
+            padding: 1rem;
             background: white;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -476,20 +471,16 @@
         }
 
         .responsive-table th {
-            padding: 0.75rem;
-            /* Reduced from 1rem */
+            padding: 1rem;
             text-align: left;
             font-weight: 600;
-            font-size: 13px;
-            /* Reduced from 14px */
+            font-size: 14px;
         }
 
         .responsive-table td {
-            padding: 0.75rem;
-            /* Reduced from 1rem */
+            padding: 1rem;
             border-bottom: 1px solid #e9ecef;
-            font-size: 13px;
-            /* Reduced from 14px */
+            font-size: 14px;
         }
 
         .responsive-table tbody tr:hover {
@@ -629,13 +620,11 @@
         /* Employee info styling - Purple Theme */
         .employee-info {
             color: #333;
-            font-size: 1.1rem;
-            /* Reduced from 1.2rem */
-            padding: 0.75rem;
-            /* Reduced from 1rem */
+            font-size: 1.2rem;
+            padding: 1rem;
             border-radius: 8px;
             border-left: 4px solid #482e10;
-            margin-bottom: 0.75rem;
+            margin-bottom: 1rem;
         }
 
         .employee-info strong {
@@ -648,7 +637,13 @@
     </style>
 </head>
 
-<body>
+<body style="--theme-color: #6b4600; --theme-rgb: 107, 70, 0;">
+    <header class="mobile-header">
+        <img src="citysavings_logo.png" alt="CitySavings"
+            style="height: 24px; width: auto; filter: brightness(0) invert(1);">
+        <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button>
+    </header>
+
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
@@ -659,15 +654,15 @@
                 <a class="nav-link" href="index4.html">PLI</a>
                 <a class="nav-link" href="index5.html">LE</a>
             </div>
-            <button class="logout-btn" onclick="logout()">↪</button>
+            <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button>
         </div>
     </nav>
 
 
 
     <div class="page-header"
-        style="position: relative; display: flex; flex-direction: column; align-items: left; justify-content: center;">
-        <div class="page-subtitle">Payroll Management System</div>
+        style="position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding-top: 10px;">
+        <div class="page-subtitle" style="text-align: left; width: 100%;">Payroll Management System</div>
         <div style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
             <h1 style="margin: 0; align-items: center;">DEDAMT POSITIVE</h1>
 
@@ -682,8 +677,8 @@
 
 
     <!-- Search Section -->
-    <div class="search-card">
-        <div class="card">
+    <div class="search-section" style="padding: 10px 1.25rem 0;">
+        <div class="card" style="padding: 1.5rem; border-radius: 20px; margin-bottom: 0.5rem;">
             <div class="input-group">
                 <label class="input-label" for="searchInputPos">Employee Number</label>
 
@@ -727,6 +722,29 @@
         </div>
     </div>
 
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav" style="--theme-color: #6b4600; --theme-rgb: 107, 70, 0;">
+        <a href="index.html" class="bottom-nav-link">
+            <i class="bi bi-wallet2"></i>
+            <span>NETPAY</span>
+        </a>
+        <a href="index2.html" class="bottom-nav-link active">
+            <i class="bi bi-cash-stack"></i>
+            <span>DEDAMT</span>
+        </a>
+        <a href="index3.html" class="bottom-nav-link">
+            <i class="bi bi-hourglass-split"></i>
+            <span>ONQ</span>
+        </a>
+        <a href="index4.html" class="bottom-nav-link">
+            <i class="bi bi-file-earmark-text"></i>
+            <span>PLI</span>
+        </a>
+        <a href="index5.html" class="bottom-nav-link">
+            <i class="bi bi-calculator"></i>
+            <span>LE</span>
+        </a>
+    </div>
     <!-- Admin Section -->
     <div class="admin-section container-admin" style="display: none;">
         <div class="admin-card">

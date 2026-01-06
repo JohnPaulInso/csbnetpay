@@ -420,7 +420,7 @@ async function displayEmployeeInfoPLI(monthName, csvData) {
     }
 
     if (!employeeFound) {
-        employeeInfoSectionPLI.innerHTML = 'Employee ID not found in latest month.';
+        showErrorCard(employeeInfoSectionPLI, 'Employee ID not found in latest month.');
     }
 }
 
@@ -469,6 +469,11 @@ function displayResultsTablePLI(fetchedDataPLI) {
         });
     });
 
+    if (resultsMap.size === 0) {
+        resultsSectionPLI.innerHTML = '';
+        return;
+    }
+
     resultsMap.forEach((data, monthName) => {
         const row = document.createElement('tr');
         row.innerHTML = `
@@ -486,12 +491,12 @@ detailCell.innerHTML = `
         <table class="detail-table" style="width: 100%; min-width: 260px; background: white; border: 1px solid rgba(96, 14, 18, 0.15); border-radius: 6px; overflow: hidden; border-collapse: collapse;">
             <thead>
                 <tr style="font-size:6px; background: #600e12; color: white; text-transform: uppercase;">
-                    <th style="font-size: 12px; text-align: center; width: 16px !important; min-width: 16px !important; max-width: 16px !important; padding: 0.3rem 0 !important;">/</th>
-                    <th style="font-size: 12px;width: 35px; padding: 0rem 0rem !important;">PLI</th>
-                    <th style="font-size: 12px;width: 50px; padding: 0rem 0rem !important;">EFF</th>
-                    <th style="font-size: 12px;width: 50px; padding: 0rem 0rem !important;">TERM</th>
-                    <th style="font-size: 12px;width: 65px; text-align: left; padding: 0rem 0rem !important;">DEDAMT</th>
-                    <th style="font-size: 12px;width: 45px; padding: 0rem 0rem !important;">POL #</th>
+                    <th style="font-size: 11px; text-align: center; width: 16px !important; min-width: 16px !important; max-width: 16px !important; padding: 0.3rem 0 !important;">/</th>
+                    <th style="font-size: 11px;width: 35px; padding: 0rem 0rem !important;">PLI</th>
+                    <th style="font-size: 11px;width: 50px; padding: 0rem 0rem !important;">EFF</th>
+                    <th style="font-size: 11px;width: 50px; padding: 0rem 0rem !important;">TERM</th>
+                    <th style="font-size: 11px;width: 65px; text-align: left; padding: 0rem 0rem !important;">DEDAMT</th>
+                    <th style="font-size: 11px;width: 45px; padding: 0rem 0rem !important;">POL #</th>
                 </tr>
             </thead>
             <tbody style="font-size: 7px;">
@@ -500,13 +505,13 @@ detailCell.innerHTML = `
                         <td style="text-align: center; width: 16px !important; min-width: 16px !important; max-width: 16px !important; padding: 0.3rem 0 !important; line-height: 1;">
                             <input type="checkbox" class="dedamtpli-checkbox" data-dedamtpli="${d.dedamtpli}" checked style="cursor: pointer; width: 11px; height: 11px; margin: 0 auto; padding: 0; accent-color: #600e12; display: block; vertical-align: middle;" />
                         </td>
-                        <td style="font-size: 12px; padding: 0rem 0.2rem !important;">${d.dedcode.toString().padStart(5, '0')}</td>
+                        <td style="font-size: 11px; padding: 0.3rem 0.4rem !important;">${d.dedcode.toString().padStart(5, '0')}</td>
 
-                        <td style="font-size: 12px; padding: 0rem 0.2rem !important;">${d.effmm.toString().padStart(2, '0')}/${d.effyy}</td>
-                        <td style="font-size: 12px; padding: 0rem 0.2rem !important;">${d.termmm.toString().padStart(2, '0')}/${d.termyy}</td>
+                        <td style="font-size: 11px; padding: 0.3rem 0.4rem !important;">${d.effmm.toString().padStart(2, '0')}/${d.effyy}</td>
+                        <td style="font-size: 11px; padding: 0rem 0.4rem !important;">${d.termmm.toString().padStart(2, '0')}/${d.termyy}</td>
                     
-                        <td style="font-size: 12px; text-align: left; font-weight: 700; color: #600e12; padding: 0.3rem 0.3rem !important;">₱${d.dedamtpli.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
-                        <td style="font-size: 12px; padding: 0.3rem 0.3rem !important; overflow: hidden; text-overflow: ellipsis; ">${d.policyno}</td>
+                        <td style="font-size: 11px; text-align: left; font-weight: 700; color: #600e12; padding: 0.3rem 0.3rem !important;">₱${d.dedamtpli.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
+                        <td style="font-size: 11px; padding: 0.3rem 0.4rem !important; overflow: hidden; text-overflow: ellipsis; ">${d.policyno}</td>
                     </tr>
                 `).join('')}
             </tbody>
@@ -627,3 +632,14 @@ function checkLoggedInUser() {
 
 // Call this function on page load to check if jonathan77 is logged in
 checkLoggedInUser();
+
+// Helper to show premium error card
+function showErrorCard(container, message) {
+    container.innerHTML = `
+        <div class="error-card">
+            <i class="bi bi-exclamation-circle-fill"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    container.className = ''; // Remove profile-card class if present
+}

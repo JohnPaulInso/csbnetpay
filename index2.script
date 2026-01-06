@@ -35,6 +35,9 @@ function searchEmployeePos() {
     const loader = document.getElementById("loadingIndicatorPos");
     loader.style.display = "block";
 
+    const resultsContainer = document.querySelector(".results-section");
+    if (resultsContainer) resultsContainer.style.display = "none";
+
     const monthNames = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
     const files = [];
 
@@ -53,6 +56,9 @@ function searchEmployeePos() {
             }
 
             valid.sort((a, b) => b.date - a.date);
+
+            const resultsContainer = document.querySelector(".results-section");
+            if (resultsContainer) resultsContainer.style.display = "block";
 
             displayEmployeeInfoPos(valid);
             displayResultsTablePos(valid);
@@ -344,7 +350,7 @@ async function displayEmployeeInfoPos(allData) {
             }
         }
     }
-    info.textContent = "Employee not found.";
+    showErrorCard(info, 'Employee ID not found in latest month.');
 }
 
 // ---------------- TABLE (PURPLE STYLE + DROPDOWN) ----------------
@@ -364,6 +370,11 @@ function displayResultsTablePos(allData) {
             map.get(file.monthName).push(amt);
         });
     });
+
+    if (map.size === 0) {
+        container.innerHTML = '';
+        return;
+    }
 
     const table = document.createElement("table");
     table.className = "responsive-table";
@@ -451,6 +462,17 @@ function checkLoggedInUser() {
     } else {
         adminContainer.style.display = "none"; // Hide the element
     }
+}
+
+// Helper to show premium error card
+function showErrorCard(container, message) {
+    container.innerHTML = `
+        <div class="error-card">
+            <i class="bi bi-exclamation-circle-fill"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    container.className = ''; // Remove profile-card class if present
 }
 
 // Call this function on page load to check if jonathan77 is logged in

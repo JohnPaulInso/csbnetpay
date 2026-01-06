@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Historical Netpay</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -54,9 +54,6 @@
         }
 
         /* Page Header - Keep Original Style */
-        .page-header {
-            /* Keep original styles */
-        }
 
         .page-subtitle {
             font-size: 0.75rem;
@@ -109,8 +106,7 @@
             color: white;
             font-weight: 600;
             text-align: left;
-            font-size: 0.8rem;
-            /* Reduced from 0.85rem */
+            font-size: 0.85rem;
             border-bottom: 2px solid #00c12d;
         }
 
@@ -125,8 +121,7 @@
 
         .responsive-table tbody td {
             color: #333;
-            font-size: 0.8rem;
-            /* Reduced from 0.85rem */
+            font-size: 0.85rem;
         }
 
         .detail-table {
@@ -265,7 +260,7 @@
 
         .detail-table {
             width: 100%;
-            /* Changed from min-width: 500px */
+            /* Ensure table doesn't get too compressed */
         }
 
         .detail-table th,
@@ -292,13 +287,11 @@
         /* Employee info styling - Purple Theme */
         .employee-info {
             color: #333;
-            font-size: 1.1rem;
-            /* Reduced from 1.2rem */
-            padding: 0.75rem;
-            /* Reduced from 1rem */
+            font-size: 1.2rem;
+            padding: 1rem;
             border-radius: 8px;
             border-left: 4px solid #10481b;
-            margin-bottom: 0.75rem;
+            margin-bottom: 1rem;
         }
 
         .employee-info strong {
@@ -311,7 +304,14 @@
     </style>
 </head>
 
-<body>
+<body style="--theme-color: #00641a; --theme-rgb: 0, 100, 26;">
+    <!-- Mobile Header -->
+    <header class="mobile-header">
+        <img src="citysavings_logo.png" alt="CitySavings"
+            style="height: 24px; width: auto; filter: brightness(0) invert(1);">
+        <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button>
+    </header>
+
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
@@ -322,12 +322,12 @@
                 <a class="nav-link" href="index4.html">PLI</a>
                 <a class="nav-link" href="index5.html">LE</a>
             </div>
-            <button class="logout-btn" onclick="logout()">↪</button>
+            <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button>
         </div>
     </nav>
 
     <div class="page-header"
-        style="position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: center;">
+        style="position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding-top: 10px;">
         <div class="page-subtitle">Payroll Management System</div>
         <div style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
             <h1 style="margin: 0;">ON QUEUE RESULTS</h1>
@@ -384,6 +384,29 @@
         </div>
     </div>
 
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav" style="--theme-color: #00641a; --theme-rgb: 0, 100, 26;">
+        <a href="index.html" class="bottom-nav-link">
+            <i class="bi bi-wallet2"></i>
+            <span>NETPAY</span>
+        </a>
+        <a href="index2.html" class="bottom-nav-link">
+            <i class="bi bi-cash-stack"></i>
+            <span>DEDAMT</span>
+        </a>
+        <a href="index3.html" class="bottom-nav-link active">
+            <i class="bi bi-hourglass-split"></i>
+            <span>ONQ</span>
+        </a>
+        <a href="index4.html" class="bottom-nav-link">
+            <i class="bi bi-file-earmark-text"></i>
+            <span>PLI</span>
+        </a>
+        <a href="index5.html" class="bottom-nav-link">
+            <i class="bi bi-calculator"></i>
+            <span>LE</span>
+        </a>
+    </div>
     <!-- Admin Section (Upload) -->
     <div class="admin-section container-admin" style="display: none;">
         <div class="admin-card">

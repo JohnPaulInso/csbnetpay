@@ -403,7 +403,7 @@ async function displayEmployeeInfoOnq(monthName, csvData) {
     }
 
     if (!employeeFound) {
-        employeeInfoSectionOnq.innerHTML = 'Employee not found.';
+        showErrorCard(employeeInfoSectionOnq, 'Employee ID not found in latest month.');
     }
 }
 
@@ -459,6 +459,11 @@ function displayResultsTableOnq(fetchedDataOnq) {
             }
         });
     });
+
+    if (resultsMap.size === 0) {
+        resultsSectionOnq.innerHTML = '';
+        return;
+    }
 
     resultsMap.forEach((data, monthName) => {
         const monthRow = document.createElement('tr');
@@ -618,6 +623,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-window.onload = () => {
-    checkLoggedInUser();
-};
+
+// Helper to show premium error card
+function showErrorCard(container, message) {
+    container.innerHTML = `
+        <div class="error-card">
+            <i class="bi bi-exclamation-circle-fill"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    container.className = ''; // Remove profile-card class if present
+}
