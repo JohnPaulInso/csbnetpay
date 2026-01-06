@@ -17,7 +17,7 @@ nav {
 
 .table {
     border: 1px solid #ffffff4a;
-    font-size: 12px;
+    font-size: 15px;
 }
 
 .table th,
@@ -220,7 +220,7 @@ nav {
     }
 
     .table {
-        font-size: 1em;
+        font-size: 1.2em;
         /* Increase table text size */
     }
 
