@@ -4,7 +4,7 @@
   "short_name": "Netpay Search",
   "start_url": "/csbnetpay/index.html",
   "display": "standalone",
-  "background_color": "#4F2683",
+  "background_color": "#1f1f1f",
   "theme_color": "#4F2683",
   "icons": [
     {

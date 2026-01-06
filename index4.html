@@ -285,6 +285,12 @@
     }
 
     document.addEventListener("DOMContentLoaded", function () {
+      // Theme Sync
+      const themeColor = getComputedStyle(document.body).getPropertyValue('--theme-color').trim();
+      if (themeColor) {
+        document.getElementById('theme-meta').setAttribute('content', themeColor);
+      }
+
       initSwipeNavigation();
       const resultsSection = document.getElementById("resultsSection");
 

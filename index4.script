@@ -63,6 +63,28 @@ async function searchEmployeePLI() {
         return;
     }
 
+    // --- Offline Check ---
+    if (!navigator.onLine) {
+        const cacheKey = `cache_pli_${searchInputPLI}`;
+        const cachedItem = sessionStorage.getItem(cacheKey);
+        
+        if (!cachedItem) {
+            if (employeeInfoSectionPLI) {
+                employeeInfoSectionPLI.innerHTML = `
+                    <div class="offline-card">
+                        <i class="bi bi-emoji-frown"></i>
+                        <span>Unable to search, you are currently offline</span>
+                        <small>Please check your internet connection and try again.</small>
+                    </div>
+                `;
+                employeeInfoSectionPLI.className = '';
+                if (resultsSectionElement) resultsSectionElement.style.display = 'block';
+            }
+            if (resultsSectionPLI) resultsSectionPLI.innerHTML = '';
+            return;
+        }
+    }
+
     const micBtn = document.getElementById('micBtn');
 
     // Start search state

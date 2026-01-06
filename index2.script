@@ -36,6 +36,32 @@ function searchEmployeePos() {
     const empNo = document.getElementById("searchInputPos").value.trim();
     if (!empNo) return;
 
+    // --- Offline Check ---
+    if (!navigator.onLine) {
+        const cacheKey = `cache_dedamt_${empNo}`;
+        const cachedItem = sessionStorage.getItem(cacheKey);
+        
+        if (!cachedItem) {
+            const employeeInfoSection = document.getElementById("employeeInfoPos");
+            const resultsSection = document.getElementById("resultsSection");
+            const resultsContainer = document.getElementById("resultspos");
+
+            if (employeeInfoSection) {
+                employeeInfoSection.innerHTML = `
+                    <div class="offline-card">
+                        <i class="bi bi-emoji-frown"></i>
+                        <span>Unable to search, you are currently offline</span>
+                        <small>Please check your internet connection and try again.</small>
+                    </div>
+                `;
+                employeeInfoSection.className = '';
+                if (resultsSection) resultsSection.style.display = "block";
+            }
+            if (resultsContainer) resultsContainer.innerHTML = '';
+            return;
+        }
+    }
+
     const searchBtn = document.getElementById("searchButtonPos");
     const resultsSection = document.getElementById("resultsSection");
     const micBtn = document.getElementById("micBtn");

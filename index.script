@@ -51,6 +51,30 @@
             return;
         }
 
+        // --- Offline Check ---
+        if (!navigator.onLine) {
+            const cacheKey = `cache_netpay_${searchInputNetpay}`;
+            const cachedItem = sessionStorage.getItem(cacheKey);
+            
+            // If we don't have it in session cache, show offline error
+            if (!cachedItem) {
+                if (employeeInfoSectionNetpay) {
+                    employeeInfoSectionNetpay.innerHTML = `
+                        <div class="offline-card">
+                            <i class="bi bi-emoji-frown"></i>
+                            <span>Unable to search, you are currently offline</span>
+                            <small>Please check your internet connection and try again.</small>
+                        </div>
+                    `;
+                    employeeInfoSectionNetpay.className = '';
+                    if (resultsSectionElement) resultsSectionElement.style.display = 'block';
+                }
+                if (resultsSectionNetpay) resultsSectionNetpay.innerHTML = '';
+                return;
+            }
+            // If we HAVE it in cache, we'll proceed below to use cached data
+        }
+
         const micBtn = document.getElementById('micBtn');
 
         // Start search state

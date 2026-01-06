@@ -20,6 +20,8 @@
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="icon" href="favicon.png" type="image/png" sizes="any">
 
+    <meta name="theme-color" id="theme-meta" content="#4F2683">
+
     <link rel="stylesheet" href="index.css">
 
     <style>
@@ -424,6 +426,12 @@
         }
 
         document.addEventListener("DOMContentLoaded", function () {
+            // Theme Sync
+            const themeColor = getComputedStyle(document.body).getPropertyValue('--theme-color').trim();
+            if (themeColor) {
+                document.getElementById('theme-meta').setAttribute('content', themeColor);
+            }
+
             initSwipeNavigation();
             const resultsSection = document.querySelector(".results-section");
 

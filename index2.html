@@ -16,12 +16,12 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <!-- Main Styles -->
-    <link rel="stylesheet" href="index.css">
-
-    <!-- Manifest & Icons -->
-    <link rel="manifest" href="/csbnetpay/manifest.json">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="icon" href="favicon.png" type="image/png" sizes="any">
+
+    <meta name="theme-color" id="theme-meta" content="#6b4600">
+
+    <link rel="stylesheet" href="index.css">
 
     <style>
         /* Prevent text selection from triggering mobile search */
@@ -301,6 +301,12 @@
         }
 
         document.addEventListener("DOMContentLoaded", function () {
+            // Theme Sync
+            const themeColor = getComputedStyle(document.body).getPropertyValue('--theme-color').trim();
+            if (themeColor) {
+                document.getElementById('theme-meta').setAttribute('content', themeColor);
+            }
+
             initSwipeNavigation();
             const resultsSection = document.getElementById("resultsSection");
 
