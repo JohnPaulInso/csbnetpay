@@ -5,7 +5,7 @@
   "start_url": "/csbnetpay/index.html",
   "display": "standalone",
   "background_color": "#1f1f1f",
-  "theme_color": "#4F2683",
+  "theme_color": "#1f1f1f",
   "icons": [
     {
       "src": "icon-192.png",

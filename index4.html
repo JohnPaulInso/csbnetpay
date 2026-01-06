@@ -104,17 +104,6 @@
 </head>
 
 <body style="--theme-color: #600e12; --theme-rgb: 96, 14, 18;">
-  <script>
-    // Immediate Theme Sync
-    function syncTheme() {
-      const themeColor = getComputedStyle(document.body).getPropertyValue('--theme-color').trim();
-      if (themeColor) {
-        const meta = document.getElementById('theme-meta');
-        if (meta) meta.setAttribute('content', themeColor);
-      }
-    }
-    syncTheme();
-  </script>
   <!-- Mobile Header -->
   <header class="mobile-header">
     <img src="citysavings_logo.png" alt="CitySavings"
