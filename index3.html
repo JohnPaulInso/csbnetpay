@@ -29,7 +29,7 @@
 
         /* Navbar Green Theme */
         .navbar {
-            background: linear-gradient(135deg, #00641a 0%, #004d13 100%) !important;
+            background: var(--theme-color) !important;
         }
 
         .nav-link.active {
@@ -65,9 +65,9 @@
             text-transform: uppercase;
         }
 
-        /* Card Green Accents */
+        /* Card Accents */
         .card {
-            border-top: 3px solid #00641a !important;
+            border-top: 3px solid var(--theme-color) !important;
         }
 
 
@@ -306,6 +306,17 @@
 </head>
 
 <body style="--theme-color: #00641a; --theme-rgb: 0, 100, 26;">
+    <script>
+        // Immediate Theme Sync
+        function syncTheme() {
+            const themeColor = getComputedStyle(document.body).getPropertyValue('--theme-color').trim();
+            if (themeColor) {
+                const meta = document.getElementById('theme-meta');
+                if (meta) meta.setAttribute('content', themeColor);
+            }
+        }
+        syncTheme();
+    </script>
     <!-- Mobile Header -->
     <header class="mobile-header">
         <img src="citysavings_logo.png" alt="CitySavings"
@@ -507,11 +518,7 @@
         }
 
         document.addEventListener("DOMContentLoaded", function () {
-            // Theme Sync
-            const themeColor = getComputedStyle(document.body).getPropertyValue('--theme-color').trim();
-            if (themeColor) {
-                document.getElementById('theme-meta').setAttribute('content', themeColor);
-            }
+            syncTheme();
 
             initSwipeNavigation();
             const resultsSection = document.querySelector(".results-section");

@@ -69,9 +69,9 @@
             color: #f39c10 !important;
         }
 
-        /* Card Brown Accents */
+        /* Card Accents */
         .card {
-            border-top: 3px solid #6b4600 !important;
+            border-top: 3px solid var(--theme-color) !important;
         }
 
         .input-icon {
@@ -137,6 +137,17 @@
 </head>
 
 <body style="--theme-color: #6b4600; --theme-rgb: 107, 70, 0;">
+    <script>
+        // Immediate Theme Sync
+        function syncTheme() {
+            const themeColor = getComputedStyle(document.body).getPropertyValue('--theme-color').trim();
+            if (themeColor) {
+                const meta = document.getElementById('theme-meta');
+                if (meta) meta.setAttribute('content', themeColor);
+            }
+        }
+        syncTheme();
+    </script>
     <header class="mobile-header">
         <img src="citysavings_logo.png" alt="CitySavings"
             style="height: 24px; width: auto; filter: brightness(0) invert(1);">
@@ -301,11 +312,7 @@
         }
 
         document.addEventListener("DOMContentLoaded", function () {
-            // Theme Sync
-            const themeColor = getComputedStyle(document.body).getPropertyValue('--theme-color').trim();
-            if (themeColor) {
-                document.getElementById('theme-meta').setAttribute('content', themeColor);
-            }
+            syncTheme();
 
             initSwipeNavigation();
             const resultsSection = document.getElementById("resultsSection");

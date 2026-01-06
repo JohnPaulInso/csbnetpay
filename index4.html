@@ -19,35 +19,35 @@
   <link rel="manifest" href="/csbnetpay/manifest.json">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="icon" href="favicon.png" type="image/png" sizes="any">
+  <meta name="theme-color" id="theme-meta" content="#600e12">
 
   <link rel="stylesheet" href="index.css">
 
   <style>
     /* Red Theme Overrides */
     .navbar {
-      background: #600e12;
-      /* Dark Red */
+      background: var(--theme-color) !important;
     }
 
     .employee-info {
-      border-left: 4px solid #600e12;
+      border-left: 4px solid var(--theme-color);
     }
 
     .employee-info strong {
-      color: #600e12;
+      color: var(--theme-color);
     }
 
     .card {
-      border-top: 3px solid #600e12 !important;
+      border-top: 3px solid var(--theme-color) !important;
     }
 
     .form-input:focus {
-      border-color: #600e12;
-      box-shadow: 0 0 0 4px rgba(96, 14, 18, 0.1);
+      border-color: var(--theme-color);
+      box-shadow: 0 0 0 4px rgba(var(--theme-rgb), 0.1);
     }
 
     .form-input:focus+.input-icon {
-      color: #600e12;
+      color: var(--theme-color);
     }
 
     .btn-primary {
@@ -104,6 +104,17 @@
 </head>
 
 <body style="--theme-color: #600e12; --theme-rgb: 96, 14, 18;">
+  <script>
+    // Immediate Theme Sync
+    function syncTheme() {
+      const themeColor = getComputedStyle(document.body).getPropertyValue('--theme-color').trim();
+      if (themeColor) {
+        const meta = document.getElementById('theme-meta');
+        if (meta) meta.setAttribute('content', themeColor);
+      }
+    }
+    syncTheme();
+  </script>
   <!-- Mobile Header -->
   <header class="mobile-header">
     <img src="citysavings_logo.png" alt="CitySavings"
@@ -542,6 +553,46 @@
   </footer>
 
   <script>
+    // Swipe Navigation
+    function initSwipeNavigation() {
+      let touchstartX = 0;
+      let touchendX = 0;
+      const pages = ["index.html", "index2.html", "index3.html", "index4.html", "index5.html"];
+      const currentPage = window.location.pathname.split("/").pop() || "index4.html";
+      let currentIndex = pages.indexOf(currentPage);
+
+      if (currentIndex === -1) {
+        if (currentPage.includes("index2")) currentIndex = 1;
+        else if (currentPage.includes("index3")) currentIndex = 2;
+        else if (currentPage.includes("index4")) currentIndex = 3;
+        else if (currentPage.includes("index5")) currentIndex = 4;
+        else currentIndex = 0;
+      }
+
+      document.addEventListener('touchstart', e => {
+        touchstartX = e.changedTouches[0].screenX;
+        const target = e.target;
+        if (target.closest('.table-scroll-wrapper') || target.closest('.responsive-table')) return;
+      }, { passive: true });
+
+      document.addEventListener('touchend', e => {
+        touchendX = e.changedTouches[0].screenX;
+        const threshold = 100;
+        const swipeDist = touchendX - touchstartX;
+        if (Math.abs(swipeDist) < threshold) return;
+        if (swipeDist < 0 && currentIndex < pages.length - 1) {
+          window.location.href = pages[currentIndex + 1];
+        } else if (swipeDist > 0 && currentIndex > 0) {
+          window.location.href = pages[currentIndex - 1];
+        }
+      }, { passive: true });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      syncTheme();
+      initSwipeNavigation();
+    });
+
     async function updateVersionDisplay() {
       try {
         const response = await fetch('version.json?t=' + Date.now());
