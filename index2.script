@@ -35,9 +35,6 @@ function searchEmployeePos() {
     const loader = document.getElementById("loadingIndicatorPos");
     loader.style.display = "block";
 
-    const resultsContainer = document.querySelector(".results-section");
-    if (resultsContainer) resultsContainer.style.display = "none";
-
     const monthNames = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
     const files = [];
 
@@ -56,9 +53,6 @@ function searchEmployeePos() {
             }
 
             valid.sort((a, b) => b.date - a.date);
-
-            const resultsContainer = document.querySelector(".results-section");
-            if (resultsContainer) resultsContainer.style.display = "block";
 
             displayEmployeeInfoPos(valid);
             displayResultsTablePos(valid);

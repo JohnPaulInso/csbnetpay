@@ -68,13 +68,9 @@
         fetchedDataNet.sort((a, b) => b.date - a.date);
 
         if (fetchedDataNet.length > 0) {
-            const resultsContainer = document.querySelector(".results-section");
-            if (resultsContainer) resultsContainer.style.display = "block";
             displayEmployeeInfoNetpay(fetchedDataNet[0].monthName, fetchedDataNet[0].csvData);
             displayResultsTableNetpay(fetchedDataNet);
         } else {
-            const resultsContainer = document.querySelector(".results-section");
-            if (resultsContainer) resultsContainer.style.display = "block";
             employeeInfoSectionNetpay.innerHTML = 'No data available for the most recent month.';
         }
 

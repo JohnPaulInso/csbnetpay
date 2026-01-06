@@ -179,15 +179,15 @@
 
         <!-- Loading Indicator -->
         <div id="loadingIndicatorNetpay" class="loading-indicator">
-            <div class="modern-loader" style="align-items: center;"></div>
+            <img src="loading.gif" alt="Loading...">
         </div>
     </div>
 
     <!-- Listening Overlay -->
-    <div id=" listeningOverlay" class="listening-overlay"></div>
+    <div id="listeningOverlay" class="listening-overlay"></div>
 
     <!-- Results Section -->
-    <div class="results-section" style="display: none;">
+    <div class="results-section">
         <h3 id="employeeInfoNetpay" class="employee-info"></h3>
         <div id="resultsNetpay" class="table-container">
             <!-- Table will be dynamically inserted here -->
@@ -209,8 +209,7 @@
                 <div>
                     <div class="admin-card__eyebrow">Admin · Abstract uploader</div>
                     <h5>Upload Latest Abstract</h5>
-                    <p>Select the month and year, then upload an .xlsx file with NETPAY, POS, ONQUEUE, and PLI
-                        sheets.
+                    <p>Select the month and year, then upload an .xlsx file with NETPAY, POS, ONQUEUE, and PLI sheets.
                     </p>
                 </div>
                 <div class="summary-chip">Uploading</div>
@@ -252,8 +251,7 @@
                         <div class="convert-hint">Convert to CSV before distributing to your team.</div>
                     </div>
 
-                    <small id="pliWarning" class="warning-text">Take note: Recheck the PLI file exceeding 25
-                        MB</small>
+                    <small id="pliWarning" class="warning-text">Take note: Recheck the PLI file exceeding 25 MB</small>
 
                     <div id="progressContainer" class="progress-container">
                         <div class="progress">
@@ -431,10 +429,10 @@
                         searchBtn.style.cursor = "pointer";
 
                         // Show results section after search completes
-                        // const resultsSection = document.querySelector(".results-section");
-                        // if (resultsSection) {
-                        //     resultsSection.style.display = "block";
-                        // }
+                        const resultsSection = document.querySelector(".results-section");
+                        if (resultsSection) {
+                            resultsSection.style.display = "block";
+                        }
                     }, 2000);
                 } else {
                     console.log("❌ No Employee Number Entered.");
