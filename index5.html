@@ -5,7 +5,7 @@
     <title>Historical Netpay</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="styles.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="icon" href="favicon.png" type="image/png" sizes="any">
@@ -332,8 +332,8 @@
 
 
             <tr>
-                <td class="smallfont" style="border: 1px solid #ccc; padding: 10px;">LOAN AMT</td>
-                <td style="border: 1px solid #ccc; padding: 10px;">
+                <td class="smallfont" style="border: 1px solid #ccc; padding: 6px;">LOAN AMT</td>
+                <td style="border: 1px solid #ccc; padding: 6px;">
                     <input type="text" class="form-control bg-dark text-light border-0 loanAmountInput" id="loanAmount"
                         value="50,000" onblur="formatLoanAmount()" />
                 </td>
@@ -341,10 +341,10 @@
 
             <!-- Terms Row -->
             <tr>
-                <td class="smallfont" style="border: 1px solid #ccc; padding: 10px;">TERM</td>
-                <td style="border: 1px solid #ccc; padding: 10px;">
+                <td class="smallfont" style="border: 1px solid #ccc; padding: 6px;">TERM</td>
+                <td style="border: 1px solid #ccc; padding: 6px;">
                     <select id="terms" class="form-select bg-dark text-light border-0 termsSelect"
-                        style="padding: 10px; width: 100%;" onchange="updateInterestRate()">
+                        style="padding: 6px; width: 100%;" onchange="updateInterestRate()">
                         <script>
                             for (let i = 6; i <= 60; i++) {
                                 document.write('<option value="' + i + '"' + (i === 60 ? ' selected' : '') + '>' + i + '</option>');
@@ -356,10 +356,10 @@
 
             <!-- Interest Rate Row (Read Only) -->
             <tr class="d-none">
-                <td style="border: 1px solid #ccc; padding: 10px;">Interest Rate (%)</td>
-                <td style="border: 1px solid #ccc; padding: 10px;">
+                <td style="border: 1px solid #ccc; padding: 6px;">Interest Rate (%)</td>
+                <td style="border: 1px solid #ccc; padding: 6px;">
                     <input type="text" class="form-control bg-dark text-light" id="rate" value="9.66"
-                        style="border: 1px solid #ccc; padding: 10px; width: 100%;" readonly />
+                        style="border: 1px solid #ccc; padding: 6px; width: 100%;" readonly />
                 </td>
             </tr>
 
@@ -463,18 +463,18 @@
 
 
                 <tr class="plihide">
-                    <td id="A10" class="smallfont" style="border: 1px solid #ccc; padding: 10px;">ANTICPT</td>
-                    <td style="border: 1px solid #ccc; padding: 10px; color: #5f5f5f;">
+                    <td id="A10" class="smallfont" style="border: 1px solid #ccc; padding: 6px;">ANTICPT</td>
+                    <td style="border: 1px solid #ccc; padding: 6px; color: #5f5f5f;">
                         <input id="anticipation" type="number" value=""
                             class="form-control bg-dark text-light border-0">
 
                     </td>
                     <td class="d-none" id="anticipationhidden"
-                        style="border: 1px solid #ccc; padding: 10px; color: white;"></td>
+                        style="border: 1px solid #ccc; padding: 6px; color: white;"></td>
                 </tr>
                 <tr class="plihide">
-                    <td id="A11" class="smallfont" style="border: 1px solid #ccc; padding: 10px;">PRMTION</td>
-                    <td style="border: 1px solid #ccc; padding: 10px; color: #5f5f5f;">
+                    <td id="A11" class="smallfont" style="border: 1px solid #ccc; padding: 6px;">PRMTION</td>
+                    <td style="border: 1px solid #ccc; padding: 6px; color: #5f5f5f;">
 
 
 
@@ -551,7 +551,7 @@
 
 
                     <td class="d-none" value="" id="promotionhidden"
-                        style="border: 1px solid #ccc; padding: 10px; color: white;">
+                        style="border: 1px solid #ccc; padding: 6px; color: white;">
 
 
 

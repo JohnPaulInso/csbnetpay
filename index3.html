@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Historical Netpay</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -55,7 +55,7 @@
 
         /* Page Header - Keep Original Style */
         .page-header {
-            /* Remove green background override */
+            /* Keep original styles */
         }
 
         .page-subtitle {
@@ -109,7 +109,8 @@
             color: white;
             font-weight: 600;
             text-align: left;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
+            /* Reduced from 0.85rem */
             border-bottom: 2px solid #00c12d;
         }
 
@@ -124,7 +125,8 @@
 
         .responsive-table tbody td {
             color: #333;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
+            /* Reduced from 0.85rem */
         }
 
         .detail-table {
@@ -262,8 +264,8 @@
         }
 
         .detail-table {
-            min-width: 500px;
-            /* Ensure table doesn't get too compressed */
+            width: 100%;
+            /* Changed from min-width: 500px */
         }
 
         .detail-table th,
@@ -290,11 +292,13 @@
         /* Employee info styling - Purple Theme */
         .employee-info {
             color: #333;
-            font-size: 1.2rem;
-            padding: 1rem;
+            font-size: 1.1rem;
+            /* Reduced from 1.2rem */
+            padding: 0.75rem;
+            /* Reduced from 1rem */
             border-radius: 8px;
             border-left: 4px solid #10481b;
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
         }
 
         .employee-info strong {
