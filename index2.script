@@ -68,12 +68,15 @@ function searchEmployeePos() {
     const loader = document.getElementById("loadingIndicatorPos");
     const resultsContainer = document.getElementById("resultspos");
     const employeeInfoSection = document.getElementById("employeeInfoPos");
+    const particles = document.getElementById("searchParticles");
 
     // Start search state
     isSearchingPos = true;
     searchBtn.disabled = true;
     if (micBtn) micBtn.disabled = true;
     searchBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Searching...';
+    // searchBtn.classList.add('searching'); // Removed pulse effect
+    // if (particles) particles.classList.add('active'); // Removed start animation
     localStorage.setItem("employeeNumber", empNo);
 
     // Reset display early to avoid duplicates
@@ -84,6 +87,8 @@ function searchEmployeePos() {
         searchBtn.disabled = false;
         if (micBtn) micBtn.disabled = false;
         searchBtn.innerHTML = '<i class="bi bi-search"></i> Search Employee';
+        searchBtn.classList.remove('searching');
+        if (particles) particles.classList.remove('active');
         isSearchingPos = false;
         if (resultsSection) resultsSection.style.display = "block";
         loader.style.display = "none";
@@ -354,6 +359,15 @@ async function displayEmployeeInfoPos(allData) {
         for (let i = 1; i < file.csvData.length; i++) {
             const row = file.csvData[i];
             if (row[3] === empNo) {
+                // Trigger Confetti
+                const confetti = document.getElementById('confettiContainer');
+                if (confetti) {
+                    confetti.classList.add('active');
+                    setTimeout(() => {
+                        confetti.classList.remove('active');
+                    }, 2000);
+                }
+
                 const fname = row[4] || "";
                 const mi = row[5] || "";
                 const lname = row[6] || "";

@@ -16,6 +16,267 @@
     --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.08);
 }
 
+/* ===== Touch Feedback Animations ===== */
+/* Subtle scale animation on touch for interactive elements */
+.btn:active,
+.bottom-nav-link:active,
+.nav-link:active,
+.logout-btn:active,
+.mic-inside-input:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease-out;
+}
+
+/* Restore transform for buttons on release */
+.btn,
+.bottom-nav-link,
+.nav-link,
+.logout-btn,
+.mic-inside-input {
+    transition: transform 0.15s ease-out, background 0.2s ease, color 0.2s ease;
+}
+
+/* Touch feedback for table rows */
+.responsive-table tbody tr:active {
+    background-color: rgba(var(--theme-rgb, 79, 38, 131), 0.08);
+    transition: background-color 0.1s ease-out;
+}
+
+/* ===== Pinch-to-Zoom for Tables Only ===== */
+/* Allow pinch-to-zoom on table/results area */
+.results-section,
+.table-container {
+    touch-action: pan-x pan-y pinch-zoom;
+}
+
+/* Keep header and navigation fixed during zoom */
+.mobile-header,
+.navbar,
+.bottom-nav {
+    position: fixed;
+    touch-action: none;
+    transform: none !important;
+    will-change: auto;
+}
+
+/* Fix mobile header positioning */
+.mobile-header {
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+}
+
+/* Fix bottom nav positioning */
+.bottom-nav {
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+/* ===== Confetti Celebration Animation ===== */
+/* Container for confetti - sits on top of search card */
+.confetti-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2000;
+    overflow: visible;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.confetti-container.active {
+    opacity: 1;
+}
+
+/* Confetti pieces */
+.confetti {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: var(--theme-color, #4F2683);
+    opacity: 0;
+    /* Default spreads (overridden by nth-child) */
+    --spread-x: 0vw;
+    --spread-y: 0vh;
+}
+
+/* Left side confetti - Start outside left */
+.confetti.left {
+    left: -10%;
+    top: 70%; /* Start lower */
+    transform-origin: center;
+    animation: confetti-throw-left 2s ease-out forwards;
+}
+
+/* Right side confetti - Start outside right */
+.confetti.right {
+    right: -10%;
+    top: 70%; /* Start lower */
+    transform-origin: center;
+    animation: confetti-throw-right 2s ease-out forwards;
+}
+
+/* Animations with Spread Variables for Triangular/Cone effect */
+@keyframes confetti-throw-left {
+    0% {
+        opacity: 0;
+        transform: translate(0, 0) rotate(0deg) scale(0);
+    }
+    15% {
+        opacity: 1;
+        transform: translate(5vw, -10vh) rotate(45deg) scale(1);
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        /* Target center (60vw) + random spread */
+        transform: translate(calc(60vw + var(--spread-x)), calc(-60vh + var(--spread-y))) rotate(720deg) scale(1);
+    }
+}
+
+@keyframes confetti-throw-right {
+    0% {
+        opacity: 0;
+        transform: translate(0, 0) rotate(0deg) scale(0);
+    }
+    15% {
+        opacity: 1;
+        transform: translate(-5vw, -10vh) rotate(-45deg) scale(1);
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        /* Target center (-60vw) + random spread (note: spread-x adds variance) */
+        transform: translate(calc(-60vw + var(--spread-x)), calc(-60vh + var(--spread-y))) rotate(-720deg) scale(1);
+    }
+}
+
+/* Spread Generators (Triangular Scattering) */
+/* The 'spread' values deviate the end-point, creating a cone from the start point */
+.confetti:nth-child(1) { --spread-x: 10vw; --spread-y: -10vh; }
+.confetti:nth-child(2) { --spread-x: -5vw; --spread-y: 5vh; }
+.confetti:nth-child(3) { --spread-x: 15vw; --spread-y: -20vh; }
+.confetti:nth-child(4) { --spread-x: -12vw; --spread-y: 10vh; }
+.confetti:nth-child(5) { --spread-x: 5vw; --spread-y: -5vh; }
+.confetti:nth-child(6) { --spread-x: -8vw; --spread-y: -15vh; }
+.confetti:nth-child(7) { --spread-x: 12vw; --spread-y: 8vh; }
+.confetti:nth-child(8) { --spread-x: 0vw; --spread-y: -25vh; } /* High shot */
+.confetti:nth-child(9) { --spread-x: -15vw; --spread-y: -5vh; }
+.confetti:nth-child(10) { --spread-x: 8vw; --spread-y: 12vh; }
+.confetti:nth-child(11) { --spread-x: -2vw; --spread-y: -18vh; }
+.confetti:nth-child(12) { --spread-x: 18vw; --spread-y: 0vh; }
+.confetti:nth-child(13) { --spread-x: -10vw; --spread-y: -12vh; }
+.confetti:nth-child(14) { --spread-x: 2vw; --spread-y: -30vh; } /* High shot */
+.confetti:nth-child(15) { --spread-x: -6vw; --spread-y: 5vh; }
+
+/* Mirror for Right Side (using same spreads creates symmetry in divergence) */
+.confetti:nth-child(16) { --spread-x: -10vw; --spread-y: -10vh; } /* Invert X for mirroring */
+.confetti:nth-child(17) { --spread-x: 5vw; --spread-y: 5vh; }
+.confetti:nth-child(18) { --spread-x: -15vw; --spread-y: -20vh; }
+.confetti:nth-child(19) { --spread-x: 12vw; --spread-y: 10vh; }
+.confetti:nth-child(20) { --spread-x: -5vw; --spread-y: -5vh; }
+.confetti:nth-child(21) { --spread-x: 8vw; --spread-y: -15vh; }
+.confetti:nth-child(22) { --spread-x: -12vw; --spread-y: 8vh; }
+.confetti:nth-child(23) { --spread-x: 0vw; --spread-y: -25vh; }
+.confetti:nth-child(24) { --spread-x: 15vw; --spread-y: -5vh; }
+.confetti:nth-child(25) { --spread-x: -8vw; --spread-y: 12vh; }
+.confetti:nth-child(26) { --spread-x: 2vw; --spread-y: -18vh; }
+.confetti:nth-child(27) { --spread-x: -18vw; --spread-y: 0vh; }
+.confetti:nth-child(28) { --spread-x: 10vw; --spread-y: -12vh; }
+.confetti:nth-child(29) { --spread-x: -2vw; --spread-y: -30vh; }
+.confetti:nth-child(30) { --spread-x: 6vw; --spread-y: 5vh; }
+
+/* Random Stylings (Opacities/Colors) */
+.confetti:nth-child(4n) { opacity: 0.8; }
+.confetti:nth-child(4n+1) { opacity: 0.6; }
+.confetti:nth-child(4n+2) { opacity: 1; filter: brightness(1.2); }
+.confetti:nth-child(4n+3) { opacity: 0.9; filter: brightness(0.8); }
+
+.confetti:nth-child(odd) { animation-duration: 1.8s; }
+.confetti:nth-child(even) { animation-duration: 2.2s; }
+
+.confetti:nth-child(3n) { width: 8px; height: 4px; }
+.confetti:nth-child(3n+1) { width: 5px; height: 5px; border-radius: 50%; }
+
+/* Start Position Randomization (Vertical only, horizontal is fixed to sides) */
+/* Using Margin-Top to avoid conflict with Keyframe Translate/Top */
+/* Actually, TOP is not animated in keyframes, so we can use it. */
+.confetti:nth-child(1), .confetti:nth-child(16) { top: 70%; }
+.confetti:nth-child(2), .confetti:nth-child(17) { top: 80%; }
+.confetti:nth-child(3), .confetti:nth-child(18) { top: 90%; }
+.confetti:nth-child(4), .confetti:nth-child(19) { top: 100%; }
+.confetti:nth-child(5), .confetti:nth-child(20) { top: 110%; }
+.confetti:nth-child(6), .confetti:nth-child(21) { top: 75%; }
+.confetti:nth-child(7), .confetti:nth-child(22) { top: 85%; }
+.confetti:nth-child(8), .confetti:nth-child(23) { top: 95%; }
+.confetti:nth-child(9), .confetti:nth-child(24) { top: 105%; }
+.confetti:nth-child(10), .confetti:nth-child(25) { top: 60%; }
+.confetti:nth-child(11), .confetti:nth-child(26) { top: 115%; }
+.confetti:nth-child(12), .confetti:nth-child(27) { top: 65%; }
+.confetti:nth-child(13), .confetti:nth-child(28) { top: 55%; }
+.confetti:nth-child(14), .confetti:nth-child(29) { top: 92%; }
+.confetti:nth-child(15), .confetti:nth-child(30) { top: 82%; }
+
+/* Subtle glow effect on button when searching */
+.btn-primary.searching {
+    animation: button-pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes button-pulse {
+    0%, 100% {
+        box-shadow: 0 4px 12px rgba(var(--theme-rgb, 79, 38, 131), 0.3);
+    }
+    50% {
+        box-shadow: 0 4px 25px rgba(var(--theme-rgb, 79, 38, 131), 0.6),
+                    0 0 40px rgba(var(--theme-rgb, 79, 38, 131), 0.2);
+    }
+}
+
+/* Sparkle dots around the button */
+.btn-primary.searching::before,
+.btn-primary.searching::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    animation: sparkle 1s infinite ease-in-out;
+}
+
+.btn-primary.searching::before {
+    top: -8px;
+    left: 30%;
+    animation-delay: 0s;
+}
+
+.btn-primary.searching::after {
+    bottom: -8px;
+    right: 30%;
+    animation-delay: 0.5s;
+}
+
+@keyframes sparkle {
+    0%, 100% {
+        opacity: 0;
+        transform: scale(0);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.5);
+    }
+}
+
 .results-section {
     display: none;
 }

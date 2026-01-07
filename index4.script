@@ -86,12 +86,15 @@ async function searchEmployeePLI() {
     }
 
     const micBtn = document.getElementById('micBtn');
+    const particles = document.getElementById('searchParticles');
 
     // Start search state
     isSearchingPLI = true;
     searchBtnPLI.disabled = true;
     if (micBtn) micBtn.disabled = true;
     searchBtnPLI.innerHTML = '<i class="bi bi-hourglass-split"></i> Searching...';
+    // searchBtnPLI.classList.add('searching');
+    // if (particles) particles.classList.add('active');
     localStorage.setItem("employeeNumber", searchInputPLI);
 
     // Reset display early to avoid duplicates
@@ -102,6 +105,8 @@ async function searchEmployeePLI() {
         searchBtnPLI.disabled = false;
         if (micBtn) micBtn.disabled = false;
         searchBtnPLI.innerHTML = '<i class="bi bi-search"></i> Search Employee';
+        searchBtnPLI.classList.remove('searching');
+        if (particles) particles.classList.remove('active');
         isSearchingPLI = false;
         if (resultsSectionElement) resultsSectionElement.style.display = 'block';
         loadingIndicatorPLI.style.display = 'none';
@@ -414,6 +419,15 @@ async function displayEmployeeInfoPLI(monthName, csvData) {
         const empno = row[3];
         if (empno === document.getElementById('searchInputPLI').value.trim()) {
             employeeFound = true;
+
+            // Trigger Confetti
+            const confetti = document.getElementById('confettiContainer');
+            if (confetti) {
+                confetti.classList.add('active');
+                setTimeout(() => {
+                    confetti.classList.remove('active');
+                }, 2000);
+            }
 
             const div = row[1];
             const sta = row[2];

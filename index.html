@@ -142,6 +142,21 @@
 
     <!-- Search Section -->
     <div class="search-card">
+        <!-- Confetti Celebration -->
+        <div id="confettiContainer" class="confetti-container">
+            <div class="confetti left"></div><div class="confetti left"></div><div class="confetti left"></div>
+            <div class="confetti left"></div><div class="confetti left"></div><div class="confetti left"></div>
+            <div class="confetti left"></div><div class="confetti left"></div><div class="confetti left"></div>
+            <div class="confetti left"></div><div class="confetti left"></div><div class="confetti left"></div>
+            <div class="confetti left"></div><div class="confetti left"></div><div class="confetti left"></div>
+            
+            <div class="confetti right"></div><div class="confetti right"></div><div class="confetti right"></div>
+            <div class="confetti right"></div><div class="confetti right"></div><div class="confetti right"></div>
+            <div class="confetti right"></div><div class="confetti right"></div><div class="confetti right"></div>
+            <div class="confetti right"></div><div class="confetti right"></div><div class="confetti right"></div>
+            <div class="confetti right"></div><div class="confetti right"></div><div class="confetti right"></div>
+        </div>
+        
         <div class="card">
             <div class="input-group">
                 <label class="input-label" for="searchInputNetpay">Employee Number</label>
@@ -160,7 +175,6 @@
                             <i class="bi bi-mic-fill"></i>
                         </button>
                     </div>
-
 
 
 
@@ -401,45 +415,9 @@
 ">Stop</button>
 
     <script>
-        // Swipe Navigation
-        function initSwipeNavigation() {
-            let touchstartX = 0;
-            let touchendX = 0;
-            const pages = ["index.html", "index2.html", "index3.html", "index4.html", "index5.html"];
-            const currentPage = window.location.pathname.split("/").pop() || "index.html";
-            let currentIndex = pages.indexOf(currentPage);
-
-            // Fallback for file:// URLs or unexpected pathnames
-            if (currentIndex === -1) {
-                if (currentPage.includes("index2")) currentIndex = 1;
-                else if (currentPage.includes("index3")) currentIndex = 2;
-                else if (currentPage.includes("index4")) currentIndex = 3;
-                else if (currentPage.includes("index5")) currentIndex = 4;
-                else currentIndex = 0;
-            }
-
-            document.addEventListener('touchstart', e => {
-                touchstartX = e.changedTouches[0].screenX;
-                const target = e.target;
-                if (target.closest('.table-scroll-wrapper') || target.closest('.responsive-table')) return;
-            }, { passive: true });
-
-            document.addEventListener('touchend', e => {
-                touchendX = e.changedTouches[0].screenX;
-                const threshold = 100;
-                const swipeDist = touchendX - touchstartX;
-                if (Math.abs(swipeDist) < threshold) return; if (swipeDist < 0 && currentIndex < pages.length - 1) {
-                    window.location.href = pages[currentIndex + 1];
-                } else if (swipeDist > 0 && currentIndex > 0) {
-                    window.location.href = pages[currentIndex - 1];
-                }
-            }, { passive: true });
-        }
-
         document.addEventListener("DOMContentLoaded", function () {
             syncTheme();
 
-            initSwipeNavigation();
             const resultsSection = document.querySelector(".results-section");
 
             // Ensure hidden on first load

@@ -76,12 +76,15 @@
         }
 
         const micBtn = document.getElementById('micBtn');
+        const particles = document.getElementById('searchParticles');
 
         // Start search state
         isSearchingNet = true;
         searchBtn.disabled = true;
         if (micBtn) micBtn.disabled = true;
         searchBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Searching...';
+        // searchBtn.classList.add('searching');
+        // if (particles) particles.classList.add('active');
         localStorage.setItem("employeeNumber", searchInputNetpay);
 
         // Reset display early to avoid duplicates
@@ -92,6 +95,8 @@
             searchBtn.disabled = false;
             if (micBtn) micBtn.disabled = false;
             searchBtn.innerHTML = '<i class="bi bi-search"></i> Search Employee';
+            searchBtn.classList.remove('searching');
+            if (particles) particles.classList.remove('active');
             isSearchingNet = false;
             if (resultsSectionElement) resultsSectionElement.style.display = 'block';
             loadingIndicatorNetpay.style.display = 'none';
@@ -382,6 +387,15 @@
             if (empno === searchEmpNo) {
                 employeeFound = true;
                 
+                // Trigger Confetti
+                const confetti = document.getElementById('confettiContainer');
+                if (confetti) {
+                    confetti.classList.add('active');
+                    setTimeout(() => {
+                        confetti.classList.remove('active');
+                    }, 2000);
+                }
+
                 // Add copy toast if not present
                 if (!document.querySelector('.copy-toast')) {
                     const toast = document.createElement('div');
