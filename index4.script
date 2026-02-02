@@ -37,11 +37,22 @@
 
 
 
-const csvFilesPLI = [
-    'pli_dec25.csv', 'pli_nov25.csv', 'pli_oct25.csv', 'pli_sep25.csv', 
-    'pli_aug25.csv', 'pli_jul25.csv', 'pli_jun25.csv', 'pli_may25.csv', 
-    'pli_apr25.csv', 'pli_mar25.csv', 'pli_feb25.csv', 'pli_jan25.csv'
-];
+function generateCsvFilesPLI() {
+    const files = [];
+    const currentYear = new Date().getFullYear();
+    const startYear = 2025;
+    const monthNamesShort = ['dec', 'nov', 'oct', 'sep', 'aug', 'jul', 'jun', 'may', 'apr', 'mar', 'feb', 'jan'];
+    
+    for (let year = currentYear; year >= startYear; year--) {
+        const ySuffix = year.toString().slice(-2);
+        for (const month of monthNamesShort) {
+            files.push(`pli_${month}${ySuffix}.csv`);
+        }
+    }
+    return files;
+}
+
+const csvFilesPLI = generateCsvFilesPLI();
 
 
 document.getElementById('searchButtonPLI').addEventListener('click', searchEmployeePLI);

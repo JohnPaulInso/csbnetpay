@@ -35,11 +35,22 @@ function openFullscreen() {
 // ======================= ONLY FETCH THE MOST RECENT FILE =======================
 
 // List of available CSV files (sorted in descending order for recency)
-const csvFilesOnq = [
-    'onq_dec25.csv', 'onq_nov25.csv', 'onq_oct25.csv', 'onq_sep25.csv', 'onq_aug25.csv',
-    'onq_jul25.csv', 'onq_jun25.csv', 'onq_may25.csv', 'onq_apr25.csv', 'onq_mar25.csv',
-    'onq_feb25.csv', 'onq_jan25.csv'
-];
+function generateCsvFilesOnq() {
+    const files = [];
+    const currentYear = new Date().getFullYear();
+    const startYear = 2024;
+    const monthNamesShort = ['dec', 'nov', 'oct', 'sep', 'aug', 'jul', 'jun', 'may', 'apr', 'mar', 'feb', 'jan'];
+    
+    for (let year = currentYear; year >= startYear; year--) {
+        const ySuffix = year.toString().slice(-2);
+        for (const month of monthNamesShort) {
+            files.push(`onq_${month}${ySuffix}.csv`);
+        }
+    }
+    return files;
+}
+
+const csvFilesOnq = generateCsvFilesOnq();
 
 document.getElementById('searchButtonOnq').addEventListener('click', searchEmployeeOnq);
 

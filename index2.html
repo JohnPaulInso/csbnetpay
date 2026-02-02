@@ -284,7 +284,7 @@
         <div class="admin-card">
             <h5>Already have the Positive for <span style="color: #00c12d;" id="month-name"></span>?</h5>
             <p>Please double check the month and year and make sure it's a CSV File. Example: <u
-                    id="example-file">pos_feb25.csv</u></p>
+                    id="example-file">pos_feb26.csv</u></p>
 
             <div class="form-group">
                 <div class="file-upload-wrapper">
@@ -316,7 +316,8 @@
             if (monthNameEl) monthNameEl.textContent = getPreviousMonthName();
             if (exampleFileEl) {
                 const prevMonthShort = getPreviousMonthName().substring(0, 3).toLowerCase();
-                exampleFileEl.textContent = `pos_${prevMonthShort}25.csv`;
+                const currentYrSuffix = new Date().getFullYear().toString().slice(-2);
+                exampleFileEl.textContent = `pos_${prevMonthShort}${currentYrSuffix}.csv`;
             }
         });
 

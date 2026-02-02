@@ -455,7 +455,7 @@
                                 onchange="updateFileName()">
                             <small id="fileName" class="file-name">No file chosen</small>
                             <div class="file-hint">Select your OnQueue CSV file. Example: <u
-                                    id="example-file">onq_feb25.csv</u></div>
+                                    id="example-file">onq_feb26.csv</u></div>
                         </div>
                     </div>
 
@@ -782,10 +782,10 @@
             });
         }
 
-        // Initialize admin sections when DOM is ready
         document.addEventListener("DOMContentLoaded", function () {
             const previousMonth = getPreviousMonth();
-            const previousMonthText = 'onq_' + previousMonth.short.toLowerCase() + '25.csv';
+            const currentYrSuffix = new Date().getFullYear().toString().slice(-2);
+            const previousMonthText = 'onq_' + previousMonth.short.toLowerCase() + currentYrSuffix + '.csv';
             const monthNameEl = document.getElementById("month-name");
             const exampleFileEl = document.getElementById("example-file");
 

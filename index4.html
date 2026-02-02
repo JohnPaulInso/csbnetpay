@@ -238,7 +238,7 @@
           <div class="admin-card__eyebrow">Admin · Upload</div>
           <h5>Already have the PLI Deduction for <span style="color: #00c12d;" id="month-name"></span>?</h5>
           <p>Please double check the month and year and make sure it's a CSV File. Example: <u
-              id="example-file">pli_feb25.csv</u></p>
+              id="example-file">pli_feb26.csv</u></p>
         </div>
       </div>
 
@@ -453,7 +453,8 @@
 
     window.onload = function () {
       const previousMonth = getPreviousMonth();
-      const previousMonthText = "pli_" + previousMonth.toLowerCase() + '25.csv';
+      const currentYrSuffix = new Date().getFullYear().toString().slice(-2);
+      const previousMonthText = "pli_" + previousMonth.toLowerCase() + currentYrSuffix + '.csv';
       const monthNameEl = document.getElementById("month-name");
       const exampleFileEl = document.getElementById("example-file");
       if (monthNameEl) monthNameEl.textContent = previousMonth;

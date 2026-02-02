@@ -26,11 +26,24 @@
         }
     }
 
-    const csvFilesNetpay = [
-        'dec25.csv', 'nov25.csv', 'oct25.csv', 'sep25.csv', 'aug25.csv', 'jul25.csv', 'jun25.csv', 'may25.csv', 
-        'apr25.csv', 'mar25.csv', 'feb25.csv', 'jan25.csv', 'dec24.csv', 'nov24.csv', 'oct24.csv', 'sep24.csv', 
-        'aug24.csv', 'jul24.csv', 'jun24.csv', 'may24.csv', 'apr24.csv', 'mar24.csv', 'feb24.csv'
-    ];
+    function generateCsvFilesNetpay() {
+        const files = [];
+        const currentYear = new Date().getFullYear();
+        const startYear = 2024;
+        const monthNamesShort = ['dec', 'nov', 'oct', 'sep', 'aug', 'jul', 'jun', 'may', 'apr', 'mar', 'feb', 'jan'];
+        
+        for (let year = currentYear; year >= startYear; year--) {
+            const ySuffix = year.toString().slice(-2);
+            for (const month of monthNamesShort) {
+                // Filter out months before Feb 2024 if necessary
+                if (year === 2024 && ['jan'].includes(month)) continue;
+                files.push(`${month}${ySuffix}.csv`);
+            }
+        }
+        return files;
+    }
+
+    const csvFilesNetpay = generateCsvFilesNetpay();
 
     document.getElementById('searchButtonNetpay').addEventListener('click', searchEmployeeNetpay);
 

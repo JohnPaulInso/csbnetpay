@@ -309,7 +309,7 @@
                         <div class="summary-item">
                             <div>
                                 <div class="summary-label">Year</div>
-                                <div class="summary-value" id="cartYear">2025</div>
+                                <div class="summary-value" id="cartYear">2026</div>
                             </div>
                             <span class="status-dot ready"></span>
                         </div>
@@ -360,7 +360,7 @@
             <div class="admin-card">
                 <h5>Already have the Netpay for <span style="color: #00c12d;" id="month-name"></span>?</h5>
                 <p>Please double check the month and year and make sure it's a CSV File. Example: <u
-                        id="example-file">feb25.csv</u></p>
+                        id="example-file">feb26.csv</u></p>
 
                 <div class="form-group" style="margin-bottom: 1rem;">
                     <div class="upload-chip">
@@ -859,7 +859,7 @@
             }
 
             if (yearSelect && cartYear) {
-                cartYear.textContent = yearSelect.value || "2025";
+                cartYear.textContent = yearSelect.value || new Date().getFullYear().toString();
             }
 
             if (fileInput && cartFile) {
@@ -898,11 +898,18 @@
             // Populate month dropdown
             populateMonthDropdown();
 
+            // Dynamic Year for Example File
+            const exampleFileEl = document.getElementById("example-file");
+            if (exampleFileEl) {
+                const currentYrSuffix = new Date().getFullYear().toString().slice(-2);
+                exampleFileEl.textContent = `feb${currentYrSuffix}.csv`;
+            }
+
             // Set previous month display
             const previousMonth = getPreviousMonth();
-            const previousMonthText = previousMonth.short.toLowerCase() + '25.csv';
+            const currentYrSuffix = new Date().getFullYear().toString().slice(-2);
+            const previousMonthText = previousMonth.short.toLowerCase() + currentYrSuffix + '.csv';
             const monthNameEl = document.getElementById("month-name");
-            const exampleFileEl = document.getElementById("example-file");
 
             if (monthNameEl) {
                 monthNameEl.textContent = previousMonth.full;
