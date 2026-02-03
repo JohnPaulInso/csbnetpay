@@ -164,7 +164,11 @@
                 // Filter fetched data to only include rows for this employee to minimize cache size
                 const filteredResults = fetchedDataNet.map(data => ({
                     monthName: data.monthName,
-                    csvData: data.csvData.filter((row, idx) => idx === 0 || row[3] === searchInputNetpay), // idx 0 is header
+                    csvData: data.csvData.filter((row, idx) => {
+                        if (idx === 0) return true;
+                        const empno = row[3];
+                        return empno && searchInputNetpay && empno.toString().replace(/^0+/, '') === searchInputNetpay.toString().replace(/^0+/, '');
+                    }),
                     date: data.date
                 })).filter(data => data.csvData.length > 1); // Only keep months where employee was found
 
@@ -244,11 +248,25 @@
     }
 
     function parseCSVNetpay(data) {
-        // Robust CSV parsing to handle commas inside quotes
         const rows = data.trim().split('\n');
         return rows.map(row => {
-            const matches = row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
-            return matches ? matches.map(val => val.replace(/^"|"$/g, '').trim()) : [];
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            for (let i = 0; i < row.length; i++) {
+                const char = row[i];
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            result.push(current.trim());
+            // Cleanup quotes from the values
+            return result.map(val => val.replace(/^"|"$/g, '').trim());
         });
     }
 
@@ -397,7 +415,7 @@
             const mi = row[5];
             const lname = row[6];
 
-            if (empno === searchEmpNo) {
+            if (empno && searchEmpNo && empno.toString().replace(/^0+/, '') === searchEmpNo.toString().replace(/^0+/, '')) {
                 employeeFound = true;
                 
                 // Trigger Confetti
@@ -539,8 +557,9 @@
         const searchEmpNo = document.getElementById('searchInputNetpay').value.trim();
         
         // First check if the employee exists in ANY of the data
+        const searchEmpNoNormalized = searchEmpNo.replace(/^0+/, '');
         const hasResults = fetchedDataNet.some(data => 
-            data.csvData.some(row => row.length >= 4 && row[3] === searchEmpNo)
+            data.csvData.some(row => row.length >= 4 && row[3] && row[3].toString().replace(/^0+/, '') === searchEmpNoNormalized)
         );
 
         if (!hasResults) {
@@ -578,7 +597,7 @@
                 if (row.length < 4) return;
 
                 const empno = row[3];
-                if (empno === searchEmpNo) {
+                if (empno && searchEmpNo && empno.toString().replace(/^0+/, '') === searchEmpNo.toString().replace(/^0+/, '')) {
                     const cleanAmount = (row[7] || '0').replace(/[",]/g, '');
                     const takehomeVal = parseFloat(cleanAmount);
                     const takehome = takehomeVal.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });

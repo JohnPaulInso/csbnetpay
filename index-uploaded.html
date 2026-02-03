@@ -728,6 +728,8 @@ setTimeout(() => {
 
         // Auto-fill from localStorage
         window.addEventListener("DOMContentLoaded", () => {
+            populateMonthDropdown();
+            populateYearDropdown();
             const employeeNumber = localStorage.getItem("employeeNumber");
             if (employeeNumber) {
                 const possibleInputIds = ["searchInputNetpay", "searchInputPos", "searchInputOnq", "searchInputPLI"];
@@ -748,6 +750,12 @@ setTimeout(() => {
             const currentDate = new Date();
             const currentMonth = currentDate.getMonth();
             const monthSelect = document.getElementById("monthSelect");
+            if (!monthSelect) return;
+
+            // Clear existing options except the first one
+            while (monthSelect.children.length > 1) {
+                monthSelect.removeChild(monthSelect.lastChild);
+            }
 
             for (let i = 2; i >= 0; i--) {
                 const monthIndex = (currentMonth - i + 12) % 12;
@@ -755,6 +763,24 @@ setTimeout(() => {
                 option.value = months[monthIndex].substring(0, 3).toLowerCase();
                 option.text = months[monthIndex];
                 monthSelect.appendChild(option);
+            }
+        }
+
+        function populateYearDropdown() {
+            const currentYear = new Date().getFullYear();
+            const yearSelect = document.getElementById("yearSelect");
+            if (!yearSelect) return;
+
+            // Clear existing options
+            yearSelect.innerHTML = "";
+
+            // Add current year and some surrounding years
+            for (let year = currentYear - 1; year <= currentYear + 1; year++) {
+                const option = document.createElement("option");
+                option.value = year.toString();
+                option.text = year.toString();
+                if (year === currentYear) option.selected = true;
+                yearSelect.appendChild(option);
             }
         }
 
@@ -822,6 +848,7 @@ setTimeout(() => {
 
         window.onload = function() {
             populateMonthDropdown();
+            populateYearDropdown();
             const previousMonth = getPreviousMonth();
             const currentYrSuffix = new Date().getFullYear().toString().slice(-2);
             const previousMonthText = previousMonth.short.toLowerCase() + currentYrSuffix + '.csv';

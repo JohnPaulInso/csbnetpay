@@ -162,7 +162,11 @@ function searchEmployeeOnq() {
                 }
 
                 // Filter CSV data to only include rows for this employee
-                const filteredCsvData = data.csvData.filter((row, idx) => idx === 0 || row[3] === searchInputOnq);
+                const filteredCsvData = data.csvData.filter((row, idx) => {
+                    if (idx === 0) return true;
+                    const empno = row[3];
+                    return empno && searchInputOnq && empno.toString().replace(/^0+/, '') === searchInputOnq.toString().replace(/^0+/, '');
+                });
 
                 if (filteredCsvData.length > 1) {
                     const cachePayload = {
@@ -256,7 +260,24 @@ function getMonthNameFromCsvOnq(csvFile) {
 
 function parseCSVOnq(data) {
     const rows = data.trim().split('\n');
-    return rows.map(row => row.split(','));
+    return rows.map(row => {
+        const result = [];
+        let current = '';
+        let inQuotes = false;
+        for (let i = 0; i < row.length; i++) {
+            const char = row[i];
+            if (char === '"') {
+                inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+                result.push(current.trim());
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+        result.push(current.trim());
+        return result.map(val => val.replace(/^"|"$/g, '').trim());
+    });
 }
 
 // Global mapping for customer info
@@ -409,8 +430,8 @@ async function displayEmployeeInfoOnq(monthName, csvData) {
     for (let i = 1; i < csvData.length; i++) {
         const row = csvData[i];
         if (row.length < 4) continue;
-        const empno = row[3];
-        if (empno === document.getElementById('searchInputOnq').value.trim()) {
+        const searchInputVal = document.getElementById('searchInputOnq').value.trim();
+        if (empno && searchInputVal && empno.toString().replace(/^0+/, '') === searchInputVal.toString().replace(/^0+/, '')) {
             employeeFound = true;
 
             // Trigger Confetti
@@ -582,8 +603,8 @@ function displayResultsTableOnq(fetchedDataOnq) {
         data.csvData.forEach((row, index) => {
             if (index === 0) return;
 
-            const empno = row[3];
-            if (empno === document.getElementById('searchInputOnq').value.trim()) {
+            const searchInputVal = document.getElementById('searchInputOnq').value.trim();
+            if (empno && searchInputVal && empno.toString().replace(/^0+/, '') === searchInputVal.toString().replace(/^0+/, '')) {
                 const monthName = data.monthName;
                 const dedamt = parseFloat(row[13]);
                 

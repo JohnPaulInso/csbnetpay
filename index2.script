@@ -145,7 +145,7 @@ function searchEmployeePos() {
             const filteredResults = valid.map(data => ({
                 monthName: data.monthName,
                 date: data.date,
-                csvData: data.csvData.filter((row, idx) => idx === 0 || row[3] === empNo) // idx 0 is header
+                csvData: data.csvData.filter((row, idx) => idx === 0 || (row[3] && empNo && row[3].toString().replace(/^0+/, '') === empNo.toString().replace(/^0+/, ''))) // idx 0 is header
             })).filter(data => data.csvData.length > 1); // Only keep months where employee was found
 
             if (filteredResults.length > 0) {
@@ -205,7 +205,25 @@ function getMonthNameFromCsvPos(file) {
 }
 
 function parseCSVPos(data) {
-    return data.trim().split("\n").map(r => r.split(","));
+    const rows = data.trim().split('\n');
+    return rows.map(row => {
+        const result = [];
+        let current = '';
+        let inQuotes = false;
+        for (let i = 0; i < row.length; i++) {
+            const char = row[i];
+            if (char === '"') {
+                inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+                result.push(current.trim());
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+        result.push(current.trim());
+        return result.map(val => val.replace(/^"|"$/g, '').trim());
+    });
 }
 
 // Global mapping for customer info
@@ -359,7 +377,7 @@ async function displayEmployeeInfoPos(allData) {
     for (const file of allData) {
         for (let i = 1; i < file.csvData.length; i++) {
             const row = file.csvData[i];
-            if (row[3] === empNo) {
+            if (row[3] && empNo && row[3].toString().replace(/^0+/, '') === empNo.toString().replace(/^0+/, '')) {
                 // Trigger Confetti
                 const confetti = document.getElementById('confettiContainer');
                 if (confetti) {
