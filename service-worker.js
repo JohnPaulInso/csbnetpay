@@ -2,9 +2,9 @@
  * CHANGE DETAILS:
  * File: service-worker.js
  * Date: 2026-07-07
- *      Bumped cache version to v13 to force clients to update immediately.
+ *      Bumped cache version to v14 to force clients to update immediately and resolve HEAD fetch bugs.
  */
-const CACHE_NAME = "csb-search-v13";
+const CACHE_NAME = "csb-search-v14";
 const ASSETS = [
   "./",
   "index.html",
@@ -55,6 +55,10 @@ self.addEventListener("activate", e => {
 });
 
 self.addEventListener("fetch", e => {
+  // Bypass service worker interception for HEAD requests to prevent fetch validation exceptions
+  if (e.request.method === 'HEAD') {
+    return;
+  }
   e.respondWith(
     caches.match(e.request).then(response => {
       return response || fetch(e.request);
