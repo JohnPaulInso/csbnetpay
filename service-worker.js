@@ -1,5 +1,5 @@
-/* CHANGE: 2026-07-07 — Bumped to v6: strip commas from column N (row[13]) in pos_ files before parseFloat */
-const CACHE_NAME = "csb-search-v6";
+/* CHANGE: 2026-07-07 — Bumped to v7: fix ReferenceError: empno is not defined in index3.script */
+const CACHE_NAME = "csb-search-v7";
 const ASSETS = [
   "./",
   "index.html",

@@ -431,6 +431,14 @@ async function displayEmployeeInfoOnq(monthName, csvData) {
         const row = csvData[i];
         if (row.length < 4) continue;
         const searchInputVal = document.getElementById('searchInputOnq').value.trim();
+        /*
+         * CHANGE DETAILS:
+         * Element: displayEmployeeInfoOnq — empno declaration
+         * Date: 2026-07-07
+         * Fix: ReferenceError: empno is not defined.
+         *      empno must be read from row[3] (Column D = Employee No) of each CSV row.
+         */
+        const empno = row[3];   // Column D (index 3) = Employee Number
         if (empno && searchInputVal && empno.toString().replace(/^0+/, '') === searchInputVal.toString().replace(/^0+/, '')) {
             employeeFound = true;
 
@@ -604,6 +612,14 @@ function displayResultsTableOnq(fetchedDataOnq) {
             if (index === 0) return;
 
             const searchInputVal = document.getElementById('searchInputOnq').value.trim();
+            /*
+             * CHANGE DETAILS:
+             * Element: displayResultsTableOnq — empno declaration
+             * Date: 2026-07-07
+             * Fix: ReferenceError: empno is not defined.
+             *      empno must be read from row[3] (Column D = Employee No) of each CSV row.
+             */
+            const empno = row[3];   // Column D (index 3) = Employee Number
             if (empno && searchInputVal && empno.toString().replace(/^0+/, '') === searchInputVal.toString().replace(/^0+/, '')) {
                 const monthName = data.monthName;
                 const dedamt = parseFloat(row[13]);
