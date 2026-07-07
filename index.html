@@ -322,6 +322,14 @@
 
                     <small id="pliWarning" class="warning-text">Take note: Recheck the PLI file exceeding 25 MB</small>
 
+                    <!-- FIX: 2026-07-07 - Added crash-resume banner for interrupted conversions -->
+                    <!-- Element: convertResumeBanner - shown when localStorage detects a prior crashed session -->
+                    <div id="convertResumeBanner" style="display:none; background: #2d1a00; border: 1px solid #f59e0b; border-radius: 8px; padding: 10px 14px; margin-bottom: 10px; color: #fbbf24; font-size: 0.85rem; display: flex; align-items: center; gap: 10px;">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <span id="convertResumeBannerText">Last conversion was interrupted. Please re-upload the file to retry.</span>
+                        <button onclick="dismissResumeBanner()" style="margin-left:auto; background:none; border:none; color:#fbbf24; cursor:pointer; font-size: 1rem;">&times;</button>
+                    </div>
+
                     <div id="progressContainer" class="progress-container">
                         <div class="progress">
                             <div id="progressBar" class="progress-bar">0%</div>
@@ -372,6 +380,53 @@
             </div>
         </div>
     </div>
+
+    <!-- FEATURE: 2026-07-07 - Admin Coverage Table -->
+    <!-- Element: adminCoverageSection - shows which months have been uploaded for each data type -->
+    <!-- Function: Performs HEAD requests against known CSV filenames to detect presence/absence per month -->
+    <div class="admin-section container-admin" style="display: none; margin-top: 1rem;">
+        <div class="admin-card admin-coverage-card">
+            <div class="admin-card__header">
+                <div>
+                    <div class="admin-card__eyebrow">Admin · Upload Coverage</div>
+                    <p>Shows which months have been uploaded. Checks the last 12 months automatically.</p>
+                </div>
+                <div class="summary-chip">Coverage</div>
+            </div>
+
+            <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                <!-- Element: coverageTableWrapper - scrollable container for the month/type coverage grid -->
+                <div id="coverageTableWrapper" style="min-width: 340px;">
+                    <table id="coverageTable" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                        <thead>
+                            <tr style="background: #1a0d2e; color: white; text-align: center;">
+                                <th style="padding: 10px 14px; text-align: left; font-weight: 600;">Month</th>
+                                <th style="padding: 10px 8px; font-weight: 600;">NETPAY</th>
+                                <th style="padding: 10px 8px; font-weight: 600;">POS</th>
+                                <th style="padding: 10px 8px; font-weight: 600;">ONQ</th>
+                                <th style="padding: 10px 8px; font-weight: 600;">PLI</th>
+                            </tr>
+                        </thead>
+                        <!-- Element: coverageTableBody - populated by loadCoverageTable() -->
+                        <tbody id="coverageTableBody">
+                            <tr>
+                                <td colspan="5" style="text-align:center; padding: 20px; color: #888;">
+                                    <i class="bi bi-hourglass-split"></i> Checking coverage...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div style="margin-top: 10px; font-size: 0.78rem; color: #888; display: flex; gap: 16px; flex-wrap: wrap;">
+                <span><span style="color: #16a34a; font-size: 1rem;">✅</span> Uploaded</span>
+                <span><span style="color: #dc2626; font-size: 1rem;">❌</span> Missing</span>
+                <button onclick="loadCoverageTable()" style="margin-left: auto; background: #4F2683; border: none; color: white; padding: 4px 12px; border-radius: 6px; cursor: pointer; font-size: 0.78rem;">
+                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- Bottom Navigation -->
@@ -1128,25 +1183,35 @@
                 downloadButtonsContainer.innerHTML = "";
             }
 
+            /*
+             * CHANGE DETAILS:
+             * Element: convertExcelToCSV progress tracking
+             * Date: 2026-07-07
+             * Fix: Replaced fake timeout-based progress (50% at 5s, 80% at 20s) with
+             *   real per-sheet progress updates. Also saves convert_progress to localStorage
+             *   so a crash/reload shows a resume banner instead of silently failing.
+             */
             const file = fileInput.files[0];
             const reader = new FileReader();
             const filesToDownload = [];
 
-            const timeout50 = setTimeout(() => {
-                if (progressBar) {
-                    progressBar.style.width = "50%";
-                    progressBar.textContent = "50%";
-                }
-                if (progressText) progressText.textContent = "Working on it (50%)...";
-            }, 5000);
+            // Save crash-resume state to localStorage
+            localStorage.setItem('convert_progress', JSON.stringify({
+                step: 0, total: 4, label: 'Initializing...', timestamp: Date.now()
+            }));
 
-            const timeout80 = setTimeout(() => {
+            // Helper: update progress bar + localStorage step
+            function updateProgress(step, total, label) {
+                const pct = Math.round((step / total) * 100);
                 if (progressBar) {
-                    progressBar.style.width = "80%";
-                    progressBar.textContent = "80%";
+                    progressBar.style.width = pct + '%';
+                    progressBar.textContent = pct + '%';
                 }
-                if (progressText) progressText.textContent = "Still processing (80%)...";
-            }, 20000);
+                if (progressText) progressText.textContent = label;
+                localStorage.setItem('convert_progress', JSON.stringify({
+                    step, total, label, timestamp: Date.now()
+                }));
+            }
 
             reader.onload = async function (e) {
                 try {
@@ -1278,17 +1343,20 @@
                             blob: blob
                         });
 
-                        if (progressText) progressText.textContent = `Prepared ${sheetConfig.output}`;
+                        /*
+                         * CHANGE DETAILS:
+                         * Element: per-sheet progress update inside convertExcelToCSV for-loop
+                         * Date: 2026-07-07
+                         * Fix: Call updateProgress() after each sheet completes so bar reflects real steps.
+                         */
+                        const sheetIndex = presentSheets.indexOf(sheetConfig) + 1;
+                        updateProgress(sheetIndex, presentSheets.length, `Prepared ${sheetConfig.output} (${sheetIndex}/${presentSheets.length})`);
                     }
 
-                    clearTimeout(timeout50);
-                    clearTimeout(timeout80);
+                    // Mark conversion as complete — clear crash-resume state
+                    localStorage.removeItem('convert_progress');
 
-                    if (progressBar) {
-                        progressBar.style.width = "100%";
-                        progressBar.textContent = "100%";
-                    }
-                    if (progressText) progressText.textContent = "Conversion complete!";
+                    updateProgress(1, 1, 'Conversion complete! ✅');
 
                     const downloadBtn = document.createElement("button");
                     downloadBtn.className = "btn btn-success";
