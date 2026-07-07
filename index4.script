@@ -9,17 +9,26 @@
 
   document.addEventListener('DOMContentLoaded', () => {
         const prompt = document.getElementById('fullscreenPrompt');
+        
+        /*
+         * CHANGE DETAILS:
+         * Element: DOMContentLoaded handler for fullscreenPrompt
+         * Date: 2026-07-07
+         * Fix: TypeError: Cannot read properties of null (reading 'style').
+         *      Wrap the listeners in a check to ensure 'prompt' exists.
+         */
+        if (prompt) {
+            // Show the prompt when the mouse moves
+            document.addEventListener('mousemove', () => {
+                prompt.style.display = 'block';
+            });
 
-        // Show the prompt when the mouse moves
-        document.addEventListener('mousemove', () => {
-            prompt.style.display = 'block';
-        });
-
-        // Enter fullscreen when the prompt is clicked
-        prompt.addEventListener('click', () => {
-            openFullscreen();
-            prompt.style.display = 'none'; // Hide prompt after entering full-screen
-        });
+            // Enter fullscreen when the prompt is clicked
+            prompt.addEventListener('click', () => {
+                openFullscreen();
+                prompt.style.display = 'none'; // Hide prompt after entering full-screen
+            });
+        }
     });
 
     function openFullscreen() {
@@ -58,6 +67,11 @@ const csvFilesPLI = generateCsvFilesPLI();
 document.getElementById('searchButtonPLI').addEventListener('click', searchEmployeePLI);
 
 let isSearchingPLI = false;
+let currentSearchPliIndex = 0;
+let existingFilesPLI = [];
+let searchInputPLIGlobal = '';
+let profileFoundPLI = false;
+let displayedMonthsPLI = new Set();
 
 async function searchEmployeePLI() {
     if (isSearchingPLI) return;
@@ -73,6 +87,26 @@ async function searchEmployeePLI() {
         alert('Please enter an employee number.');
         return;
     }
+
+    searchInputPLIGlobal = searchInputPLI;
+    localStorage.setItem("employeeNumber", searchInputPLI);
+
+    // Reset display early to avoid duplicates
+    if (resultsSectionPLI) resultsSectionPLI.innerHTML = '';
+    if (employeeInfoSectionPLI) employeeInfoSectionPLI.innerHTML = '';
+    displayedMonthsPLI.clear();
+    profileFoundPLI = false;
+
+    const updateUISearchComplete = () => {
+        searchBtnPLI.disabled = false;
+        if (micBtn) micBtn.disabled = false;
+        searchBtnPLI.innerHTML = '<i class="bi bi-search"></i> Search Employee';
+        searchBtnPLI.classList.remove('searching');
+        if (particles) particles.classList.remove('active');
+        isSearchingPLI = false;
+        if (resultsSectionElement) resultsSectionElement.style.display = 'block';
+        loadingIndicatorPLI.style.display = 'none';
+    };
 
     // --- Offline Check ---
     if (!navigator.onLine) {
@@ -104,122 +138,104 @@ async function searchEmployeePLI() {
     searchBtnPLI.disabled = true;
     if (micBtn) micBtn.disabled = true;
     searchBtnPLI.innerHTML = '<i class="bi bi-hourglass-split"></i> Searching...';
-    // searchBtnPLI.classList.add('searching');
-    // if (particles) particles.classList.add('active');
-    localStorage.setItem("employeeNumber", searchInputPLI);
 
-    // Reset display early to avoid duplicates
-    if (resultsSectionPLI) resultsSectionPLI.innerHTML = '';
-    if (employeeInfoSectionPLI) employeeInfoSectionPLI.innerHTML = '';
+    loadingIndicatorPLI.style.display = 'block';
 
-    const updateUISearchComplete = () => {
-        searchBtnPLI.disabled = false;
-        if (micBtn) micBtn.disabled = false;
-        searchBtnPLI.innerHTML = '<i class="bi bi-search"></i> Search Employee';
-        searchBtnPLI.classList.remove('searching');
-        if (particles) particles.classList.remove('active');
-        isSearchingPLI = false;
-        if (resultsSectionElement) resultsSectionElement.style.display = 'block';
-        loadingIndicatorPLI.style.display = 'none';
-    };
+    /*
+     * CHANGE DETAILS:
+     * Element: searchEmployeePLI — multi-month fetch sequence
+     * Date: 2026-07-07
+     * Feature: Parallel fetch of available CSV files to establish recency indexes,
+     *          followed by initial chunk load of 3 months.
+     */
+    getAvailableFilesPLI().then(availableFiles => {
+        existingFilesPLI = availableFiles;
+        currentSearchPliIndex = 0;
 
-    // Check for cached results in sessionStorage with 5-minute TTL
-    const cacheKey = `cache_pli_${searchInputPLI}`;
-    const cachedItem = sessionStorage.getItem(cacheKey);
-
-    if (cachedItem) {
-        try {
-            const { data, timestamp } = JSON.parse(cachedItem);
-            const isExpired = !timestamp || (Date.now() - timestamp) > 300000; // 5 minutes
-
-            if (!isExpired) {
-                console.log("✅ Using cached results for PLI (cached within 5m):", searchInputPLI);
-                displayEmployeeInfoPLI(data.monthName, data.csvData);
-                displayResultsTablePLI([data]);
-                updateUISearchComplete();
-                return;
-            } else {
-                console.log("⌛ Cache expired for PLI, fetching fresh data...");
-                sessionStorage.removeItem(cacheKey);
-            }
-        } catch (e) {
-            console.error("Cache parsing error:", e);
-            sessionStorage.removeItem(cacheKey);
+        if (existingFilesPLI.length === 0) {
+            alert('No available files found.');
+            updateUISearchComplete();
+            return;
         }
-    }
 
-    loadingIndicatorPLI.style.display = 'block'; // Show loading indicator
-
-    // **Find the most recent available file**
-    const sortedFilesPLI = csvFilesPLI
-        .map(file => ({ file, date: getDateFromCsvPLI(file) }))
-        .filter(entry => entry.date) // Remove invalid dates
-        .sort((a, b) => b.date - a.date); // Sort by latest first
-
-    if (sortedFilesPLI.length === 0) {
-        alert('No available data files found.');
-        updateUISearchComplete();
-        return;
-    }
-
-    let latestFilePLI = null;
-
-    // Check which file exists
-    for (const entry of sortedFilesPLI) {
-        const exists = await checkFileExistsPLI(entry.file);
-        if (exists) {
-            latestFilePLI = entry.file;
-            break;
-        }
-    }
-
-    if (!latestFilePLI) {
-        console.log('No existing files found.');
-        updateUISearchComplete();
-        return;
-    }
-
-    console.log("Using file:", latestFilePLI);
-
-    fetchCSVPLI(latestFilePLI)
-        .then(data => {
-            if (!data) {
-                alert('No valid data found in the latest file.');
-                return;
-            }
-
-            // Filter CSV data to only include rows for this employee
-            const filteredCsvData = data.csvData.filter((row, idx) => {
-                if (idx === 0) return true;
-                const empno = row[3];
-                return empno && searchInputPLI && empno.toString().replace(/^0+/, '') === searchInputPLI.toString().replace(/^0+/, '');
-            });
-
-            if (filteredCsvData.length > 1) {
-                const cachePayload = {
-                    monthName: data.monthName,
-                    csvData: filteredCsvData
-                };
-                // Store in cache with 5-minute TTL
-                const cacheData = {
-                    data: cachePayload,
-                    timestamp: Date.now()
-                };
-                sessionStorage.setItem(cacheKey, JSON.stringify(cacheData));
-
-                displayEmployeeInfoPLI(data.monthName, filteredCsvData);
-                displayResultsTablePLI([cachePayload]);
-            } else {
-                showErrorCard(employeeInfoSectionPLI, 'Employee not found in latest records.');
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching CSV data:', error);
-            alert('Error fetching data. Check the console for details.');
-        })
-        .finally(() => {
+        loadMoreMonthsPLI().then(() => {
+            updateUISearchComplete();
+        }).catch(err => {
+            console.error("Error loading initial PLI months:", err);
             updateUISearchComplete();
         });
+    });
+}
+
+async function getAvailableFilesPLI() {
+    const sortedFiles = csvFilesPLI
+        .map(file => ({ file, date: getDateFromCsvPLI(file) }))
+        .filter(entry => entry.date)
+        .sort((a, b) => b.date - a.date);
+
+    const checkPromises = sortedFiles.map(entry => 
+        fetch(entry.file, { method: 'HEAD' })
+            .then(res => res.ok ? entry.file : null)
+            .catch(() => null)
+    );
+    const results = await Promise.all(checkPromises);
+    return results.filter(file => file !== null);
+}
+
+async function loadMoreMonthsPLI() {
+    const filesToFetch = existingFilesPLI.slice(currentSearchPliIndex, currentSearchPliIndex + 3);
+    if (filesToFetch.length === 0) {
+        return;
+    }
+
+    currentSearchPliIndex += filesToFetch.length;
+
+    const resultsSectionPLI = document.getElementById('resultsPLI');
+    let loadMoreBtn = document.getElementById('loadMorePliBtn');
+    if (loadMoreBtn) {
+        loadMoreBtn.disabled = true;
+        loadMoreBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Loading...';
+    }
+
+    const fetchPromises = filesToFetch.map(file => 
+        fetchCSVPLI(file)
+            .then(data => {
+                if (!data) return null;
+                const filteredCsvData = data.csvData.filter((row, idx) => {
+                    if (idx === 0) return true;
+                    const empno = row[3];
+                    return empno && searchInputPLIGlobal && empno.toString().replace(/^0+/, '') === searchInputPLIGlobal.toString().replace(/^0+/, '');
+                });
+                return {
+                    monthName: data.monthName,
+                    csvData: filteredCsvData,
+                    hasEmployee: filteredCsvData.length > 1
+                };
+            })
+            .catch(err => {
+                console.error(`Error fetching CSV for ${file}:`, err);
+                return null;
+            })
+    );
+
+    const results = await Promise.all(fetchPromises);
+    const validResults = results.filter(r => r !== null);
+
+    if (!profileFoundPLI) {
+        const foundData = validResults.find(r => r.hasEmployee);
+        if (foundData) {
+            displayEmployeeInfoPLI(foundData.monthName, foundData.csvData);
+            profileFoundPLI = true;
+        }
+    }
+
+    if (!profileFoundPLI && currentSearchPliIndex >= existingFilesPLI.length) {
+        const employeeInfoSectionPLI = document.getElementById('employeeInfoPLI');
+        showErrorCard(employeeInfoSectionPLI, 'Employee ID not found in latest records.');
+    }
+
+    appendResultsToTablePLI(validResults);
+    renderLoadMoreButtonPLI();
 }
 
 function checkFileExistsPLI(url) {
@@ -449,6 +465,7 @@ async function displayEmployeeInfoPLI(monthName, csvData) {
         const row = csvData[i];
         if (row.length < 4) continue;
         const searchInputVal = document.getElementById('searchInputPLI').value.trim();
+        const empno = row[3];
         if (empno && searchInputVal && empno.toString().replace(/^0+/, '') === searchInputVal.toString().replace(/^0+/, '')) {
             employeeFound = true;
 
@@ -591,112 +608,225 @@ async function displayEmployeeInfoPLI(monthName, csvData) {
     }
 }
 
-function displayResultsTablePLI(fetchedDataPLI) {
+function appendResultsToTablePLI(validResults) {
     const resultsSectionPLI = document.getElementById('resultsPLI');
     
-    const table = document.createElement('table');
-    table.classList.add('responsive-table');
+    let table = resultsSectionPLI.querySelector('.responsive-table');
+    let tbody;
+    if (!table) {
+        const tableContainer = document.createElement('div');
+        tableContainer.classList.add('table-container');
 
-    const thead = document.createElement('thead');
-    const headerRow = document.createElement('tr');
-    headerRow.innerHTML = `
-        <th style="padding-left: 1rem;"><i class="bi bi-calendar3"></i> MONTH</th>
-        <th style="padding-right: 0.5rem; text-align: left;"><i class="bi bi-cash"></i> DEDAMTPLI</th>
-    `;
-    thead.appendChild(headerRow);
-    table.appendChild(thead);
+        const tableWrapper = document.createElement('div');
+        tableWrapper.classList.add('table-scroll-wrapper');
 
-    const tbody = document.createElement('tbody');
-    const resultsMap = new Map();
-
-    fetchedDataPLI.forEach(data => {
-        data.csvData.forEach((row, index) => {
-            if (index === 0) return;
-
-            const searchInputVal = document.getElementById('searchInputPLI').value.trim();
-            if (empno && searchInputVal && empno.toString().replace(/^0+/, '') === searchInputVal.toString().replace(/^0+/, '')) {
-                const monthName = data.monthName;
-                const dedamtpli = parseFloat(row[15]);
-                
-                if (!resultsMap.has(monthName)) {
-                    resultsMap.set(monthName, { sum: 0, details: [] });
-                }
-
-                const dedcode = row[9];
-                const effyy = row[11];
-                const effmm = convertMonth(row[12]); // Convert month number
-                const termyy = row[13];
-                const termmm = convertMonth(row[14]); // Convert month number
-                const policyno = row[16];
-
-                const entry = resultsMap.get(monthName);
-                entry.sum += dedamtpli;
-                entry.details.push({ dedcode, policyno, effyy, effmm, termyy, termmm, dedamtpli });
-            }
-        });
-    });
-
-    if (resultsMap.size === 0) {
-        resultsSectionPLI.innerHTML = '';
-        return;
-    }
-
-    resultsMap.forEach((data, monthName) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-         <td style="padding-left: 1rem;">${monthName}</td>
-            <!-- <td>₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td> -->
-        <td id="totalAmountPLI" style="padding-right: 0.2rem; font-weight:700; text-align: left;">₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td> <!-- Start with ₱0.00 -->
-
-        `;
-        tbody.appendChild(row);
-        const detailRow = document.createElement('tr');
-const detailCell = document.createElement('td');
-detailCell.setAttribute('colspan', 2);
-detailCell.innerHTML = `
-    <div class="detail-table-wrapper" style="padding: 0.5rem; background: transparent; overflow-x: auto; -webkit-overflow-scrolling: touch;">
-        <table class="detail-table" style="width: 100%; min-width: 260px; background: white; border: 1px solid rgba(96, 14, 18, 0.15); border-radius: 6px; overflow: hidden; border-collapse: collapse;">
+        table = document.createElement('table');
+        table.classList.add('responsive-table');
+        table.innerHTML = `
             <thead>
-                <tr style="font-size:6px; background: #600e12; color: white; text-transform: uppercase;">
-                    <th style="font-size: 11px; text-align: center; width: 16px !important; min-width: 16px !important; max-width: 16px !important; padding: 0.3rem 0 !important;">/</th>
-                    <th style="font-size: 11px;width: 35px; padding: 0rem 0rem !important;">PLI</th>
-                    <th style="font-size: 11px;width: 50px; padding: 0rem 0rem !important;">EFF</th>
-                    <th style="font-size: 11px;width: 50px; padding: 0rem 0rem !important;">TERM</th>
-                    <th style="font-size: 11px;width: 65px; text-align: left; padding: 0rem 0rem !important;">DEDAMT</th>
-                    <th style="font-size: 11px;width: 45px; padding: 0rem 0rem !important;">POL #</th>
+                <tr>
+                    <th style="padding-left: 1rem;"><i class="bi bi-calendar3"></i> MONTH</th>
+                    <th style="padding-right: 0.5rem; text-align: left;"><i class="bi bi-cash"></i> DEDAMT</th>
                 </tr>
             </thead>
-            <tbody style="font-size: 7px;">
-                ${data.details.map((d, idx) => `
-                    <tr style="background: ${idx % 2 === 0 ? 'white' : 'rgba(96, 14, 18, 0.02)'};">
-                        <td style="text-align: center; width: 16px !important; min-width: 16px !important; max-width: 16px !important; padding: 0.3rem 0 !important; line-height: 1;">
-                            <input type="checkbox" class="dedamtpli-checkbox" data-dedamtpli="${d.dedamtpli}" checked style="cursor: pointer; width: 11px; height: 11px; margin: 0 auto; padding: 0; accent-color: #600e12; display: block; vertical-align: middle;" />
-                        </td>
-                        <td style="font-size: 11px; padding: 0.3rem 0.4rem !important;">${d.dedcode.toString().padStart(5, '0')}</td>
+            <tbody></tbody>
+        `;
+        tableWrapper.appendChild(table);
+        tableContainer.appendChild(tableWrapper);
+        resultsSectionPLI.appendChild(tableContainer);
+        tbody = table.querySelector('tbody');
+    } else {
+        tbody = table.querySelector('tbody');
+    }
 
-                        <td style="font-size: 11px; padding: 0.3rem 0.4rem !important;">${d.effmm.toString().padStart(2, '0')}/${d.effyy}</td>
-                        <td style="font-size: 11px; padding: 0rem 0.4rem !important;">${d.termmm.toString().padStart(2, '0')}/${d.termyy}</td>
-                    
-                        <td style="font-size: 11px; text-align: left; font-weight: 700; color: #600e12; padding: 0.3rem 0.3rem !important;">₱${d.dedamtpli.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
-                        <td style="font-size: 11px; padding: 0.3rem 0.4rem !important; overflow: hidden; text-overflow: ellipsis; ">${d.policyno}</td>
-                    </tr>
-                `).join('')}
-            </tbody>
-        </table>
-    </div>
-`;
+    validResults.forEach(data => {
+        if (displayedMonthsPLI.has(data.monthName)) return;
+        displayedMonthsPLI.add(data.monthName);
 
+        const row = document.createElement('tr');
+        
+        const monthCell = document.createElement('td');
+        monthCell.setAttribute('data-label', 'MONTH');
+        monthCell.style.paddingLeft = '1rem';
+        monthCell.textContent = data.monthName;
 
+        const dedamtCell = document.createElement('td');
+        dedamtCell.setAttribute('data-label', 'DEDAMT');
+        dedamtCell.classList.add('number-cell');
+        dedamtCell.style.textAlign = 'left';
+        dedamtCell.style.paddingRight = '0.5rem';
 
+        row.appendChild(monthCell);
+        row.appendChild(dedamtCell);
 
+        if (data.hasEmployee) {
+            /*
+             * CHANGE DETAILS:
+             * Element: appendResultsToTablePLI — Accordion Month Row
+             * Date: 2026-07-07
+             * Feature: Toggles the collapsible PLI details row and flips the chevron icon.
+             */
+            row.style.cursor = 'pointer';
+            row.classList.add('accordion-toggle-row');
 
+            let initialSum = 0;
+            for (let i = 1; i < data.csvData.length; i++) {
+                initialSum += parseFloat(data.csvData[i][15]) || 0;
+            }
 
+            dedamtCell.innerHTML = `
+                <div class="pli-total-container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <span class="pli-total-value" style="font-weight:700;" id="totalAmountPLI-${data.monthName.replace(/\s/g, '-')}">₱${initialSum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</span>
+                    <i class="bi bi-chevron-left accordion-arrow" style="font-weight: bold; color: #600e12; font-size: 0.95rem; margin-left: 0.5rem;"></i>
+                </div>
+            `;
+            tbody.appendChild(row);
 
+            const detailRow = document.createElement('tr');
+            detailRow.classList.add('detail-row');
+            detailRow.style.display = 'none'; // Closed by default
+            const detailCell = document.createElement('td');
+            detailCell.setAttribute('colspan', '2');
+            detailCell.style.padding = '0';
 
+            const resultsMapDetails = [];
+            for (let i = 1; i < data.csvData.length; i++) {
+                const r = data.csvData[i];
+                const dedamtpli = parseFloat(r[15]) || 0;
+                const dedcode = r[9];
+                const effyy = r[11];
+                const effmm = convertMonth(r[12]);
+                const termyy = r[13] ? Math.floor(parseFloat(r[13])) : '';
+                const termmm = convertMonth(r[14]);
+                const policyno = r[16];
+                resultsMapDetails.push({ dedcode, policyno, effyy, effmm, termyy, termmm, dedamtpli });
+            }
 
+            const detailTableHtml = `
+                <div class="detail-table-wrapper" style="padding: 0.5rem; background: transparent; overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                    <table class="detail-table" style="width: 100%; min-width: 260px; background: white; border: 1px solid rgba(96, 14, 18, 0.15); border-radius: 6px; overflow: hidden; border-collapse: collapse;">
+                        <thead>
+                            <tr style="font-size:6px; background: #600e12; color: white; text-transform: uppercase;">
+                                <th style="font-size: 11px; text-align: center; width: 16px !important; min-width: 16px !important; max-width: 16px !important; padding: 0.3rem 0 !important;">/</th>
+                                <th style="font-size: 11px; width: 35px; padding: 0rem 0rem !important;">PLI</th>
+                                <th style="font-size: 11px; width: 50px; padding: 0rem 0rem !important;">EFF</th>
+                                <th style="font-size: 11px; width: 50px; padding: 0rem 0rem !important;">TERM</th>
+                                <th style="font-size: 11px; width: 65px; text-align: left; padding: 0rem 0rem !important;">DEDAMT</th>
+                                <th style="font-size: 11px; width: 45px; padding: 0rem 0rem !important;">POL #</th>
+                            </tr>
+                        </thead>
+                        <tbody style="font-size: 7px;">
+                            ${resultsMapDetails.map((d, idx) => `
+                                <tr style="background: ${idx % 2 === 0 ? 'white' : 'rgba(96, 14, 18, 0.02)'};">
+                                    <td style="text-align: center; width: 16px !important; min-width: 16px !important; max-width: 16px !important; padding: 0.3rem 0 !important; line-height: 1;">
+                                        <input type="checkbox" class="dedamtpli-checkbox" 
+                                               data-dedamtpli="${d.dedamtpli}" 
+                                               data-month="${data.monthName.replace(/\s/g, '-')}" 
+                                               checked 
+                                               style="cursor: pointer; width: 11px; height: 11px; margin: 0 auto; padding: 0; accent-color: #600e12; display: block; vertical-align: middle;" />
+                                    </td>
+                                    <td style="font-size: 11px; padding: 0.3rem 0.4rem !important;">${d.dedcode.toString().padStart(5, '0')}</td>
+                                    <td style="font-size: 11px; padding: 0.3rem 0.4rem !important;">${d.effmm.toString().padStart(2, '0')}/${d.effyy}</td>
+                                    <td style="font-size: 11px; padding: 0rem 0.4rem !important;">${d.termmm.toString().padStart(2, '0')}/${d.termyy}</td>
+                                    <td style="font-size: 11px; text-align: left; font-weight: 700; color: #600e12; padding: 0.3rem 0.3rem !important;">₱${d.dedamtpli.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                    <td style="font-size: 11px; padding: 0.3rem 0.4rem !important; overflow: hidden; text-overflow: ellipsis; ">${d.policyno}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            detailCell.innerHTML = detailTableHtml;
+            detailRow.appendChild(detailCell);
+            tbody.appendChild(detailRow);
 
-function calculateTotalPLI() {
-    const checkboxesPLI = document.querySelectorAll('.dedamtpli-checkbox');
+            row.addEventListener('click', () => {
+                const isCollapsed = detailRow.style.display === 'none';
+                detailRow.style.display = isCollapsed ? 'table-row' : 'none';
+                const arrow = dedamtCell.querySelector('.accordion-arrow');
+                if (arrow) {
+                    if (isCollapsed) {
+                        arrow.classList.remove('bi-chevron-left');
+                        arrow.classList.add('bi-chevron-right');
+                    } else {
+                        arrow.classList.remove('bi-chevron-right');
+                        arrow.classList.add('bi-chevron-left');
+                    }
+                }
+            });
+        } else {
+            row.style.cursor = 'default';
+            row.style.opacity = '0.7';
+            dedamtCell.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <span style="color: #888; font-weight: 500;">N/A</span>
+                    <span style="font-size: 0.75rem; color: #aaa; font-style: italic; margin-right: 0.2rem;">No Records</span>
+                </div>
+            `;
+            tbody.appendChild(row);
+        }
+    });
+}
+
+function renderLoadMoreButtonPLI() {
+    const resultsSectionPLI = document.getElementById('resultsPLI');
+    
+    let loadMoreBtn = document.getElementById('loadMorePliBtn');
+    if (loadMoreBtn) {
+        loadMoreBtn.remove();
+    }
+
+    if (currentSearchPliIndex < existingFilesPLI.length) {
+        /*
+         * CHANGE DETAILS:
+         * Element: renderLoadMoreButtonPLI — Load More Button
+         * Date: 2026-07-07
+         * Feature: Generates a premium Load More button with gradient, shadow,
+         *          and hover transitions matching the red theme color.
+         */
+        loadMoreBtn = document.createElement('button');
+        loadMoreBtn.id = 'loadMorePliBtn';
+        loadMoreBtn.className = 'load-more-btn';
+        loadMoreBtn.style.display = 'block';
+        loadMoreBtn.style.margin = '1.5rem auto';
+        loadMoreBtn.style.padding = '0.6rem 2rem';
+        loadMoreBtn.style.background = 'linear-gradient(135deg, #600e12 0%, #7d1c21 100%)';
+        loadMoreBtn.style.color = 'white';
+        loadMoreBtn.style.border = 'none';
+        loadMoreBtn.style.borderRadius = '50px';
+        loadMoreBtn.style.fontWeight = '600';
+        loadMoreBtn.style.fontSize = '0.9rem';
+        loadMoreBtn.style.cursor = 'pointer';
+        loadMoreBtn.style.boxShadow = '0 4px 15px rgba(96, 14, 18, 0.2)';
+        loadMoreBtn.style.transition = 'all 0.3s ease';
+        loadMoreBtn.innerHTML = '<i class="bi bi-arrow-down-circle"></i> Load More Months';
+
+        loadMoreBtn.addEventListener('mouseover', () => {
+            loadMoreBtn.style.transform = 'translateY(-2px)';
+            loadMoreBtn.style.boxShadow = '0 6px 20px rgba(96, 14, 18, 0.35)';
+        });
+        loadMoreBtn.addEventListener('mouseout', () => {
+            loadMoreBtn.style.transform = 'translateY(0)';
+            loadMoreBtn.style.boxShadow = '0 4px 15px rgba(96, 14, 18, 0.2)';
+        });
+
+        loadMoreBtn.addEventListener('click', () => {
+            loadMoreMonthsPLI().then(() => {
+                const currentBtn = document.getElementById('loadMorePliBtn');
+                if (currentBtn) {
+                    currentBtn.disabled = false;
+                    currentBtn.innerHTML = '<i class="bi bi-arrow-down-circle"></i> Load More Months';
+                }
+            });
+        });
+
+        resultsSectionPLI.appendChild(loadMoreBtn);
+    }
+}
+
+function calculateTotalPLI(month) {
+    const checkboxesPLI = document.querySelectorAll(`.dedamtpli-checkbox[data-month="${month}"]`);
     let total = 0;
 
     checkboxesPLI.forEach(checkbox => {
@@ -705,38 +835,26 @@ function calculateTotalPLI() {
         }
     });
 
-    // Update the total display
-    const totalDisplayPLI = document.querySelector('#totalAmountPLI');
-    totalDisplayPLI.innerText = `₱${total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+    const totalDisplayPLI = document.getElementById(`totalAmountPLI-${month}`);
+    if (totalDisplayPLI) {
+        totalDisplayPLI.innerText = `₱${total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+    }
 }
 
 // Event listener for checkbox changes
 document.addEventListener('change', (event) => {
     if (event.target.classList.contains('dedamtpli-checkbox')) {
-        const checkboxesPLI = document.querySelectorAll('.dedamtpli-checkbox');
+        const month = event.target.dataset.month;
+        const checkboxesPLI = document.querySelectorAll(`.dedamtpli-checkbox[data-month="${month}"]`);
         checkboxesPLI.forEach(checkbox => {
             if (checkbox !== event.target) {
-                checkbox.checked = false; // Uncheck other checkboxesPLI
+                checkbox.checked = false; // Uncheck other checkboxes for this month
             }
         });
-        calculateTotalPLI(); // Recalculate total after changing checkboxesPLI
+        calculateTotalPLI(month); // Recalculate total after changing checkboxes for this month
     }
 });
 
-
-// Initial calculation on page load
-document.addEventListener('DOMContentLoaded', calculateTotalPLI);
-
-
-
-detailRow.appendChild(detailCell);
-tbody.appendChild(detailRow);
-
-    });
-
-    table.appendChild(tbody);
-    resultsSectionPLI.appendChild(table);
-}
 
 function convertMonth(monthNumber) {
     const monthNames = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
@@ -747,16 +865,6 @@ function convertMonth(monthNumber) {
 
 
 
-
-        document.addEventListener("DOMContentLoaded", function() {
-            const loginTime = localStorage.getItem("loginTime");
-
-            // Check if the login time exists and if the session has expired (4 hours)
-            if (!loginTime || (new Date().getTime() - loginTime) > 3 * 60 * 60 * 1000) {
-                // Redirect to login page if no login session or session expired
-                window.location.href = "login/index.html";
-            }
-        });
 
 // Function to handle logout
 function logout() {

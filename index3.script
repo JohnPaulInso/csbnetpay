@@ -55,6 +55,11 @@ const csvFilesOnq = generateCsvFilesOnq();
 document.getElementById('searchButtonOnq').addEventListener('click', searchEmployeeOnq);
 
 let isSearchingOnq = false;
+let currentOnqFileIndex = 0;
+let existingFilesOnq = [];
+let searchInputOnqGlobal = '';
+let profileFoundOnq = false;
+let displayedMonthsOnq = new Set();
 
 function searchEmployeeOnq() {
     if (isSearchingOnq) return;
@@ -70,6 +75,26 @@ function searchEmployeeOnq() {
         alert('Please enter an employee number.');
         return;
     }
+
+    searchInputOnqGlobal = searchInputOnq;
+    localStorage.setItem("employeeNumber", searchInputOnq);
+
+    // Reset display early to avoid duplicates
+    if (resultsSectionOnq) resultsSectionOnq.innerHTML = '';
+    if (employeeInfoSectionOnq) employeeInfoSectionOnq.innerHTML = '';
+    displayedMonthsOnq.clear();
+    profileFoundOnq = false;
+
+    const updateUISearchComplete = () => {
+        searchBtnOnq.disabled = false;
+        if (micBtn) micBtn.disabled = false;
+        searchBtnOnq.innerHTML = '<i class="bi bi-search"></i> Search Employee';
+        searchBtnOnq.classList.remove('searching');
+        if (particles) particles.classList.remove('active');
+        isSearchingOnq = false;
+        if (resultsSectionElement) resultsSectionElement.style.display = 'block';
+        loadingIndicatorOnq.style.display = 'none';
+    };
 
     // --- Offline Check ---
     if (!navigator.onLine) {
@@ -101,99 +126,99 @@ function searchEmployeeOnq() {
     searchBtnOnq.disabled = true;
     if (micBtn) micBtn.disabled = true;
     searchBtnOnq.innerHTML = '<i class="bi bi-hourglass-split"></i> Searching...';
-    // searchBtnOnq.classList.add('searching');
-    // if (particles) particles.classList.add('active');
-    localStorage.setItem("employeeNumber", searchInputOnq);
 
-    // Reset display early to avoid duplicates
-    if (resultsSectionOnq) resultsSectionOnq.innerHTML = '';
-    if (employeeInfoSectionOnq) employeeInfoSectionOnq.innerHTML = '';
+    loadingIndicatorOnq.style.display = 'block';
 
-    const updateUISearchComplete = () => {
-        searchBtnOnq.disabled = false;
-        if (micBtn) micBtn.disabled = false;
-        searchBtnOnq.innerHTML = '<i class="bi bi-search"></i> Search Employee';
-        searchBtnOnq.classList.remove('searching');
-        if (particles) particles.classList.remove('active');
-        isSearchingOnq = false;
-        if (resultsSectionElement) resultsSectionElement.style.display = 'block';
-        loadingIndicatorOnq.style.display = 'none';
-    };
-
-    // Check for cached results in sessionStorage with 5-minute TTL
-    const cacheKey = `cache_onq_${searchInputOnq}`;
-    const cachedItem = sessionStorage.getItem(cacheKey);
-
-    if (cachedItem) {
-        try {
-            const { data, timestamp } = JSON.parse(cachedItem);
-            const isExpired = !timestamp || (Date.now() - timestamp) > 300000; // 5 minutes
-
-            if (!isExpired) {
-                console.log("✅ Using cached results for ONQ (cached within 5m):", searchInputOnq);
-                displayEmployeeInfoOnq(data.monthName, data.csvData);
-                displayResultsTableOnq([data]);
-                updateUISearchComplete();
-                return;
-            } else {
-                console.log("⌛ Cache expired for ONQ, fetching fresh data...");
-                sessionStorage.removeItem(cacheKey);
-            }
-        } catch (e) {
-            console.error("Cache parsing error:", e);
-            sessionStorage.removeItem(cacheKey);
-        }
-    }
-
-    loadingIndicatorOnq.style.display = 'block'; // Show loading indicator
-
-    findMostRecentFile().then(mostRecentFile => {
-        if (!mostRecentFile) {
+    /*
+     * CHANGE DETAILS:
+     * Element: searchEmployeeOnq — multi-month fetch sequence
+     * Date: 2026-07-07
+     * Feature: Parallel fetch of available CSV files to establish recency indexes,
+     *          followed by initial chunk load of 3 months.
+     */
+    getAvailableFilesOnq().then(availableFiles => {
+        existingFilesOnq = availableFiles;
+        currentOnqFileIndex = 0;
+        
+        if (existingFilesOnq.length === 0) {
             alert('No available files found.');
             updateUISearchComplete();
             return;
         }
 
-        fetchCSVOnq(mostRecentFile)
-            .then(data => {
-                if (!data || !data.csvData.length) {
-                    alert('No data found in the most recent file.');
-                    return;
-                }
+        loadMoreMonthsOnq().then(() => {
+            updateUISearchComplete();
+        }).catch(err => {
+            console.error("Error loading initial months:", err);
+            updateUISearchComplete();
+        });
+    });
+}
 
-                // Filter CSV data to only include rows for this employee
+async function getAvailableFilesOnq() {
+    const checkPromises = csvFilesOnq.map(file => 
+        fetch(file, { method: 'HEAD' })
+            .then(res => res.ok ? file : null)
+            .catch(() => null)
+    );
+    const results = await Promise.all(checkPromises);
+    return results.filter(file => file !== null);
+}
+
+async function loadMoreMonthsOnq() {
+    const filesToFetch = existingFilesOnq.slice(currentOnqFileIndex, currentOnqFileIndex + 3);
+    if (filesToFetch.length === 0) {
+        return;
+    }
+
+    currentOnqFileIndex += filesToFetch.length;
+
+    const resultsSectionOnq = document.getElementById('resultsonq');
+    let loadMoreBtn = document.getElementById('loadMoreOnqBtn');
+    if (loadMoreBtn) {
+        loadMoreBtn.disabled = true;
+        loadMoreBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Loading...';
+    }
+
+    const fetchPromises = filesToFetch.map(file => 
+        fetchCSVOnq(file)
+            .then(data => {
+                if (!data) return null;
                 const filteredCsvData = data.csvData.filter((row, idx) => {
                     if (idx === 0) return true;
                     const empno = row[3];
-                    return empno && searchInputOnq && empno.toString().replace(/^0+/, '') === searchInputOnq.toString().replace(/^0+/, '');
+                    return empno && searchInputOnqGlobal && empno.toString().replace(/^0+/, '') === searchInputOnqGlobal.toString().replace(/^0+/, '');
                 });
-
-                if (filteredCsvData.length > 1) {
-                    const cachePayload = {
-                        monthName: data.monthName,
-                        csvData: filteredCsvData
-                    };
-                    // Store in cache with 5-minute TTL
-                    const cacheData = {
-                        data: cachePayload,
-                        timestamp: Date.now()
-                    };
-                    sessionStorage.setItem(cacheKey, JSON.stringify(cacheData));
-
-                    displayEmployeeInfoOnq(data.monthName, filteredCsvData);
-                    displayResultsTableOnq([cachePayload]);
-                } else {
-                    showErrorCard(employeeInfoSectionOnq, 'Employee not found in latest records.');
-                }
+                return {
+                    monthName: data.monthName,
+                    csvData: filteredCsvData,
+                    hasEmployee: filteredCsvData.length > 1
+                };
             })
-            .catch(error => {
-                console.error('Error fetching CSV data:', error);
-                alert('Error fetching data. Check the console for more details.');
+            .catch(err => {
+                console.error(`Error fetching CSV for ${file}:`, err);
+                return null;
             })
-            .finally(() => {
-                updateUISearchComplete();
-            });
-    });
+    );
+
+    const results = await Promise.all(fetchPromises);
+    const validResults = results.filter(r => r !== null);
+
+    if (!profileFoundOnq) {
+        const foundData = validResults.find(r => r.hasEmployee);
+        if (foundData) {
+            displayEmployeeInfoOnq(foundData.monthName, foundData.csvData);
+            profileFoundOnq = true;
+        }
+    }
+
+    if (!profileFoundOnq && currentOnqFileIndex >= existingFilesOnq.length) {
+        const employeeInfoSectionOnq = document.getElementById('employeeInfoOnq');
+        showErrorCard(employeeInfoSectionOnq, 'Employee ID not found in latest records.');
+    }
+
+    appendResultsToTableOnq(validResults);
+    renderLoadMoreButtonOnq();
 }
 
 function findMostRecentFile() {
@@ -579,163 +604,239 @@ async function displayEmployeeInfoOnq(monthName, csvData) {
     if (!employeeFound) {
         showErrorCard(employeeInfoSectionOnq, 'Employee ID not found in latest month.');
     }
-}
-
-function displayResultsTableOnq(fetchedDataOnq) {
+}function appendResultsToTableOnq(validResults) {
     const resultsSectionOnq = document.getElementById('resultsonq');
     
-    // Create table container with responsive wrapper
-    const tableContainer = document.createElement('div');
-    tableContainer.classList.add('table-container');
+    // Find or create the table
+    let table = resultsSectionOnq.querySelector('.responsive-table');
+    let tbody;
+    if (!table) {
+        const tableContainer = document.createElement('div');
+        tableContainer.classList.add('table-container');
 
-    const tableWrapper = document.createElement('div');
-    tableWrapper.classList.add('table-scroll-wrapper');
+        const tableWrapper = document.createElement('div');
+        tableWrapper.classList.add('table-scroll-wrapper');
 
-    const table = document.createElement('table');
-    table.classList.add('responsive-table');
-
-    table.innerHTML = `
-        <thead>
-            <tr>
-                <th style="padding-left: 1rem;"><i class="bi bi-calendar3"></i> MONTH</th>
-                <th style="padding-right: 0.5rem; text-align: left;"><i class="bi bi-cash"></i> DEDAMT</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    `;
-
-    const tbody = table.querySelector('tbody');
-    const resultsMap = new Map();
-
-    fetchedDataOnq.forEach(data => {
-        data.csvData.forEach((row, index) => {
-            if (index === 0) return;
-
-            const searchInputVal = document.getElementById('searchInputOnq').value.trim();
-            /*
-             * CHANGE DETAILS:
-             * Element: displayResultsTableOnq — empno declaration
-             * Date: 2026-07-07
-             * Fix: ReferenceError: empno is not defined.
-             *      empno must be read from row[3] (Column D = Employee No) of each CSV row.
-             */
-            const empno = row[3];   // Column D (index 3) = Employee Number
-            if (empno && searchInputVal && empno.toString().replace(/^0+/, '') === searchInputVal.toString().replace(/^0+/, '')) {
-                const monthName = data.monthName;
-                const dedamt = parseFloat(row[13]);
-                
-                if (!resultsMap.has(monthName)) {
-                    resultsMap.set(monthName, { sum: 0, details: [] });
-                }
-
-                const dedcode = row[7];
-                const effyy = row[9];
-                const effmm = convertMonth(row[10]); // Convert month number
-                const termyy = row[11];
-                const termmm = convertMonth(row[12]); // Convert month number
-                const policyno = row[15];
-
-                const entry = resultsMap.get(monthName);
-                entry.sum += dedamt;
-                entry.details.push({ dedcode, policyno, effyy, effmm, termyy, termmm, dedamt });
-            }
-        });
-    });
-
-    if (resultsMap.size === 0) {
-        resultsSectionOnq.innerHTML = '';
-        return;
+        table = document.createElement('table');
+        table.classList.add('responsive-table');
+        table.innerHTML = `
+            <thead>
+                <tr>
+                    <th style="padding-left: 1rem;"><i class="bi bi-calendar3"></i> MONTH</th>
+                    <th style="padding-right: 0.5rem; text-align: left;"><i class="bi bi-cash"></i> ONQ</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        `;
+        tableWrapper.appendChild(table);
+        tableContainer.appendChild(tableWrapper);
+        resultsSectionOnq.appendChild(tableContainer);
+        tbody = table.querySelector('tbody');
+    } else {
+        tbody = table.querySelector('tbody');
     }
 
-    resultsMap.forEach((data, monthName) => {
+    validResults.forEach(data => {
+        // Prevent duplicate rendering of the same month
+        if (displayedMonthsOnq.has(data.monthName)) return;
+        displayedMonthsOnq.add(data.monthName);
+
         const monthRow = document.createElement('tr');
         
         const monthCell = document.createElement('td');
         monthCell.setAttribute('data-label', 'MONTH');
-        monthCell.textContent = monthName;
+        monthCell.textContent = data.monthName;
         monthCell.style.paddingLeft = '0.5rem';
 
         const dedamtCell = document.createElement('td');
         dedamtCell.setAttribute('data-label', 'DEDAMT');
-        dedamtCell.innerHTML = `<b style="text-align: left;"id="totalAmount-${monthName.replace(/\s/g, '-')}">₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</b>`;
         dedamtCell.classList.add('number-cell');
         dedamtCell.style.textAlign = 'left';
         dedamtCell.style.paddingRight = '0.5rem';
 
         monthRow.appendChild(monthCell);
         monthRow.appendChild(dedamtCell);
-        tbody.appendChild(monthRow);
 
-        // Create detail row
-        const detailRow = document.createElement('tr');
-        detailRow.classList.add('detail-row');
-        const detailCell = document.createElement('td');
-        detailCell.setAttribute('colspan', '2');
-        detailCell.style.padding = '0';
-        
-        // Create inner table for details
-        const detailTableHtml = `
-            <div class="detail-table-wrapper" style="padding: 0.75rem; background: transparent; overflow-x: auto; -webkit-overflow-scrolling: touch;">
-                <table class="detail-table" style="width: 100%; min-width: 180px; background: white; border: 1px solid rgba(0, 100, 26, 0.15); border-radius: 6px; overflow: hidden; border-collapse: collapse;">
-                    <thead>
-                        <tr>
-                            <th style="text-align: center; width: 20px !important; min-width: 20px !important; max-width: 20px !important; padding: 0.5rem 0 !important;"></th>
-                            <th style="width: 60px; padding: 0.5rem 0.4rem !important;">PLI</th>
-                            <th style="width: 75px; padding: 0.5rem 0.4rem !important;">EFF</th>
-                            <th style="width: 75px; padding: 0.5rem 0.4rem !important;">TERM</th>
-                            <th style="width: 95px; text-align: right; padding: 0.5rem 0.5rem !important;">DEDAMT</th>
-                            <th style="width: 75px; padding: 0.5rem 0.4rem !important;">POLICYNO</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${data.details.map((d, idx) => `
-                            <tr style="background: ${idx % 2 === 0 ? 'white' : 'rgba(0, 100, 26, 0.02)'};">
-                                <td style="text-align: left; width: 20px !important; min-width: 20px !important; max-width: 20px !important; padding: 0.5rem 0 !important; line-height: 1;">
-                                    <input type="checkbox" class="dedamt-checkbox" 
-                                           data-dedamt="${d.dedamt}" 
-                                           data-month="${monthName.replace(/\s/g, '-')}" 
-                                           checked 
-                                           style="cursor: pointer; width: 12px; height: 12px; margin: 0 auto; padding: 0; accent-color: #00641a; display: block; vertical-align: middle;" />
-                                </td>
-                                <td style="padding: 0.5rem 0.4rem !important;">${d.dedcode.toString().padStart(5, '0')}</td>
-                                <td style="padding: 0.5rem 0.4rem !important;">${d.effmm.toString().padStart(2, '0')}/${d.effyy}</td>
-                                <td style="padding: 0.5rem 0.4rem !important;">${d.termmm.toString().padStart(2, '0')}/${d.termyy}</td>
-                                <td style="text-align: right; font-weight: 700; color: #00641a; padding: 0.5rem 0.5rem !important;">₱${d.dedamt.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                <td style="font-size: 0.5rem; padding: 0.2rem 0.4rem !important;">${d.policyno}</td>
+        if (data.hasEmployee) {
+            /*
+             * CHANGE DETAILS:
+             * Element: appendResultsToTableOnq — Accordion Month Row
+             * Date: 2026-07-07
+             * Feature: Toggles the collapsible details row and flips the chevron icon.
+             */
+            monthRow.style.cursor = 'pointer';
+            monthRow.classList.add('accordion-toggle-row');
+
+            // Calculate initial sum of DEDAMTs for this month
+            let initialSum = 0;
+            for (let i = 1; i < data.csvData.length; i++) {
+                initialSum += parseFloat(data.csvData[i][13]) || 0;
+            }
+
+            dedamtCell.innerHTML = `
+                <div class="onq-total-container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <b class="onq-total-value" style="text-align: left;" id="totalAmount-${data.monthName.replace(/\s/g, '-')}">₱${initialSum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</b>
+                    <i class="bi bi-chevron-left accordion-arrow" style="font-weight: bold; color: #00641a; font-size: 0.95rem; margin-left: 0.5rem;"></i>
+                </div>
+            `;
+            tbody.appendChild(monthRow);
+
+            // Create detail row
+            const detailRow = document.createElement('tr');
+            detailRow.classList.add('detail-row');
+            detailRow.style.display = 'none'; // Closed by default
+            const detailCell = document.createElement('td');
+            detailCell.setAttribute('colspan', '2');
+            detailCell.style.padding = '0';
+
+            // Create detail table
+            const resultsMapDetails = [];
+            for (let i = 1; i < data.csvData.length; i++) {
+                const row = data.csvData[i];
+                const dedamt = parseFloat(row[13]) || 0;
+                const dedcode = row[7];
+                const effyy = row[9];
+                const effmm = convertMonth(row[10]);
+                const termyy = row[11] ? Math.floor(parseFloat(row[11])) : '';
+                const termmm = convertMonth(row[12]);
+                const policyno = row[15];
+                resultsMapDetails.push({ dedcode, policyno, effyy, effmm, termyy, termmm, dedamt });
+            }
+
+            const detailTableHtml = `
+                <div class="detail-table-wrapper" style="padding: 0.75rem; background: transparent; overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                    <table class="detail-table" style="width: 100%; min-width: 180px; background: white; border: 1px solid rgba(0, 100, 26, 0.15); border-radius: 6px; overflow: hidden; border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th style="text-align: center; width: 20px !important; min-width: 20px !important; max-width: 20px !important; padding: 0.5rem 0 !important;"></th>
+                                <th style="width: 60px; padding: 0.5rem 0.4rem !important;">PLI</th>
+                                <th style="width: 75px; padding: 0.5rem 0.4rem !important;">EFF</th>
+                                <th style="width: 75px; padding: 0.5rem 0.4rem !important;">TERM</th>
+                                <th style="width: 95px; text-align: right; padding: 0.5rem 0.5rem !important;">DEDAMT</th>
+                                <th style="width: 75px; padding: 0.5rem 0.4rem !important;">POLICYNO</th>
                             </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            </div>
-        `;
-        
-        detailCell.innerHTML = detailTableHtml;
-        detailRow.appendChild(detailCell);
-        tbody.appendChild(detailRow);
+                        </thead>
+                        <tbody>
+                            ${resultsMapDetails.map((d, idx) => `
+                                <tr style="background: ${idx % 2 === 0 ? 'white' : 'rgba(0, 100, 26, 0.02)'};">
+                                    <td style="text-align: left; width: 20px !important; min-width: 20px !important; max-width: 20px !important; padding: 0.5rem 0 !important; line-height: 1;">
+                                        <input type="checkbox" class="dedamt-checkbox" 
+                                               data-dedamt="${d.dedamt}" 
+                                               data-month="${data.monthName.replace(/\s/g, '-')}" 
+                                               checked 
+                                               style="cursor: pointer; width: 12px; height: 12px; margin: 0 auto; padding: 0; accent-color: #00641a; display: block; vertical-align: middle;" />
+                                    </td>
+                                    <td style="padding: 0.5rem 0.4rem !important;">${d.dedcode.toString().padStart(5, '0')}</td>
+                                    <td style="padding: 0.5rem 0.4rem !important;">${d.effmm.toString().padStart(2, '0')}/${d.effyy}</td>
+                                    <td style="padding: 0.5rem 0.4rem !important;">${d.termmm.toString().padStart(2, '0')}/${d.termyy}</td>
+                                    <td style="text-align: right; font-weight: 700; color: #00641a; padding: 0.5rem 0.5rem !important;">₱${d.dedamt.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                    <td style="font-size: 0.5rem; padding: 0.2rem 0.4rem !important;">${d.policyno}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            detailCell.innerHTML = detailTableHtml;
+            detailRow.appendChild(detailCell);
+            tbody.appendChild(detailRow);
+
+            // Toggle details logic
+            monthRow.addEventListener('click', () => {
+                const isCollapsed = detailRow.style.display === 'none';
+                detailRow.style.display = isCollapsed ? 'table-row' : 'none';
+                const arrow = dedamtCell.querySelector('.accordion-arrow');
+                if (arrow) {
+                    if (isCollapsed) {
+                        arrow.classList.remove('bi-chevron-left');
+                        arrow.classList.add('bi-chevron-right');
+                    } else {
+                        arrow.classList.remove('bi-chevron-right');
+                        arrow.classList.add('bi-chevron-left');
+                    }
+                }
+            });
+
+            // Set up checkbox listeners for this month
+            const monthCheckboxes = detailRow.querySelectorAll('.dedamt-checkbox');
+            monthCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', () => {
+                    calculateTotal(data.monthName.replace(/\s/g, '-'));
+                });
+            });
+        } else {
+            // Render blank month row with DEDAMT = N/A and style muted
+            monthRow.style.cursor = 'default';
+            monthRow.style.opacity = '0.7';
+            dedamtCell.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <span style="color: #888; font-weight: 500;">N/A</span>
+                    <span style="font-size: 0.75rem; color: #aaa; font-style: italic; margin-right: 0.2rem;">No Records</span>
+                </div>
+            `;
+            tbody.appendChild(monthRow);
+        }
     });
-
-    tableWrapper.appendChild(table);
-    tableContainer.appendChild(tableWrapper);
-    resultsSectionOnq.appendChild(tableContainer);
-
-    // Add event listeners for checkboxes after table is created
-    setupCheckboxListeners();
 }
 
-function setupCheckboxListeners() {
-    const checkboxes = document.querySelectorAll('.dedamt-checkbox');
+function renderLoadMoreButtonOnq() {
+    const resultsSectionOnq = document.getElementById('resultsonq');
     
-    checkboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-            const month = this.dataset.month;
-            calculateTotal(month);
-        });
-    });
+    // Remove existing button if present
+    let loadMoreBtn = document.getElementById('loadMoreOnqBtn');
+    if (loadMoreBtn) {
+        loadMoreBtn.remove();
+    }
 
-    // Calculate initial totals
-    const months = new Set();
-    checkboxes.forEach(cb => months.add(cb.dataset.month));
-    months.forEach(month => calculateTotal(month));
+    if (currentOnqFileIndex < existingFilesOnq.length) {
+        /*
+         * CHANGE DETAILS:
+         * Element: renderLoadMoreButtonOnq — Load More Button
+         * Date: 2026-07-07
+         * Feature: Generates a premium Load More button with gradient, shadow,
+         *          and hover transitions matching the green theme color.
+         */
+        loadMoreBtn = document.createElement('button');
+        loadMoreBtn.id = 'loadMoreOnqBtn';
+        loadMoreBtn.className = 'load-more-btn';
+        loadMoreBtn.style.display = 'block';
+        loadMoreBtn.style.margin = '1.5rem auto';
+        loadMoreBtn.style.padding = '0.6rem 2rem';
+        loadMoreBtn.style.background = 'linear-gradient(135deg, #00641a 0%, #007d21 100%)';
+        loadMoreBtn.style.color = 'white';
+        loadMoreBtn.style.border = 'none';
+        loadMoreBtn.style.borderRadius = '50px';
+        loadMoreBtn.style.fontWeight = '600';
+        loadMoreBtn.style.fontSize = '0.9rem';
+        loadMoreBtn.style.cursor = 'pointer';
+        loadMoreBtn.style.boxShadow = '0 4px 15px rgba(0, 100, 26, 0.2)';
+        loadMoreBtn.style.transition = 'all 0.3s ease';
+        loadMoreBtn.innerHTML = '<i class="bi bi-arrow-down-circle"></i> Load More Months';
+
+        // Hover animations
+        loadMoreBtn.addEventListener('mouseover', () => {
+            loadMoreBtn.style.transform = 'translateY(-2px)';
+            loadMoreBtn.style.boxShadow = '0 6px 20px rgba(0, 100, 26, 0.35)';
+        });
+        loadMoreBtn.addEventListener('mouseout', () => {
+            loadMoreBtn.style.transform = 'translateY(0)';
+            loadMoreBtn.style.boxShadow = '0 4px 15px rgba(0, 100, 26, 0.2)';
+        });
+
+        // Click handler to load the next batch
+        loadMoreBtn.addEventListener('click', () => {
+            loadMoreMonthsOnq().then(() => {
+                const currentBtn = document.getElementById('loadMoreOnqBtn');
+                if (currentBtn) {
+                    currentBtn.disabled = false;
+                    currentBtn.innerHTML = '<i class="bi bi-arrow-down-circle"></i> Load More Months';
+                }
+            });
+        });
+
+        resultsSectionOnq.appendChild(loadMoreBtn);
+    }
 }
 
 function calculateTotal(month) {

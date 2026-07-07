@@ -1,5 +1,10 @@
-/* CHANGE: 2026-07-07 — Bumped to v7: fix ReferenceError: empno is not defined in index3.script */
-const CACHE_NAME = "csb-search-v7";
+/* 
+ * CHANGE DETAILS:
+ * File: service-worker.js
+ * Date: 2026-07-07
+ *      Bumped cache version to v13 to force clients to update immediately.
+ */
+const CACHE_NAME = "csb-search-v13";
 const ASSETS = [
   "./",
   "index.html",
@@ -23,6 +28,8 @@ const ASSETS = [
 ];
 
 self.addEventListener("install", e => {
+  // Force the waiting service worker to become the active service worker immediately
+  self.skipWaiting();
   e.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
       return cache.addAll(ASSETS);
@@ -40,6 +47,9 @@ self.addEventListener("activate", e => {
           }
         })
       );
+    }).then(() => {
+      // Force active service worker to take control of all open clients/tabs immediately
+      return self.clients.claim();
     })
   );
 });
