@@ -1067,24 +1067,42 @@
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: "array" });
 
+                    /*
+                     * CHANGE DETAILS:
+                     * Element: sheetsToProcess config array
+                     * Date: 2026-07-07
+                     * Fix: Replaced exact name list with `keywords` array for keyword/substring-based
+                     *      sheet detection. A sheet is matched if its name CONTAINS any keyword
+                     *      (case-insensitive), so "allPLIs Dedns" matches PLI via "pli",
+                     *      "CSB POSITIVE" matches POS via "pos", "onQUEUE" matches ONQUEUE via "queue".
+                     * Priority order: NETPAY → POS → ONQUEUE → PLI (checked in sequence to avoid overlap).
+                     */
                     const sheetsToProcess = [
                         {
-                            names: ["NETPAY", "Net Pay", "netpay", "net", "NETPAY", "NTHP"],
+                            /* NETPAY sheet: keywords trigger on "netpay", "net pay", or "nthp" */
+                            id: "NETPAY",
+                            keywords: ["netpay", "net pay", "nthp"],
                             output: `${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
                             numberColumn: "H"
                         },
                         {
-                            names: ["POS", "pos", "positive", "dedamt", "DED", "CSB", "CSB DEDNS", "POSITIVE", "ALL POSITIVE", "ALL POSITIVES", "CSB POSITIVE"],
+                            /* POS/POSITIVE sheet: keywords trigger on "pos", "positive", "dedamt", "dedns" */
+                            id: "POS",
+                            keywords: ["pos", "positive", "dedamt", "dedns"],
                             output: `pos_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
                             numberColumn: "N"
                         },
                         {
-                            names: ["ONQUEUE", "ONQ", "QUEQUE", "ON QUEUE", "ALL ON QUEUE", "ALL ONQUEUE", "ONQUE", "onQUEUE"],
+                            /* ONQUEUE sheet: keywords trigger on "onqueue", "onq", "queue", "queque" */
+                            id: "ONQUEUE",
+                            keywords: ["onqueue", "onq", "queue", "queque"],
                             output: `onq_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
                             numberColumn: "N"
                         },
                         {
-                            names: ["PLI", "pli", "ALL PLIs", "ALL PLI", "ALL PLIS", "allPLIs Dedns"],
+                            /* PLI sheet: keyword triggers on "pli" — catches "allPLIs Dedns", "ALL PLI", etc. */
+                            id: "PLI",
+                            keywords: ["pli"],
                             output: `pli_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
                             clearColumns: ["A", "S", "T", "U", "V", "W", "X", "Y", "Z"],
                             numberColumn: "N"
@@ -1092,16 +1110,22 @@
                     ];
 
 
-                    /* 
+                    /*
                      * CHANGE DETAILS:
-                     * Element: sheet detection matching logic (presentSheets filtering)
+                     * Element: presentSheets filter + sheetName finder
                      * Date: 2026-07-07
-                     * Fix: Change exact matching to case-insensitive and trimmed string matching to recognize sheets like "onqueue" correctly.
+                     * Fix: Changed from exact name matching to keyword SUBSTRING matching.
+                     *      A workbook sheet is matched when its name CONTAINS any keyword
+                     *      from sheetConfig.keywords (case-insensitive, whitespace-trimmed).
+                     *      Example: "allPLIs Dedns".includes("pli") → TRUE → assigned to PLI sheet.
                      */
+                    const sheetMatchesConfig = (sheetName, sheetConfig) =>
+                        sheetConfig.keywords.some(kw =>
+                            sheetName.toLowerCase().trim().includes(kw.toLowerCase())
+                        );
+
                     const presentSheets = sheetsToProcess.filter(sheetConfig =>
-                        Object.keys(workbook.Sheets).some(name =>
-                            sheetConfig.names.some(configName => configName.toLowerCase() === name.toLowerCase().trim())
-                        )
+                        Object.keys(workbook.Sheets).some(name => sheetMatchesConfig(name, sheetConfig))
                     );
 
                     if (presentSheets.length === 0) {
@@ -1111,14 +1135,8 @@
                     }
 
                     for (const sheetConfig of presentSheets) {
-                        /* 
-                         * CHANGE DETAILS:
-                         * Element: sheet retrieval logic
-                         * Date: 2026-07-07
-                         * Fix: Retrieve sheet name case-insensitively to match correct key in workbook.Sheets.
-                         */
                         const sheetName = Object.keys(workbook.Sheets).find(name =>
-                            sheetConfig.names.some(configName => configName.toLowerCase() === name.toLowerCase().trim())
+                            sheetMatchesConfig(name, sheetConfig)
                         );
                         let sheet = workbook.Sheets[sheetName];
 
