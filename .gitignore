@@ -6,7 +6,7 @@
 # =============================================
 
 # ----- Large CSV data files -----
-*.csv
+# *.csv
 
 # ----- Excel workbooks (raw data, not source code) -----
 *.xlsx
