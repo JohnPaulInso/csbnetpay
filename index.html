@@ -319,6 +319,17 @@
                         </button>
                         <div class="convert-hint">Convert to CSV before distributing to your team.</div>
                     </div>
+
+                    <small id="pliWarning" class="warning-text">Take note: Recheck the PLI file exceeding 25 MB</small>
+
+                    <div id="progressContainer" class="progress-container">
+                        <div class="progress">
+                            <div id="progressBar" class="progress-bar">0%</div>
+                        </div>
+                        <small id="progressText" class="progress-text">Processing...</small>
+                    </div>
+
+                    <div id="downloadButtons" class="download-buttons"></div>
                 </div>
 
                 <div class="upload-summary-card">
@@ -359,130 +370,8 @@
                     </div>
                 </div>
             </div>
-
-            <!-- FIX: Moved progress bar, warning banner, and download buttons to the bottom of the card -->
-            <!-- Date: 2026-07-07, Element: adminCardProcessingArea -->
-            <div class="admin-processing-area"
-                style="width: 100%; margin-top: 1.5rem; border-top: 1px solid rgba(0,0,0,0.06); padding-top: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
-                <small id="pliWarning" class="warning-text">Take note: Recheck the PLI file exceeding 25 MB</small>
-
-                <!-- FIX: 2026-07-07 - Added crash-resume banner for interrupted conversions -->
-                <!-- Element: convertResumeBanner - shown when localStorage detects a prior crashed session -->
-                <div id="convertResumeBanner"
-                    style="display:none; background: #2d1a00; border: 1px solid #f59e0b; border-radius: 8px; padding: 10px 14px; color: #fbbf24; font-size: 0.85rem; align-items: center; gap: 10px;">
-                    <i class="bi bi-exclamation-triangle-fill"></i>
-                    <span id="convertResumeBannerText">Last conversion was interrupted. Please re-upload the file to
-                        retry.</span>
-                    <button onclick="dismissResumeBanner()"
-                        style="margin-left:auto; background:none; border:none; color:#fbbf24; cursor:pointer; font-size: 1rem;">&times;</button>
-                </div>
-
-                <div id="progressContainer" class="progress-container" style="margin-top: 0;">
-                    <div class="progress">
-                        <div id="progressBar" class="progress-bar">0%</div>
-                    </div>
-                    <small id="progressText" class="progress-text">Processing...</small>
-                </div>
-
-                <div id="downloadButtons" class="download-buttons"></div>
-            </div>
         </div>
     </div>
-
-    <!-- FEATURE: 2026-07-07 - Admin Coverage Table (Modern Redesign) -->
-    <!-- Element: adminCoverageSection - shows which months have been uploaded for each data type -->
-    <!-- Function: Performs HEAD requests against known CSV filenames to detect presence/absence per month -->
-    <div class="admin-section container-admin" style="display: none; margin-top: 1.5rem;">
-        <div class="admin-card admin-coverage-card"
-            style="border-radius: 16px; border: 1px solid rgba(0, 0, 0, 0.08); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04); background: #fff; padding: 1.75rem;">
-
-            <div class="admin-card__header"
-                style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
-                <div>
-                    <div class="admin-card__eyebrow"
-                        style="text-transform: uppercase; letter-spacing: 0.08em; font-size: 11px; color: #6b7280; font-weight: 700; margin-bottom: 0.35rem;">
-                        Admin · Upload Coverage</div>
-                    <h5
-                        style="font-size: 1.25rem; font-weight: 800; color: #111827; margin: 0 0 0.25rem 0; letter-spacing: -0.5px;">
-                        File Upload Status Tracker</h5>
-                    <p style="color: #6b7280; font-size: 0.85rem; margin: 0;">Monitor which monthly datasets are
-                        currently active and ready in the system.</p>
-                </div>
-                <span class="summary-chip"
-                    style="padding: 0.35rem 0.75rem; background: rgba(79, 38, 131, 0.08); color: #4F2683; border-radius: 999px; font-size: 12px; font-weight: 700;">Coverage
-                    Matrix</span>
-            </div>
-
-            <!-- Table section with improved visual structure -->
-            <div
-                style="overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 12px; border: 1px solid #e5e7eb; background: #fafafa; margin-bottom: 1.25rem;">
-                <!-- Element: coverageTableWrapper - scrollable container for the month/type coverage grid -->
-                <div id="coverageTableWrapper" style="min-width: 340px;">
-                    <table id="coverageTable"
-                        style="width: 100%; border-collapse: collapse; font-size: 0.88rem; background: #fff;">
-                        <thead>
-                            <tr
-                                style="background: linear-gradient(135deg, #4f2683 0%, #36175e 100%); color: white; text-align: center;">
-                                <th
-                                    style="padding: 12px 16px; text-align: left; font-weight: 600; font-size: 11.5px; letter-spacing: 0.05em; text-transform: uppercase;">
-                                    Month</th>
-                                <th
-                                    style="padding: 12px 8px; font-weight: 600; font-size: 11.5px; letter-spacing: 0.05em; text-transform: uppercase; width: 18%;">
-                                    NETPAY</th>
-                                <th
-                                    style="padding: 12px 8px; font-weight: 600; font-size: 11.5px; letter-spacing: 0.05em; text-transform: uppercase; width: 18%;">
-                                    POS</th>
-                                <th
-                                    style="padding: 12px 8px; font-weight: 600; font-size: 11.5px; letter-spacing: 0.05em; text-transform: uppercase; width: 18%;">
-                                    ONQ</th>
-                                <th
-                                    style="padding: 12px 8px; font-weight: 600; font-size: 11.5px; letter-spacing: 0.05em; text-transform: uppercase; width: 18%;">
-                                    PLI</th>
-                            </tr>
-                        </thead>
-                        <!-- Element: coverageTableBody - populated by loadCoverageTable() -->
-                        <tbody id="coverageTableBody">
-                            <tr>
-                                <td colspan="5"
-                                    style="text-align:center; padding: 30px; color: #6b7280; font-size: 0.9rem;">
-                                    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-                                        <div class="spinner"
-                                            style="display: inline-block; width: 24px; height: 24px; border: 3px solid rgba(79, 38, 131, 0.15); border-top-color: #4F2683;">
-                                        </div>
-                                        <span>Analyzing server storage and checking datasets...</span>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Legend and Action Toolbar redesigned -->
-            <div
-                style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; border-top: 1px solid #e5e7eb; padding-top: 1.25rem; margin-top: 0.5rem;">
-                <div
-                    style="display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.8rem; font-weight: 600; color: #4b5563;">
-                    <span style="display: inline-flex; align-items: center; gap: 6px;">
-                        <i class="bi bi-check-circle-fill"
-                            style="color: #10b981; font-size: 1.1rem; line-height: 1;"></i>
-                        Uploaded Data
-                    </span>
-                    <span style="display: inline-flex; align-items: center; gap: 6px;">
-                        <i class="bi bi-x-circle-fill" style="color: #ef4444; font-size: 1.1rem; line-height: 1;"></i>
-                        Missing File
-                    </span>
-                </div>
-
-                <button onclick="loadCoverageTable()" class="btn btn-outline"
-                    onmouseenter="this.style.background='#4F2683'; this.style.color='white';"
-                    onmouseleave="this.style.background='transparent'; this.style.color='#4F2683';"
-                    style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; border: 1.5px solid #4F2683; color: #4F2683; background: transparent; border-radius: 30px; cursor: pointer; font-size: 0.8rem; font-weight: 700; transition: all 0.2s ease; outline: none;">
-                    <i class="bi bi-arrow-clockwise" style="font-size: 0.95rem; -webkit-text-stroke: 0.5px;"></i>
-                    Refresh Matrix
-                </button>
-            </div>
-        </div>
     </div>
 
     <!-- Bottom Navigation -->
@@ -1012,102 +901,16 @@
             }
         }
 
-        /*
-         * CHANGE DETAILS:
-         * Element: updateAbstractFileName() function
-         * Date: 2026-07-07
-         * Fix/Feature: On file select, auto-detect the month (and optionally 2-digit year)
-         *   from the filename using keyword substring matching. If a month is detected,
-         *   auto-set monthSelect to that month so the user doesn't have to pick it manually.
-         *   After detecting, auto-trigger convertButton to start conversion immediately.
-         *
-         * Month keyword mapping (case-insensitive substring):
-         *   "jan" → January, "feb" → February, "mar" → March, "apr" → April,
-         *   "may" → May, "jun" → June, "jul" → July, "aug" → August,
-         *   "sep" → September, "oct" → October, "nov" → November, "dec" → December
-         *
-         * Year detection: looks for 2-digit number 23-30 in the filename (e.g. "jul25")
-         *   and sets yearSelect accordingly.
-         */
         function updateAbstractFileName() {
             const fileInput = document.getElementById("abstractFileInput");
-            const fileNameDisplay = document.getElementById("abstractFileName");
-            const monthSelect = document.getElementById("monthSelect");
-            const yearSelect = document.getElementById("yearSelect");
-
-            if (!fileInput || !fileInput.files.length) {
-                if (fileNameDisplay) fileNameDisplay.textContent = "No file chosen";
-                refreshUploadCart();
-                return;
+            const fileName = document.getElementById("abstractFileName");
+            if (fileInput && fileName) {
+                fileName.textContent = fileInput.files.length
+                    ? `Selected file: ${fileInput.files[0].name}`
+                    : "No file chosen";
             }
-
-            const rawName = fileInput.files[0].name;
-            if (fileNameDisplay) fileNameDisplay.textContent = `Selected file: ${rawName}`;
-
-            // --- Month keyword auto-detection ---
-            // Element: monthAutoDetect - maps short keyword to monthSelect option value
-            const monthKeywords = [
-                { keyword: "jan", value: "jan" },
-                { keyword: "feb", value: "feb" },
-                { keyword: "mar", value: "mar" },
-                { keyword: "apr", value: "apr" },
-                { keyword: "may", value: "may" },
-                { keyword: "jun", value: "jun" },
-                { keyword: "jul", value: "jul" },
-                { keyword: "aug", value: "aug" },
-                { keyword: "sep", value: "sep" },
-                { keyword: "oct", value: "oct" },
-                { keyword: "nov", value: "nov" },
-                { keyword: "dec", value: "dec" }
-            ];
-
-            const lowerName = rawName.toLowerCase();
-            let detectedMonth = null;
-
-            for (const m of monthKeywords) {
-                if (lowerName.includes(m.keyword)) {
-                    detectedMonth = m.value;
-                    break;
-                }
-            }
-
-            // Auto-set monthSelect if a month was detected in the filename
-            if (detectedMonth && monthSelect) {
-                for (let i = 0; i < monthSelect.options.length; i++) {
-                    if (monthSelect.options[i].value === detectedMonth) {
-                        monthSelect.selectedIndex = i;
-                        break;
-                    }
-                }
-            }
-
-            // --- Year auto-detection (2-digit: 23–30 range) ---
-            // Element: yearAutoDetect - looks for e.g. "25", "26" in filename
-            if (yearSelect) {
-                const yearMatch = lowerName.match(/\b(2[3-9]|30)\b/);
-                if (yearMatch) {
-                    const fullYear = "20" + yearMatch[1];
-                    for (let i = 0; i < yearSelect.options.length; i++) {
-                        if (yearSelect.options[i].value === fullYear) {
-                            yearSelect.selectedIndex = i;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            // Refresh the upload cart display after setting month/year
             refreshUploadCart();
-
-            // --- Auto-trigger convert button ---
-            // Element: convertButtonAutoTrigger - clicks convertButton after a short delay
-            // to allow the UI/cart to update visually before processing starts
-            setTimeout(() => {
-                const btn = document.getElementById("convertButton");
-                if (btn) btn.click();
-            }, 300);
         }
-
 
         function refreshUploadCart() {
             const monthSelect = document.getElementById("monthSelect");
@@ -1200,215 +1003,7 @@
             if (abstractInput) abstractInput.addEventListener("change", refreshUploadCart);
 
             refreshUploadCart();
-
-            /*
-             * CHANGE DETAILS:
-             * Element: crash-resume check on DOMContentLoaded
-             * Date: 2026-07-07
-             * Updated: 2026-07-07 — Now restores selectedMonth and selectedYear from the saved
-             *   progress state so the dropdowns are pre-filled after a crash. The banner prompts
-             *   the user to re-select the file — updateAbstractFileName() auto-triggers convert.
-             */
-            const staleProgress = localStorage.getItem('convert_progress');
-            if (staleProgress) {
-                try {
-                    const prog = JSON.parse(staleProgress);
-                    const ageMs = Date.now() - (prog.timestamp || 0);
-                    if (ageMs < 10 * 60 * 1000) { // within 10 minutes
-                        // Restore month dropdown
-                        if (prog.selectedMonth) {
-                            const mSel = document.getElementById('monthSelect');
-                            if (mSel) {
-                                for (let i = 0; i < mSel.options.length; i++) {
-                                    if (mSel.options[i].value === prog.selectedMonth) {
-                                        mSel.selectedIndex = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                        // Restore year dropdown
-                        if (prog.selectedYear) {
-                            const ySel = document.getElementById('yearSelect');
-                            if (ySel) {
-                                for (let i = 0; i < ySel.options.length; i++) {
-                                    if (ySel.options[i].value === prog.selectedYear) {
-                                        ySel.selectedIndex = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                        refreshUploadCart();
-                        // Show resume banner prompting file re-selection
-                        const banner = document.getElementById('convertResumeBanner');
-                        const bannerText = document.getElementById('convertResumeBannerText');
-                        if (banner) {
-                            const monthLabel = prog.selectedMonth ? prog.selectedMonth.toUpperCase() : '?';
-                            const yearLabel = prog.selectedYear || '?';
-                            if (bannerText) bannerText.textContent = `⚡ Last conversion for ${monthLabel} ${yearLabel} was interrupted. Re-select the file to auto-retry.`;
-                            banner.style.display = 'flex';
-                        }
-                    } else {
-                        localStorage.removeItem('convert_progress');
-                    }
-                } catch (e) {
-                    localStorage.removeItem('convert_progress');
-                }
-            }
-
-            // Auto-load coverage table for admin
-            loadCoverageTable();
         });
-
-        /*
-         * CHANGE DETAILS:
-         * Element: dismissResumeBanner() function
-         * Date: 2026-07-07
-         * Function: Hides the interrupted-session warning banner and clears stale progress state.
-         */
-        function dismissResumeBanner() {
-            const banner = document.getElementById('convertResumeBanner');
-            if (banner) banner.style.display = 'none';
-            localStorage.removeItem('convert_progress');
-        }
-
-        /*
-         * CHANGE DETAILS:
-         * Element: loadCoverageTable() function
-         * Date: 2026-07-07
-         * Updated: 2026-07-07 — Changed from last 12 months to ALL months from Jan 2024 to now.
-         *   Added paginated display: initially shows 6 months (newest first), Load More adds 6 per click.
-         * Feature: HEAD-checks CSV files for each month to show ✅/❌ per data type.
-         *   File naming conventions:
-         *     NETPAY: {mon}{yy}.csv       e.g. jul26.csv
-         *     POS:    pos_{mon}{yy}.csv   e.g. pos_jul26.csv
-         *     ONQ:    onq_{mon}{yy}.csv   e.g. onq_jul26.csv
-         *     PLI:    pli_{mon}{yy}.csv   e.g. pli_jul26.csv
-         */
-        // Element: coverageAllResults - module-level store so Load More can access the full results
-        let coverageAllResults = [];
-        let coverageShownCount = 0;
-        const COVERAGE_PAGE_SIZE = 6;
-
-        async function loadCoverageTable() {
-            const tbody = document.getElementById('coverageTableBody');
-            if (!tbody) return;
-
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 20px; color: #888;"><i class="bi bi-hourglass-split"></i> Checking coverage...</td></tr>`;
-
-            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-            const monthShorts = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
-
-            // Build ALL months from Jan 2024 to current month (newest first)
-            const now = new Date();
-            const startDate = new Date(2024, 0, 1); // Jan 2024
-            const months = [];
-            let cursor = new Date(now.getFullYear(), now.getMonth(), 1);
-            while (cursor >= startDate) {
-                months.push({
-                    label: `${monthNames[cursor.getMonth()]} ${cursor.getFullYear()}`,
-                    short: monthShorts[cursor.getMonth()],
-                    yy: cursor.getFullYear().toString().slice(-2)
-                });
-                cursor.setMonth(cursor.getMonth() - 1);
-            }
-
-            // HEAD-check a file — returns true if the server returns 200
-            async function fileExists(filename) {
-                try {
-                    const r = await fetch(filename, { method: 'HEAD' });
-                    return r.ok;
-                } catch { return false; }
-            }
-
-            // Check all months in parallel (batch HEAD requests)
-            coverageAllResults = await Promise.all(months.map(async m => {
-                const [netpay, pos, onq, pli] = await Promise.all([
-                    fileExists(`${m.short}${m.yy}.csv`),
-                    fileExists(`pos_${m.short}${m.yy}.csv`),
-                    fileExists(`onq_${m.short}${m.yy}.csv`),
-                    fileExists(`pli_${m.short}${m.yy}.csv`)
-                ]);
-                return { label: m.label, netpay, pos, onq, pli };
-            }));
-
-            // Reset shown count and render first page
-            coverageShownCount = 0;
-            tbody.innerHTML = '';
-            renderCoveragePage();
-        }
-
-        /*
-         * CHANGE DETAILS:
-         * Element: renderCoveragePage() function
-         * Date: 2026-07-07
-         * Function: Renders the next COVERAGE_PAGE_SIZE rows into the coverage table body.
-         *   Called by loadCoverageTable() and the Load More button.
-         *   Appends a Load More button row if more data remains.
-         */
-        function renderCoveragePage() {
-            const tbody = document.getElementById('coverageTableBody');
-            if (!tbody) return;
-
-            // Remove existing Load More row before appending new rows
-            const existingLoadMore = document.getElementById('coverageLoadMoreRow');
-            if (existingLoadMore) existingLoadMore.remove();
-            const check = ok => ok
-                ? `<i class="bi bi-check-circle-fill" style="color: #10b981; font-size: 1.15rem;" title="Uploaded"></i>`
-                : `<i class="bi bi-x-circle-fill" style="color: #ef4444; font-size: 1.15rem;" title="Missing"></i>`;
-
-            const slice = coverageAllResults.slice(coverageShownCount, coverageShownCount + COVERAGE_PAGE_SIZE);
-            slice.forEach((r, i) => {
-                const rowIndex = coverageShownCount + i;
-                const tr = document.createElement('tr');
-                tr.style.borderBottom = '1px solid #e5e7eb';
-                tr.style.transition = 'background-color 0.15s ease';
-                tr.onmouseenter = () => tr.style.backgroundColor = '#f9fafb';
-                tr.onmouseleave = () => tr.style.backgroundColor = 'transparent';
-
-                tr.innerHTML = `
-                    <td style="padding: 12px 16px; font-weight: 600; color: #374151; white-space: nowrap; text-align: left;">${r.label}</td>
-                    <td style="text-align: center; padding: 12px 8px; vertical-align: middle;">${check(r.netpay)}</td>
-                    <td style="text-align: center; padding: 12px 8px; vertical-align: middle;">${check(r.pos)}</td>
-                    <td style="text-align: center; padding: 12px 8px; vertical-align: middle;">${check(r.onq)}</td>
-                    <td style="text-align: center; padding: 12px 8px; vertical-align: middle;">${check(r.pli)}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-            coverageShownCount += slice.length;
-
-            // Append Load More row if more data remains
-            if (coverageShownCount < coverageAllResults.length) {
-                const loadMoreRow = document.createElement('tr');
-                loadMoreRow.id = 'coverageLoadMoreRow';
-                loadMoreRow.innerHTML = `
-                    <td colspan="5" style="text-align: center; padding: 16px 10px; background: #fafafa; border-top: 1px solid #e5e7eb;">
-                        <button onclick="renderCoveragePage()"
-                            style="background: #4F2683; border: none; color: white; padding: 8px 24px;
-                                   border-radius: 30px; cursor: pointer; font-size: 0.82rem; font-weight: 700;
-                                   box-shadow: 0 4px 10px rgba(79, 38, 131, 0.2); transition: all 0.2s ease;
-                                   display: inline-flex; align-items: center; gap: 6px;">
-                            <i class="bi bi-chevron-down" style="font-size: 0.85rem; -webkit-text-stroke: 0.5px;"></i>
-                            Load More Statuses (${coverageAllResults.length - coverageShownCount} left)
-                        </button>
-                    </td>
-                `;
-                // Add simple hover scale animation via Javascript triggers since it's inline-styled
-                const btn = loadMoreRow.querySelector('button');
-                btn.onmouseenter = () => {
-                    btn.style.transform = 'translateY(-1px)';
-                    btn.style.boxShadow = '0 6px 14px rgba(79, 38, 131, 0.3)';
-                    btn.style.background = '#3d1c69';
-                };
-                btn.onmouseleave = () => {
-                    btn.style.transform = 'none';
-                    btn.style.boxShadow = '0 4px 10px rgba(79, 38, 131, 0.2)';
-                    btn.style.background = '#4F2683';
-                };
-                tbody.appendChild(loadMoreRow);
-            }
-        }
 
         async function convertExcelToCSV() {
             const monthSelect = document.getElementById("monthSelect");
@@ -1447,86 +1042,49 @@
                 downloadButtonsContainer.innerHTML = "";
             }
 
-            /*
-             * CHANGE DETAILS:
-             * Element: convertExcelToCSV progress tracking
-             * Date: 2026-07-07
-             * Fix: Replaced fake timeout-based progress (50% at 5s, 80% at 20s) with
-             *   real per-sheet progress updates. Also saves convert_progress to localStorage
-             *   so a crash/reload shows a resume banner instead of silently failing.
-             */
             const file = fileInput.files[0];
             const reader = new FileReader();
             const filesToDownload = [];
 
-            /*
-             * CHANGE DETAILS:
-             * Element: convert_progress localStorage save — crash resume
-             * Date: 2026-07-07
-             * Updated: 2026-07-07 — Now also saves selectedMonth and selectedYear so dropdowns
-             *   can be restored after a crash/reload for the auto-retrigger flow.
-             */
-            // Save crash-resume state including month/year for dropdown restore
-            localStorage.setItem('convert_progress', JSON.stringify({
-                step: 0, total: 4, label: 'Initializing...', timestamp: Date.now(),
-                selectedMonth: monthSelect.value,
-                selectedYear: yearSelect.value
-            }));
-
-            // Helper: update progress bar + localStorage step
-            function updateProgress(step, total, label) {
-                const pct = Math.round((step / total) * 100);
+            const timeout50 = setTimeout(() => {
                 if (progressBar) {
-                    progressBar.style.width = pct + '%';
-                    progressBar.textContent = pct + '%';
+                    progressBar.style.width = "50%";
+                    progressBar.textContent = "50%";
                 }
-                if (progressText) progressText.textContent = label;
-                localStorage.setItem('convert_progress', JSON.stringify({
-                    step, total, label, timestamp: Date.now()
-                }));
-            }
+                if (progressText) progressText.textContent = "Working on it (50%)...";
+            }, 5000);
+
+            const timeout80 = setTimeout(() => {
+                if (progressBar) {
+                    progressBar.style.width = "80%";
+                    progressBar.textContent = "80%";
+                }
+                if (progressText) progressText.textContent = "Still processing (80%)...";
+            }, 20000);
 
             reader.onload = async function (e) {
                 try {
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: "array" });
 
-                    /*
-                     * CHANGE DETAILS:
-                     * Element: sheetsToProcess config array
-                     * Date: 2026-07-07
-                     * Fix: Replaced exact name list with `keywords` array for keyword/substring-based
-                     *      sheet detection. A sheet is matched if its name CONTAINS any keyword
-                     *      (case-insensitive), so "allPLIs Dedns" matches PLI via "pli",
-                     *      "CSB POSITIVE" matches POS via "pos", "onQUEUE" matches ONQUEUE via "queue".
-                     * Priority order: NETPAY → POS → ONQUEUE → PLI (checked in sequence to avoid overlap).
-                     */
                     const sheetsToProcess = [
                         {
-                            /* NETPAY sheet: keywords trigger on "netpay", "net pay", or "nthp" */
-                            id: "NETPAY",
-                            keywords: ["netpay", "net pay", "nthp", "takehome", "net take home", "take", "home"],
+                            names: ["NETPAY", "Net Pay", "netpay", "net", "NETPAY", "NTHP"],
                             output: `${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
                             numberColumn: "H"
                         },
                         {
-                            /* POS/POSITIVE sheet: keywords trigger on "pos", "positive", "dedamt", "dedns" */
-                            id: "POS",
-                            keywords: ["pos", "positive", "dedamt", "dedns"],
+                            names: ["POS", "pos", "positive", "dedamt", "DED", "CSB", "CSB DEDNS", "POSITIVE", "ALL POSITIVE", "ALL POSITIVES", "CSB POSITIVE"],
                             output: `pos_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
                             numberColumn: "N"
                         },
                         {
-                            /* ONQUEUE sheet: keywords trigger on "onqueue", "onq", "queue", "queque" */
-                            id: "ONQUEUE",
-                            keywords: ["onqueue", "onq", "queue", "queque"],
+                            names: ["ONQUEUE", "ONQ", "QUEQUE", "ON QUEUE", "ALL ON QUEUE", "ALL ONQUEUE", "ONQUE", "onQUEUE"],
                             output: `onq_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
                             numberColumn: "N"
                         },
                         {
-                            /* PLI sheet: keyword triggers on "pli" — catches "allPLIs Dedns", "ALL PLI", etc. */
-                            id: "PLI",
-                            keywords: ["pli"],
+                            names: ["PLI", "pli", "ALL PLIs", "ALL PLI", "ALL PLIS", "allPLIs Dedns"],
                             output: `pli_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
                             clearColumns: ["A", "S", "T", "U", "V", "W", "X", "Y", "Z"],
                             numberColumn: "N"
@@ -1534,22 +1092,16 @@
                     ];
 
 
-                    /*
+                    /* 
                      * CHANGE DETAILS:
-                     * Element: presentSheets filter + sheetName finder
+                     * Element: sheet detection matching logic (presentSheets filtering)
                      * Date: 2026-07-07
-                     * Fix: Changed from exact name matching to keyword SUBSTRING matching.
-                     *      A workbook sheet is matched when its name CONTAINS any keyword
-                     *      from sheetConfig.keywords (case-insensitive, whitespace-trimmed).
-                     *      Example: "allPLIs Dedns".includes("pli") → TRUE → assigned to PLI sheet.
+                     * Fix: Change exact matching to case-insensitive and trimmed string matching to recognize sheets like "onqueue" correctly.
                      */
-                    const sheetMatchesConfig = (sheetName, sheetConfig) =>
-                        sheetConfig.keywords.some(kw =>
-                            sheetName.toLowerCase().trim().includes(kw.toLowerCase())
-                        );
-
                     const presentSheets = sheetsToProcess.filter(sheetConfig =>
-                        Object.keys(workbook.Sheets).some(name => sheetMatchesConfig(name, sheetConfig))
+                        Object.keys(workbook.Sheets).some(name =>
+                            sheetConfig.names.some(configName => configName.toLowerCase() === name.toLowerCase().trim())
+                        )
                     );
 
                     if (presentSheets.length === 0) {
@@ -1559,8 +1111,14 @@
                     }
 
                     for (const sheetConfig of presentSheets) {
+                        /* 
+                         * CHANGE DETAILS:
+                         * Element: sheet retrieval logic
+                         * Date: 2026-07-07
+                         * Fix: Retrieve sheet name case-insensitively to match correct key in workbook.Sheets.
+                         */
                         const sheetName = Object.keys(workbook.Sheets).find(name =>
-                            sheetMatchesConfig(name, sheetConfig)
+                            sheetConfig.names.some(configName => configName.toLowerCase() === name.toLowerCase().trim())
                         );
                         let sheet = workbook.Sheets[sheetName];
 
@@ -1616,20 +1174,17 @@
                             blob: blob
                         });
 
-                        /*
-                         * CHANGE DETAILS:
-                         * Element: per-sheet progress update inside convertExcelToCSV for-loop
-                         * Date: 2026-07-07
-                         * Fix: Call updateProgress() after each sheet completes so bar reflects real steps.
-                         */
-                        const sheetIndex = presentSheets.indexOf(sheetConfig) + 1;
-                        updateProgress(sheetIndex, presentSheets.length, `Prepared ${sheetConfig.output} (${sheetIndex}/${presentSheets.length})`);
+                        if (progressText) progressText.textContent = `Prepared ${sheetConfig.output}`;
                     }
 
-                    // Mark conversion as complete — clear crash-resume state
-                    localStorage.removeItem('convert_progress');
+                    clearTimeout(timeout50);
+                    clearTimeout(timeout80);
 
-                    updateProgress(1, 1, 'Conversion complete! ✅');
+                    if (progressBar) {
+                        progressBar.style.width = "100%";
+                        progressBar.textContent = "100%";
+                    }
+                    if (progressText) progressText.textContent = "Conversion complete!";
 
                     const downloadBtn = document.createElement("button");
                     downloadBtn.className = "btn btn-success";
@@ -1749,7 +1304,7 @@
                 } catch (e) {
                     accounts = [
                         { username: "jonathan77", password: "atan77", email: "jonathan77@example.com" },
-                        { username: "region7", password: "ashh7", email: "region7@example.com" }
+                        { username: "region7", password: "salesmenr7", email: "region7@example.com" }
                     ];
                     localStorage.setItem("netpay_accounts", JSON.stringify(accounts));
                 }
