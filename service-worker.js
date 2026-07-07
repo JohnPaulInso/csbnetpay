@@ -1,4 +1,5 @@
-const CACHE_NAME = "csb-search-v1";
+/* CHANGE: 2026-07-07 — Bumped to v6: strip commas from column N (row[13]) in pos_ files before parseFloat */
+const CACHE_NAME = "csb-search-v6";
 const ASSETS = [
   "./",
   "index.html",
