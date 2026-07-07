@@ -1228,13 +1228,19 @@ setTimeout(() => {
     </div>
 
     <script>
+        /* 
+         * CHANGE DETAILS:
+         * Element: getAccounts function / default accounts initialization
+         * Date: 2026-07-08
+         * Fix: Replaced default region7 password "ash7" with "salesmenr7" to make default credentials consistent across files.
+         */
         // Modal functions for credentials management
         function getAccounts() {
             let accounts = localStorage.getItem("netpay_accounts");
             if (!accounts) {
                 accounts = [
                     { username: "jonathan77", password: "atan77", email: "jonathan77@example.com" },
-                    { username: "region7", password: "ash7", email: "region7@example.com" }
+                    { username: "region7", password: "salesmenr7", email: "region7@example.com" }
                 ];
                 localStorage.setItem("netpay_accounts", JSON.stringify(accounts));
             } else {
@@ -1243,7 +1249,7 @@ setTimeout(() => {
                 } catch(e) {
                     accounts = [
                         { username: "jonathan77", password: "atan77", email: "jonathan77@example.com" },
-                        { username: "region7", password: "ash7", email: "region7@example.com" }
+                        { username: "region7", password: "salesmenr7", email: "region7@example.com" }
                     ];
                     localStorage.setItem("netpay_accounts", JSON.stringify(accounts));
                 }
