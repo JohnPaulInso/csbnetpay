@@ -592,6 +592,8 @@
         let speechLines = [];
         let empNameForSpeech = '';
 
+        // Gather all matching rows first
+        const allRows = [];
         fetchedDataNet.forEach(data => {
             data.csvData.forEach(row => {
                 if (row.length < 4) return;
@@ -612,28 +614,68 @@
                         empNameForSpeech = toTitleCase(`${rawFname} ${rawLname}`); // Use Title Case for natural speech
                     }
 
-                    const rowElement = document.createElement('tr');
-                    
-                    // Create cells with data-label for mobile responsiveness
-                    const monthCell = document.createElement('td');
-                    monthCell.setAttribute('data-label', 'MONTH');
-                    monthCell.textContent = data.monthName;
-
-                    const takehomeCell = document.createElement('td');
-                    takehomeCell.setAttribute('data-label', 'TAKEHOME');
-                    takehomeCell.innerHTML = `<b>${takehome}</b>`;
-                    takehomeCell.classList.add('number-cell');
-
-                    rowElement.appendChild(monthCell);
-                    rowElement.appendChild(takehomeCell);
-                    tbody.appendChild(rowElement);
+                    allRows.push({
+                        monthName: data.monthName,
+                        takehome: takehome,
+                        takehomeVal: takehomeVal
+                    });
                 }
             });
         });
 
+        // Pagination setup
+        let displayedCount = 0;
+        const INITIAL_LIMIT = 12;
+        const LOAD_MORE_STEP = 6;
+
+        function appendRows(count) {
+            const nextBatch = allRows.slice(displayedCount, displayedCount + count);
+            nextBatch.forEach(dataRow => {
+                const rowElement = document.createElement('tr');
+                
+                const monthCell = document.createElement('td');
+                monthCell.setAttribute('data-label', 'MONTH');
+                monthCell.textContent = dataRow.monthName;
+
+                const takehomeCell = document.createElement('td');
+                takehomeCell.setAttribute('data-label', 'TAKEHOME');
+                takehomeCell.innerHTML = `<b>${dataRow.takehome}</b>`;
+                takehomeCell.classList.add('number-cell');
+
+                rowElement.appendChild(monthCell);
+                rowElement.appendChild(takehomeCell);
+                tbody.appendChild(rowElement);
+            });
+            displayedCount += nextBatch.length;
+            updateLoadMoreButton();
+        }
+
+        // Add load more button
+        const loadMoreBtn = document.createElement('button');
+        loadMoreBtn.className = 'btn btn-primary';
+        loadMoreBtn.style.margin = '15px auto';
+        loadMoreBtn.style.display = 'none';
+        loadMoreBtn.innerHTML = '<i class="bi bi-chevron-down"></i> Load More';
+        loadMoreBtn.onclick = () => {
+            appendRows(LOAD_MORE_STEP);
+        };
+
+        function updateLoadMoreButton() {
+            if (displayedCount < allRows.length) {
+                loadMoreBtn.style.display = 'block';
+                loadMoreBtn.innerHTML = `<i class="bi bi-chevron-down"></i> Load More (${allRows.length - displayedCount} remaining)`;
+            } else {
+                loadMoreBtn.style.display = 'none';
+            }
+        }
+
+        // Render initial limit
+        appendRows(INITIAL_LIMIT);
+
         tableWrapper.appendChild(table);
         tableContainer.appendChild(tableWrapper);
         resultsSectionNetpay.appendChild(tableContainer);
+        resultsSectionNetpay.appendChild(loadMoreBtn);
 
         // Trigger Speech if data found
         if (empNameForSpeech && speechLines.length > 0) {

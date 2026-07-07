@@ -1144,7 +1144,199 @@
             if (abstractInput) abstractInput.addEventListener("change", refreshUploadCart);
 
             refreshUploadCart();
+
+            /*
+             * CHANGE DETAILS:
+             * Element: crash-resume check on DOMContentLoaded
+             * Date: 2026-07-07
+             * Updated: 2026-07-07 — Now restores selectedMonth and selectedYear from the saved
+             *   progress state so the dropdowns are pre-filled after a crash. The banner prompts
+             *   the user to re-select the file — updateAbstractFileName() auto-triggers convert.
+             */
+            const staleProgress = localStorage.getItem('convert_progress');
+            if (staleProgress) {
+                try {
+                    const prog = JSON.parse(staleProgress);
+                    const ageMs = Date.now() - (prog.timestamp || 0);
+                    if (ageMs < 10 * 60 * 1000) { // within 10 minutes
+                        // Restore month dropdown
+                        if (prog.selectedMonth) {
+                            const mSel = document.getElementById('monthSelect');
+                            if (mSel) {
+                                for (let i = 0; i < mSel.options.length; i++) {
+                                    if (mSel.options[i].value === prog.selectedMonth) {
+                                        mSel.selectedIndex = i;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        // Restore year dropdown
+                        if (prog.selectedYear) {
+                            const ySel = document.getElementById('yearSelect');
+                            if (ySel) {
+                                for (let i = 0; i < ySel.options.length; i++) {
+                                    if (ySel.options[i].value === prog.selectedYear) {
+                                        ySel.selectedIndex = i;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        refreshUploadCart();
+                        // Show resume banner prompting file re-selection
+                        const banner = document.getElementById('convertResumeBanner');
+                        const bannerText = document.getElementById('convertResumeBannerText');
+                        if (banner) {
+                            const monthLabel = prog.selectedMonth ? prog.selectedMonth.toUpperCase() : '?';
+                            const yearLabel = prog.selectedYear || '?';
+                            if (bannerText) bannerText.textContent = `⚡ Last conversion for ${monthLabel} ${yearLabel} was interrupted. Re-select the file to auto-retry.`;
+                            banner.style.display = 'flex';
+                        }
+                    } else {
+                        localStorage.removeItem('convert_progress');
+                    }
+                } catch(e) {
+                    localStorage.removeItem('convert_progress');
+                }
+            }
+
+            // Auto-load coverage table for admin
+            loadCoverageTable();
         });
+
+        /*
+         * CHANGE DETAILS:
+         * Element: dismissResumeBanner() function
+         * Date: 2026-07-07
+         * Function: Hides the interrupted-session warning banner and clears stale progress state.
+         */
+        function dismissResumeBanner() {
+            const banner = document.getElementById('convertResumeBanner');
+            if (banner) banner.style.display = 'none';
+            localStorage.removeItem('convert_progress');
+        }
+
+        /*
+         * CHANGE DETAILS:
+         * Element: loadCoverageTable() function
+         * Date: 2026-07-07
+         * Updated: 2026-07-07 — Changed from last 12 months to ALL months from Jan 2024 to now.
+         *   Added paginated display: initially shows 6 months (newest first), Load More adds 6 per click.
+         * Feature: HEAD-checks CSV files for each month to show ✅/❌ per data type.
+         *   File naming conventions:
+         *     NETPAY: {mon}{yy}.csv       e.g. jul26.csv
+         *     POS:    pos_{mon}{yy}.csv   e.g. pos_jul26.csv
+         *     ONQ:    onq_{mon}{yy}.csv   e.g. onq_jul26.csv
+         *     PLI:    pli_{mon}{yy}.csv   e.g. pli_jul26.csv
+         */
+        // Element: coverageAllResults - module-level store so Load More can access the full results
+        let coverageAllResults = [];
+        let coverageShownCount = 0;
+        const COVERAGE_PAGE_SIZE = 6;
+
+        async function loadCoverageTable() {
+            const tbody = document.getElementById('coverageTableBody');
+            if (!tbody) return;
+
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 20px; color: #888;"><i class="bi bi-hourglass-split"></i> Checking coverage...</td></tr>`;
+
+            const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+            const monthShorts = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+
+            // Build ALL months from Jan 2024 to current month (newest first)
+            const now = new Date();
+            const startDate = new Date(2024, 0, 1); // Jan 2024
+            const months = [];
+            let cursor = new Date(now.getFullYear(), now.getMonth(), 1);
+            while (cursor >= startDate) {
+                months.push({
+                    label: `${monthNames[cursor.getMonth()]} ${cursor.getFullYear()}`,
+                    short: monthShorts[cursor.getMonth()],
+                    yy: cursor.getFullYear().toString().slice(-2)
+                });
+                cursor.setMonth(cursor.getMonth() - 1);
+            }
+
+            // HEAD-check a file — returns true if the server returns 200
+            async function fileExists(filename) {
+                try {
+                    const r = await fetch(filename, { method: 'HEAD' });
+                    return r.ok;
+                } catch { return false; }
+            }
+
+            // Check all months in parallel (batch HEAD requests)
+            coverageAllResults = await Promise.all(months.map(async m => {
+                const [netpay, pos, onq, pli] = await Promise.all([
+                    fileExists(`${m.short}${m.yy}.csv`),
+                    fileExists(`pos_${m.short}${m.yy}.csv`),
+                    fileExists(`onq_${m.short}${m.yy}.csv`),
+                    fileExists(`pli_${m.short}${m.yy}.csv`)
+                ]);
+                return { label: m.label, netpay, pos, onq, pli };
+            }));
+
+            // Reset shown count and render first page
+            coverageShownCount = 0;
+            tbody.innerHTML = '';
+            renderCoveragePage();
+        }
+
+        /*
+         * CHANGE DETAILS:
+         * Element: renderCoveragePage() function
+         * Date: 2026-07-07
+         * Function: Renders the next COVERAGE_PAGE_SIZE rows into the coverage table body.
+         *   Called by loadCoverageTable() and the Load More button.
+         *   Appends a Load More button row if more data remains.
+         */
+        function renderCoveragePage() {
+            const tbody = document.getElementById('coverageTableBody');
+            if (!tbody) return;
+
+            // Remove existing Load More row before appending new rows
+            const existingLoadMore = document.getElementById('coverageLoadMoreRow');
+            if (existingLoadMore) existingLoadMore.remove();
+
+            const check = ok => ok
+                ? `<span style="color:#16a34a; font-size:1.1rem;" title="Uploaded">✅</span>`
+                : `<span style="color:#dc2626; font-size:1.1rem;" title="Missing">❌</span>`;
+
+            const slice = coverageAllResults.slice(coverageShownCount, coverageShownCount + COVERAGE_PAGE_SIZE);
+            slice.forEach((r, i) => {
+                const rowIndex = coverageShownCount + i;
+                const tr = document.createElement('tr');
+                tr.style.background = rowIndex % 2 === 0 ? 'rgba(255,255,255,0.03)' : 'transparent';
+                tr.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+                tr.innerHTML = `
+                    <td style="padding: 8px 14px; font-weight: 500; white-space: nowrap;">${r.label}</td>
+                    <td style="text-align: center; padding: 8px;">${check(r.netpay)}</td>
+                    <td style="text-align: center; padding: 8px;">${check(r.pos)}</td>
+                    <td style="text-align: center; padding: 8px;">${check(r.onq)}</td>
+                    <td style="text-align: center; padding: 8px;">${check(r.pli)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            coverageShownCount += slice.length;
+
+            // Append Load More row if more data remains
+            if (coverageShownCount < coverageAllResults.length) {
+                const loadMoreRow = document.createElement('tr');
+                loadMoreRow.id = 'coverageLoadMoreRow';
+                loadMoreRow.innerHTML = `
+                    <td colspan="5" style="text-align: center; padding: 10px;">
+                        <button onclick="renderCoveragePage()"
+                            style="background: #4F2683; border: none; color: white; padding: 6px 20px;
+                                   border-radius: 20px; cursor: pointer; font-size: 0.82rem; font-weight: 600;">
+                            <i class="bi bi-chevron-down"></i>
+                            Load More (${coverageAllResults.length - coverageShownCount} remaining)
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(loadMoreRow);
+            }
+        }
 
         async function convertExcelToCSV() {
             const monthSelect = document.getElementById("monthSelect");
@@ -1195,9 +1387,18 @@
             const reader = new FileReader();
             const filesToDownload = [];
 
-            // Save crash-resume state to localStorage
+            /*
+             * CHANGE DETAILS:
+             * Element: convert_progress localStorage save — crash resume
+             * Date: 2026-07-07
+             * Updated: 2026-07-07 — Now also saves selectedMonth and selectedYear so dropdowns
+             *   can be restored after a crash/reload for the auto-retrigger flow.
+             */
+            // Save crash-resume state including month/year for dropdown restore
             localStorage.setItem('convert_progress', JSON.stringify({
-                step: 0, total: 4, label: 'Initializing...', timestamp: Date.now()
+                step: 0, total: 4, label: 'Initializing...', timestamp: Date.now(),
+                selectedMonth: monthSelect.value,
+                selectedYear: yearSelect.value
             }));
 
             // Helper: update progress bar + localStorage step

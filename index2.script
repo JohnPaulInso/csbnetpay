@@ -571,24 +571,60 @@ function displayResultsTablePos(allData) {
 
     const tbody = table.querySelector("tbody");
 
+    // Convert map to array for pagination
+    const allMonths = [];
     map.forEach((vals, month) => {
-        const sum = vals.reduce((a,b)=>a+b,0);
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td>${month}</td>
-            <td style="text-align:right">
-                <span class="dedamt-hover">
-                    <u><b>${sum.toLocaleString("en-PH",{style:"currency",currency:"PHP"})}</b></u>
-                    <div class="dedamt-dropdown">
-                        ${vals.map(v=>`<div>${v.toLocaleString("en-PH",{style:"currency",currency:"PHP"})}</div>`).join("")}
-                    </div>
-                </span>
-            </td>
-        `;
-        tbody.appendChild(tr);
+        const sum = vals.reduce((a, b) => a + b, 0);
+        allMonths.push({ month, sum, vals });
     });
 
+    let displayedCount = 0;
+    const INITIAL_LIMIT = 12;
+    const LOAD_MORE_STEP = 6;
+
+    function appendRows(count) {
+        const nextBatch = allMonths.slice(displayedCount, displayedCount + count);
+        nextBatch.forEach(item => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${item.month}</td>
+                <td style="text-align:right">
+                    <span class="dedamt-hover">
+                        <u><b>${item.sum.toLocaleString("en-PH",{style:"currency",currency:"PHP"})}</b></u>
+                        <div class="dedamt-dropdown">
+                            ${item.vals.map(v=>`<div>${v.toLocaleString("en-PH",{style:"currency",currency:"PHP"})}</div>`).join("")}
+                        </div>
+                    </span>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+        displayedCount += nextBatch.length;
+        updateLoadMoreButton();
+    }
+
+    const loadMoreBtn = document.createElement('button');
+    loadMoreBtn.className = 'btn btn-primary';
+    loadMoreBtn.style.margin = '15px auto';
+    loadMoreBtn.style.display = 'none';
+    loadMoreBtn.innerHTML = '<i class="bi bi-chevron-down"></i> Load More';
+    loadMoreBtn.onclick = () => {
+        appendRows(LOAD_MORE_STEP);
+    };
+
+    function updateLoadMoreButton() {
+        if (displayedCount < allMonths.length) {
+            loadMoreBtn.style.display = 'block';
+            loadMoreBtn.innerHTML = `<i class="bi bi-chevron-down"></i> Load More (${allMonths.length - displayedCount} remaining)`;
+        } else {
+            loadMoreBtn.style.display = 'none';
+        }
+    }
+
+    appendRows(INITIAL_LIMIT);
+
     container.appendChild(table);
+    container.appendChild(loadMoreBtn);
 }
 
 // Function to handle logout
