@@ -1,0 +1,829 @@
+
+// =====================================================================================================
+// INDEX 4 =============================================================================================
+// =====================================================================================================
+
+
+
+
+
+  document.addEventListener('DOMContentLoaded', () => {
+        const prompt = document.getElementById('fullscreenPrompt');
+
+        // Show the prompt when the mouse moves
+        document.addEventListener('mousemove', () => {
+            prompt.style.display = 'block';
+        });
+
+        // Enter fullscreen when the prompt is clicked
+        prompt.addEventListener('click', () => {
+            openFullscreen();
+            prompt.style.display = 'none'; // Hide prompt after entering full-screen
+        });
+    });
+
+    function openFullscreen() {
+        const elem = document.documentElement;
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+        } else if (elem.mozRequestFullScreen) {
+            elem.mozRequestFullScreen();
+        } else if (elem.webkitRequestFullscreen) {
+            elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) {
+            elem.msRequestFullscreen();
+        }
+    }
+
+
+
+function generateCsvFilesPLI() {
+    const files = [];
+    const currentYear = new Date().getFullYear();
+    const startYear = 2024;
+    const monthNamesShort = ['dec', 'nov', 'oct', 'sep', 'aug', 'jul', 'jun', 'may', 'apr', 'mar', 'feb', 'jan'];
+    
+    for (let year = currentYear; year >= startYear; year--) {
+        const ySuffix = year.toString().slice(-2);
+        for (const month of monthNamesShort) {
+            files.push(`pli_${month}${ySuffix}.csv`);
+        }
+    }
+    return files;
+}
+
+const csvFilesPLI = generateCsvFilesPLI();
+
+
+document.getElementById('searchButtonPLI').addEventListener('click', searchEmployeePLI);
+
+let isSearchingPLI = false;
+
+async function searchEmployeePLI() {
+    if (isSearchingPLI) return;
+
+    const searchInputPLI = document.getElementById('searchInputPLI').value.trim();
+    const loadingIndicatorPLI = document.getElementById('loadingIndicatorPLI');
+    const resultsSectionPLI = document.getElementById('resultsPLI');
+    const employeeInfoSectionPLI = document.getElementById('employeeInfoPLI');
+    const searchBtnPLI = document.getElementById('searchButtonPLI');
+    const resultsSectionElement = document.getElementById('resultsSection');
+
+    if (!searchInputPLI) {
+        alert('Please enter an employee number.');
+        return;
+    }
+
+    // --- Offline Check ---
+    if (!navigator.onLine) {
+        const cacheKey = `cache_pli_${searchInputPLI}`;
+        const cachedItem = sessionStorage.getItem(cacheKey);
+        
+        if (!cachedItem) {
+            if (employeeInfoSectionPLI) {
+                employeeInfoSectionPLI.innerHTML = `
+                    <div class="offline-card">
+                        <i class="bi bi-emoji-frown"></i>
+                        <span>Unable to search, you are currently offline</span>
+                        <small>Please check your internet connection and try again.</small>
+                    </div>
+                `;
+                employeeInfoSectionPLI.className = '';
+                if (resultsSectionElement) resultsSectionElement.style.display = 'block';
+            }
+            if (resultsSectionPLI) resultsSectionPLI.innerHTML = '';
+            return;
+        }
+    }
+
+    const micBtn = document.getElementById('micBtn');
+    const particles = document.getElementById('searchParticles');
+
+    // Start search state
+    isSearchingPLI = true;
+    searchBtnPLI.disabled = true;
+    if (micBtn) micBtn.disabled = true;
+    searchBtnPLI.innerHTML = '<i class="bi bi-hourglass-split"></i> Searching...';
+    // searchBtnPLI.classList.add('searching');
+    // if (particles) particles.classList.add('active');
+    localStorage.setItem("employeeNumber", searchInputPLI);
+
+    // Reset display early to avoid duplicates
+    if (resultsSectionPLI) resultsSectionPLI.innerHTML = '';
+    if (employeeInfoSectionPLI) employeeInfoSectionPLI.innerHTML = '';
+
+    const updateUISearchComplete = () => {
+        searchBtnPLI.disabled = false;
+        if (micBtn) micBtn.disabled = false;
+        searchBtnPLI.innerHTML = '<i class="bi bi-search"></i> Search Employee';
+        searchBtnPLI.classList.remove('searching');
+        if (particles) particles.classList.remove('active');
+        isSearchingPLI = false;
+        if (resultsSectionElement) resultsSectionElement.style.display = 'block';
+        loadingIndicatorPLI.style.display = 'none';
+    };
+
+    // Check for cached results in sessionStorage with 5-minute TTL
+    const cacheKey = `cache_pli_${searchInputPLI}`;
+    const cachedItem = sessionStorage.getItem(cacheKey);
+
+    if (cachedItem) {
+        try {
+            const { data, timestamp } = JSON.parse(cachedItem);
+            const isExpired = !timestamp || (Date.now() - timestamp) > 300000; // 5 minutes
+
+            if (!isExpired) {
+                console.log("✅ Using cached results for PLI (cached within 5m):", searchInputPLI);
+                displayEmployeeInfoPLI(data.monthName, data.csvData);
+                displayResultsTablePLI([data]);
+                updateUISearchComplete();
+                return;
+            } else {
+                console.log("⌛ Cache expired for PLI, fetching fresh data...");
+                sessionStorage.removeItem(cacheKey);
+            }
+        } catch (e) {
+            console.error("Cache parsing error:", e);
+            sessionStorage.removeItem(cacheKey);
+        }
+    }
+
+    loadingIndicatorPLI.style.display = 'block'; // Show loading indicator
+
+    // **Find the most recent available file**
+    const sortedFilesPLI = csvFilesPLI
+        .map(file => ({ file, date: getDateFromCsvPLI(file) }))
+        .filter(entry => entry.date) // Remove invalid dates
+        .sort((a, b) => b.date - a.date); // Sort by latest first
+
+    if (sortedFilesPLI.length === 0) {
+        alert('No available data files found.');
+        updateUISearchComplete();
+        return;
+    }
+
+    let latestFilePLI = null;
+
+    // Check which file exists
+    for (const entry of sortedFilesPLI) {
+        const exists = await checkFileExistsPLI(entry.file);
+        if (exists) {
+            latestFilePLI = entry.file;
+            break;
+        }
+    }
+
+    if (!latestFilePLI) {
+        console.log('No existing files found.');
+        updateUISearchComplete();
+        return;
+    }
+
+    console.log("Using file:", latestFilePLI);
+
+    fetchCSVPLI(latestFilePLI)
+        .then(data => {
+            if (!data) {
+                alert('No valid data found in the latest file.');
+                return;
+            }
+
+            // Filter CSV data to only include rows for this employee
+            const filteredCsvData = data.csvData.filter((row, idx) => {
+                if (idx === 0) return true;
+                const empno = row[3];
+                return empno && searchInputPLI && empno.toString().replace(/^0+/, '') === searchInputPLI.toString().replace(/^0+/, '');
+            });
+
+            if (filteredCsvData.length > 1) {
+                const cachePayload = {
+                    monthName: data.monthName,
+                    csvData: filteredCsvData
+                };
+                // Store in cache with 5-minute TTL
+                const cacheData = {
+                    data: cachePayload,
+                    timestamp: Date.now()
+                };
+                sessionStorage.setItem(cacheKey, JSON.stringify(cacheData));
+
+                displayEmployeeInfoPLI(data.monthName, filteredCsvData);
+                displayResultsTablePLI([cachePayload]);
+            } else {
+                showErrorCard(employeeInfoSectionPLI, 'Employee not found in latest records.');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching CSV data:', error);
+            alert('Error fetching data. Check the console for details.');
+        })
+        .finally(() => {
+            updateUISearchComplete();
+        });
+}
+
+function checkFileExistsPLI(url) {
+    return fetch(url, { method: 'HEAD' })
+        .then(response => response.ok)
+        .catch(() => false);
+}
+
+
+
+function fetchCSVPLI(csvFile) {
+    return new Promise((resolve, reject) => {
+        const monthName = getMonthNameFromCsvPLI(csvFile);
+        const date = getDateFromCsvPLI(csvFile);
+
+        fetch(csvFile)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Unable to fetch ${csvFile}. Status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(text => {
+                const csvData = parseCSVPLI(text);
+                resolve({ monthName, csvData, date });
+            })
+            .catch(error => {
+                console.error(`Error fetching data for ${monthName}:`, error);
+                resolve(null);
+            });
+    });
+}
+
+function getDateFromCsvPLI(csvFile) {
+    const fileName = csvFile.replace('pli_', '');
+    const monthMap = {
+        'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'may': 4, 'jun': 5,
+        'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11
+    };
+    const monthPart = fileName.slice(0, 3);
+    const yearPart = '20' + fileName.slice(3, 5);
+    const monthIndex = monthMap[monthPart];
+    return new Date(yearPart, monthIndex);
+}
+
+function getMonthNameFromCsvPLI(csvFile) {
+    const fileName = csvFile.replace('pli_', '');
+    const monthMap = {
+        'jan': 'January', 'feb': 'February', 'mar': 'March', 'apr': 'April', 'may': 'May', 'jun': 'June',
+        'jul': 'July', 'aug': 'August', 'sep': 'September', 'oct': 'October', 'nov': 'November', 'dec': 'December'
+    };
+    const monthPart = fileName.slice(0, 3);
+    const yearPart = '20' + fileName.slice(3, 5);
+    return `${monthMap[monthPart]} ${yearPart}`;
+}
+
+function parseCSVPLI(data) {
+    const rows = data.trim().split('\n');
+    return rows.map(row => {
+        const result = [];
+        let current = '';
+        let inQuotes = false;
+        for (let i = 0; i < row.length; i++) {
+            const char = row[i];
+            if (char === '"') {
+                inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+                result.push(current.trim());
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+        result.push(current.trim());
+        return result.map(val => val.replace(/^"|"$/g, '').trim());
+    });
+}
+
+// Global mapping for customer info
+let customerMap = new Map();
+let customerDataLoaded = false;
+let customerDataPromise = fetchCustomerData();
+
+document.addEventListener("DOMContentLoaded", function() {
+    // Initial fetch started at top level
+    
+    // Sync TTS switch with localStorage
+    const ttsSwitch = document.getElementById('ttsSwitch');
+    if (ttsSwitch) {
+        const savedState = localStorage.getItem('ttsEnabled');
+        if (savedState !== null) {
+            ttsSwitch.checked = (savedState === 'true');
+        }
+        
+        ttsSwitch.addEventListener('change', () => {
+            const isEnabled = ttsSwitch.checked;
+            localStorage.setItem('ttsEnabled', isEnabled);
+            
+            const icon = ttsSwitch.nextElementSibling.querySelector('.icon');
+            if (icon) {
+                icon.className = isEnabled ? "bi bi-volume-up-fill icon" : "bi bi-volume-mute-fill icon";
+            }
+
+            if (!isEnabled) {
+                window.speechSynthesis.cancel();
+            }
+        });
+    }
+
+    // Enter key support
+    const searchInput = document.getElementById('searchInputPLI');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                searchEmployeePLI();
+            }
+        });
+    }
+
+    // Auto-search if employee number is saved
+    const savedEmpNo = localStorage.getItem("employeeNumber");
+    if (savedEmpNo) {
+        const input = document.getElementById('searchInputPLI');
+        if (input) {
+            input.value = savedEmpNo;
+            searchEmployeePLI();
+        }
+    }
+});
+
+async function fetchCustomerData() {
+    try {
+        const response = await fetch('customer_information.csv');
+        if (!response.ok) throw new Error("Failed to load customer info");
+        const text = await response.text();
+        
+        const rows = text.split('\n');
+        const dataStartIndex = 2;
+
+        for (let i = dataStartIndex; i < rows.length; i++) {
+            const row = rows[i].trim();
+            if (!row) continue;
+            
+            // Robust CSV parser (handles commas in quotes)
+            const matches = row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
+            if (!matches || matches.length < 3) continue;
+
+            const clean = (val) => val ? val.replace(/^"|"$/g, '').trim() : '';
+
+            const empNum = clean(matches[2]); 
+            
+            if (empNum) {
+                 customerMap.set(empNum, {
+                    branch: clean(matches[0]),
+                    account: clean(matches[1]),
+                    address: clean(matches[3]),
+                    phone: clean(matches[4])
+                });
+            }
+        }
+        console.log("Customer data loaded. Total entries:", customerMap.size);
+    } catch(err) {
+        console.error("Error loading customer CSV:", err);
+    } finally {
+        customerDataLoaded = true;
+    }
+}
+
+// Helper for Title Case (reusable)
+const toTitleCase = (str) => {
+    if (!str) return '';
+    return str.replace(/\w\S*/g, (txt) => {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+};
+
+function speakText(text) {
+    const ttsSwitch = document.getElementById('ttsSwitch');
+    const ttsEnabled = ttsSwitch ? ttsSwitch.checked : (localStorage.getItem('ttsEnabled') === 'true');
+    if (!ttsEnabled || !('speechSynthesis' in window)) return;
+    
+    const speak = () => {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        const voices = window.speechSynthesis.getVoices();
+        
+        const voice = voices.find(v => 
+            (v.name.includes('Google') && v.name.includes('US') && v.name.includes('Female')) ||
+            v.name.includes('Google US English')
+        ) || voices.find(v => 
+            v.name.includes('Zira') || v.name.includes('Microsoft Zira')
+        ) || voices.find(v => 
+            v.name.toLowerCase().includes('female') && v.lang.startsWith('en')
+        ) || voices.find(v => 
+            v.lang === 'en-US' && !v.name.includes('Male')
+        );
+        
+        if (voice) {
+            utterance.voice = voice;
+        }
+        
+        utterance.rate = 0.95;
+        utterance.pitch = 1.15;
+        utterance.volume = 0.7; // User requested 0.7 volume
+        
+        window.speechSynthesis.speak(utterance);
+    };
+
+    if (window.speechSynthesis.getVoices().length === 0) {
+         window.speechSynthesis.onvoiceschanged = speak;
+    } else {
+        speak();
+    }
+}
+
+async function displayEmployeeInfoPLI(monthName, csvData) {
+    const employeeInfoSectionPLI = document.getElementById('employeeInfoPLI');
+    let employeeFound = false;
+
+    // Wait for customer data if not yet loaded
+    if (!customerDataLoaded) {
+        await customerDataPromise;
+    }
+
+    for (let i = 1; i < csvData.length; i++) {
+        const row = csvData[i];
+        if (row.length < 4) continue;
+        const searchInputVal = document.getElementById('searchInputPLI').value.trim();
+        if (empno && searchInputVal && empno.toString().replace(/^0+/, '') === searchInputVal.toString().replace(/^0+/, '')) {
+            employeeFound = true;
+
+            // Trigger Confetti
+            const confetti = document.getElementById('confettiContainer');
+            if (confetti) {
+                confetti.classList.add('active');
+                setTimeout(() => {
+                    confetti.classList.remove('active');
+                }, 2000);
+            }
+
+            const div = row[1];
+            const sta = row[2];
+            const fname = row[5];
+            const mi = row[6];
+            const lname = row[7];
+
+            // Announce name once
+            const empNoField = document.getElementById('searchInputPLI').value.trim();
+            if (window.lastSpokenEmpNo !== empNoField) {
+                const fullName = toTitleCase(`${fname} ${mi} ${lname}`.replace(/\s+/g, ' ').trim());
+                speakText(`Results for ${fullName}`);
+                window.lastSpokenEmpNo = empNoField;
+            }
+
+            // Add copy toast if not present
+            if (!document.querySelector('.copy-toast')) {
+                const toast = document.createElement('div');
+                toast.className = 'copy-toast';
+                toast.textContent = 'Copied to clipboard';
+                document.body.appendChild(toast);
+            }
+
+            window.copyToClipboard = function(text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    const toast = document.querySelector('.copy-toast');
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 2000);
+                });
+            };
+
+            // Look up extra details
+            const extra = customerMap.get(empno) || {};
+            
+            // Format Address
+            const rawAddress = extra.address || '';
+            const formattedAddress = rawAddress ? toTitleCase(rawAddress) : 'Not available';
+            const mapsUrl = rawAddress ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(formattedAddress)}` : '';
+            
+            // Format Phone
+            const phoneVal = extra.phone || '';
+            const formattedPhone = phoneVal ? (phoneVal.startsWith('0') ? phoneVal : '0' + phoneVal) : 'Not available';
+            const dialPhone = phoneVal ? (phoneVal.startsWith('0') ? phoneVal : '0' + phoneVal) : '';
+
+            // Apply card class and theme
+            employeeInfoSectionPLI.className = 'profile-card theme-red';
+
+            employeeInfoSectionPLI.innerHTML = `
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    <div class="profile-title">
+                        <h3>${fname}&nbsp;&nbsp;${mi}&nbsp;&nbsp;${lname}</h3>
+                        <span>Employee</span>
+                    </div>
+                </div>
+
+                <div class="profile-list">
+                    <div class="profile-item">
+                        <div class="profile-icon"><i class="bi bi-person-badge-fill"></i></div>
+                        <div class="profile-details">
+                            <span class="label">EMPLOYEE NUMBER</span>
+                            <span class="value">${empno}</span>
+                        </div>
+                        <div class="profile-action" onclick="copyToClipboard('${empno}')" title="Copy">
+                            <i class="bi bi-copy" style="-webkit-text-stroke: 1px;"></i>
+                        </div>
+                    </div>
+
+                    <div class="profile-item">
+                        <div class="profile-icon"><i class="bi bi-building-fill"></i></div>
+                        <div class="profile-details">
+                            <span class="label">DIVISION / STATION</span>
+                            <span class="value">${div} / ${sta}</span>
+                        </div>
+                    </div>
+
+                    <div class="profile-item ${extra.address ? '' : 'inactive'}">
+                        <div class="profile-icon"><i class="bi bi-house-door-fill"></i></div>
+                        <div class="profile-details">
+                            <span class="label">HOME ADDRESS</span>
+                            <span class="value" style="font-size: 13px;">${formattedAddress}</span>
+                        </div>
+                        <div class="profile-action" ${mapsUrl ? `onclick="window.open('${mapsUrl}', '_blank')"` : ''} style="${mapsUrl ? 'cursor:pointer;' : ''}">
+                            <i class="bi bi-geo-alt-fill"></i>
+                        </div>
+                    </div>
+
+                    <div class="profile-item ${extra.branch ? '' : 'inactive'}">
+                        <div class="profile-icon"><i class="bi bi-buildings-fill"></i></div>
+                        <div class="profile-details">
+                            <span class="label">BRANCH</span>
+                            <span class="value">${extra.branch || 'Not available'}</span>
+                        </div>
+                    </div>
+
+                    <div class="profile-item ${extra.account ? '' : 'inactive'}">
+                         <div class="profile-icon"><i class="bi bi-wallet-fill"></i></div>
+                        <div class="profile-details">
+                            <span class="label">ACCOUNT NUMBER</span>
+                            <span class="value">${extra.account || 'Not available'}</span>
+                        </div>
+                        ${extra.account ? `
+                        <div class="profile-action" onclick="copyToClipboard('${extra.account}')" title="Copy">
+                            <i class="bi bi-copy" style="-webkit-text-stroke: 1px;"></i>
+                        </div>
+                        ` : ''}
+                    </div>
+
+                     <div class="profile-item ${extra.phone ? '' : 'inactive'}">
+                         <div class="profile-icon"><i class="bi bi-telephone-fill"></i></div>
+                        <div class="profile-details">
+                            <span class="label">PHONE NUMBER</span>
+                            <span class="value">${formattedPhone}</span>
+                        </div>
+                        <div class="profile-action" ${dialPhone ? `onclick="window.location.href='tel:${dialPhone}'" style="cursor:pointer"` : ''}>
+                            <i class="bi bi-telephone-fill"></i>
+                        </div>
+                    </div>
+                </div>
+            `;
+            break;
+        }
+    }
+
+    if (!employeeFound) {
+        showErrorCard(employeeInfoSectionPLI, 'Employee ID not found in latest month.');
+    }
+}
+
+function displayResultsTablePLI(fetchedDataPLI) {
+    const resultsSectionPLI = document.getElementById('resultsPLI');
+    
+    const table = document.createElement('table');
+    table.classList.add('responsive-table');
+
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    headerRow.innerHTML = `
+        <th style="padding-left: 1rem;"><i class="bi bi-calendar3"></i> MONTH</th>
+        <th style="padding-right: 0.5rem; text-align: left;"><i class="bi bi-cash"></i> DEDAMTPLI</th>
+    `;
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+    const resultsMap = new Map();
+
+    fetchedDataPLI.forEach(data => {
+        data.csvData.forEach((row, index) => {
+            if (index === 0) return;
+
+            const searchInputVal = document.getElementById('searchInputPLI').value.trim();
+            if (empno && searchInputVal && empno.toString().replace(/^0+/, '') === searchInputVal.toString().replace(/^0+/, '')) {
+                const monthName = data.monthName;
+                const dedamtpli = parseFloat(row[15]);
+                
+                if (!resultsMap.has(monthName)) {
+                    resultsMap.set(monthName, { sum: 0, details: [] });
+                }
+
+                const dedcode = row[9];
+                const effyy = row[11];
+                const effmm = convertMonth(row[12]); // Convert month number
+                const termyy = row[13];
+                const termmm = convertMonth(row[14]); // Convert month number
+                const policyno = row[16];
+
+                const entry = resultsMap.get(monthName);
+                entry.sum += dedamtpli;
+                entry.details.push({ dedcode, policyno, effyy, effmm, termyy, termmm, dedamtpli });
+            }
+        });
+    });
+
+    if (resultsMap.size === 0) {
+        resultsSectionPLI.innerHTML = '';
+        return;
+    }
+
+    resultsMap.forEach((data, monthName) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+         <td style="padding-left: 1rem;">${monthName}</td>
+            <!-- <td>₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td> -->
+        <td id="totalAmountPLI" style="padding-right: 0.2rem; font-weight:700; text-align: left;">₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td> <!-- Start with ₱0.00 -->
+
+        `;
+        tbody.appendChild(row);
+        const detailRow = document.createElement('tr');
+const detailCell = document.createElement('td');
+detailCell.setAttribute('colspan', 2);
+detailCell.innerHTML = `
+    <div class="detail-table-wrapper" style="padding: 0.5rem; background: transparent; overflow-x: auto; -webkit-overflow-scrolling: touch;">
+        <table class="detail-table" style="width: 100%; min-width: 260px; background: white; border: 1px solid rgba(96, 14, 18, 0.15); border-radius: 6px; overflow: hidden; border-collapse: collapse;">
+            <thead>
+                <tr style="font-size:6px; background: #600e12; color: white; text-transform: uppercase;">
+                    <th style="font-size: 11px; text-align: center; width: 16px !important; min-width: 16px !important; max-width: 16px !important; padding: 0.3rem 0 !important;">/</th>
+                    <th style="font-size: 11px;width: 35px; padding: 0rem 0rem !important;">PLI</th>
+                    <th style="font-size: 11px;width: 50px; padding: 0rem 0rem !important;">EFF</th>
+                    <th style="font-size: 11px;width: 50px; padding: 0rem 0rem !important;">TERM</th>
+                    <th style="font-size: 11px;width: 65px; text-align: left; padding: 0rem 0rem !important;">DEDAMT</th>
+                    <th style="font-size: 11px;width: 45px; padding: 0rem 0rem !important;">POL #</th>
+                </tr>
+            </thead>
+            <tbody style="font-size: 7px;">
+                ${data.details.map((d, idx) => `
+                    <tr style="background: ${idx % 2 === 0 ? 'white' : 'rgba(96, 14, 18, 0.02)'};">
+                        <td style="text-align: center; width: 16px !important; min-width: 16px !important; max-width: 16px !important; padding: 0.3rem 0 !important; line-height: 1;">
+                            <input type="checkbox" class="dedamtpli-checkbox" data-dedamtpli="${d.dedamtpli}" checked style="cursor: pointer; width: 11px; height: 11px; margin: 0 auto; padding: 0; accent-color: #600e12; display: block; vertical-align: middle;" />
+                        </td>
+                        <td style="font-size: 11px; padding: 0.3rem 0.4rem !important;">${d.dedcode.toString().padStart(5, '0')}</td>
+
+                        <td style="font-size: 11px; padding: 0.3rem 0.4rem !important;">${d.effmm.toString().padStart(2, '0')}/${d.effyy}</td>
+                        <td style="font-size: 11px; padding: 0rem 0.4rem !important;">${d.termmm.toString().padStart(2, '0')}/${d.termyy}</td>
+                    
+                        <td style="font-size: 11px; text-align: left; font-weight: 700; color: #600e12; padding: 0.3rem 0.3rem !important;">₱${d.dedamtpli.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
+                        <td style="font-size: 11px; padding: 0.3rem 0.4rem !important; overflow: hidden; text-overflow: ellipsis; ">${d.policyno}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    </div>
+`;
+
+
+
+
+
+
+
+
+
+
+function calculateTotalPLI() {
+    const checkboxesPLI = document.querySelectorAll('.dedamtpli-checkbox');
+    let total = 0;
+
+    checkboxesPLI.forEach(checkbox => {
+        if (checkbox.checked) {
+            total += parseFloat(checkbox.dataset.dedamtpli);
+        }
+    });
+
+    // Update the total display
+    const totalDisplayPLI = document.querySelector('#totalAmountPLI');
+    totalDisplayPLI.innerText = `₱${total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+}
+
+// Event listener for checkbox changes
+document.addEventListener('change', (event) => {
+    if (event.target.classList.contains('dedamtpli-checkbox')) {
+        const checkboxesPLI = document.querySelectorAll('.dedamtpli-checkbox');
+        checkboxesPLI.forEach(checkbox => {
+            if (checkbox !== event.target) {
+                checkbox.checked = false; // Uncheck other checkboxesPLI
+            }
+        });
+        calculateTotalPLI(); // Recalculate total after changing checkboxesPLI
+    }
+});
+
+
+// Initial calculation on page load
+document.addEventListener('DOMContentLoaded', calculateTotalPLI);
+
+
+
+detailRow.appendChild(detailCell);
+tbody.appendChild(detailRow);
+
+    });
+
+    table.appendChild(tbody);
+    resultsSectionPLI.appendChild(table);
+}
+
+function convertMonth(monthNumber) {
+    const monthNames = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
+    return monthNames[parseInt(monthNumber, 10) - 1];
+}
+
+
+
+
+
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const loginTime = localStorage.getItem("loginTime");
+
+            // Check if the login time exists and if the session has expired (4 hours)
+            if (!loginTime || (new Date().getTime() - loginTime) > 3 * 60 * 60 * 1000) {
+                // Redirect to login page if no login session or session expired
+                window.location.href = "login/index.html";
+            }
+        });
+
+// Function to handle logout
+function logout() {
+    // Clear the login-related data from localStorage
+    localStorage.removeItem("loginTime");
+    localStorage.removeItem("employeeNumber"); // If you store employeeNumber or any other login info
+
+    // Redirect to the login page
+    window.location.href = "login/index.html";
+}
+
+// Check if logged in (this part remains unchanged from your original code)
+document.addEventListener("DOMContentLoaded", function() {
+    const loginTime = localStorage.getItem("loginTime");
+
+    // Check if the login time exists and if the session has expired (4 hours)
+    if (!loginTime || (new Date().getTime() - loginTime) > 3 * 60 * 60 * 1000) {
+        // Redirect to login page if no login session or session expired
+        window.location.href = "login/index.html";
+    }
+});
+
+
+
+
+// Function to check if admin is logged in and show/hide the admin container
+function checkLoggedInUser() {
+    /* 
+     * CHANGE DETAILS:
+     * Element: checkLoggedInUser function
+     * Date: 2026-07-07
+     * Fix: Resolve the administrator username dynamically from netpay_accounts in localStorage instead of hardcoding "jonathan77".
+     */
+    const loggedInUser = localStorage.getItem("loggedInUser")?.trim().toLowerCase();
+    const adminContainer = document.querySelector(".container-admin");
+    if (!adminContainer) return;
+
+    let adminUsername = "jonathan77"; // fallback default
+    const accountsStr = localStorage.getItem("netpay_accounts");
+    if (accountsStr) {
+        try {
+            const accounts = JSON.parse(accountsStr);
+            if (accounts && accounts[0] && accounts[0].username) {
+                adminUsername = accounts[0].username;
+            }
+        } catch(e) {
+            console.error("Error parsing netpay_accounts:", e);
+        }
+    }
+
+    if (loggedInUser && loggedInUser === adminUsername.toLowerCase()) {
+        adminContainer.style.display = "block";
+    } else {
+        adminContainer.style.display = "none";
+    }
+}
+
+// Call this function on page load to check if jonathan77 is logged in
+checkLoggedInUser();
+
+// Helper to show premium error card
+function showErrorCard(container, message) {
+    container.innerHTML = `
+        <div class="error-card">
+            <i class="bi bi-exclamation-circle-fill"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    container.className = ''; // Remove profile-card class if present
+}

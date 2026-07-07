@@ -1,0 +1,657 @@
+// =====================================================================
+// INDEX 2 SCRIPT – DEDAMT POSITIVE (FIXED)
+// =====================================================================
+
+// ---------------- SESSION CHECK ----------------
+document.addEventListener("DOMContentLoaded", () => {
+    const loginTime = localStorage.getItem("loginTime");
+    if (!loginTime || (Date.now() - loginTime) > 3 * 60 * 60 * 1000) {
+        window.location.href = "login/index.html";
+    }
+});
+
+// ---------------- ADMIN VISIBILITY ----------------
+function checkLoggedInUser() {
+    /* 
+     * CHANGE DETAILS:
+     * Element: checkLoggedInUser function (admin visibility)
+     * Date: 2026-07-07
+     * Fix: Resolve the administrator username dynamically from netpay_accounts in localStorage instead of hardcoding "jonathan77".
+     */
+    const adminContainer = document.querySelector(".container-admin");
+    if (!adminContainer) return;
+
+    let adminUsername = "jonathan77"; // fallback default
+    const accountsStr = localStorage.getItem("netpay_accounts");
+    if (accountsStr) {
+        try {
+            const accounts = JSON.parse(accountsStr);
+            if (accounts && accounts[0] && accounts[0].username) {
+                adminUsername = accounts[0].username;
+            }
+        } catch(e) {
+            console.error("Error parsing netpay_accounts:", e);
+        }
+    }
+
+    const loggedInUser = localStorage.getItem("loggedInUser")?.trim().toLowerCase();
+    adminContainer.style.display =
+        loggedInUser && loggedInUser === adminUsername.toLowerCase()
+            ? "block"
+            : "none";
+}
+checkLoggedInUser();
+
+// ---------------- SEARCH BUTTON ----------------
+document
+    .getElementById("searchButtonPos")
+    .addEventListener("click", searchEmployeePos);
+
+// ---------------- SEARCH LOGIC ----------------
+let isSearchingPos = false;
+
+function searchEmployeePos() {
+    if (isSearchingPos) return;
+
+    const empNo = document.getElementById("searchInputPos").value.trim();
+    if (!empNo) return;
+
+    // --- Offline Check ---
+    if (!navigator.onLine) {
+        const cacheKey = `cache_dedamt_${empNo}`;
+        const cachedItem = sessionStorage.getItem(cacheKey);
+        
+        if (!cachedItem) {
+            const employeeInfoSection = document.getElementById("employeeInfoPos");
+            const resultsSection = document.getElementById("resultsSection");
+            const resultsContainer = document.getElementById("resultspos");
+
+            if (employeeInfoSection) {
+                employeeInfoSection.innerHTML = `
+                    <div class="offline-card">
+                        <i class="bi bi-emoji-frown"></i>
+                        <span>Unable to search, you are currently offline</span>
+                        <small>Please check your internet connection and try again.</small>
+                    </div>
+                `;
+                employeeInfoSection.className = '';
+                if (resultsSection) resultsSection.style.display = "block";
+            }
+            if (resultsContainer) resultsContainer.innerHTML = '';
+            return;
+        }
+    }
+
+    const searchBtn = document.getElementById("searchButtonPos");
+    const resultsSection = document.getElementById("resultsSection");
+    const micBtn = document.getElementById("micBtn");
+    const loader = document.getElementById("loadingIndicatorPos");
+    const resultsContainer = document.getElementById("resultspos");
+    const employeeInfoSection = document.getElementById("employeeInfoPos");
+    const particles = document.getElementById("searchParticles");
+
+    // Start search state
+    isSearchingPos = true;
+    searchBtn.disabled = true;
+    if (micBtn) micBtn.disabled = true;
+    searchBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Searching...';
+    // searchBtn.classList.add('searching'); // Removed pulse effect
+    // if (particles) particles.classList.add('active'); // Removed start animation
+    localStorage.setItem("employeeNumber", empNo);
+
+    // Reset display early to avoid duplicates
+    if (resultsContainer) resultsContainer.innerHTML = "";
+    if (employeeInfoSection) employeeInfoSection.innerHTML = "";
+
+    const updateUISearchComplete = () => {
+        searchBtn.disabled = false;
+        if (micBtn) micBtn.disabled = false;
+        searchBtn.innerHTML = '<i class="bi bi-search"></i> Search Employee';
+        searchBtn.classList.remove('searching');
+        if (particles) particles.classList.remove('active');
+        isSearchingPos = false;
+        if (resultsSection) resultsSection.style.display = "block";
+        loader.style.display = "none";
+    };
+
+    // Check for cached results in sessionStorage with 5-minute TTL
+    const cacheKey = `cache_dedamt_${empNo}`;
+    const cachedItem = sessionStorage.getItem(cacheKey);
+
+    if (cachedItem) {
+        try {
+            const { data, timestamp } = JSON.parse(cachedItem);
+            const isExpired = !timestamp || (Date.now() - timestamp) > 300000; // 5 minutes (300,000 ms)
+
+            if (!isExpired) {
+                console.log("✅ Using cached results for DEDAMT (cached within 5m):", empNo);
+                displayEmployeeInfoPos(data);
+                displayResultsTablePos(data);
+                updateUISearchComplete();
+                return;
+            } else {
+                console.log("⌛ Cache expired for DEDAMT, fetching fresh data...");
+                sessionStorage.removeItem(cacheKey);
+            }
+        } catch (e) {
+            console.error("Cache parsing error:", e);
+            sessionStorage.removeItem(cacheKey);
+        }
+    }
+
+    loader.style.display = "block";
+
+    const monthNames = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+    const files = [];
+
+    const currentYear = new Date().getFullYear();
+    for (let year = 2024; year <= currentYear; year++) {
+        for (let m = (year === 2024 ? 2 : 0); m < 12; m++) {
+            files.push(`pos_${monthNames[m]}${year % 100}.csv`);
+        }
+    }
+
+    Promise.all(files.map(fetchCSVPos))
+        .then(results => {
+            const valid = results.filter(Boolean);
+            if (!valid.length) {
+                alert("No data found.");
+                return;
+            }
+
+            valid.sort((a, b) => b.date - a.date);
+
+            // Filter valid data to only include rows for this employee to minimize cache size
+            const filteredResults = valid.map(data => ({
+                monthName: data.monthName,
+                date: data.date,
+                csvData: data.csvData.filter((row, idx) => idx === 0 || (row[3] && empNo && row[3].toString().replace(/^0+/, '') === empNo.toString().replace(/^0+/, ''))) // idx 0 is header
+            })).filter(data => data.csvData.length > 1); // Only keep months where employee was found
+
+            if (filteredResults.length > 0) {
+                // Store in cache with 5-minute TTL
+                const cacheData = {
+                    data: filteredResults,
+                    timestamp: Date.now()
+                };
+                sessionStorage.setItem(cacheKey, JSON.stringify(cacheData));
+                
+                displayEmployeeInfoPos(filteredResults);
+                displayResultsTablePos(filteredResults);
+            } else {
+                showErrorCard(employeeInfoSection, 'Employee not found in any available records.');
+            }
+        })
+        .catch(err => {
+            console.error("Search failed:", err);
+            showErrorCard(employeeInfoSection, 'An error occurred during search.');
+        })
+        .finally(() => {
+            updateUISearchComplete();
+        });
+}
+
+// ---------------- FETCH CSV ----------------
+function fetchCSVPos(file) {
+    return fetch(file)
+        .then(r => (r.ok ? r.text() : null))
+        .then(text => {
+            if (!text) return null;
+            return {
+                monthName: getMonthNameFromCsvPos(file),
+                date: getDateFromCsvPos(file),
+                csvData: parseCSVPos(text)
+            };
+        })
+        .catch(() => null);
+}
+
+// ---------------- DATE HELPERS ----------------
+function getDateFromCsvPos(file) {
+    const m = file.match(/pos_([a-z]{3})(\d{2})/);
+    if (!m) return null;
+    const map = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+    return new Date(2000 + +m[2], map[m[1]], 1);
+}
+
+function getMonthNameFromCsvPos(file) {
+    const map = {
+        jan:"January",feb:"February",mar:"March",apr:"April",
+        may:"May",jun:"June",jul:"July",aug:"August",
+        sep:"September",oct:"October",nov:"November",dec:"December"
+    };
+    const m = file.match(/pos_([a-z]{3})(\d{2})/);
+    return `${map[m[1]]} 20${m[2]}`;
+}
+
+function parseCSVPos(data) {
+    const rows = data.trim().split('\n');
+    return rows.map(row => {
+        const result = [];
+        let current = '';
+        let inQuotes = false;
+        for (let i = 0; i < row.length; i++) {
+            const char = row[i];
+            if (char === '"') {
+                inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+                result.push(current.trim());
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+        result.push(current.trim());
+        return result.map(val => val.replace(/^"|"$/g, '').trim());
+    });
+}
+
+// Global mapping for customer info
+let customerMap = new Map();
+let customerDataLoaded = false;
+let customerDataPromise = fetchCustomerData();
+
+document.addEventListener("DOMContentLoaded", function() {
+    // Initial fetch started at top level
+    
+    // Sync TTS switch with localStorage
+    const ttsSwitch = document.getElementById('ttsSwitch');
+    if (ttsSwitch) {
+        const savedState = localStorage.getItem('ttsEnabled');
+        if (savedState !== null) {
+            ttsSwitch.checked = (savedState === 'true');
+        }
+        
+        ttsSwitch.addEventListener('change', () => {
+            const isEnabled = ttsSwitch.checked;
+            localStorage.setItem('ttsEnabled', isEnabled);
+            
+            const icon = ttsSwitch.nextElementSibling.querySelector('.icon');
+            if (icon) {
+                icon.className = isEnabled ? "bi bi-volume-up-fill icon" : "bi bi-volume-mute-fill icon";
+            }
+
+            if (!isEnabled) {
+                window.speechSynthesis.cancel();
+            }
+        });
+    }
+
+    // Enter key support
+    const searchInput = document.getElementById('searchInputPos');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                searchEmployeePos();
+            }
+        });
+    }
+
+    // Auto-search if employee number is saved
+    const savedEmpNo = localStorage.getItem("employeeNumber");
+    if (savedEmpNo) {
+        const input = document.getElementById('searchInputPos');
+        if (input) {
+            input.value = savedEmpNo;
+            searchEmployeePos();
+        }
+    }
+});
+
+async function fetchCustomerData() {
+    try {
+        const response = await fetch('customer_information.csv');
+        if (!response.ok) throw new Error("Failed to load customer info");
+        const text = await response.text();
+        
+        const rows = text.split('\n');
+        const dataStartIndex = 2; // Data starts at line 3
+
+        for (let i = dataStartIndex; i < rows.length; i++) {
+            const row = rows[i].trim();
+            if (!row) continue;
+            
+            // Robust CSV parser (handles commas in quotes)
+            const matches = row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
+            if (!matches || matches.length < 3) continue;
+
+            const clean = (val) => val ? val.replace(/^"|"$/g, '').trim() : '';
+
+            const empNum = clean(matches[2]); 
+            
+            if (empNum) {
+                 customerMap.set(empNum, {
+                    branch: clean(matches[0]),
+                    account: clean(matches[1]),
+                    address: clean(matches[3]),
+                    phone: clean(matches[4])
+                });
+            }
+        }
+        console.log("Customer data loaded. Total entries:", customerMap.size);
+    } catch(err) {
+        console.error("Error loading customer CSV:", err);
+    } finally {
+        customerDataLoaded = true;
+    }
+}
+
+// Helper for Title Case (reusable)
+const toTitleCase = (str) => {
+    if (!str) return '';
+    return str.replace(/\w\S*/g, (txt) => {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+};
+
+function speakText(text) {
+    const ttsSwitch = document.getElementById('ttsSwitch');
+    const ttsEnabled = ttsSwitch ? ttsSwitch.checked : (localStorage.getItem('ttsEnabled') === 'true');
+    if (!ttsEnabled || !('speechSynthesis' in window)) return;
+    
+    const speak = () => {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        const voices = window.speechSynthesis.getVoices();
+        
+        const voice = voices.find(v => 
+            (v.name.includes('Google') && v.name.includes('US') && v.name.includes('Female')) ||
+            v.name.includes('Google US English')
+        ) || voices.find(v => 
+            v.name.includes('Zira') || v.name.includes('Microsoft Zira')
+        ) || voices.find(v => 
+            v.name.toLowerCase().includes('female') && v.lang.startsWith('en')
+        ) || voices.find(v => 
+            v.lang === 'en-US' && !v.name.includes('Male')
+        );
+        
+        if (voice) {
+            utterance.voice = voice;
+        }
+        
+        utterance.rate = 0.95;
+        utterance.pitch = 1.15;
+        utterance.volume = 0.7; // User requested 0.7 volume
+        
+        window.speechSynthesis.speak(utterance);
+    };
+
+    if (window.speechSynthesis.getVoices().length === 0) {
+         window.speechSynthesis.onvoiceschanged = speak;
+    } else {
+        speak();
+    }
+}
+
+// ---------------- EMPLOYEE INFO (PROFILE CARD) ----------------
+async function displayEmployeeInfoPos(allData) {
+    const empNo = document.getElementById("searchInputPos").value.trim();
+    const info = document.getElementById("employeeInfoPos");
+
+    // Wait for customer data if not yet loaded
+    if (!customerDataLoaded) {
+        await customerDataPromise;
+    }
+
+    for (const file of allData) {
+        for (let i = 1; i < file.csvData.length; i++) {
+            const row = file.csvData[i];
+            if (row[3] && empNo && row[3].toString().replace(/^0+/, '') === empNo.toString().replace(/^0+/, '')) {
+                // Trigger Confetti
+                const confetti = document.getElementById('confettiContainer');
+                if (confetti) {
+                    confetti.classList.add('active');
+                    setTimeout(() => {
+                        confetti.classList.remove('active');
+                    }, 2000);
+                }
+
+                const fname = row[4] || "";
+                const mi = row[5] || "";
+                const lname = row[6] || "";
+                const div = row[1];
+                const sta = row[2];
+
+                // Announce name once
+                if (window.lastSpokenEmpNo !== empNo) {
+                    const fullName = toTitleCase(`${fname} ${mi} ${lname}`.replace(/\s+/g, ' ').trim());
+                    speakText(`Results for ${fullName}`);
+                    window.lastSpokenEmpNo = empNo;
+                }
+
+                // Add copy toast if not present
+                if (!document.querySelector('.copy-toast')) {
+                    const toast = document.createElement('div');
+                    toast.className = 'copy-toast';
+                    toast.textContent = 'Copied to clipboard';
+                    document.body.appendChild(toast);
+                }
+
+                window.copyToClipboard = function(text) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        const toast = document.querySelector('.copy-toast');
+                        toast.classList.add('show');
+                        setTimeout(() => toast.classList.remove('show'), 2000);
+                    });
+                };
+
+                // Look up extra details
+                const extra = customerMap.get(empNo) || {};
+                
+                // Format Address
+                const rawAddress = extra.address || '';
+                const formattedAddress = rawAddress ? toTitleCase(rawAddress) : 'Not available';
+                const mapsUrl = rawAddress ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(formattedAddress)}` : '';
+                
+                // Format Phone
+                const phoneVal = extra.phone || '';
+                const formattedPhone = phoneVal ? (phoneVal.startsWith('0') ? phoneVal : '0' + phoneVal) : 'Not available';
+                const dialPhone = phoneVal ? (phoneVal.startsWith('0') ? phoneVal : '0' + phoneVal) : '';
+
+                // Apply card class and theme
+                info.className = 'profile-card theme-gold';
+
+                info.innerHTML = `
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        <div class="profile-title">
+                            <h3>${fname}&nbsp;&nbsp;${mi}&nbsp;&nbsp;${lname}</h3>
+                            <span>Employee</span>
+                        </div>
+                    </div>
+    
+                    <div class="profile-list">
+                        <div class="profile-item">
+                            <div class="profile-icon"><i class="bi bi-person-badge-fill"></i></div>
+                            <div class="profile-details">
+                                <span class="label">EMPLOYEE NUMBER</span>
+                                <span class="value">${empNo}</span>
+                            </div>
+                            <div class="profile-action" onclick="copyToClipboard('${empNo}')" title="Copy">
+                                <i class="bi bi-copy" style="-webkit-text-stroke: 1px;"></i>
+                            </div>
+                        </div>
+
+                        <div class="profile-item">
+                            <div class="profile-icon"><i class="bi bi-building-fill"></i></div>
+                            <div class="profile-details">
+                                <span class="label">DIVISION / STATION</span>
+                                <span class="value">${div} / ${sta}</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-item ${extra.address ? '' : 'inactive'}">
+                            <div class="profile-icon"><i class="bi bi-house-door-fill"></i></div>
+                            <div class="profile-details">
+                                <span class="label">HOME ADDRESS</span>
+                                <span class="value" style="font-size: 13px;">${formattedAddress}</span>
+                            </div>
+                            <div class="profile-action" ${mapsUrl ? `onclick="window.open('${mapsUrl}', '_blank')"` : ''} style="${mapsUrl ? 'cursor:pointer;' : ''}">
+                                <i class="bi bi-geo-alt-fill"></i>
+                            </div>
+                        </div>
+
+                        <div class="profile-item ${extra.branch ? '' : 'inactive'}">
+                            <div class="profile-icon"><i class="bi bi-buildings-fill"></i></div>
+                            <div class="profile-details">
+                                <span class="label">BRANCH</span>
+                                <span class="value">${extra.branch || 'Not available'}</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-item ${extra.account ? '' : 'inactive'}">
+                             <div class="profile-icon"><i class="bi bi-wallet-fill"></i></div>
+                            <div class="profile-details">
+                                <span class="label">ACCOUNT NUMBER</span>
+                                <span class="value">${extra.account || 'Not available'}</span>
+                            </div>
+                            ${extra.account ? `
+                            <div class="profile-action" onclick="copyToClipboard('${extra.account}')" title="Copy">
+                                <i class="bi bi-copy" style="-webkit-text-stroke: 1px;"></i>
+                            </div>
+                            ` : ''}
+                        </div>
+
+                         <div class="profile-item ${extra.phone ? '' : 'inactive'}">
+                             <div class="profile-icon"><i class="bi bi-telephone-fill"></i></div>
+                            <div class="profile-details">
+                                <span class="label">PHONE NUMBER</span>
+                                <span class="value">${formattedPhone}</span>
+                            </div>
+                            <div class="profile-action" ${dialPhone ? `onclick="window.location.href='tel:${dialPhone}'" style="cursor:pointer"` : ''}>
+                                <i class="bi bi-telephone-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+        }
+    }
+    showErrorCard(info, 'Employee ID not found in latest month.');
+}
+
+// ---------------- TABLE (PURPLE STYLE + DROPDOWN) ----------------
+function displayResultsTablePos(allData) {
+    const empNo = document.getElementById("searchInputPos").value.trim();
+    const container = document.getElementById("resultspos");
+    container.innerHTML = "";
+
+    const map = new Map();
+
+    allData.forEach(file => {
+        file.csvData.forEach((row, i) => {
+            if (i === 0 || row[3] !== empNo) return;
+            const amt = parseFloat(row[13]) || 0;
+
+            if (!map.has(file.monthName)) map.set(file.monthName, []);
+            map.get(file.monthName).push(amt);
+        });
+    });
+
+    if (map.size === 0) {
+        container.innerHTML = '';
+        return;
+    }
+
+    const table = document.createElement("table");
+    table.className = "responsive-table";
+    table.innerHTML = `
+        <thead style="background:#463009;color:white">
+            <tr>
+                <th><i class="bi bi-calendar3"></i> MONTH</th>
+                <th style="text-align:right"><i class="bi bi-cash"></i> DEDAMT</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    `;
+
+    const tbody = table.querySelector("tbody");
+
+    map.forEach((vals, month) => {
+        const sum = vals.reduce((a,b)=>a+b,0);
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${month}</td>
+            <td style="text-align:right">
+                <span class="dedamt-hover">
+                    <u><b>${sum.toLocaleString("en-PH",{style:"currency",currency:"PHP"})}</b></u>
+                    <div class="dedamt-dropdown">
+                        ${vals.map(v=>`<div>${v.toLocaleString("en-PH",{style:"currency",currency:"PHP"})}</div>`).join("")}
+                    </div>
+                </span>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    container.appendChild(table);
+}
+
+// Function to handle logout
+function logout() {
+    localStorage.removeItem("loginTime");
+    localStorage.removeItem("employeeNumber");
+    window.location.href = "login/index.html";
+}
+document.addEventListener("DOMContentLoaded", function() {
+    const loginTime = localStorage.getItem("loginTime");
+
+    // Check if the login time exists and if the session has expired (4 hours)
+    if (!loginTime || (new Date().getTime() - loginTime) > 3 * 60 * 60 * 1000) {
+        // Redirect to login page if no login session or session expired
+        window.location.href = "login/index.html";
+    }
+});
+
+
+
+
+// Function to check if admin is logged in and show/hide the admin container
+function checkLoggedInUser() {
+    /* 
+     * CHANGE DETAILS:
+     * Element: checkLoggedInUser function (admin visibility second definition)
+     * Date: 2026-07-07
+     * Fix: Resolve the administrator username dynamically from netpay_accounts in localStorage instead of hardcoding "jonathan77".
+     */
+    const loggedInUser = localStorage.getItem("loggedInUser")?.trim().toLowerCase();
+    const adminContainer = document.querySelector(".container-admin");
+    if (!adminContainer) return;
+
+    let adminUsername = "jonathan77"; // fallback default
+    const accountsStr = localStorage.getItem("netpay_accounts");
+    if (accountsStr) {
+        try {
+            const accounts = JSON.parse(accountsStr);
+            if (accounts && accounts[0] && accounts[0].username) {
+                adminUsername = accounts[0].username;
+            }
+        } catch(e) {
+            console.error("Error parsing netpay_accounts:", e);
+        }
+    }
+
+    if (loggedInUser && loggedInUser === adminUsername.toLowerCase()) {
+        adminContainer.style.display = "block";
+    } else {
+        adminContainer.style.display = "none";
+    }
+}
+
+// Helper to show premium error card
+function showErrorCard(container, message) {
+    container.innerHTML = `
+        <div class="error-card">
+            <i class="bi bi-exclamation-circle-fill"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    container.className = ''; // Remove profile-card class if present
+}
+
+// Call this function on page load to check if jonathan77 is logged in
+checkLoggedInUser();

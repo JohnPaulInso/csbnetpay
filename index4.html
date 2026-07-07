@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Historical Netpay - PLI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <meta name="theme-color" id="theme-meta" content="#600e12">
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+  <!-- Manifest & Icons -->
+  <link rel="manifest" href="/csbnetpay/manifest.json">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="icon" href="favicon.png" type="image/png" sizes="any">
+
+  <link rel="stylesheet" href="index.css">
+
+  <style>
+    /* Red Theme Overrides */
+    .navbar {
+      background: var(--theme-color) !important;
+    }
+
+    .employee-info {
+      border-left: 4px solid var(--theme-color);
+    }
+
+    .employee-info strong {
+      color: var(--theme-color);
+    }
+
+    .card {
+      border-top: 3px solid var(--theme-color) !important;
+    }
+
+    .form-input:focus {
+      border-color: var(--theme-color);
+      box-shadow: 0 0 0 4px rgba(var(--theme-rgb), 0.1);
+    }
+
+    .form-input:focus+.input-icon {
+      color: var(--theme-color);
+    }
+
+    .btn-primary {
+      background: #600e12;
+      box-shadow: 0 4px 12px rgba(96, 14, 18, 0.3);
+    }
+
+    .btn-primary:hover {
+      background: #7a1318;
+      /* Slightly lighter dark red */
+      box-shadow: 0 6px 16px rgba(96, 14, 18, 0.4);
+    }
+
+    .page-subtitle {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      color: rgba(96, 14, 18, 0.7);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+
+    .responsive-table thead {
+      background: #600e12;
+    }
+
+    /* Prevent text selection from triggering mobile search */
+    table td,
+    table th {
+      -webkit-user-select: text;
+      -moz-user-select: text;
+      -ms-user-select: text;
+      user-select: text;
+      -webkit-touch-callout: none;
+    }
+
+    @media (max-width: 768px) {
+      .page-subtitle {
+        font-size: 0.65rem;
+        margin-bottom: 0.35rem;
+      }
+    }
+
+    /* Table overrides for Index 4 logic if needed */
+    .table-borderless th,
+    .table-borderless td {
+      border: none;
+    }
+
+    .mic-inside-input {
+      color: #600e12 !important;
+    }
+  </style>
+</head>
+
+<body style="--theme-color: #600e12; --theme-rgb: 96, 14, 18;">
+  <script>
+    // Immediate Theme Sync
+    function syncTheme() {
+      const themeColor = getComputedStyle(document.body).getPropertyValue('--theme-color').trim();
+      if (themeColor) {
+        const meta = document.getElementById('theme-meta');
+        if (meta) meta.setAttribute('content', themeColor);
+      }
+    }
+    syncTheme();
+  </script>
+  <!-- Mobile Header -->
+  <header class="mobile-header" style="background: #600e12 !important;">
+    <img src="citysavings_logo.png" alt="CitySavings"
+      style="height: 24px; width: auto; filter: brightness(0) invert(1);">
+    <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button>
+  </header>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-links">
+        <a class="nav-link" href="index.html">NETPAY</a>
+        <a class="nav-link" href="index2.html">DEDAMT</a>
+        <a class="nav-link" href="index3.html">ONQ</a>
+        <a class="nav-link active" href="index4.html">PLI</a>
+        <a class="nav-link" href="index5.html">LE</a>
+      </div>
+      <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button>
+    </div>
+  </nav>
+
+  <div class="page-header"
+    style="position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding-top: 10px;">
+    <div class="page-subtitle">Payroll Management System</div>
+    <div style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
+      <h1 style="margin: 0;">PLI DEDUCTION RESULT</h1>
+
+      <label class="switch">
+        <input type="checkbox" id="ttsSwitch" checked>
+        <span class="slider round">
+          <i class="bi bi-volume-up-fill icon"></i>
+        </span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Search Section -->
+  <div class="search-card">
+    <!-- Confetti Celebration -->
+    <div id="confettiContainer" class="confetti-container">
+        <div class="confetti left"></div><div class="confetti left"></div><div class="confetti left"></div>
+        <div class="confetti left"></div><div class="confetti left"></div><div class="confetti left"></div>
+        <div class="confetti left"></div><div class="confetti left"></div><div class="confetti left"></div>
+        <div class="confetti left"></div><div class="confetti left"></div><div class="confetti left"></div>
+        <div class="confetti left"></div><div class="confetti left"></div><div class="confetti left"></div>
+        
+        <div class="confetti right"></div><div class="confetti right"></div><div class="confetti right"></div>
+        <div class="confetti right"></div><div class="confetti right"></div><div class="confetti right"></div>
+        <div class="confetti right"></div><div class="confetti right"></div><div class="confetti right"></div>
+        <div class="confetti right"></div><div class="confetti right"></div><div class="confetti right"></div>
+        <div class="confetti right"></div><div class="confetti right"></div><div class="confetti right"></div>
+    </div>
+
+    <div class="card">
+      <div class="input-group">
+        <label class="input-label" for="searchInputPLI">Employee Number</label>
+        <div class="input-wrapper">
+          <div class="input-with-icon">
+            <input type="text" id="searchInputPLI" class="form-input" placeholder="Employee Number..."
+              autocomplete="on" />
+            <button type="button" id="micBtn" class="mic-inside-input">
+              <i class="bi bi-mic-fill"></i>
+            </button>
+          </div>
+          <i class="bi bi-search input-icon"></i>
+        </div>
+        <div id="feedback" class="feedback-text"></div>
+      </div>
+      <button id="searchButtonPLI" class="btn btn-primary">
+        <i class="bi bi-search"></i>
+        Search Employee
+      </button>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loadingIndicatorPLI" class="loading-indicator">
+      <img src="loading.gif" alt="Loading...">
+    </div>
+  </div>
+
+  <!-- Listening Overlay -->
+  <div id="listeningOverlay" class="listening-overlay"></div>
+
+  <!-- Results Section -->
+  <div class="results-section" id="resultsSection" style="display:block;">
+    <h3 id="employeeInfoPLI" class="employee-info" style="min-height: 20px;"></h3>
+    <div id="resultsPLI" class="table-container">
+      <!-- Table will be dynamically inserted here -->
+    </div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav" style="--theme-color: #600e12; --theme-rgb: 96, 14, 18;">
+    <a href="index.html" class="bottom-nav-link">
+      <i class="bi bi-wallet2"></i>
+      <span>NETPAY</span>
+    </a>
+    <a href="index2.html" class="bottom-nav-link">
+      <i class="bi bi-cash-stack"></i>
+      <span>DEDAMT</span>
+    </a>
+    <a href="index3.html" class="bottom-nav-link">
+      <i class="bi bi-hourglass-split"></i>
+      <span>ONQ</span>
+    </a>
+    <a href="index4.html" class="bottom-nav-link active">
+      <i class="bi bi-file-earmark-text"></i>
+      <span>PLI</span>
+    </a>
+    <a href="index5.html" class="bottom-nav-link">
+      <i class="bi bi-calculator"></i>
+      <span>LE</span>
+    </a>
+  </div>
+
+  <!-- Admin Section (Upload) -->
+  <div class="admin-section container-admin" style="display: none;">
+    <div class="admin-card">
+      <div class="admin-card__header">
+        <div>
+          <div class="admin-card__eyebrow">Admin · Upload</div>
+          <h5>Already have the PLI Deduction for <span style="color: #00c12d;" id="month-name"></span>?</h5>
+          <p>Please double check the month and year and make sure it's a CSV File. Example: <u
+              id="example-file">pli_feb26.csv</u></p>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 1rem;">
+        <div class="file-upload-wrapper drop-zone">
+          <label for="fileInput" class="file-upload-label">Choose File</label>
+          <input type="file" id="fileInput" class="file-input" onchange="updateFileName()">
+          <small id="fileName" class="file-name">No file chosen</small>
+        </div>
+        <button onclick="uploadFiles()" class="btn btn-success" style="margin-top: 1rem;">Upload</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <script>
+    // Ripple Effect
+    document.addEventListener('click', function (e) {
+      if (e.target.classList.contains('btn') || e.target.closest('.btn')) {
+        const button = e.target.classList.contains('btn') ? e.target : e.target.closest('.btn');
+        const ripple = document.createElement('span');
+        ripple.classList.add('ripple');
+        const rect = button.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        button.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 600);
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      // Theme Sync
+      const themeColor = getComputedStyle(document.body).getPropertyValue('--theme-color').trim();
+      if (themeColor) {
+        document.getElementById('theme-meta').setAttribute('content', themeColor);
+      }
+
+      const resultsSection = document.getElementById("resultsSection");
+
+      // Ensure hidden on first load
+      if (resultsSection) resultsSection.style.display = "none";
+    });
+
+    // Voice Recognition (Integrated)
+    const micBtn = document.getElementById("micBtn");
+    const feedback = document.getElementById("feedback");
+    const listeningOverlay = document.getElementById("listeningOverlay");
+
+    const listeningSound = new Audio('listening.ogg');
+    const searchingSound = new Audio('searching.ogg');
+
+    function showFeedback(message) {
+      if (feedback) {
+        feedback.textContent = message;
+        feedback.style.display = "block";
+      }
+    }
+
+    function clearFeedback() {
+      if (feedback) {
+        feedback.textContent = "";
+        feedback.style.display = "none";
+      }
+    }
+
+    function showOverlay() {
+      if (listeningOverlay) listeningOverlay.classList.add('active');
+    }
+
+    function hideOverlay() {
+      if (listeningOverlay) listeningOverlay.classList.remove('active');
+    }
+
+    function resetMicButton() {
+      if (micBtn) {
+        micBtn.classList.remove("listening");
+        micBtn.innerHTML = '<i class="bi bi-mic-fill"></i>';
+        micBtn.disabled = false;
+      }
+      hideOverlay();
+    }
+
+    if (micBtn) {
+      micBtn.addEventListener("click", () => {
+        listeningSound.play();
+        micBtn.disabled = true;
+        startListening();
+      });
+    }
+
+    function startListening() {
+      clearFeedback();
+      if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
+        showFeedback("Sorry, your browser does not support speech recognition.");
+        resetMicButton();
+        return;
+      }
+
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'en-US';
+      recognition.interimResults = true;
+      recognition.continuous = false;
+
+      if (micBtn) {
+        micBtn.classList.add("listening");
+        micBtn.innerHTML = '<div class="listening-dots"><span></span><span></span><span></span></div>';
+      }
+
+      recognition.start();
+      showOverlay();
+
+      const inputField = document.getElementById('searchInputPLI');
+      if (inputField) inputField.value = "";
+
+      let finalTranscript = "";
+      let processingTimeout;
+
+      recognition.onresult = (event) => {
+        clearTimeout(processingTimeout);
+        let interimTranscript = "";
+        let currentFinal = "";
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            currentFinal += event.results[i][0].transcript;
+          } else {
+            interimTranscript += event.results[i][0].transcript;
+          }
+        }
+        if (currentFinal) finalTranscript += currentFinal;
+        const combinedTranscript = (finalTranscript + interimTranscript).toLowerCase().trim();
+        if (inputField) {
+          const digitsOnly = combinedTranscript.match(/\d+/g);
+          if (digitsOnly) inputField.value = digitsOnly.join('');
+        }
+        processingTimeout = setTimeout(() => {
+          searchingSound.play();
+          recognition.stop();
+          processCommand(combinedTranscript);
+        }, 2000);
+      };
+
+      recognition.onerror = () => {
+        showFeedback("Error. Try again.");
+        recognition.stop();
+        resetMicButton();
+      };
+
+      recognition.onend = () => {
+        resetMicButton();
+      };
+
+      function processCommand(speech) {
+        if (!speech) return;
+        const routes = [
+          { keywords: ["netpay", "net pay"], file: "index.html" },
+          { keywords: ["dedamt", "ded amount"], file: "index2.html" },
+          { keywords: ["onqueue", "on q", "onq"], file: "index3.html" },
+          { keywords: ["pli"], file: "index4.html" }
+        ];
+        let matchedRoute = null;
+        let employeeNumber = "";
+        for (const route of routes) {
+          for (const keyword of route.keywords) {
+            if (speech.startsWith(keyword)) {
+              matchedRoute = route;
+              const afterKeyword = speech.substring(keyword.length).trim();
+              const digits = afterKeyword.match(/\d+/g);
+              if (digits) employeeNumber = digits.join('');
+              break;
+            }
+          }
+          if (matchedRoute) break;
+        }
+        if (!matchedRoute) {
+          const digits = speech.match(/\d+/g);
+          if (digits) {
+            employeeNumber = digits.join('');
+            matchedRoute = routes[3];
+            document.getElementById("searchInputPLI").value = employeeNumber;
+            document.getElementById("searchButtonPLI").click();
+            return;
+          }
+        }
+        if (matchedRoute) {
+          localStorage.setItem("employeeNumber", employeeNumber);
+          if (window.location.pathname.endsWith(matchedRoute.file)) {
+            document.getElementById("searchInputPLI").value = employeeNumber;
+            document.getElementById("searchButtonPLI").click();
+          } else {
+            window.location.href = matchedRoute.file;
+          }
+        } else {
+          showFeedback("Not recognized.");
+        }
+      }
+    }
+
+    // Admin Upload Script (Adapted)
+    function getPreviousMonth() {
+      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const currentDate = new Date();
+      const currentMonth = currentDate.getMonth();
+      const previousMonthIndex = (currentMonth - 1 + 12) % 12;
+      return months[previousMonthIndex];
+    }
+
+    window.onload = function () {
+      const previousMonth = getPreviousMonth();
+      const currentYrSuffix = new Date().getFullYear().toString().slice(-2);
+      const previousMonthText = "pli_" + previousMonth.toLowerCase() + currentYrSuffix + '.csv';
+      const monthNameEl = document.getElementById("month-name");
+      const exampleFileEl = document.getElementById("example-file");
+      if (monthNameEl) monthNameEl.textContent = previousMonth;
+      if (exampleFileEl) exampleFileEl.textContent = previousMonthText;
+    }
+
+    function updateFileName() {
+      const fileInput = document.getElementById("fileInput");
+      const fileName = document.getElementById("fileName");
+      if (fileInput.files.length > 0) {
+        fileName.textContent = `Selected file: ${fileInput.files[0].name}`;
+      } else {
+        fileName.textContent = "No file chosen";
+      }
+    }
+
+    async function uploadFiles() {
+      const fileInput = document.getElementById("fileInput");
+      const files = fileInput.files;
+      if (!files.length) return alert("Please select at least one file.");
+
+      alert("Uploading files to GitHub...");
+
+      const repo = "csbnetpay";
+      const owner = "JohnPaulInso";
+      const part1 = "ghp_";
+      const part2 = "vnpu7K5e3lNEsKwMczRGTgPA35ER5R2odvye";
+      const token = part1 + part2;
+
+      const uploadPromises = Array.from(files).map(async (file) => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = async () => {
+            const content = reader.result.split(",")[1];
+            const path = file.name;
+            const message = `Upload ${file.name} via API`;
+            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+
+            try {
+              const response = await fetch(url, {
+                method: "PUT",
+                headers: {
+                  "Authorization": `token ${token}`,
+                  "Accept": "application/vnd.github.v3+json",
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ message: message, content: content })
+              });
+              if (response.ok) {
+                resolve(file.name);
+              } else {
+                reject(`Failed: ${file.name}`);
+              }
+            } catch (error) {
+              reject(`Error: ${file.name}`);
+            }
+          };
+        });
+      });
+
+      try {
+        const uploadedFiles = await Promise.all(uploadPromises);
+        alert(`Upload Complete! ${uploadedFiles.length} file(s) uploaded.`);
+        setTimeout(function () { location.reload(); }, 1000);
+      } catch (error) {
+        alert("Some uploads failed.");
+      }
+    }
+  </script>
+
+  <!-- Main Logic Script -->
+  <script src="index4.script"></script>
+  <footer class="app-footer">
+    Developed by John Paul Inso | <span id="appVersion">v1.0.0</span>
+  </footer>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      syncTheme();
+    });
+
+    async function updateVersionDisplay() {
+      try {
+        const response = await fetch('version.json?t=' + Date.now());
+        const data = await response.json();
+        const versionEl = document.getElementById('appVersion');
+        if (versionEl) {
+          versionEl.textContent = `v${data.version}.${data.build}`;
+        }
+      } catch (err) {
+        console.log("Versioning unavailable");
+      }
+    }
+    updateVersionDisplay();
+  </script>
+</body>
+
+</html>

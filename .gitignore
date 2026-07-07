@@ -1,0 +1,36 @@
+# =============================================
+# .gitignore for csbnetpay project
+# Created: 2026-07-07
+# Purpose: Exclude large data files, raw CSVs,
+#          Excel workbooks, and OS junk from GitHub
+# =============================================
+
+# ----- Large CSV data files -----
+*.csv
+
+# ----- Excel workbooks (raw data, not source code) -----
+*.xlsx
+*.xlsm
+*.xls
+
+# ----- OS / editor junk -----
+Thumbs.db
+.DS_Store
+.vscode/
+
+# ----- Untitled/temp files -----
+Untitled
+
+# ----- Backup / copy HTML files (keep only main ones) -----
+*copy*.html
+*Copy*.html
+index2 - Copy.html
+index3 - Copy.html
+index3 copy*.html
+index4 copy*.html
+index5 copy*.html
+index7 copy*.html
+index copy.script
+
+# ----- Old/test HTML files -----
+index5.txt

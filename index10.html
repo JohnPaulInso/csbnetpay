@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Salary Grade Table</title>
+    <style>
+        /* Additional styles can be added here if needed */
+    </style>
+</head>
+
+<body>
+
+<div class="container mt-5">
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <td id="promotionCell" style="border: none; margin-bottom:0px"
+                    class="d-flex justify-content-between align-items-center">
+                    <span id="promotionDisplay">₱ 0.00</span>
+                    <button class="promotion-button bg-transparent border-0 p-0" style="margin-left: 10px;"
+                            onclick="toggleTable()">📖
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div id="salaryTable" class="d-none">
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>SALARY GRADE</th>
+                <th>BASIC PAY</th>
+                <th>PRMTN NET</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>
+                    <select onchange="updateValues(this)" class="form-control">
+                        <option value="">Select SALARY GRADE</option>
+                    </select>
+                </td>
+                <td id="basicPay1">0</td>
+                <td id="prmtnNet1">0</td>
+            </tr>
+            <tr>
+                <td>
+                    <select onchange="updateValues(this)" class="form-control">
+                        <option value="">Select SALARY GRADE</option>
+                    </select>
+                </td>
+                <td id="basicPay2">0</td>
+                <td id="prmtnNet2">0</td>
+            </tr>
+            <tr>
+                <td>DIFF</td>
+                <td id="basicPayTable3"></td>
+                <td>
+                    <input id="promotion" type="number" class="bg-dark text-light border-0"
+                           style="font-size:10px; font-weight: bold; width:50%;" step="0.01"
+                           oninput="updatePromotionDisplay(this)" 
+                           placeholder="0.00" min="0" />
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Toggle the display of the salary table with 1 click
+    function toggleTable() {
+        const table = document.getElementById("salaryTable");
+        table.classList.toggle("d-none"); // Toggle the d-none class
+    }
+
+    // Update the displayed promotion value in the "promotionCell" when the input value changes
+    function updatePromotionDisplay(inputElement) {
+    const promotionValue = parseFloat(inputElement.value).toFixed(2);
+    document.getElementById('promotionDisplay').textContent = isNaN(promotionValue) ? '₱ 0.00' : '₱ ' + promotionValue;
+}
+
+    // Global variable to store parsed data
+    let parsedData = [];
+
+    // Load CSV data on window load
+    window.onload = function () {
+        loadprmtnCSV();
+    };
+
+    // Function to load and parse CSV file
+    function loadprmtnCSV() {
+        fetch("promotion_bracket.csv")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(data => {
+                parsedData = parseCSV(data);
+                console.log("Parsed Data:", parsedData); // Log parsed data for debugging
+                populateSalaryDropdown(parsedData);
+            })
+            .catch(error => console.error("Error loading CSV:", error));
+    }
+
+    // Function to parse CSV data
+    function parseCSV(data) {
+        const rows = data.trim().split('\n').map(row => row.split(','));
+        return rows.slice(1, 161).map(row => row.map(cell => cell.trim())); // Limit to first 163 rows after the header
+    }
+
+    // Populate salary dropdowns
+    function populateSalaryDropdown(data) {
+        const dropdowns = document.querySelectorAll('select');
+        dropdowns.forEach(dropdown => {
+            data.forEach(row => {
+                const option = document.createElement('option');
+                option.textContent = row[0];
+                dropdown.appendChild(option);
+            });
+        });
+    }
+
+    // Update values based on selection
+    function updateValues(selectElement) {
+        const selectedValue = selectElement.value;
+        const rowIndex = Array.from(selectElement.closest('tbody').rows).indexOf(selectElement.closest('tr'));
+
+        // Find the selected data using the selected value
+        const selectedData = parsedData.find(row => row[0] === selectedValue);
+
+        if (selectedData) {
+            const basicPay = parseFloat(selectedData[1]);
+            const prmtNNet = parseFloat(selectedData[2]);
+
+            // Update BASIC PAY and PRMTN NET for the selected row
+            document.getElementById(`basicPay${rowIndex + 1}`).textContent = !isNaN(basicPay) ? basicPay.toFixed(2) : '0';
+            document.getElementById(`prmtnNet${rowIndex + 1}`).textContent = !isNaN(prmtNNet) ? prmtNNet.toFixed(2) : '0';
+
+            // Check and calculate differences if both rows 1 and 2 are populated
+            const basicPay1 = parseFloat(document.getElementById('basicPay1').textContent) || 0;
+            const basicPay2 = parseFloat(document.getElementById('basicPay2').textContent) || 0;
+            const prmtNNet1 = parseFloat(document.getElementById('prmtnNet1').textContent) || 0;
+            const prmtNNet2 = parseFloat(document.getElementById('prmtnNet2').textContent) || 0;
+
+            console.log("BasicPay1:", basicPay1, "BasicPay2:", basicPay2);
+            console.log("PrmtNNet1:", prmtNNet1, "PrmtNNet2:", prmtNNet2);
+
+            // Calculate differences and update the difference row
+            const basicPayDiff = basicPay2 - basicPay1;
+            const prmtNNetDiff = prmtNNet2 - prmtNNet1;
+
+            console.log("Basic Pay Diff:", basicPayDiff, "Promotion Net Diff:", prmtNNetDiff);
+
+            // Update the difference fields
+            document.getElementById('basicPayTable3').textContent = !isNaN(basicPayDiff) ? basicPayDiff.toFixed(2) : '0';
+            document.getElementById('promotion').value = !isNaN(prmtNNetDiff) ? prmtNNetDiff.toFixed(2) : '0';
+
+            // Update the promotion value displayed in promotionCell
+            updatePromotionDisplay(document.getElementById('promotion'));
+        } else {
+            console.log("No matching data found for the selected value:", selectedValue);
+        }
+    }
+</script>
+
+</body>
+</html>

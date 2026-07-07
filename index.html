@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Historical Netpay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <!-- Manifest & Icons -->
+    <link rel="manifest" href="/csbnetpay/manifest.json">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon.png" type="image/png" sizes="any">
+
+    <meta name="theme-color" id="theme-meta" content="#4F2683">
+
+    <link rel="stylesheet" href="index.css">
+
+    <style>
+        /* Prevent text selection from triggering mobile search */
+        table td,
+        table th {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+            -webkit-touch-callout: none;
+        }
+
+        /* Page subtitle style */
+        .page-subtitle {
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            color: rgba(79, 38, 131, 0.7);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 768px) {
+            .page-subtitle {
+                font-size: 0.65rem;
+                margin-bottom: 0.35rem;
+            }
+        }
+
+
+        /* Employee info styling - Purple Theme */
+        .employee-info {
+            color: #333;
+            font-size: 1.2rem;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #4F2683;
+            margin-bottom: 1rem;
+        }
+
+        .employee-info strong {
+            color: #4F2683;
+        }
+
+        .employee-info b {
+            color: #f39c10 !important;
+        }
+
+
+        /* Card Accents */
+        .card {
+            border-top: 3px solid var(--theme-color) !important;
+        }
+    </style>
+</head>
+
+<body style="--theme-color: #4F2683; --theme-rgb: 79, 38, 131;">
+    <script>
+        // Immediate Theme Sync
+        function syncTheme() {
+            const themeColor = getComputedStyle(document.body).getPropertyValue('--theme-color').trim();
+            if (themeColor) {
+                const meta = document.getElementById('theme-meta');
+                if (meta) meta.setAttribute('content', themeColor);
+            }
+        }
+        syncTheme();
+    </script>
+    <header class="mobile-header">
+        <img src="citysavings_logo.png" alt="CitySavings"
+            style="height: 24px; width: auto; filter: brightness(0) invert(1);">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <!-- FIX: Added settings gear button in mobile header -->
+            <!-- Date: 2026-07-07, Element: headerSettingsBtnMobile -->
+            <button class="settings-btn" id="headerSettingsBtnMobile" onclick="openCredentialsModal()"
+                title="Manage Credentials"
+                style="background: none; border: none; color: white; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center;">
+                <i class="bi bi-gear-fill"></i>
+            </button>
+            <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-links">
+                <a class="nav-link active" href="index.html">NETPAY</a>
+                <a class="nav-link" href="index2.html">DEDAMT</a>
+                <a class="nav-link" href="index3.html">ONQ</a>
+                <a class="nav-link" href="index4.html">PLI</a>
+                <a class="nav-link" href="index5.html">LE</a>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <!-- FIX: Added settings gear button in desktop navbar -->
+                <!-- Date: 2026-07-07, Element: headerSettingsBtnNavbar -->
+                <button class="settings-btn" id="headerSettingsBtnNavbar" onclick="openCredentialsModal()"
+                    title="Manage Credentials"
+                    style="background: none; border: none; color: white; cursor: pointer; font-size: 1.25rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-gear-fill"></i>
+                </button>
+                <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button>
+            </div>
+        </div>
+    </nav>
+
+
+
+
+
+
+
+
+    <div class="page-header"
+        style="position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding-top: 10px;">
+        <div class="page-subtitle">Payroll Management System</div>
+        <div style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
+            <h1 style="margin: 0;">HISTORICAL NETPAY</h1>
+
+            <label class="switch">
+                <input type="checkbox" id="ttsSwitch" checked>
+                <span class="slider round">
+                    <i class="bi bi-volume-up-fill icon"></i>
+                </span>
+            </label>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+    <!-- Search Section -->
+    <div class="search-card">
+        <!-- Confetti Celebration -->
+        <div id="confettiContainer" class="confetti-container">
+            <div class="confetti left"></div>
+            <div class="confetti left"></div>
+            <div class="confetti left"></div>
+            <div class="confetti left"></div>
+            <div class="confetti left"></div>
+            <div class="confetti left"></div>
+            <div class="confetti left"></div>
+            <div class="confetti left"></div>
+            <div class="confetti left"></div>
+            <div class="confetti left"></div>
+            <div class="confetti left"></div>
+            <div class="confetti left"></div>
+            <div class="confetti left"></div>
+            <div class="confetti left"></div>
+            <div class="confetti left"></div>
+
+            <div class="confetti right"></div>
+            <div class="confetti right"></div>
+            <div class="confetti right"></div>
+            <div class="confetti right"></div>
+            <div class="confetti right"></div>
+            <div class="confetti right"></div>
+            <div class="confetti right"></div>
+            <div class="confetti right"></div>
+            <div class="confetti right"></div>
+            <div class="confetti right"></div>
+            <div class="confetti right"></div>
+            <div class="confetti right"></div>
+            <div class="confetti right"></div>
+            <div class="confetti right"></div>
+            <div class="confetti right"></div>
+        </div>
+
+        <div class="card">
+            <div class="input-group">
+                <label class="input-label" for="searchInputNetpay">Employee Number</label>
+
+
+                <div class="input-wrapper">
+
+
+                    <div class="input-with-icon">
+                        <input type="text" id="searchInputNetpay" class="form-input" placeholder="Employee Number..."
+                            autocomplete="on" />
+
+
+
+                        <button type="button" id="micBtn" class="mic-inside-input">
+                            <i class="bi bi-mic-fill"></i>
+                        </button>
+                    </div>
+
+
+
+
+                    <i class="bi bi-search input-icon"></i>
+
+
+
+
+                </div>
+
+                <div id="feedback" class="feedback-text"></div>
+
+            </div>
+            <button id="searchButtonNetpay" class="btn btn-primary">
+                <i class="bi bi-search"></i>
+                Search Employee
+            </button>
+        </div>
+
+        <!-- Microphone Section
+        <div class="mic-section">
+            <button id="micBtn" class="btn btn-primary btn-mic">
+                <i class="bi bi-mic"></i>
+                <span>Start Speaking</span>
+            </button>
+            <div id="feedback" class="feedback-text"></div>
+        </div> -->
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicatorNetpay" class="loading-indicator">
+            <img src="loading.gif" alt="Loading...">
+        </div>
+    </div>
+
+    <!-- Listening Overlay -->
+    <div id="listeningOverlay" class="listening-overlay"></div>
+
+    <!-- Results Section -->
+    <div class="results-section">
+        <h3 id="employeeInfoNetpay" class="employee-info"></h3>
+        <div id="resultsNetpay" class="table-container">
+            <!-- Table will be dynamically inserted here -->
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+    <!-- Admin Section (Upload) -->
+    <div class="admin-section container-admin" style="display: none;">
+
+        <div class="admin-card">
+            <div class="admin-card__header">
+                <div>
+                    <div class="admin-card__eyebrow">Admin · Abstract uploader</div>
+                    <!-- FIX: Updated description text to include .xlsm files -->
+                    <!-- Date: 2026-07-07, Element: upload-abstract-description -->
+                    <p>Select the month and year, then upload an .xlsx or .xlsm file with NETPAY, POS, ONQUEUE, and PLI
+                        sheets.
+                    </p>
+                </div>
+                <div class="summary-chip">Uploading</div>
+            </div>
+
+            <div class="admin-grid">
+                <div class="admin-card__body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="input-label">Month</label>
+                            <select id="monthSelect" class="form-select">
+                                <option value="" disabled selected>Select Month</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="input-label">Year</label>
+                            <select id="yearSelect" class="form-select">
+                                <option value="2025" selected>2025</option>
+                                <option value="2026">2026</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 0.5rem;">
+                        <div class="file-upload-wrapper drop-zone">
+                            <!-- FIX: Extended input accept to allow .xlsm files in addition to .xlsx, updated label text -->
+                            <!-- Date: 2026-07-07, Element: abstractFileInput label and input -->
+                            <label for="abstractFileInput" class="file-upload-label">Choose .xlsx or .xlsm File</label>
+                            <input type="file" id="abstractFileInput" class="file-input" accept=".xlsx,.xlsm"
+                                onchange="updateAbstractFileName()">
+                            <small id="abstractFileName" class="file-name">No file chosen</small>
+                            <div class="file-hint">Drag & drop or click to select your abstract file.</div>
+                        </div>
+                    </div>
+
+                    <div class="convert-actions">
+                        <button id="convertButton" class="btn btn-primary" onclick="convertExcelToCSV()">
+                            <span id="buttonText">CONVERT</span>
+                            <span id="buttonSpinner" class="spinner"></span>
+                        </button>
+                        <div class="convert-hint">Convert to CSV before distributing to your team.</div>
+                    </div>
+
+                    <small id="pliWarning" class="warning-text">Take note: Recheck the PLI file exceeding 25 MB</small>
+
+                    <div id="progressContainer" class="progress-container">
+                        <div class="progress">
+                            <div id="progressBar" class="progress-bar">0%</div>
+                        </div>
+                        <small id="progressText" class="progress-text">Processing...</small>
+                    </div>
+
+                    <div id="downloadButtons" class="download-buttons"></div>
+                </div>
+
+                <div class="upload-summary-card">
+                    <div class="summary-header">
+                        <div>
+                            <div class="summary-eyebrow">Upload cart</div>
+                            <h6 style="margin: 0;">What you'll process</h6>
+                        </div>
+                        <div class="summary-chip">Live</div>
+                    </div>
+                    <div class="summary-list">
+                        <div class="summary-item">
+                            <div>
+                                <div class="summary-label">Month</div>
+                                <div class="summary-value" id="cartMonth">Not selected</div>
+                            </div>
+                            <span class="status-dot idle" id="cartMonthStatus"></span>
+                        </div>
+                        <div class="summary-item">
+                            <div>
+                                <div class="summary-label">Year</div>
+                                <div class="summary-value" id="cartYear">2026</div>
+                            </div>
+                            <span class="status-dot ready"></span>
+                        </div>
+                        <div class="summary-item">
+                            <div>
+                                <div class="summary-label">File</div>
+                                <div class="summary-value" id="cartFile">No file chosen</div>
+                            </div>
+                            <span class="status-dot idle" id="cartFileStatus"></span>
+                        </div>
+                    </div>
+                    <div class="summary-footer">
+                        <span
+                            style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#16a34a;"></span>
+                        <span>Keep this green by picking month, year, and file.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav" style="--theme-color: #4F2683; --theme-rgb: 79, 38, 131;">
+        <a href="index.html" class="bottom-nav-link active">
+            <i class="bi bi-wallet2"></i>
+            <span>NETPAY</span>
+        </a>
+        <a href="index2.html" class="bottom-nav-link">
+            <i class="bi bi-cash-stack"></i>
+            <span>DEDAMT</span>
+        </a>
+        <a href="index3.html" class="bottom-nav-link">
+            <i class="bi bi-hourglass-split"></i>
+            <span>ONQ</span>
+        </a>
+        <a href="index4.html" class="bottom-nav-link">
+            <i class="bi bi-file-earmark-text"></i>
+            <span>PLI</span>
+        </a>
+        <a href="index5.html" class="bottom-nav-link">
+            <i class="bi bi-calculator"></i>
+            <span>LE</span>
+        </a>
+    </div>
+    <div class="admin-section container-admin" style="display: none;">
+        <div class="admin-chip">
+            <div class="admin-card">
+                <h5>Already have the Netpay for <span style="color: #00c12d;" id="month-name"></span>?</h5>
+                <p>Please double check the month and year and make sure it's a CSV File. Example: <u
+                        id="example-file">feb26.csv</u></p>
+
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <div class="upload-chip">
+                        <div class="file-upload-wrapper">
+                            <label for="fileInput" class="file-upload-label">Choose File</label>
+                            <input type="file" id="fileInput" class="file-input" onchange="updateFileName()">
+                            <small id="fileName" class="file-name">No file chosen</small>
+                        </div>
+                        <button onclick="uploadFile()" class="btn btn-success">Upload</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <!-- Floating Speaking Indicator -->
+    <div id="ttsFloating" style="
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #4F2683;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 50px;
+    font-weight: 600;
+    display: none;
+    z-index: 2000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    cursor: pointer;
+">
+    </div>
+
+    <!-- Stop TTS Button -->
+    <button id="stopTTS" style="
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 50px;
+    font-weight: 600;
+    display: none;
+    z-index: 2000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    cursor: pointer;
+">Stop</button>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            syncTheme();
+
+            const resultsSection = document.querySelector(".results-section");
+
+            // Ensure hidden on first load
+            if (resultsSection) resultsSection.style.display = "none";
+        });
+
+        // Ripple Effect for Buttons
+        document.addEventListener('click', function (e) {
+            if (e.target.classList.contains('btn') || e.target.closest('.btn')) {
+                const button = e.target.classList.contains('btn') ? e.target : e.target.closest('.btn');
+                const ripple = document.createElement('span');
+                ripple.classList.add('ripple');
+                const rect = button.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                button.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
+            }
+        });
+
+        // Voice Recognition
+        const micBtn = document.getElementById("micBtn");
+        const feedback = document.getElementById("feedback");
+        const listeningOverlay = document.getElementById("listeningOverlay");
+
+        const listeningSound = new Audio('listening.ogg');
+        const searchingSound = new Audio('searching.ogg');
+
+        function showFeedback(message) {
+            if (feedback) {
+                feedback.textContent = message;
+                feedback.style.display = "block";
+            }
+        }
+
+        function clearFeedback() {
+            if (feedback) {
+                feedback.textContent = "";
+                feedback.style.display = "none";
+            }
+        }
+
+        function showOverlay() {
+            if (listeningOverlay) listeningOverlay.classList.add('active');
+        }
+
+        function hideOverlay() {
+            if (listeningOverlay) listeningOverlay.classList.remove('active');
+        }
+
+        function resetMicButton() {
+            if (micBtn) {
+                micBtn.classList.remove("listening");
+                micBtn.innerHTML = '<i class="bi bi-mic-fill"></i>';
+                micBtn.disabled = false;
+            }
+            hideOverlay();
+        }
+
+        if (micBtn) {
+            micBtn.addEventListener("click", () => {
+                listeningSound.play();
+                micBtn.disabled = true;
+                startListening();
+            });
+        }
+
+        function startListening() {
+            clearFeedback();
+            if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
+                showFeedback("Sorry, your browser does not support speech recognition.");
+                resetMicButton();
+                return;
+            }
+
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'en-US';
+            recognition.interimResults = true;
+            recognition.continuous = false;
+
+            if (micBtn) {
+                micBtn.classList.add("listening");
+                micBtn.innerHTML = `
+        <div class="listening-dots">
+            <span></span><span></span><span></span>
+        </div>
+        `;
+            }
+
+            recognition.start();
+            showOverlay();
+
+            const inputField = document.getElementById('searchInputNetpay');
+            if (inputField) inputField.value = "";
+
+            let finalTranscript = "";
+            let processingTimeout;
+
+            recognition.onresult = (event) => {
+                clearTimeout(processingTimeout);
+                let interimTranscript = "";
+                let currentFinal = "";
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        currentFinal
+                            += event.results[i][0].transcript;
+                    } else { interimTranscript += event.results[i][0].transcript; }
+                } if
+                    (currentFinal) finalTranscript += currentFinal; const combinedTranscript = (finalTranscript +
+                        interimTranscript).toLowerCase().trim(); if (inputField) {
+                            const
+                                digitsOnly = combinedTranscript.match(/\d+/g); if (digitsOnly) inputField.value = digitsOnly.join('');
+                        }
+                processingTimeout = setTimeout(() => {
+                    searchingSound.play();
+                    recognition.stop();
+                    processCommand(combinedTranscript);
+                }, 2000);
+            };
+
+            recognition.onerror = () => {
+                showFeedback("Speech recognition error. Please try again.");
+                recognition.stop();
+                resetMicButton();
+            };
+
+            recognition.onend = () => {
+                resetMicButton();
+            };
+
+            function processCommand(speech) {
+                if (!speech) return;
+                const routes = [
+                    { keywords: ["netpay", "net pay"], file: "index.html" },
+                    { keywords: ["dedamt", "ded amount"], file: "index2.html" },
+                    { keywords: ["onqueue", "on q", "onq"], file: "index3.html" },
+                    { keywords: ["pli"], file: "index4.html" }
+                ];
+                let employeeNumber = "";
+                let matchedRoute = null;
+                for (const route of routes) {
+                    for (const keyword of route.keywords) {
+                        if (speech.startsWith(keyword)) {
+                            matchedRoute = route;
+                            const afterKeyword = speech.substring(keyword.length).trim();
+                            const digits = afterKeyword.match(/\d+/g);
+                            if (digits) employeeNumber = digits.join('');
+                            break;
+                        }
+                    }
+                    if (matchedRoute) break;
+                }
+                if (!matchedRoute) {
+                    const digits = speech.match(/\d+/g);
+                    if (digits) {
+                        employeeNumber = digits.join('');
+                        matchedRoute = routes[0];
+                        document.getElementById("searchInputNetpay").value = employeeNumber;
+                        document.getElementById("searchButtonNetpay").click();
+                        return;
+                    }
+                }
+                if (matchedRoute && employeeNumber) {
+                    localStorage.setItem("employeeNumber", employeeNumber);
+                    if (window.location.pathname.endsWith(matchedRoute.file)) {
+                        document.getElementById("searchInputNetpay").value = employeeNumber;
+                        document.getElementById("searchButtonNetpay").click();
+                    } else {
+                        window.location.href = matchedRoute.file;
+                    }
+                } else {
+                    showFeedback("Not recognized.");
+                }
+            }
+        }
+    </script>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+        let currentUtterance = null;
+        let autoReadDisabled = false; // gate to stop auto TTS when user interacts
+        let ttsEnabled = localStorage.getItem("ttsEnabled") === "false" ? false : true; // default ON
+
+        function disableAutoRead() {
+            autoReadDisabled = true;
+            stopTTS();
+        }
+
+        // If the page was reloaded, don't auto-read results
+        const navEntry = performance.getEntriesByType("navigation")[0];
+        if (navEntry && navEntry.type === "reload") {
+            disableAutoRead();
+        }
+
+        function getFemaleVoice() {
+            const voices = speechSynthesis.getVoices();
+            // Prefer voices that have "female" or "Google UK English Female" etc.
+            return voices.find(v => /female/i.test(v.name)) || voices[0];
+        }
+
+        function readEmployeeResults() {
+            if (!ttsEnabled) return; // Do nothing if TTS is off
+
+            stopTTS(); // stop any previous reading
+
+            const infoEl = document.getElementById("employeeInfoNetpay");
+            const tableEl = document.querySelector("#resultsNetpay table");
+            if (!infoEl || !tableEl) return;
+
+            // === Read NAME only first ===
+            const nameMatch = infoEl.textContent.match(/NAME:\s*(.+)/i);
+            const nameText = nameMatch ? nameMatch[1].trim() : "";
+
+            if (!nameText) return;
+
+            // First utterance: NAME only
+            const nameUtterance = new SpeechSynthesisUtterance(nameText);
+            nameUtterance.voice = getFemaleVoice();
+            nameUtterance.rate = 1;
+            nameUtterance.pitch = 1;
+
+            // Second utterance: table content
+            const headers = Array.from(tableEl.querySelectorAll("thead th")).map(th => th.textContent);
+            const rows = tableEl.querySelectorAll("tbody tr");
+
+            let tableSpeech = "";
+            rows.forEach(row => {
+                const cells = Array.from(row.querySelectorAll("td"));
+                cells.forEach((cell, index) => {
+                    tableSpeech += `${headers[index]}: ${cell.textContent}. `;
+                });
+            });
+
+            const tableUtterance = new SpeechSynthesisUtterance(tableSpeech);
+            tableUtterance.voice = getFemaleVoice();
+            tableUtterance.rate = 1;
+            tableUtterance.pitch = 1;
+
+            // Show floating TTS indicators
+            const floating = document.getElementById("ttsFloating");
+            const stopBtn = document.getElementById("stopTTS");
+            const ttsStopFab = document.getElementById('ttsStopFab');
+
+            if (floating) floating.style.display = "block";
+            if (stopBtn) stopBtn.style.display = "block";
+            if (ttsStopFab) ttsStopFab.classList.add('show');
+
+
+            // When nameUtterance ends, start tableUtterance
+            nameUtterance.onend = () => {
+                speechSynthesis.speak(tableUtterance);
+            };
+
+            tableUtterance.onend = () => {
+                if (floating) floating.style.display = "none";
+                if (stopBtn) stopBtn.style.display = "none";
+                if (ttsStopFab) ttsStopFab.classList.remove('show');
+                currentUtterance = null;
+            };
+
+            // Speak name first
+            currentUtterance = nameUtterance;
+            speechSynthesis.speak(nameUtterance);
+        }
+
+        // Stop TTS function
+        function stopTTS() {
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
+            }
+            const floating = document.getElementById("ttsFloating");
+            const stopBtn = document.getElementById("stopTTS");
+            const ttsStopFab = document.getElementById('ttsStopFab');
+
+            if (floating) floating.style.display = "none";
+            if (stopBtn) stopBtn.style.display = "none";
+            if (ttsStopFab) ttsStopFab.classList.remove('show');
+            currentUtterance = null;
+        }
+
+        // Stop button click
+        const stopTTSButton = document.getElementById("stopTTS");
+        if (stopTTSButton) {
+            stopTTSButton.addEventListener("click", stopTTS);
+        }
+
+        // Stop reading if user clicks into any input-like control
+        document.addEventListener("focusin", (event) => {
+            if (event.target.matches("input, textarea, select")) {
+                disableAutoRead();
+            }
+        });
+
+        // Stop lingering speech on reloads
+        window.addEventListener("pageshow", () => stopTTS());
+
+        // Ensure voices are loaded
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = () => { getFemaleVoice(); };
+        }
+
+        // After results appear, auto-read if not disabled
+        setTimeout(() => {
+            if (autoReadDisabled || !ttsEnabled) return;
+            const table = document.querySelector("#resultsNetpay table");
+            if (table) {
+                readEmployeeResults();
+            }
+        }, 500);
+
+        // =============================
+        // TTS Switch & Toggle Handling
+        // =============================
+
+        const ttsSwitch = document.getElementById("ttsSwitch");
+        const icon = document.querySelector(".slider .icon");
+
+        // Initialize switch and icon
+        if (ttsSwitch) {
+            ttsSwitch.checked = ttsEnabled;
+        }
+        if (icon) {
+            icon.className = ttsEnabled ? "bi bi-volume-up-fill icon" : "bi bi-volume-mute-fill icon";
+        }
+
+        // Listen for switch changes
+        if (ttsSwitch) {
+            ttsSwitch.addEventListener("change", () => {
+                ttsEnabled = ttsSwitch.checked;
+                localStorage.setItem("ttsEnabled", ttsEnabled); // save state
+
+                if (ttsEnabled) {
+                    if (icon) icon.className = "bi bi-volume-up-fill icon";
+                    console.log("TTS ON");
+                } else {
+                    if (icon) icon.className = "bi bi-volume-mute-fill icon";
+                    console.log("TTS OFF");
+                    stopTTS(); // stop ongoing speech immediately
+                }
+            });
+        }
+
+        // Optional separate toggle button (if you have one)
+        const ttsToggleBtn = document.getElementById("ttsToggleBtn");
+        if (ttsToggleBtn) {
+            ttsToggleBtn.innerHTML = ttsEnabled ? '<i class="bi bi-volume-up-fill"></i>' : '<i class="bi bi-volume-mute-fill"></i>';
+            ttsToggleBtn.addEventListener("click", () => {
+                ttsEnabled = !ttsEnabled;
+                localStorage.setItem("ttsEnabled", ttsEnabled);
+                if (ttsSwitch) ttsSwitch.checked = ttsEnabled;
+                if (icon) icon.className = ttsEnabled ? "bi bi-volume-up-fill icon" : "bi bi-volume-mute-fill icon";
+                ttsToggleBtn.innerHTML = ttsEnabled ? '<i class="bi bi-volume-up-fill"></i>' : '<i class="bi bi-volume-mute-fill"></i>';
+                if (!ttsEnabled) stopTTS();
+            });
+        }
+
+        // Auto-fill from localStorage and initial search trigger
+        window.addEventListener("DOMContentLoaded", () => {
+            populateMonthDropdown();
+            populateYearDropdown();
+            const employeeNumber = localStorage.getItem("employeeNumber");
+            if (employeeNumber) {
+                const possibleInputIds = ["searchInputNetpay", "searchInputPos", "searchInputOnq", "searchInputPLI", ""];
+                let inputFieldFound = false;
+                for (const id of possibleInputIds) {
+                    const inputField = document.getElementById(id);
+                    if (inputField) {
+                        inputField.value = employeeNumber;
+                        inputFieldFound = true;
+                        break;
+                    }
+                }
+
+                // If an input field was found and populated, trigger search for Netpay page
+                if (inputFieldFound && document.getElementById("searchInputNetpay")) {
+                    console.log("Retrieved Employee Number for auto-search:", employeeNumber);
+                    // Trigger search automatically
+                    setTimeout(() => {
+                        const searchButton = document.getElementById("searchButtonNetpay");
+                        if (searchButton) searchButton.click();
+                    }, 100);
+                }
+            } else {
+                console.log("No employee number found in localStorage.");
+            }
+        });
+
+        // Excel Upload Functions
+        function populateMonthDropdown() {
+            /* 
+             * CHANGE DETAILS:
+             * Element: monthSelect (id="monthSelect")
+             * Date: 2026-07-07
+             * Fix: Extended loop limit to show the past 12 months instead of the past 3 months.
+             */
+            const months = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"];
+            const currentDate = new Date();
+            const currentMonth = currentDate.getMonth();
+            const monthSelect = document.getElementById("monthSelect");
+            if (!monthSelect) return;
+
+            // Clear existing options except the first one
+            while (monthSelect.children.length > 1) {
+                monthSelect.removeChild(monthSelect.lastChild);
+            }
+
+            // Loop changed from (let i = 2; i >= 0; i--) to (let i = 11; i >= 0; i--)
+            for (let i = 11; i >= 0; i--) {
+                const monthIndex = (currentMonth - i + 12) % 12;
+                const option = document.createElement("option");
+                option.value = months[monthIndex].substring(0, 3).toLowerCase();
+                option.text = months[monthIndex];
+                monthSelect.appendChild(option);
+            }
+        }
+
+        function populateYearDropdown() {
+            const currentYear = new Date().getFullYear();
+            const yearSelect = document.getElementById("yearSelect");
+            if (!yearSelect) return;
+
+            // Clear existing options
+            yearSelect.innerHTML = "";
+
+            // Add current year and some surrounding years
+            for (let year = currentYear - 1; year <= currentYear + 1; year++) {
+                const option = document.createElement("option");
+                option.value = year.toString();
+                option.text = year.toString();
+                if (year === currentYear) option.selected = true;
+                yearSelect.appendChild(option);
+            }
+        }
+
+        function updateAbstractFileName() {
+            const fileInput = document.getElementById("abstractFileInput");
+            const fileName = document.getElementById("abstractFileName");
+            if (fileInput && fileName) {
+                fileName.textContent = fileInput.files.length
+                    ? `Selected file: ${fileInput.files[0].name}`
+                    : "No file chosen";
+            }
+            refreshUploadCart();
+        }
+
+        function refreshUploadCart() {
+            const monthSelect = document.getElementById("monthSelect");
+            const yearSelect = document.getElementById("yearSelect");
+            const fileInput = document.getElementById("abstractFileInput");
+
+            const cartMonth = document.getElementById("cartMonth");
+            const cartYear = document.getElementById("cartYear");
+            const cartFile = document.getElementById("cartFile");
+            const cartMonthStatus = document.getElementById("cartMonthStatus");
+            const cartFileStatus = document.getElementById("cartFileStatus");
+
+            if (monthSelect && cartMonth) {
+                const monthText = monthSelect.selectedIndex > 0
+                    ? monthSelect.options[monthSelect.selectedIndex].text
+                    : "Not selected";
+                cartMonth.textContent = monthText;
+                cartMonthStatus?.classList.toggle("ready", monthSelect.selectedIndex > 0);
+                cartMonthStatus?.classList.toggle("idle", monthSelect.selectedIndex <= 0);
+            }
+
+            if (yearSelect && cartYear) {
+                cartYear.textContent = yearSelect.value || new Date().getFullYear().toString();
+            }
+
+            if (fileInput && cartFile) {
+                cartFile.textContent = fileInput.files.length
+                    ? fileInput.files[0].name
+                    : "No file chosen";
+                const hasFile = fileInput.files.length > 0;
+                cartFileStatus?.classList.toggle("ready", hasFile);
+                cartFileStatus?.classList.toggle("idle", !hasFile);
+            }
+        }
+
+        function updateFileName() {
+            const fileInput = document.getElementById("fileInput");
+            const fileName = document.getElementById("fileName");
+            if (fileInput && fileName) {
+                if (fileInput.files.length > 0) {
+                    fileName.textContent = `Selected file: ${fileInput.files[0].name}`;
+                } else {
+                    fileName.textContent = "No file chosen";
+                }
+            }
+        }
+
+        function getPreviousMonth() {
+            const monthsShort = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const monthsFull = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const currentDate = new Date();
+            const currentMonth = currentDate.getMonth();
+            const previousMonthIndex = (currentMonth - 1 + 12) % 12;
+            return { short: monthsShort[previousMonthIndex], full: monthsFull[previousMonthIndex] };
+        }
+
+        // Initialize admin sections when DOM is ready
+        document.addEventListener("DOMContentLoaded", function () {
+            // Populate dropdowns
+            populateMonthDropdown();
+            populateYearDropdown();
+
+            // Dynamic Year for Example File
+            const exampleFileEl = document.getElementById("example-file");
+            if (exampleFileEl) {
+                const currentYrSuffix = new Date().getFullYear().toString().slice(-2);
+                exampleFileEl.textContent = `feb${currentYrSuffix}.csv`;
+            }
+
+            // Set previous month display
+            const previousMonth = getPreviousMonth();
+            const currentYrSuffix = new Date().getFullYear().toString().slice(-2);
+            const previousMonthText = previousMonth.short.toLowerCase() + currentYrSuffix + '.csv';
+            const monthNameEl = document.getElementById("month-name");
+
+            if (monthNameEl) {
+                monthNameEl.textContent = previousMonth.full;
+            }
+            if (exampleFileEl) {
+                exampleFileEl.textContent = previousMonthText;
+            }
+
+            // Add event listeners
+            const monthSelect = document.getElementById("monthSelect");
+            const yearSelect = document.getElementById("yearSelect");
+            const abstractInput = document.getElementById("abstractFileInput");
+
+            if (monthSelect) monthSelect.addEventListener("change", refreshUploadCart);
+            if (yearSelect) yearSelect.addEventListener("change", refreshUploadCart);
+            if (abstractInput) abstractInput.addEventListener("change", refreshUploadCart);
+
+            refreshUploadCart();
+        });
+
+        async function convertExcelToCSV() {
+            const monthSelect = document.getElementById("monthSelect");
+            const yearSelect = document.getElementById("yearSelect");
+            const fileInput = document.getElementById("abstractFileInput");
+            const progressContainer = document.getElementById("progressContainer");
+            const progressBar = document.getElementById("progressBar");
+            const progressText = document.getElementById("progressText");
+            const convertButton = document.getElementById("convertButton");
+            const buttonText = document.getElementById("buttonText");
+            const buttonSpinner = document.getElementById("buttonSpinner");
+            const pliWarning = document.getElementById("pliWarning");
+            const downloadButtonsContainer = document.getElementById("downloadButtons");
+
+            if (!monthSelect.value || !yearSelect.value) return alert("Please select both month and year.");
+            /* 
+             * CHANGE DETAILS:
+             * Element: file validation check
+             * Date: 2026-07-07
+             * Fix: Support either .xlsx or .xlsm file extension for uploader validation.
+             */
+            if (!fileInput.files.length) return alert("Please select an .xlsx or .xlsm file.");
+
+            if (convertButton) convertButton.disabled = true;
+            if (buttonText) buttonText.style.display = 'none';
+            if (buttonSpinner) buttonSpinner.style.display = 'inline-block';
+            if (progressContainer) progressContainer.style.display = "block";
+            if (progressBar) {
+                progressBar.style.width = "0%";
+                progressBar.textContent = "0%";
+            }
+            if (progressText) progressText.textContent = "Initializing...";
+            if (pliWarning) pliWarning.style.display = "none";
+            if (downloadButtonsContainer) {
+                downloadButtonsContainer.style.display = "none";
+                downloadButtonsContainer.innerHTML = "";
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            const filesToDownload = [];
+
+            const timeout50 = setTimeout(() => {
+                if (progressBar) {
+                    progressBar.style.width = "50%";
+                    progressBar.textContent = "50%";
+                }
+                if (progressText) progressText.textContent = "Working on it (50%)...";
+            }, 5000);
+
+            const timeout80 = setTimeout(() => {
+                if (progressBar) {
+                    progressBar.style.width = "80%";
+                    progressBar.textContent = "80%";
+                }
+                if (progressText) progressText.textContent = "Still processing (80%)...";
+            }, 20000);
+
+            reader.onload = async function (e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: "array" });
+
+                    const sheetsToProcess = [
+                        {
+                            names: ["NETPAY", "Net Pay", "netpay", "net", "NETPAY", "NTHP"],
+                            output: `${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
+                            numberColumn: "H"
+                        },
+                        {
+                            names: ["POS", "pos", "positive", "dedamt", "DED", "CSB", "CSB DEDNS", "POSITIVE", "ALL POSITIVE", "ALL POSITIVES", "CSB POSITIVE"],
+                            output: `pos_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
+                            numberColumn: "N"
+                        },
+                        {
+                            names: ["ONQUEUE", "ONQ", "QUEQUE", "ON QUEUE", "ALL ON QUEUE", "ALL ONQUEUE", "ONQUE", "onQUEUE"],
+                            output: `onq_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
+                            numberColumn: "N"
+                        },
+                        {
+                            names: ["PLI", "pli", "ALL PLIs", "ALL PLI", "ALL PLIS", "allPLIs Dedns"],
+                            output: `pli_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
+                            clearColumns: ["A", "S", "T", "U", "V", "W", "X", "Y", "Z"],
+                            numberColumn: "N"
+                        }
+                    ];
+
+
+                    /* 
+                     * CHANGE DETAILS:
+                     * Element: sheet detection matching logic (presentSheets filtering)
+                     * Date: 2026-07-07
+                     * Fix: Change exact matching to case-insensitive and trimmed string matching to recognize sheets like "onqueue" correctly.
+                     */
+                    const presentSheets = sheetsToProcess.filter(sheetConfig =>
+                        Object.keys(workbook.Sheets).some(name =>
+                            sheetConfig.names.some(configName => configName.toLowerCase() === name.toLowerCase().trim())
+                        )
+                    );
+
+                    if (presentSheets.length === 0) {
+                        alert('No matching sheets found in the Excel file.');
+                        resetUI();
+                        return;
+                    }
+
+                    for (const sheetConfig of presentSheets) {
+                        /* 
+                         * CHANGE DETAILS:
+                         * Element: sheet retrieval logic
+                         * Date: 2026-07-07
+                         * Fix: Retrieve sheet name case-insensitively to match correct key in workbook.Sheets.
+                         */
+                        const sheetName = Object.keys(workbook.Sheets).find(name =>
+                            sheetConfig.names.some(configName => configName.toLowerCase() === name.toLowerCase().trim())
+                        );
+                        let sheet = workbook.Sheets[sheetName];
+
+                        if (sheetConfig.clearColumns) {
+                            const range = XLSX.utils.decode_range(sheet["!ref"]);
+                            for (let col = range.s.c; col <= range.e.c; col++) {
+                                const colLetter = XLSX.utils.encode_col(col);
+                                if (sheetConfig.clearColumns.includes(colLetter)) {
+                                    for (let row = range.s.r; row <= range.e.r; row++) {
+                                        const cellAddress = `${colLetter}${row + 1}`;
+                                        delete sheet[cellAddress];
+                                    }
+                                }
+                            }
+                        }
+
+                        if (sheetConfig.numberColumn) {
+                            const range = XLSX.utils.decode_range(sheet["!ref"]);
+                            const colIndex = XLSX.utils.decode_col(sheetConfig.numberColumn);
+                            for (let row = range.s.r + 1; row <= range.e.r; row++) {
+                                const cellAddress = XLSX.utils.encode_cell({ c: colIndex, r: row });
+                                const cell = sheet[cellAddress];
+                                if (cell && cell.v !== undefined) {
+                                    let val = String(cell.v).replace(/,/g, '');
+                                    const numeric = parseFloat(val);
+                                    if (!isNaN(numeric)) {
+                                        // Save as raw string to prevent XLSX from re-formatting with commas
+                                        const cleanVal = numeric.toFixed(2);
+                                        cell.v = cleanVal;
+                                        cell.t = 's';
+                                        // CRITICAL: Delete formatted text and format string
+                                        delete cell.w;
+                                        delete cell.z;
+                                    }
+                                }
+                            }
+                        }
+
+                        const csv = XLSX.utils.sheet_to_csv(sheet, {
+                            FS: ",",
+                            RS: "\r\n",
+                            blankrows: false
+                        });
+
+                        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+
+                        if (sheetConfig.output.startsWith('pli_') && blob.size > 25 * 1024 * 1024) {
+                            if (pliWarning) pliWarning.style.display = "block";
+                        }
+
+                        filesToDownload.push({
+                            filename: sheetConfig.output,
+                            blob: blob
+                        });
+
+                        if (progressText) progressText.textContent = `Prepared ${sheetConfig.output}`;
+                    }
+
+                    clearTimeout(timeout50);
+                    clearTimeout(timeout80);
+
+                    if (progressBar) {
+                        progressBar.style.width = "100%";
+                        progressBar.textContent = "100%";
+                    }
+                    if (progressText) progressText.textContent = "Conversion complete!";
+
+                    const downloadBtn = document.createElement("button");
+                    downloadBtn.className = "btn btn-success";
+                    downloadBtn.textContent = "Download All Files";
+                    downloadBtn.onclick = () => {
+                        filesToDownload.forEach(file => {
+                            const link = document.createElement('a');
+                            link.href = URL.createObjectURL(file.blob);
+                            link.download = file.filename;
+                            link.style.display = "none";
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                            URL.revokeObjectURL(link.href);
+                        });
+                    };
+                    if (downloadButtonsContainer) {
+                        downloadButtonsContainer.appendChild(downloadBtn);
+                        downloadButtonsContainer.style.display = "block";
+                    }
+
+                    resetUI();
+                } catch (error) {
+                    alert('Error processing the Excel file: ' + error.message);
+                    resetUI();
+                }
+            };
+
+            reader.readAsArrayBuffer(file);
+
+            function resetUI() {
+                if (buttonText) buttonText.style.display = 'inline';
+                if (buttonSpinner) buttonSpinner.style.display = 'none';
+                if (convertButton) convertButton.disabled = false;
+                if (progressContainer) setTimeout(() => progressContainer.style.display = 'none', 2000);
+            }
+        }
+
+        function logout() {
+            console.log("Logging out...");
+            // Add your logout logic here
+            localStorage.removeItem("employeeNumber");
+            // Example: Redirect to login page
+            // window.location.href = "login/index.html";
+        }
+    </script>
+
+    <!-- Floating TTS Stop Button -->
+    <button id="ttsStopFab" class="tts-stop-fab" title="Stop Text to Speech" onclick="stopTTS()">
+        <i class="bi bi-stop-circle-fill"></i>
+    </button>
+
+    <!-- FIX: Added credentialsModal overlay to edit user credentials (usernames, emails, passwords) -->
+    <!-- Date: 2026-07-07, Element: credentialsModal (id="credentialsModal") -->
+    <!-- Function: Allows logged-in users to manage and update system access credentials stored in localStorage -->
+    <div id="credentialsModal"
+        style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); justify-content: center; align-items: center;">
+        <div class="credentials-card"
+            style="background: #222; border: 1px solid #4F2683; border-radius: 12px; max-width: 400px; width: 90%; padding: 25px; color: white; font-family: 'Montserrat', sans-serif; box-shadow: 0 8px 32px rgba(0,0,0,0.5);">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px;">
+                <h5 style="margin: 0; font-family: 'Inter', sans-serif; font-size: 1.25rem; color: #fff;">Change
+                    Credentials</h5>
+                <button onclick="closeCredentialsModal()"
+                    style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; line-height: 1;">&times;</button>
+            </div>
+            <div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; color: #bbb; font-size: 0.9rem;">Select
+                        Account</label>
+                    <select id="modalSelectAccount" onchange="onModalAccountChange()"
+                        style="width: 100%; padding: 8px 12px; background: #333; border: 1px solid #4F2683; color: white; border-radius: 6px;">
+                        <option value="0">Account 1 (Admin - jonathan77)</option>
+                        <option value="1">Account 2 (region7)</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; color: #bbb; font-size: 0.9rem;">Username</label>
+                    <input type="text" id="modalUsername"
+                        style="width: 100%; padding: 8px 12px; background: #333; border: 1px solid #4F2683; color: white; border-radius: 6px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; color: #bbb; font-size: 0.9rem;">Email
+                        Address</label>
+                    <input type="email" id="modalEmail"
+                        style="width: 100%; padding: 8px 12px; background: #333; border: 1px solid #4F2683; color: white; border-radius: 6px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; color: #bbb; font-size: 0.9rem;">Password</label>
+                    <input type="text" id="modalPassword"
+                        style="width: 100%; padding: 8px 12px; background: #333; border: 1px solid #4F2683; color: white; border-radius: 6px;">
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px;">
+                    <button onclick="closeCredentialsModal()"
+                        style="background: #444; border: none; color: white; padding: 8px 16px; border-radius: 6px; cursor: pointer;">Cancel</button>
+                    <button onclick="saveCredentials()"
+                        style="background: #4F2683; border: none; color: white; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold;">Save
+                        Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal functions for credentials management
+        function getAccounts() {
+            let accounts = localStorage.getItem("netpay_accounts");
+            if (!accounts) {
+                accounts = [
+                    { username: "jonathan77", password: "atan77", email: "jonathan77@example.com" },
+                    { username: "region7", password: "ashh7", email: "region7@example.com" }
+                ];
+                localStorage.setItem("netpay_accounts", JSON.stringify(accounts));
+            } else {
+                try {
+                    accounts = JSON.parse(accounts);
+                } catch (e) {
+                    accounts = [
+                        { username: "jonathan77", password: "atan77", email: "jonathan77@example.com" },
+                        { username: "region7", password: "ashh7", email: "region7@example.com" }
+                    ];
+                    localStorage.setItem("netpay_accounts", JSON.stringify(accounts));
+                }
+            }
+            return accounts;
+        }
+
+        function openCredentialsModal() {
+            const modal = document.getElementById("credentialsModal");
+            if (modal) {
+                modal.style.display = "flex";
+                onModalAccountChange();
+            }
+        }
+
+        // Add settings button to target class styles if not defined
+        const settingsStyles = document.createElement("style");
+        settingsStyles.innerHTML = `
+            .settings-btn:hover {
+                transform: scale(1.1);
+                color: #e0e0e0 !important;
+            }
+            .settings-btn {
+                transition: transform 0.2s ease, color 0.2s ease;
+            }
+        `;
+        document.head.appendChild(settingsStyles);
+
+        function closeCredentialsModal() {
+            const modal = document.getElementById("credentialsModal");
+            if (modal) modal.style.display = "none";
+        }
+
+        function onModalAccountChange() {
+            const select = document.getElementById("modalSelectAccount");
+            const index = parseInt(select.value, 10);
+            const accounts = getAccounts();
+            const account = accounts[index];
+
+            if (account) {
+                document.getElementById("modalUsername").value = account.username;
+                document.getElementById("modalEmail").value = account.email || "";
+                document.getElementById("modalPassword").value = account.password;
+            }
+        }
+
+        function saveCredentials() {
+            const select = document.getElementById("modalSelectAccount");
+            const index = parseInt(select.value, 10);
+            const usernameVal = document.getElementById("modalUsername").value.trim();
+            const emailVal = document.getElementById("modalEmail").value.trim();
+            const passwordVal = document.getElementById("modalPassword").value;
+
+            if (!usernameVal || !passwordVal) {
+                alert("Username and Password are required.");
+                return;
+            }
+
+            const accounts = getAccounts();
+            accounts[index] = {
+                username: usernameVal,
+                email: emailVal,
+                password: passwordVal
+            };
+
+            localStorage.setItem("netpay_accounts", JSON.stringify(accounts));
+            alert("Account credentials updated successfully!");
+
+            // If the logged-in user changed their own username, update loggedInUser to keep them logged in
+            const currentLoggedIn = localStorage.getItem("loggedInUser");
+            if (currentLoggedIn === accounts[index].username || (index === 0 && currentLoggedIn === "jonathan77") || (index === 1 && currentLoggedIn === "region7")) {
+                localStorage.setItem("loggedInUser", usernameVal);
+            }
+
+            closeCredentialsModal();
+            // Trigger admin visibility check refresh on the page
+            if (typeof checkLoggedInUser === "function") {
+                checkLoggedInUser();
+            }
+        }
+    </script>
+
+    <script src="index.script"></script>
+    <footer class="app-footer">
+        Developed by John Paul Inso | <span id="appVersion">v1.0.0</span>
+    </footer>
+
+    <script>
+        async function updateVersionDisplay() {
+            try {
+                const response = await fetch('version.json?t=' + Date.now());
+                const data = await response.json();
+                const versionEl = document.getElementById('appVersion');
+                if (versionEl) {
+                    versionEl.textContent = `v${data.version}.${data.build}`;
+                }
+            } catch (err) {
+                console.log("Versioning unavailable");
+            }
+        }
+        updateVersionDisplay();
+    </script>
+</body>
+
+</html>
