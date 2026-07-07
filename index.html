@@ -901,16 +901,102 @@
             }
         }
 
+        /*
+         * CHANGE DETAILS:
+         * Element: updateAbstractFileName() function
+         * Date: 2026-07-07
+         * Fix/Feature: On file select, auto-detect the month (and optionally 2-digit year)
+         *   from the filename using keyword substring matching. If a month is detected,
+         *   auto-set monthSelect to that month so the user doesn't have to pick it manually.
+         *   After detecting, auto-trigger convertButton to start conversion immediately.
+         *
+         * Month keyword mapping (case-insensitive substring):
+         *   "jan" → January, "feb" → February, "mar" → March, "apr" → April,
+         *   "may" → May, "jun" → June, "jul" → July, "aug" → August,
+         *   "sep" → September, "oct" → October, "nov" → November, "dec" → December
+         *
+         * Year detection: looks for 2-digit number 23-30 in the filename (e.g. "jul25")
+         *   and sets yearSelect accordingly.
+         */
         function updateAbstractFileName() {
             const fileInput = document.getElementById("abstractFileInput");
-            const fileName = document.getElementById("abstractFileName");
-            if (fileInput && fileName) {
-                fileName.textContent = fileInput.files.length
-                    ? `Selected file: ${fileInput.files[0].name}`
-                    : "No file chosen";
+            const fileNameDisplay = document.getElementById("abstractFileName");
+            const monthSelect = document.getElementById("monthSelect");
+            const yearSelect = document.getElementById("yearSelect");
+
+            if (!fileInput || !fileInput.files.length) {
+                if (fileNameDisplay) fileNameDisplay.textContent = "No file chosen";
+                refreshUploadCart();
+                return;
             }
+
+            const rawName = fileInput.files[0].name;
+            if (fileNameDisplay) fileNameDisplay.textContent = `Selected file: ${rawName}`;
+
+            // --- Month keyword auto-detection ---
+            // Element: monthAutoDetect - maps short keyword to monthSelect option value
+            const monthKeywords = [
+                { keyword: "jan", value: "jan" },
+                { keyword: "feb", value: "feb" },
+                { keyword: "mar", value: "mar" },
+                { keyword: "apr", value: "apr" },
+                { keyword: "may", value: "may" },
+                { keyword: "jun", value: "jun" },
+                { keyword: "jul", value: "jul" },
+                { keyword: "aug", value: "aug" },
+                { keyword: "sep", value: "sep" },
+                { keyword: "oct", value: "oct" },
+                { keyword: "nov", value: "nov" },
+                { keyword: "dec", value: "dec" }
+            ];
+
+            const lowerName = rawName.toLowerCase();
+            let detectedMonth = null;
+
+            for (const m of monthKeywords) {
+                if (lowerName.includes(m.keyword)) {
+                    detectedMonth = m.value;
+                    break;
+                }
+            }
+
+            // Auto-set monthSelect if a month was detected in the filename
+            if (detectedMonth && monthSelect) {
+                for (let i = 0; i < monthSelect.options.length; i++) {
+                    if (monthSelect.options[i].value === detectedMonth) {
+                        monthSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            // --- Year auto-detection (2-digit: 23–30 range) ---
+            // Element: yearAutoDetect - looks for e.g. "25", "26" in filename
+            if (yearSelect) {
+                const yearMatch = lowerName.match(/\b(2[3-9]|30)\b/);
+                if (yearMatch) {
+                    const fullYear = "20" + yearMatch[1];
+                    for (let i = 0; i < yearSelect.options.length; i++) {
+                        if (yearSelect.options[i].value === fullYear) {
+                            yearSelect.selectedIndex = i;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // Refresh the upload cart display after setting month/year
             refreshUploadCart();
+
+            // --- Auto-trigger convert button ---
+            // Element: convertButtonAutoTrigger - clicks convertButton after a short delay
+            // to allow the UI/cart to update visually before processing starts
+            setTimeout(() => {
+                const btn = document.getElementById("convertButton");
+                if (btn) btn.click();
+            }, 300);
         }
+
 
         function refreshUploadCart() {
             const monthSelect = document.getElementById("monthSelect");
