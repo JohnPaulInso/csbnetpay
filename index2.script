@@ -602,19 +602,45 @@ function displayResultsTablePos(allData) {
         displayedCount += nextBatch.length;
         updateLoadMoreButton();
     }
-
+    // Add load more button with modern premium styling
+    // Element: loadMoreBtn - custom styled pill button for Pos search pagination
     const loadMoreBtn = document.createElement('button');
-    loadMoreBtn.className = 'btn btn-primary';
-    loadMoreBtn.style.margin = '15px auto';
+    loadMoreBtn.className = 'btn';
     loadMoreBtn.style.display = 'none';
+    loadMoreBtn.style.margin = '20px auto';
+    loadMoreBtn.style.padding = '8px 24px';
+    loadMoreBtn.style.borderRadius = '30px';
+    loadMoreBtn.style.background = '#4F2683';
+    loadMoreBtn.style.border = 'none';
+    loadMoreBtn.style.color = 'white';
+    loadMoreBtn.style.fontWeight = '700';
+    loadMoreBtn.style.fontSize = '0.85rem';
+    loadMoreBtn.style.cursor = 'pointer';
+    loadMoreBtn.style.boxShadow = '0 4px 10px rgba(79, 38, 131, 0.2)';
+    loadMoreBtn.style.transition = 'all 0.2s ease';
+    loadMoreBtn.style.alignItems = 'center';
+    loadMoreBtn.style.justifyContent = 'center';
+    loadMoreBtn.style.gap = '6px';
     loadMoreBtn.innerHTML = '<i class="bi bi-chevron-down"></i> Load More';
+
+    loadMoreBtn.onmouseenter = () => {
+        loadMoreBtn.style.transform = 'translateY(-1px)';
+        loadMoreBtn.style.boxShadow = '0 6px 14px rgba(79, 38, 131, 0.3)';
+        loadMoreBtn.style.background = '#3d1c69';
+    };
+    loadMoreBtn.onmouseleave = () => {
+        loadMoreBtn.style.transform = 'none';
+        loadMoreBtn.style.boxShadow = '0 4px 10px rgba(79, 38, 131, 0.2)';
+        loadMoreBtn.style.background = '#4F2683';
+    };
+
     loadMoreBtn.onclick = () => {
         appendRows(LOAD_MORE_STEP);
     };
 
     function updateLoadMoreButton() {
         if (displayedCount < allMonths.length) {
-            loadMoreBtn.style.display = 'block';
+            loadMoreBtn.style.display = 'flex';
             loadMoreBtn.innerHTML = `<i class="bi bi-chevron-down"></i> Load More (${allMonths.length - displayedCount} remaining)`;
         } else {
             loadMoreBtn.style.display = 'none';
