@@ -167,19 +167,36 @@ async function searchEmployeePLI() {
     });
 }
 
+let manifestCache = null;
+
+async function fetchManifest() {
+    if (manifestCache) return manifestCache;
+    try {
+        const res = await fetch('manifest.json');
+        manifestCache = await res.json();
+        return manifestCache;
+    } catch (e) {
+        console.error("Error fetching manifest:", e);
+        return { netpay: [], pos: [], onq: [], pli: [] };
+    }
+}
+
 async function getAvailableFilesPLI() {
+    /*
+     * CHANGE DETAILS:
+     * Element: getAvailableFilesPLI — manifest search
+     * Date: 2026-07-07
+     * Feature: Replaced slow HEAD fetches with manifest.json cache lookup for instant load times.
+     */
+    const manifest = await fetchManifest();
     const sortedFiles = csvFilesPLI
         .map(file => ({ file, date: getDateFromCsvPLI(file) }))
         .filter(entry => entry.date)
         .sort((a, b) => b.date - a.date);
 
-    const checkPromises = sortedFiles.map(entry => 
-        fetch(entry.file, { method: 'HEAD' })
-            .then(res => res.ok ? entry.file : null)
-            .catch(() => null)
-    );
-    const results = await Promise.all(checkPromises);
-    return results.filter(file => file !== null);
+    return sortedFiles
+        .map(entry => entry.file)
+        .filter(file => manifest.pli.includes(file));
 }
 
 async function loadMoreMonthsPLI() {

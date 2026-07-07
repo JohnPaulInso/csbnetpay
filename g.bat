@@ -33,7 +33,8 @@ echo  Commit: "%commitMsg%"
 echo.
 
 :: -- Step 1: Stage all changes --
-echo [1/3] Staging all changes...
+echo [1/3] Regenerating manifest and staging all changes...
+node generate-manifest.js
 git add .
 
 :: -- Step 2: Commit with chosen message --

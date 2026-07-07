@@ -155,14 +155,29 @@ function searchEmployeeOnq() {
     });
 }
 
+let manifestCache = null;
+
+async function fetchManifest() {
+    if (manifestCache) return manifestCache;
+    try {
+        const res = await fetch('manifest.json');
+        manifestCache = await res.json();
+        return manifestCache;
+    } catch (e) {
+        console.error("Error fetching manifest:", e);
+        return { netpay: [], pos: [], onq: [], pli: [] };
+    }
+}
+
 async function getAvailableFilesOnq() {
-    const checkPromises = csvFilesOnq.map(file => 
-        fetch(file, { method: 'HEAD' })
-            .then(res => res.ok ? file : null)
-            .catch(() => null)
-    );
-    const results = await Promise.all(checkPromises);
-    return results.filter(file => file !== null);
+    /*
+     * CHANGE DETAILS:
+     * Element: getAvailableFilesOnq — manifest search
+     * Date: 2026-07-07
+     * Feature: Replaced slow HEAD fetches with manifest.json cache lookup for instant load times.
+     */
+    const manifest = await fetchManifest();
+    return csvFilesOnq.filter(file => manifest.onq.includes(file));
 }
 
 async function loadMoreMonthsOnq() {
