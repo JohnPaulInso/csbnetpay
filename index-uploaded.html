@@ -446,8 +446,43 @@
     cursor: pointer;
 ">Stop</button>
 
-
-
+<!-- =====================================================
+     HARD REFRESH BUTTON
+     Added: 2026-07-08
+     Purpose: Clears PWA/service-worker cache and forces a
+              full page reload. Visible to ALL roles (not admin-only).
+     Element: hardRefreshBtn — fixed bottom-left, subtle pill button
+====================================================== -->
+<button
+    id="hardRefreshBtn"
+    title="Clear cache and reload"
+    onclick="hardRefreshPage()"
+    style="
+        position: fixed;
+        bottom: 16px;
+        left: 16px;
+        background: rgba(0,0,0,0.12);
+        color: rgba(0,0,0,0.45);
+        border: 1px solid rgba(0,0,0,0.12);
+        padding: 5px 13px;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        font-weight: 500;
+        cursor: pointer;
+        z-index: 1500;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        letter-spacing: 0.02em;
+        transition: background 0.2s, color 0.2s;
+        backdrop-filter: blur(4px);
+    "
+    onmouseover="this.style.background='rgba(79,38,131,0.15)';this.style.color='#4F2683';this.style.borderColor='rgba(79,38,131,0.25)'"
+    onmouseout="this.style.background='rgba(0,0,0,0.12)';this.style.color='rgba(0,0,0,0.45)';this.style.borderColor='rgba(0,0,0,0.12)'"
+>
+    <i class="bi bi-arrow-clockwise"></i> Hard Refresh
+</button>
+<!-- END HARD REFRESH BUTTON -->
 
 
 
@@ -1608,9 +1643,67 @@ setTimeout(() => {
         // Only init if the coverage section is in the DOM
         // (it will remain hidden until admin logs in)
         initCoverageTable();
+
+        // FIX: 2026-07-08 — Coverage section visibility watcher
+        // The admin section starts as display:none. When checkLoggedInUser() shows it,
+        // the table may already be populated but the section invisible. Use a
+        // MutationObserver on the body to re-init whenever coverageSection becomes visible.
+        const coverageSec = document.getElementById('coverageSection');
+        if (coverageSec) {
+            const observer = new MutationObserver(() => {
+                if (coverageSec.style.display !== 'none' && coverageAllMonths.length === 0) {
+                    initCoverageTable();
+                }
+            });
+            observer.observe(coverageSec, { attributes: true, attributeFilter: ['style'] });
+        }
     });
     </script>
     <!-- END ADMIN · UPLOAD COVERAGE JavaScript -->
+
+    <!-- =====================================================
+         HARD REFRESH — JavaScript
+         Added: 2026-07-08
+         Purpose: Clears PWA service-worker caches and forces
+                  a full browser reload, bypassing cached assets.
+         Function: hardRefreshPage()
+    ====================================================== -->
+    <script>
+    /**
+     * Function: hardRefreshPage
+     * Added: 2026-07-08
+     * Purpose: Clears all cache storage entries and unregisters
+     *          service workers, then forces a full page reload.
+     *          Available to ALL roles via the hardRefreshBtn.
+     */
+    async function hardRefreshPage() {
+        const btn = document.getElementById('hardRefreshBtn');
+        if (btn) {
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Clearing...';
+            btn.style.pointerEvents = 'none';
+        }
+
+        try {
+            // 1. Clear all Cache Storage entries
+            if ('caches' in window) {
+                const keys = await caches.keys();
+                await Promise.all(keys.map(k => caches.delete(k)));
+            }
+
+            // 2. Unregister all service workers
+            if ('serviceWorker' in navigator) {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                await Promise.all(registrations.map(r => r.unregister()));
+            }
+        } catch (e) {
+            console.warn('Hard refresh cleanup error:', e);
+        }
+
+        // 3. Force reload bypassing cache
+        window.location.reload(true);
+    }
+    </script>
+    <!-- END HARD REFRESH JavaScript -->
 
 </body>
 </html>
