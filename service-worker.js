@@ -2,10 +2,11 @@
  * CHANGE DETAILS:
  * File: service-worker.js
  * Date: 2026-07-08
- * Fix: Bumped cache version to v16 to force clients to discard old fflate-based scripts.
- *      Added available_files.json and index5.html to assets list.
+ * Fix: Bumped cache version to v17.
+ *      Forces browsers to reload updated CSS gradient variables, HTML style blocks,
+ *      and script Load More button changes (single-hue monochromatic theme gradients).
  */
-const CACHE_NAME = "csb-search-v16";
+const CACHE_NAME = "csb-search-v17";
 const ASSETS = [
   "./",
   "index.html",
