@@ -2,11 +2,10 @@
  * CHANGE DETAILS:
  * File: service-worker.js
  * Date: 2026-07-08
- * Fix: Bumped cache version to v17.
- *      Forces browsers to reload updated CSS gradient variables, HTML style blocks,
- *      and script Load More button changes (single-hue monochromatic theme gradients).
+ * Fix: Bumped cache version to v18.
+ *      Forces browsers to reload updated script files reverting fetch requests to raw CSV files directly.
  */
-const CACHE_NAME = "csb-search-v17";
+const CACHE_NAME = "csb-search-v18";
 const ASSETS = [
   "./",
   "index.html",

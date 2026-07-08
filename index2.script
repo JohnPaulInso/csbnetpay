@@ -213,7 +213,7 @@ function searchEmployeePos() {
  * CHANGE DETAILS:
  * Element: filterExistingFilesPos
  * Date: 2026-07-08
- * Fix: Added filterExistingFilesPos utility supporting available_files.json manifest with fallback Gzip HEAD checks.
+ * Fix: Reverted fallback HEAD checks to search for plain CSV files directly instead of .gz files.
  */
 async function filterExistingFilesPos(fileList) {
     try {
@@ -228,8 +228,6 @@ async function filterExistingFilesPos(fileList) {
 
     const existingFiles = await Promise.all(fileList.map(async (file) => {
         try {
-            const response = await fetch(file + '.gz', { method: 'HEAD' });
-            if (response.ok) return file;
             const responseRaw = await fetch(file, { method: 'HEAD' });
             return responseRaw.ok ? file : null;
         } catch {
@@ -244,33 +242,10 @@ async function filterExistingFilesPos(fileList) {
  * CHANGE DETAILS:
  * Element: fetchCSVText
  * Date: 2026-07-08
- * Fix: Replaced fflate library with native browser DecompressionStream API.
- *      No external library required. Tries .gz first, falls back to plain CSV.
+ * Fix: Reverted back to fetching plain CSV files directly, removing the native browser DecompressionStream code.
  */
 async function fetchCSVText(filename) {
-    try {
-        const response = await fetch(filename + '.gz');
-        if (response.ok) {
-            // Use native DecompressionStream - no fflate needed
-            const ds = new DecompressionStream('gzip');
-            const decompressedStream = response.body.pipeThrough(ds);
-            const reader = decompressedStream.getReader();
-            const chunks = [];
-            let done, value;
-            while (({ done, value } = await reader.read()) && !done) {
-                chunks.push(value);
-            }
-            const totalLength = chunks.reduce((sum, c) => sum + c.length, 0);
-            const merged = new Uint8Array(totalLength);
-            let offset = 0;
-            for (const chunk of chunks) { merged.set(chunk, offset); offset += chunk.length; }
-            return new TextDecoder('utf-8').decode(merged);
-        }
-    } catch (e) {
-        console.warn(`Could not load compressed ${filename}.gz, trying fallback:`, e);
-    }
-
-    // Fallback: try plain CSV file
+    // Fetch raw CSV file directly
     const r = await fetch(filename);
     return r.ok ? r.text() : null;
 }

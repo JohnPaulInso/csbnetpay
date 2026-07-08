@@ -34,7 +34,7 @@ echo.
 
 :: -- Step 1: Stage all changes --
 echo [1/3] Generating available_files.json manifest...
-node -e "const fs=require('fs'); const files=fs.readdirSync('.').filter(f => f.endsWith('.csv.gz')).map(f => f.slice(0, -3)); fs.writeFileSync('available_files.json', JSON.stringify(files));"
+node -e "const fs=require('fs'); const files=fs.readdirSync('.').filter(f => f.endsWith('.csv')).sort(); fs.writeFileSync('available_files.json', JSON.stringify(files));"
 
 echo [1/3] Staging all changes...
 git add .

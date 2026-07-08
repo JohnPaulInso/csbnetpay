@@ -172,8 +172,7 @@ async function getAvailableFilesPLI() {
      * CHANGE DETAILS:
      * Element: getAvailableFilesPLI — optimized file verification
      * Date: 2026-07-08
-     * Fix/Feature: Try to fetch available_files.json first for speed optimization.
-     *              Fall back to individual HEAD checking if manifest is not found.
+     * Fix/Feature: Reverted fallback checks to check raw CSV files directly via HEAD.
      */
     try {
         const res = await fetch('available_files.json');
@@ -191,9 +190,9 @@ async function getAvailableFilesPLI() {
         .sort((a, b) => b.date - a.date);
 
     const checkPromises = sortedFiles.map(entry => 
-        fetch(entry.file + '.gz', { method: 'HEAD' })
+        fetch(entry.file, { method: 'HEAD' })
             .then(res => res.ok ? entry.file : null)
-            .catch(() => fetch(entry.file, { method: 'HEAD' }).then(res => res.ok ? entry.file : null).catch(() => null))
+            .catch(() => null)
     );
     const results = await Promise.all(checkPromises);
     return results.filter(file => file !== null);
@@ -255,45 +254,44 @@ async function loadMoreMonthsPLI() {
     renderLoadMoreButtonPLI();
 }
 
-function checkFileExistsPLI(url) {
-    return fetch(url, { method: 'HEAD' })
-        .then(response => response.ok)
-        .catch(() => false);
+function findMostRecentFile() {
+    return new Promise(resolve => {
+        const last12MonthsFilesPLI = csvFilesPLI.slice(0, 12); // Get the 12 most recent file names
+        let fileFound = false;
+
+        function checkNextFile(index) {
+            if (index >= last12MonthsFilesPLI.length) {
+                resolve(null); // No available file found
+                return;
+            }
+
+            const file = last12MonthsFilesPLI[index];
+
+            fetch(file, { method: 'HEAD' }) // Check if the file exists
+                .then(response => {
+                    if (response.ok) {
+                        fileFound = true;
+                        resolve(file); // Return the first available file
+                    } else {
+                        checkNextFile(index + 1); // Check the next file
+                    }
+                })
+                .catch(() => checkNextFile(index + 1)); // Continue checking the next file if there's an error
+        }
+
+        checkNextFile(0);
+    });
 }
-
-
 
 /*
  * CHANGE DETAILS:
  * Element: fetchCSVText
  * Date: 2026-07-08
- * Fix: Replaced fflate library with native browser DecompressionStream API.
- *      No external library required. Tries .gz first, falls back to plain CSV.
+ * Fix: Reverted back to loading plain CSV files directly and removing native DecompressionStream.
  */
 async function fetchCSVText(filename) {
-    try {
-        const response = await fetch(filename + '.gz');
-        if (response.ok) {
-            // Use native DecompressionStream - no fflate needed
-            const ds = new DecompressionStream('gzip');
-            const decompressedStream = response.body.pipeThrough(ds);
-            const reader = decompressedStream.getReader();
-            const chunks = [];
-            let done, value;
-            while (({ done, value } = await reader.read()) && !done) {
-                chunks.push(value);
-            }
-            const totalLength = chunks.reduce((sum, c) => sum + c.length, 0);
-            const merged = new Uint8Array(totalLength);
-            let offset = 0;
-            for (const chunk of chunks) { merged.set(chunk, offset); offset += chunk.length; }
-            return new TextDecoder('utf-8').decode(merged);
-        }
-    } catch (e) {
-        console.warn(`Could not load compressed ${filename}.gz, trying fallback:`, e);
-    }
-
-    // Fallback: try plain CSV file
+    // Fetch raw CSV file directly
+    console.log(`Fetching ${filename} directly...`);
     const response = await fetch(filename);
     if (!response.ok) throw new Error(`Unable to fetch ${filename}`);
     return await response.text();

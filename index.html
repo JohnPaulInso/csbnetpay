@@ -1170,18 +1170,16 @@
                          * CHANGE DETAILS:
                          * Element: convertExcelToCSV
                          * Date: 2026-07-08
-                         * Fix: Compressed CSV text content to gzip Sync format and appended .gz extension to speed up downloads and loading times.
+                         * Fix: Reverted to saving plain CSV files directly without gzip compression to restore raw CSV usage.
                          */
-                        const u8 = fflate.strToU8(csv);
-                        const compressed = fflate.gzipSync(u8, { level: 9 });
-                        const blob = new Blob([compressed], { type: 'application/gzip' });
+                        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
 
-                        if (sheetConfig.output.startsWith('pli_') && u8.length > 25 * 1024 * 1024) {
+                        if (sheetConfig.output.startsWith('pli_') && csv.length > 25 * 1024 * 1024) {
                             if (pliWarning) pliWarning.style.display = "block";
                         }
 
                         filesToDownload.push({
-                            filename: sheetConfig.output + '.gz',
+                            filename: sheetConfig.output,
                             blob: blob
                         });
 
