@@ -208,10 +208,24 @@ function searchEmployeePos() {
         });
 }
 
-// ---------------- FETCH CSV ----------------
+function fetchCSVText(filename) {
+    return fetch(filename + '.gz')
+        .then(response => {
+            if (response.ok) {
+                return response.arrayBuffer().then(arrayBuffer => {
+                    const decompressed = fflate.gunzipSync(new Uint8Array(arrayBuffer));
+                    return fflate.strFromU8(decompressed, true);
+                });
+            }
+            return fetch(filename).then(r => r.ok ? r.text() : null);
+        })
+        .catch(() => {
+            return fetch(filename).then(r => r.ok ? r.text() : null);
+        });
+}
+
 function fetchCSVPos(file) {
-    return fetch(file)
-        .then(r => (r.ok ? r.text() : null))
+    return fetchCSVText(file)
         .then(text => {
             if (!text) return null;
             return {
@@ -318,9 +332,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 async function fetchCustomerData() {
     try {
-        const response = await fetch('customer_information.csv');
-        if (!response.ok) throw new Error("Failed to load customer info");
-        const text = await response.text();
+        const text = await fetchCSVText('customer_information.csv');
         
         const rows = text.split('\n');
         const dataStartIndex = 2; // Data starts at line 3

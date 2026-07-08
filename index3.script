@@ -267,17 +267,28 @@ function findMostRecentFile() {
     });
 }
 
+async function fetchCSVText(filename) {
+    try {
+        const response = await fetch(filename + '.gz');
+        if (response.ok) {
+            const arrayBuffer = await response.arrayBuffer();
+            const decompressed = fflate.gunzipSync(new Uint8Array(arrayBuffer));
+            return fflate.strFromU8(decompressed, true);
+        }
+    } catch (e) {
+        console.warn(`Could not load compressed ${filename}.gz, trying fallback:`, e);
+    }
+    
+    const response = await fetch(filename);
+    if (!response.ok) throw new Error(`Unable to fetch ${filename}`);
+    return await response.text();
+}
+
 function fetchCSVOnq(csvFile) {
     return new Promise((resolve, reject) => {
         const monthName = getMonthNameFromCsvOnq(csvFile);
 
-        fetch(csvFile)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Unable to fetch ${csvFile}. Status: ${response.status}`);
-                }
-                return response.text();
-            })
+        fetchCSVText(csvFile)
             .then(text => {
                 const csvData = parseCSVOnq(text);
                 resolve({ monthName, csvData });
@@ -377,9 +388,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 async function fetchCustomerData() {
     try {
-        const response = await fetch('customer_information.csv');
-        if (!response.ok) throw new Error("Failed to load customer info");
-        const text = await response.text();
+        const text = await fetchCSVText('customer_information.csv');
         
         const rows = text.split('\n');
         const dataStartIndex = 2;

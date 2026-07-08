@@ -643,6 +643,7 @@
 
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="fflate.min.js"></script>
 
     <script>
         let currentUtterance = null;
@@ -1163,14 +1164,16 @@
                             blankrows: false
                         });
 
-                        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                        const u8 = fflate.strToU8(csv);
+                        const compressed = fflate.gzipSync(u8, { level: 9 });
+                        const blob = new Blob([compressed], { type: 'application/gzip' });
 
-                        if (sheetConfig.output.startsWith('pli_') && blob.size > 25 * 1024 * 1024) {
+                        if (sheetConfig.output.startsWith('pli_') && u8.length > 25 * 1024 * 1024) {
                             if (pliWarning) pliWarning.style.display = "block";
                         }
 
                         filesToDownload.push({
-                            filename: sheetConfig.output,
+                            filename: sheetConfig.output + '.gz',
                             blob: blob
                         });
 

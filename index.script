@@ -216,12 +216,26 @@
         return existingFiles.filter(file => file !== null);
     }
 
+    async function fetchCSVText(filename) {
+        try {
+            const response = await fetch(filename + '.gz');
+            if (response.ok) {
+                const arrayBuffer = await response.arrayBuffer();
+                const decompressed = fflate.gunzipSync(new Uint8Array(arrayBuffer));
+                return fflate.strFromU8(decompressed, true);
+            }
+        } catch (e) {
+            console.warn(`Could not load compressed ${filename}.gz, trying fallback:`, e);
+        }
+        
+        const response = await fetch(filename);
+        if (!response.ok) throw new Error(`Unable to fetch ${filename}`);
+        return await response.text();
+    }
+
     async function fetchCSVNetpay(csvFile) {
         try {
-            const response = await fetch(csvFile);
-            if (!response.ok) throw new Error(`Unable to fetch ${csvFile}`);
-
-            const text = await response.text();
+            const text = await fetchCSVText(csvFile);
             return {
                 monthName: getMonthNameFromCsvNetpay(csvFile),
                 csvData: parseCSVNetpay(text),
@@ -299,9 +313,7 @@
     async function fetchCustomerData() {
         console.log("Fetching customer_information.csv...");
         try {
-            const response = await fetch('customer_information.csv');
-            if (!response.ok) throw new Error("Failed to load customer info");
-            const text = await response.text();
+            const text = await fetchCSVText('customer_information.csv');
             
             const rows = text.split('\n');
             const dataStartIndex = 2; // Data starts at line 3 (index 2)

@@ -2,9 +2,9 @@
  * CHANGE DETAILS:
  * File: service-worker.js
  * Date: 2026-07-07
- *      Bumped cache version to v14 to force clients to update immediately and resolve HEAD fetch bugs.
+ *      Bumped cache version to v15 to force clients to update immediately and support offline decompression.
  */
-const CACHE_NAME = "csb-search-v14";
+const CACHE_NAME = "csb-search-v15";
 const ASSETS = [
   "./",
   "index.html",
@@ -18,6 +18,7 @@ const ASSETS = [
   "index2.script",
   "index3.script",
   "index4.script",
+  "fflate.min.js",
   "manifest.json",
   "version.json",
   "citysavings_logo.png",
