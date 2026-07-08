@@ -1401,18 +1401,35 @@
         }
 
 
+        /*
+         * CHANGE DETAILS:
+         * Element: fetchCSVText
+         * Date: 2026-07-08
+         * Fix: Added fetchCSVText utility supporting client-side Gzip decompression with fflate and raw CSV fallback.
+         */
+        async function fetchCSVText(filename) {
+            try {
+                const response = await fetch(filename + '.gz');
+                if (response.ok) {
+                    const arrayBuffer = await response.arrayBuffer();
+                    const decompressed = fflate.gunzipSync(new Uint8Array(arrayBuffer));
+                    return fflate.strFromU8(decompressed, true);
+                }
+            } catch (e) {
+                console.warn(`Could not load compressed ${filename}.gz, trying fallback:`, e);
+            }
+            
+            const response = await fetch(filename);
+            if (!response.ok) throw new Error(`Unable to fetch ${filename}`);
+            return await response.text();
+        }
+
         function fetchCSVNetpay(csvFile) {
             return new Promise((resolve, reject) => {
                 const monthName = getMonthNameFromCsvNetpay(csvFile);
                 const date = getDateFromCsvNetpay(csvFile);
 
-                fetch(csvFile)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`Unable to fetch ${csvFile}`);
-                        }
-                        return response.text();
-                    })
+                fetchCSVText(csvFile)
                     .then(text => {
                         const csvData = parseCSVNetpay(text);
                         resolve({ monthName, csvData, date });
@@ -1654,13 +1671,7 @@
 
                 console.log(`Fetching data from file: ${csvFile}`);
 
-                fetch(csvFile)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`Unable to fetch ${csvFile}. Status: ${response.status}`);
-                        }
-                        return response.text();
-                    })
+                fetchCSVText(csvFile)
                     .then(text => {
                         console.log(`Successfully fetched data from ${csvFile}`);
                         const csvData = parseCSVPos(text);
@@ -2024,13 +2035,7 @@
                 const monthName = getMonthNameFromCsvOnq(csvFile);
                 const date = getDateFromCsvOnq(csvFile);
 
-                fetch(csvFile)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`Unable to fetch ${csvFile}. Status: ${response.status}`);
-                        }
-                        return response.text();
-                    })
+                fetchCSVText(csvFile)
                     .then(text => {
                         const csvData = parseCSVOnq(text);
                         resolve({ monthName, csvData, date });
@@ -2482,13 +2487,7 @@
                 const monthName = getMonthNameFromCsvPLI(csvFile);
                 const date = getDateFromCsvPLI(csvFile);
 
-                fetch(csvFile)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`Unable to fetch ${csvFile}. Status: ${response.status}`);
-                        }
-                        return response.text();
-                    })
+                fetchCSVText(csvFile)
                     .then(text => {
                         const csvData = parseCSVPLI(text);
                         resolve({ monthName, csvData, date });
@@ -3219,13 +3218,7 @@
                     const monthName = getMonthNameFromCsvLCS(csvFile);
                     const date = getDateFromCsvLCS(csvFile);
 
-                    fetch(csvFile)
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error(`Unable to fetch ${csvFile}. Status: ${response.status}`);
-                            }
-                            return response.text();
-                        })
+                    fetchCSVText(csvFile)
                         .then(text => {
                             const csvData = parseCSVLCS(text);
                             resolve({ monthName, csvData, date });
@@ -3562,13 +3555,7 @@
 
             // Function to load and parse CSV file
             function loadprmtnCSV() {
-                fetch("promotion_bracket.csv")
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.text();
-                    })
+                fetchCSVText("promotion_bracket.csv")
                     .then(data => {
                         parsedData = parseCSV(data);
                         console.log("Parsed Data:", parsedData); // Log parsed data for debugging

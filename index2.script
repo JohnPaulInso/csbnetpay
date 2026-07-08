@@ -168,7 +168,8 @@ function searchEmployeePos() {
         }
     }
 
-    Promise.all(files.map(fetchCSVPos))
+    filterExistingFilesPos(files)
+        .then(availableFiles => Promise.all(availableFiles.map(fetchCSVPos)))
         .then(results => {
             const valid = results.filter(Boolean);
             if (!valid.length) {
@@ -206,6 +207,37 @@ function searchEmployeePos() {
         .finally(() => {
             updateUISearchComplete();
         });
+}
+
+/*
+ * CHANGE DETAILS:
+ * Element: filterExistingFilesPos
+ * Date: 2026-07-08
+ * Fix: Added filterExistingFilesPos utility supporting available_files.json manifest with fallback Gzip HEAD checks.
+ */
+async function filterExistingFilesPos(fileList) {
+    try {
+        const res = await fetch('available_files.json');
+        if (res.ok) {
+            const files = await res.json();
+            return fileList.filter(f => files.includes(f));
+        }
+    } catch (err) {
+        console.warn("Could not fetch available_files.json, running fallback HEAD checks:", err);
+    }
+
+    const existingFiles = await Promise.all(fileList.map(async (file) => {
+        try {
+            const response = await fetch(file + '.gz', { method: 'HEAD' });
+            if (response.ok) return file;
+            const responseRaw = await fetch(file, { method: 'HEAD' });
+            return responseRaw.ok ? file : null;
+        } catch {
+            return null;
+        }
+    }));
+
+    return existingFiles.filter(file => file !== null);
 }
 
 /*

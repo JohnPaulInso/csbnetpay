@@ -174,9 +174,9 @@ async function getAvailableFilesOnq() {
     }
 
     const checkPromises = csvFilesOnq.map(file => 
-        fetch(file, { method: 'HEAD' })
+        fetch(file + '.gz', { method: 'HEAD' })
             .then(res => res.ok ? file : null)
-            .catch(() => null)
+            .catch(() => fetch(file, { method: 'HEAD' }).then(res => res.ok ? file : null).catch(() => null))
     );
     const results = await Promise.all(checkPromises);
     return results.filter(file => file !== null);
