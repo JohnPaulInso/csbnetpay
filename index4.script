@@ -837,13 +837,13 @@ function renderLoadMoreButtonPLI() {
          * CHANGE DETAILS:
          * Element: renderLoadMoreButtonPLI — Load More Button
          * Date: 2026-07-08
-         * Fix: Updated gradient to richer maroon-to-red. Simplified minimal pill style.
+         * Fix: Uses var(--btn-gradient) CSS variable for monochromatic theme-aware gradient.
          */
         loadMoreBtn.style.cssText = `
             display: block;
             margin: 16px auto;
             padding: 7px 22px;
-            background: linear-gradient(135deg, #4a0a0d 0%, #7d1c21 60%, #9e2028 100%);
+            background: var(--btn-gradient);
             color: white;
             border: none;
             border-radius: 50px;
@@ -851,7 +851,7 @@ function renderLoadMoreButtonPLI() {
             font-size: 0.8rem;
             letter-spacing: 0.3px;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(96, 14, 18, 0.3);
+            box-shadow: 0 2px 8px rgba(var(--theme-rgb, 96, 14, 18), 0.3);
             transition: all 0.2s ease;
             width: auto;
         `;
@@ -859,11 +859,11 @@ function renderLoadMoreButtonPLI() {
 
         loadMoreBtn.addEventListener('mouseover', () => {
             loadMoreBtn.style.transform = 'translateY(-1px)';
-            loadMoreBtn.style.boxShadow = '0 4px 12px rgba(96, 14, 18, 0.45)';
+            loadMoreBtn.style.boxShadow = '0 4px 12px rgba(var(--theme-rgb, 96, 14, 18), 0.45)';
         });
         loadMoreBtn.addEventListener('mouseout', () => {
             loadMoreBtn.style.transform = 'translateY(0)';
-            loadMoreBtn.style.boxShadow = '0 2px 8px rgba(96, 14, 18, 0.3)';
+            loadMoreBtn.style.boxShadow = '0 2px 8px rgba(var(--theme-rgb, 96, 14, 18), 0.3)';
         });
 
         loadMoreBtn.addEventListener('click', () => {

@@ -25,8 +25,21 @@
 
   <style>
     /* Red Theme Overrides */
+    /*
+     * CHANGE DETAILS:
+     * Element: Red Theme Gradient Variables
+     * Date: 2026-07-08
+     * Fix: Defined monochromatic gradients (shades of red/maroon) for header, button and thead.
+     */
+    body {
+        --nav-gradient: linear-gradient(135deg, #3d070a 0%, #600e12 60%, #80181d 100%) !important;
+        --btn-gradient: linear-gradient(135deg, #470a0d 0%, #600e12 60%, #7d1c21 100%) !important;
+        --btn-hover-gradient: linear-gradient(135deg, #600e12 0%, #7d1c21 60%, #9e2329 100%) !important;
+        --thead-gradient: linear-gradient(135deg, #3d070a 0%, #600e12 100%) !important;
+    }
+
     .navbar {
-      background: var(--theme-color) !important;
+      background: var(--nav-gradient) !important;
     }
 
     .employee-info {
@@ -51,13 +64,13 @@
     }
 
     .btn-primary {
-      background: #600e12;
+      background: var(--btn-gradient) !important;
+      border: none !important;
       box-shadow: 0 4px 12px rgba(96, 14, 18, 0.3);
     }
 
     .btn-primary:hover {
-      background: #7a1318;
-      /* Slightly lighter dark red */
+      background: var(--btn-hover-gradient) !important;
       box-shadow: 0 6px 16px rgba(96, 14, 18, 0.4);
     }
 
@@ -71,7 +84,7 @@
     }
 
     .responsive-table thead {
-      background: #600e12;
+      background: var(--thead-gradient) !important;
     }
 
     /* Prevent text selection from triggering mobile search */
@@ -116,7 +129,7 @@
     syncTheme();
   </script>
   <!-- Mobile Header -->
-  <header class="mobile-header" style="background: #600e12 !important;">
+  <header class="mobile-header" style="background: var(--nav-gradient, #600e12) !important;">
     <img src="citysavings_logo.png" alt="CitySavings"
       style="height: 24px; width: auto; filter: brightness(0) invert(1);">
     <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button>

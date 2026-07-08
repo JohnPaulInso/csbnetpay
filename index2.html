@@ -33,6 +33,19 @@
     <link rel="stylesheet" href="index.css">
 
     <style>
+        /*
+         * CHANGE DETAILS:
+         * Element: Gold Theme Gradient Variables
+         * Date: 2026-07-08
+         * Fix: Defined monochromatic gradients (shades of gold) for header, button and thead.
+         */
+        body {
+            --nav-gradient: linear-gradient(135deg, #4d3200 0%, #6b4600 60%, #8c6000 100%) !important;
+            --btn-gradient: linear-gradient(135deg, #4d3200 0%, #6b4600 60%, #8c6000 100%) !important;
+            --btn-hover-gradient: linear-gradient(135deg, #6b4600 0%, #8c6000 60%, #a87600 100%) !important;
+            --thead-gradient: linear-gradient(135deg, #4d3200 0%, #6b4600 100%) !important;
+        }
+
         /* Prevent text selection from triggering mobile search */
         table td,
         table th {
@@ -95,9 +108,18 @@
             color: #6b4600 !important;
         }
 
+        /*
+         * CHANGE DETAILS:
+         * Element: .btn-primary Button Style Override
+         * Date: 2026-07-08
+         * Fix: Updated btn-primary to use gold gradients instead of solid background color.
+         */
         .btn-primary {
-            background-color: rgba(107, 70, 0, 1) !important;
+            background: var(--btn-gradient) !important;
             border: none !important;
+        }
+        .btn-primary:hover {
+            background: var(--btn-hover-gradient) !important;
         }
 
         /* Dedamt Specific Dropdown */
@@ -157,7 +179,7 @@
         }
         syncTheme();
     </script>
-    <header class="mobile-header" style="background: #6b4600 !important;">
+    <header class="mobile-header" style="background: var(--nav-gradient, #6b4600) !important;">
         <img src="citysavings_logo.png" alt="CitySavings"
             style="height: 24px; width: auto; filter: brightness(0) invert(1);">
         <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button>

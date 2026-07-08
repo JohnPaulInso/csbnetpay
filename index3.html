@@ -25,11 +25,22 @@
 
     <style>
         /* Override to Green Theme */
-
+        /*
+         * CHANGE DETAILS:
+         * Element: Green Theme Gradient Variables
+         * Date: 2026-07-08
+         * Fix: Defined monochromatic gradients (shades of green) for header, button and thead.
+         */
+        body {
+            --nav-gradient: linear-gradient(135deg, #003d10 0%, #00641a 60%, #008021 100%) !important;
+            --btn-gradient: linear-gradient(135deg, #004d13 0%, #00641a 60%, #007d21 100%) !important;
+            --btn-hover-gradient: linear-gradient(135deg, #00641a 0%, #008021 60%, #00a82b 100%) !important;
+            --thead-gradient: linear-gradient(135deg, #003d10 0%, #00641a 100%) !important;
+        }
 
         /* Navbar Green Theme */
         .navbar {
-            background: var(--theme-color) !important;
+            background: var(--nav-gradient) !important;
         }
 
         .nav-link.active {
@@ -44,12 +55,12 @@
 
         /* Button Green Theme */
         .btn-primary {
-            background: linear-gradient(135deg, #00641a 0%, #007d21 100%) !important;
+            background: var(--btn-gradient) !important;
             border: none !important;
         }
 
         .btn-primary:hover {
-            background: linear-gradient(135deg, #007d21 0%, #00a62d 100%) !important;
+            background: var(--btn-hover-gradient) !important;
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(0, 100, 26, 0.3) !important;
         }
@@ -100,7 +111,7 @@
         }
 
         .responsive-table thead {
-            background: linear-gradient(135deg, #00641a 0%, #007d21 100%);
+            background: var(--thead-gradient) !important;
         }
 
         .responsive-table thead th {
@@ -130,7 +141,7 @@
         }
 
         .detail-table thead {
-            background: linear-gradient(135deg, #004d13 0%, #00641a 100%) !important;
+            background: linear-gradient(135deg, #003d10 0%, #004d13 100%) !important;
         }
 
         .detail-table thead th {

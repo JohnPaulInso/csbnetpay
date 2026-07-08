@@ -677,9 +677,14 @@ function displayResultsTablePos(allData) {
 
     const table = document.createElement("table");
     table.className = "responsive-table";
+    /*
+     * CHANGE DETAILS:
+     * Element: Gold table head background
+     * Date: 2026-07-08
+     * Fix: Use var(--thead-gradient) to enable monochromatic gold gradient style.
+     */
     table.innerHTML = `
-        <!-- FIX: 2026-07-07 - Updated header label to reflect Code 339 filter -->
-        <thead style="background:#463009;color:white">
+        <thead style="background:var(--thead-gradient, #463009) !important;color:white">
             <tr>
                 <th><i class="bi bi-calendar3"></i> MONTH</th>
                 <!-- Element: pos-dedamt-header - shows code 339 deduction total per month -->
@@ -743,7 +748,7 @@ function displayResultsTablePos(allData) {
      * CHANGE DETAILS:
      * Element: loadMoreBtn - DEDAMT (POS) Load More Button
      * Date: 2026-07-08
-     * Fix: Redesigned to minimal pill style with gold gradient. Was incorrectly using purple.
+     * Fix: Uses var(--btn-gradient) CSS variable for monochromatic theme-aware gradient.
      */
     const loadMoreBtn = document.createElement('button');
     loadMoreBtn.className = 'btn';
@@ -752,14 +757,14 @@ function displayResultsTablePos(allData) {
         margin: 16px auto;
         padding: 7px 22px;
         border-radius: 50px;
-        background: linear-gradient(135deg, #7a5a0a 0%, #b8860b 50%, #c9960a 100%);
+        background: var(--btn-gradient);
         border: none;
         color: white;
         font-weight: 600;
         font-size: 0.8rem;
         letter-spacing: 0.3px;
         cursor: pointer;
-        box-shadow: 0 2px 8px rgba(139, 105, 20, 0.3);
+        box-shadow: 0 2px 8px rgba(var(--theme-rgb, 107, 70, 0), 0.3);
         transition: all 0.2s ease;
         align-items: center;
         justify-content: center;
@@ -768,11 +773,11 @@ function displayResultsTablePos(allData) {
     `;
 
     loadMoreBtn.onmouseenter = () => {
-        loadMoreBtn.style.boxShadow = '0 4px 12px rgba(139, 105, 20, 0.45)';
+        loadMoreBtn.style.boxShadow = '0 4px 12px rgba(var(--theme-rgb, 107, 70, 0), 0.45)';
         loadMoreBtn.style.transform = 'translateY(-1px)';
     };
     loadMoreBtn.onmouseleave = () => {
-        loadMoreBtn.style.boxShadow = '0 2px 8px rgba(139, 105, 20, 0.3)';
+        loadMoreBtn.style.boxShadow = '0 2px 8px rgba(var(--theme-rgb, 107, 70, 0), 0.3)';
         loadMoreBtn.style.transform = 'translateY(0)';
     };
 

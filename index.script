@@ -191,8 +191,13 @@
                         displayEmployeeInfoNetpay(filteredResults[0].monthName, filteredResults[0].csvData);
                         firstResultShown = true;
                     }
-                    // Update the results table as each new month comes in
-                    displayResultsTableNetpay(filteredResults);
+                    /*
+                     * CHANGE DETAILS:
+                     * Element: searchEmployeeNetpay loop display
+                     * Date: 2026-07-08
+                     * Fix: Removed displayResultsTableNetpay from loop to prevent table rendering
+                     *      and resetting pagination until fetching is fully completed.
+                     */
                 }
             }
 
@@ -635,6 +640,15 @@
             return;
         }
 
+        // Clear old results to prevent duplicates and handle live refresh correctly
+        /*
+         * CHANGE DETAILS:
+         * Element: displayResultsTableNetpay Container Reset
+         * Date: 2026-07-08
+         * Fix: Cleared container innerHTML before appending new table container.
+         */
+        resultsSectionNetpay.innerHTML = '';
+
         // Create table container with responsive wrapper
         const tableContainer = document.createElement('div');
         tableContainer.classList.add('table-container');
@@ -721,7 +735,7 @@
          * CHANGE DETAILS:
          * Element: loadMoreBtn - NETPAY Load More Button
          * Date: 2026-07-08
-         * Fix: Redesigned to minimal pill style with purple gradient. Simpler text, no heavy shadow.
+         * Fix: Uses var(--btn-gradient) CSS variable for monochromatic theme-aware gradient.
          */
         const loadMoreBtn = document.createElement('button');
         loadMoreBtn.className = 'btn';
@@ -730,14 +744,14 @@
             margin: 16px auto;
             padding: 7px 22px;
             border-radius: 50px;
-            background: linear-gradient(135deg, #4F2683 0%, #7B3FC4 100%);
+            background: var(--btn-gradient);
             border: none;
             color: white;
             font-weight: 600;
             font-size: 0.8rem;
             letter-spacing: 0.3px;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(79, 38, 131, 0.25);
+            box-shadow: 0 2px 8px rgba(var(--theme-rgb, 79, 38, 131), 0.25);
             transition: all 0.2s ease;
             align-items: center;
             justify-content: center;
@@ -746,11 +760,11 @@
         `;
 
         loadMoreBtn.onmouseenter = () => {
-            loadMoreBtn.style.boxShadow = '0 4px 12px rgba(79, 38, 131, 0.4)';
+            loadMoreBtn.style.boxShadow = '0 4px 12px rgba(var(--theme-rgb, 79, 38, 131), 0.4)';
             loadMoreBtn.style.transform = 'translateY(-1px)';
         };
         loadMoreBtn.onmouseleave = () => {
-            loadMoreBtn.style.boxShadow = '0 2px 8px rgba(79, 38, 131, 0.25)';
+            loadMoreBtn.style.boxShadow = '0 2px 8px rgba(var(--theme-rgb, 79, 38, 131), 0.25)';
             loadMoreBtn.style.transform = 'translateY(0)';
         };
 

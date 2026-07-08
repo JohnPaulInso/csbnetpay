@@ -14,6 +14,18 @@
     --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.08);
+
+    /*
+     * CHANGE DETAILS:
+     * Element: :root Custom Gradient Properties
+     * Date: 2026-07-08
+     * Fix: Added monochromatic custom gradient variables (lighter and darker shades of the same hue)
+     *      for all themes (purple default).
+     */
+    --nav-gradient: linear-gradient(135deg, #321654 0%, #4F2683 60%, #6832a8 100%);
+    --btn-gradient: linear-gradient(135deg, #321654 0%, #4F2683 60%, #6832a8 100%);
+    --btn-hover-gradient: linear-gradient(135deg, #4f2683 0%, #6832a8 60%, #7d3eb8 100%);
+    --thead-gradient: linear-gradient(135deg, #321654 0%, #4F2683 100%);
 }
 
 /* ===== Touch Feedback Animations ===== */
@@ -304,13 +316,14 @@ body {
 
 
 /* Navigation Styles */
-/* FIX 2026-07-08: Added gradient to navbar for all theme colors */
+/*
+ * CHANGE DETAILS:
+ * Element: .navbar Background
+ * Date: 2026-07-08
+ * Fix: Changed gradient to use var(--nav-gradient) which supports monochromatic lighter/darker shades of the single hue.
+ */
 .navbar {
-    background: linear-gradient(135deg,
-        color-mix(in srgb, var(--theme-color, #4F2683) 80%, #000 20%) 0%,
-        var(--theme-color, #4F2683) 50%,
-        color-mix(in srgb, var(--theme-color, #4F2683) 80%, #fff 20%) 100%
-    );
+    background: var(--nav-gradient) !important;
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -494,19 +507,22 @@ body {
     -webkit-tap-highlight-color: transparent;
 }
 
-/* FIX 2026-07-08: Added gradient to primary buttons matching each page theme */
+/*
+ * CHANGE DETAILS:
+ * Element: .btn-primary Button
+ * Date: 2026-07-08
+ * Fix: Changed gradient to use var(--btn-gradient) and var(--btn-hover-gradient)
+ *      to ensure monochromatic lighter and darker purple / gold / green / maroon gradients.
+ */
 .btn-primary {
-    background: linear-gradient(135deg,
-        color-mix(in srgb, var(--theme-color, #4F2683) 85%, #000 15%) 0%,
-        var(--theme-color, #4F2683) 60%,
-        color-mix(in srgb, var(--theme-color, #4F2683) 75%, #fff 25%) 100%
-    );
+    background: var(--btn-gradient) !important;
     color: white;
     box-shadow: 0 4px 12px rgba(var(--theme-rgb, 79, 38, 131), 0.3);
 }
 
 .btn-primary:hover {
-    filter: brightness(1.1);
+    background: var(--btn-hover-gradient) !important;
+    filter: brightness(1.05);
     box-shadow: 0 6px 16px rgba(var(--theme-rgb, 79, 38, 131), 0.45);
     transform: translateY(-2px);
 }
@@ -667,8 +683,13 @@ body {
 }
 
 .responsive-table thead {
-    /* FIX 2026-07-08: Added gradient to table header for all themed pages */
-    background: linear-gradient(135deg, var(--theme-color, #4F2683) 0%, color-mix(in srgb, var(--theme-color, #4F2683) 70%, #fff 30%) 100%);
+    /*
+     * CHANGE DETAILS:
+     * Element: .responsive-table thead Header
+     * Date: 2026-07-08
+     * Fix: Changed gradient to use var(--thead-gradient) which supports monochromatic shades of the single hue.
+     */
+    background: var(--thead-gradient) !important;
     color: white;
 }
 
@@ -966,7 +987,13 @@ body {
 /* Mobile Enhancements (Web3 Bottom Nav & Logo Header) */
 .mobile-header {
     display: none;
-    background: var(--theme-color, var(--primary-color));
+    /*
+     * CHANGE DETAILS:
+     * Element: .mobile-header Header
+     * Date: 2026-07-08
+     * Fix: Changed gradient to use var(--nav-gradient) for monochromatic themes.
+     */
+    background: var(--nav-gradient, var(--theme-color, var(--primary-color))) !important;
     height: 56px;
     /* Standardize header height */
     padding: 0 1.25rem;
