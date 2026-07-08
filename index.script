@@ -238,20 +238,34 @@
      * CHANGE DETAILS:
      * Element: fetchCSVText
      * Date: 2026-07-08
-     * Fix: Added fetchCSVText utility supporting client-side Gzip decompression with fflate and raw CSV fallback.
+     * Fix: Replaced fflate library with native browser DecompressionStream API.
+     *      No external library required. Tries .gz first, falls back to plain CSV.
+     *      DecompressionStream is supported in Chrome 80+, Edge 80+, Firefox 113+, Safari 16.4+.
      */
     async function fetchCSVText(filename) {
         try {
             const response = await fetch(filename + '.gz');
             if (response.ok) {
-                const arrayBuffer = await response.arrayBuffer();
-                const decompressed = fflate.gunzipSync(new Uint8Array(arrayBuffer));
-                return fflate.strFromU8(decompressed, true);
+                // Use native DecompressionStream - no fflate needed
+                const ds = new DecompressionStream('gzip');
+                const decompressedStream = response.body.pipeThrough(ds);
+                const reader = decompressedStream.getReader();
+                const chunks = [];
+                let done, value;
+                while (({ done, value } = await reader.read()) && !done) {
+                    chunks.push(value);
+                }
+                const totalLength = chunks.reduce((sum, c) => sum + c.length, 0);
+                const merged = new Uint8Array(totalLength);
+                let offset = 0;
+                for (const chunk of chunks) { merged.set(chunk, offset); offset += chunk.length; }
+                return new TextDecoder('utf-8').decode(merged);
             }
         } catch (e) {
             console.warn(`Could not load compressed ${filename}.gz, trying fallback:`, e);
         }
-        
+
+        // Fallback: try plain CSV file
         const response = await fetch(filename);
         if (!response.ok) throw new Error(`Unable to fetch ${filename}`);
         return await response.text();
