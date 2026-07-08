@@ -845,28 +845,38 @@ function renderLoadMoreButtonOnq() {
         loadMoreBtn = document.createElement('button');
         loadMoreBtn.id = 'loadMoreOnqBtn';
         loadMoreBtn.className = 'load-more-btn';
-        loadMoreBtn.style.display = 'block';
-        loadMoreBtn.style.margin = '1.5rem auto';
-        loadMoreBtn.style.padding = '0.6rem 2rem';
-        loadMoreBtn.style.background = 'linear-gradient(135deg, #00641a 0%, #007d21 100%)';
-        loadMoreBtn.style.color = 'white';
-        loadMoreBtn.style.border = 'none';
-        loadMoreBtn.style.borderRadius = '50px';
-        loadMoreBtn.style.fontWeight = '600';
-        loadMoreBtn.style.fontSize = '0.9rem';
-        loadMoreBtn.style.cursor = 'pointer';
-        loadMoreBtn.style.boxShadow = '0 4px 15px rgba(0, 100, 26, 0.2)';
-        loadMoreBtn.style.transition = 'all 0.3s ease';
-        loadMoreBtn.innerHTML = '<i class="bi bi-arrow-down-circle"></i> Load More Months';
+        /*
+         * CHANGE DETAILS:
+         * Element: renderLoadMoreButtonOnq — Load More Button
+         * Date: 2026-07-08
+         * Fix: Updated gradient to richer green. Simplified minimal pill style.
+         */
+        loadMoreBtn.style.cssText = `
+            display: block;
+            margin: 16px auto;
+            padding: 7px 22px;
+            background: linear-gradient(135deg, #005215 0%, #00841f 60%, #00a828 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 100, 26, 0.3);
+            transition: all 0.2s ease;
+            width: auto;
+        `;
+        loadMoreBtn.innerHTML = '<i class="bi bi-chevron-down"></i> Load More';
 
         // Hover animations
         loadMoreBtn.addEventListener('mouseover', () => {
-            loadMoreBtn.style.transform = 'translateY(-2px)';
-            loadMoreBtn.style.boxShadow = '0 6px 20px rgba(0, 100, 26, 0.35)';
+            loadMoreBtn.style.transform = 'translateY(-1px)';
+            loadMoreBtn.style.boxShadow = '0 4px 12px rgba(0, 100, 26, 0.45)';
         });
         loadMoreBtn.addEventListener('mouseout', () => {
             loadMoreBtn.style.transform = 'translateY(0)';
-            loadMoreBtn.style.boxShadow = '0 4px 15px rgba(0, 100, 26, 0.2)';
+            loadMoreBtn.style.boxShadow = '0 2px 8px rgba(0, 100, 26, 0.3)';
         });
 
         // Click handler to load the next batch
@@ -875,7 +885,7 @@ function renderLoadMoreButtonOnq() {
                 const currentBtn = document.getElementById('loadMoreOnqBtn');
                 if (currentBtn) {
                     currentBtn.disabled = false;
-                    currentBtn.innerHTML = '<i class="bi bi-arrow-down-circle"></i> Load More Months';
+                    currentBtn.innerHTML = '<i class="bi bi-chevron-down"></i> Load More';
                 }
             });
         });

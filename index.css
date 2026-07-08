@@ -304,8 +304,13 @@ body {
 
 
 /* Navigation Styles */
+/* FIX 2026-07-08: Added gradient to navbar for all theme colors */
 .navbar {
-    background: var(--theme-color, var(--primary-color));
+    background: linear-gradient(135deg,
+        color-mix(in srgb, var(--theme-color, #4F2683) 80%, #000 20%) 0%,
+        var(--theme-color, #4F2683) 50%,
+        color-mix(in srgb, var(--theme-color, #4F2683) 80%, #fff 20%) 100%
+    );
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -489,16 +494,20 @@ body {
     -webkit-tap-highlight-color: transparent;
 }
 
+/* FIX 2026-07-08: Added gradient to primary buttons matching each page theme */
 .btn-primary {
-    background: var(--theme-color, #4F2683);
+    background: linear-gradient(135deg,
+        color-mix(in srgb, var(--theme-color, #4F2683) 85%, #000 15%) 0%,
+        var(--theme-color, #4F2683) 60%,
+        color-mix(in srgb, var(--theme-color, #4F2683) 75%, #fff 25%) 100%
+    );
     color: white;
     box-shadow: 0 4px 12px rgba(var(--theme-rgb, 79, 38, 131), 0.3);
 }
 
 .btn-primary:hover {
-    background: var(--theme-color, #4F2683);
-    filter: brightness(1.15);
-    box-shadow: 0 6px 16px rgba(var(--theme-rgb, 79, 38, 131), 0.4);
+    filter: brightness(1.1);
+    box-shadow: 0 6px 16px rgba(var(--theme-rgb, 79, 38, 131), 0.45);
     transform: translateY(-2px);
 }
 
@@ -658,7 +667,8 @@ body {
 }
 
 .responsive-table thead {
-    background: var(--theme-color, #4F2683);
+    /* FIX 2026-07-08: Added gradient to table header for all themed pages */
+    background: linear-gradient(135deg, var(--theme-color, #4F2683) 0%, color-mix(in srgb, var(--theme-color, #4F2683) 70%, #fff 30%) 100%);
     color: white;
 }
 
