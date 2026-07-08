@@ -155,29 +155,31 @@ function searchEmployeeOnq() {
     });
 }
 
-let manifestCache = null;
-
-async function fetchManifest() {
-    if (manifestCache) return manifestCache;
-    try {
-        const res = await fetch('manifest.json');
-        manifestCache = await res.json();
-        return manifestCache;
-    } catch (e) {
-        console.error("Error fetching manifest:", e);
-        return { netpay: [], pos: [], onq: [], pli: [] };
-    }
-}
-
 async function getAvailableFilesOnq() {
     /*
      * CHANGE DETAILS:
-     * Element: getAvailableFilesOnq — manifest search
-     * Date: 2026-07-07
-     * Feature: Replaced slow HEAD fetches with manifest.json cache lookup for instant load times.
+     * Element: getAvailableFilesOnq — optimized file verification
+     * Date: 2026-07-08
+     * Fix/Feature: Try to fetch available_files.json first for speed optimization.
+     *              Fall back to individual HEAD checking if manifest is not found.
      */
-    const manifest = await fetchManifest();
-    return csvFilesOnq.filter(file => manifest.onq.includes(file));
+    try {
+        const res = await fetch('available_files.json');
+        if (res.ok) {
+            const files = await res.json();
+            return csvFilesOnq.filter(f => files.includes(f));
+        }
+    } catch (err) {
+        console.warn("Could not fetch available_files.json, running fallback HEAD checks:", err);
+    }
+
+    const checkPromises = csvFilesOnq.map(file => 
+        fetch(file, { method: 'HEAD' })
+            .then(res => res.ok ? file : null)
+            .catch(() => null)
+    );
+    const results = await Promise.all(checkPromises);
+    return results.filter(file => file !== null);
 }
 
 async function loadMoreMonthsOnq() {

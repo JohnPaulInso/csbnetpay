@@ -1071,25 +1071,22 @@
                         {
                             names: ["NETPAY", "Net Pay", "netpay", "net", "NETPAY", "NTHP"],
                             output: `${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
-                            keepColumns: ["B", "C", "D", "E", "F", "G", "H"],
                             numberColumn: "H"
                         },
                         {
                             names: ["POS", "pos", "positive", "dedamt", "DED", "CSB", "CSB DEDNS", "POSITIVE", "ALL POSITIVE", "ALL POSITIVES", "CSB POSITIVE"],
                             output: `pos_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
-                            keepColumns: ["B", "C", "D", "E", "F", "G", "H", "N"],
                             numberColumn: "N"
                         },
                         {
                             names: ["ONQUEUE", "ONQ", "QUEQUE", "ON QUEUE", "ALL ON QUEUE", "ALL ONQUEUE", "ONQUE", "onQUEUE"],
                             output: `onq_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
-                            keepColumns: ["B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M", "N", "P"],
                             numberColumn: "N"
                         },
                         {
                             names: ["PLI", "pli", "ALL PLIs", "ALL PLI", "ALL PLIS", "allPLIs Dedns"],
                             output: `pli_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
-                            keepColumns: ["B", "C", "D", "F", "G", "H", "J", "K", "L", "M", "N", "P"],
+                            clearColumns: ["A", "S", "T", "U", "V", "W", "X", "Y", "Z"],
                             numberColumn: "N"
                         }
                     ];
@@ -1125,11 +1122,11 @@
                         );
                         let sheet = workbook.Sheets[sheetName];
 
-                        if (sheetConfig.keepColumns) {
+                        if (sheetConfig.clearColumns) {
                             const range = XLSX.utils.decode_range(sheet["!ref"]);
                             for (let col = range.s.c; col <= range.e.c; col++) {
                                 const colLetter = XLSX.utils.encode_col(col);
-                                if (!sheetConfig.keepColumns.includes(colLetter)) {
+                                if (sheetConfig.clearColumns.includes(colLetter)) {
                                     for (let row = range.s.r; row <= range.e.r; row++) {
                                         const cellAddress = `${colLetter}${row + 1}`;
                                         delete sheet[cellAddress];
@@ -1298,7 +1295,7 @@
             if (!accounts) {
                 accounts = [
                     { username: "jonathan77", password: "atan77", email: "jonathan77@example.com" },
-                    { username: "region7", password: "salesmenr7", email: "region7@example.com" }
+                    { username: "region7", password: "ashh7", email: "region7@example.com" }
                 ];
                 localStorage.setItem("netpay_accounts", JSON.stringify(accounts));
             } else {
