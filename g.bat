@@ -34,7 +34,7 @@ echo.
 
 :: -- Step 1: Stage all changes --
 echo [1/3] Generating available_files.json manifest...
-powershell -Command "Get-ChildItem -Path @('onq_*.csv.gz', 'pli_*.csv.gz') | ForEach-Object { `$_.Name.Replace('.gz', '') } | ConvertTo-Json -Compress | Out-File -Encoding utf8 available_files.json"
+node -e "const fs=require('fs'); const files=fs.readdirSync('.').filter(f => (f.startsWith('onq_') || f.startsWith('pli_')) && f.endsWith('.csv.gz')).map(f => f.slice(0, -3)); fs.writeFileSync('available_files.json', JSON.stringify(files));"
 
 echo [1/3] Staging all changes...
 git add .
