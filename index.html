@@ -1164,6 +1164,12 @@
                             blankrows: false
                         });
 
+                        /*
+                         * CHANGE DETAILS:
+                         * Element: convertExcelToCSV
+                         * Date: 2026-07-08
+                         * Fix: Compressed CSV text content to gzip Sync format and appended .gz extension to speed up downloads and loading times.
+                         */
                         const u8 = fflate.strToU8(csv);
                         const compressed = fflate.gzipSync(u8, { level: 9 });
                         const blob = new Blob([compressed], { type: 'application/gzip' });

@@ -216,6 +216,12 @@
         return existingFiles.filter(file => file !== null);
     }
 
+    /*
+     * CHANGE DETAILS:
+     * Element: fetchCSVText
+     * Date: 2026-07-08
+     * Fix: Added fetchCSVText utility supporting client-side Gzip decompression with fflate and raw CSV fallback.
+     */
     async function fetchCSVText(filename) {
         try {
             const response = await fetch(filename + '.gz');

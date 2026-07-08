@@ -208,6 +208,12 @@ function searchEmployeePos() {
         });
 }
 
+/*
+ * CHANGE DETAILS:
+ * Element: fetchCSVText
+ * Date: 2026-07-08
+ * Fix: Added fetchCSVText utility supporting client-side Gzip decompression with fflate and raw CSV fallback.
+ */
 function fetchCSVText(filename) {
     return fetch(filename + '.gz')
         .then(response => {
