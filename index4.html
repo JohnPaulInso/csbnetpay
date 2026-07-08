@@ -288,6 +288,65 @@
       }
     });
 
+    // Click-to-Copy for .number-cell elements
+    document.addEventListener('click', function (e) {
+      const numberCell = e.target.closest('.number-cell');
+      if (numberCell) {
+        // Get the text content and clean it
+        const textToCopy = numberCell.textContent.trim();
+        
+        // Copy to clipboard
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(textToCopy).then(() => {
+            showCopiedTooltip(numberCell);
+          }).catch(err => {
+            console.error('Failed to copy:', err);
+            fallbackCopy(textToCopy, numberCell);
+          });
+        } else {
+          fallbackCopy(textToCopy, numberCell);
+        }
+      }
+    });
+
+    // Fallback copy method for older browsers
+    function fallbackCopy(text, element) {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        showCopiedTooltip(element);
+      } catch (err) {
+        console.error('Fallback copy failed:', err);
+      }
+      document.body.removeChild(textArea);
+    }
+
+    // Show "Copied to clipboard" tooltip
+    function showCopiedTooltip(element) {
+      // Remove any existing tooltip
+      const existingTooltip = element.querySelector('.copied-tooltip');
+      if (existingTooltip) {
+        existingTooltip.remove();
+      }
+
+      // Create new tooltip
+      const tooltip = document.createElement('div');
+      tooltip.className = 'copied-tooltip';
+      tooltip.textContent = 'Copied to clipboard';
+      element.style.position = 'relative';
+      element.appendChild(tooltip);
+
+      // Remove tooltip after animation
+      setTimeout(() => {
+        tooltip.remove();
+      }, 1500);
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
       // Theme Sync
       const themeColor = getComputedStyle(document.body).getPropertyValue('--theme-color').trim();

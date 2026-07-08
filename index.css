@@ -697,13 +697,80 @@ body {
     padding: 1rem;
     text-align: left;
     font-weight: 600;
-    font-size: 16px;
+    font-size: 17px;
 }
 
 .responsive-table td {
     padding: 1rem;
     border-bottom: 1px solid #e9ecef;
-    font-size: 16px;
+    font-size: 17px;
+}
+
+/* Click-to-copy number cells */
+.number-cell {
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+    transition: all 0.2s ease;
+}
+
+.number-cell:hover {
+    color: var(--theme-color, #4F2683);
+    transform: scale(1.02);
+}
+
+.number-cell:active {
+    transform: scale(0.98);
+}
+
+/* Copied tooltip */
+.copied-tooltip {
+    position: absolute;
+    top: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--theme-color, #4F2683);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    z-index: 1000;
+    animation: fadeInOut 1.5s ease-in-out;
+    pointer-events: none;
+}
+
+.copied-tooltip::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid var(--theme-color, #4F2683);
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-5px);
+    }
+    20% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+    80% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-5px);
+    }
 }
 
 .responsive-table tbody tr:hover {
@@ -1190,7 +1257,7 @@ body {
     .responsive-table th,
     .responsive-table td {
         padding: 0.75rem;
-        font-size: 12px;
+        font-size: 14px;
     }
 }
 
