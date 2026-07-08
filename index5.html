@@ -140,7 +140,30 @@
 
 
 
-
+    <!-- Clear Cache Button - Visible to All Users -->
+    <div style="padding: 1.5rem 1rem 5rem; text-align: center; background: #f8f9fa;">
+        <button id="clearCacheBtn" onclick="clearAllDataAndReload()" style="
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+            transition: all 0.3s ease;
+        " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(220, 53, 69, 0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(220, 53, 69, 0.3)';">
+            <i class="bi bi-trash3"></i>
+            Clear Cache & Reload
+        </button>
+        <div style="margin-top: 0.5rem; font-size: 0.75rem; color: #6c757d;">
+            Clears all stored data and refreshes the page
+        </div>
+    </div>
 
     <!-- Bottom Navigation -->
     <div class="bottom-nav" style="--theme-color: #003d6b; --theme-rgb: 0, 61, 107;">
@@ -3682,5 +3705,39 @@
 function showErrorCard(container, message) {
     container.innerHTML = `<div class='error-card'><i class='bi bi-exclamation-circle-fill'></i><span>${message}</span></div>`;
     container.className = '';
+}
+</script>
+
+<script>
+async function clearAllDataAndReload() {
+    const btn = document.getElementById('clearCacheBtn');
+    if (btn) {
+        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Clearing...';
+        btn.style.pointerEvents = 'none';
+    }
+    try {
+        localStorage.clear();
+        sessionStorage.clear();
+        if ('caches' in window) {
+            const cacheNames = await caches.keys();
+            await Promise.all(cacheNames.map(cacheName => caches.delete(cacheName)));
+        }
+        if ('serviceWorker' in navigator) {
+            const registrations = await navigator.serviceWorker.getRegistrations();
+            await Promise.all(registrations.map(registration => registration.unregister()));
+        }
+        if (window.indexedDB) {
+            const databases = await window.indexedDB.databases();
+            databases.forEach(db => window.indexedDB.deleteDatabase(db.name));
+        }
+        if (btn) {
+            btn.innerHTML = '<i class="bi bi-check-circle"></i> Cleared! Reloading...';
+            btn.style.background = 'linear-gradient(135deg, #28a745, #218838)';
+        }
+        setTimeout(() => window.location.reload(true), 500);
+    } catch (error) {
+        console.error('Error clearing data:', error);
+        setTimeout(() => window.location.reload(true), 1000);
+    }
 }
 </script>
