@@ -1,10 +1,11 @@
 /* 
  * CHANGE DETAILS:
  * File: service-worker.js
- * Date: 2026-07-07
- *      Bumped cache version to v15 to force clients to update immediately and support offline decompression.
+ * Date: 2026-07-08
+ * Fix: Bumped cache version to v16 to force clients to discard old fflate-based scripts.
+ *      Added available_files.json and index5.html to assets list.
  */
-const CACHE_NAME = "csb-search-v15";
+const CACHE_NAME = "csb-search-v16";
 const ASSETS = [
   "./",
   "index.html",
@@ -18,7 +19,7 @@ const ASSETS = [
   "index2.script",
   "index3.script",
   "index4.script",
-  "fflate.min.js",
+  "available_files.json",
   "manifest.json",
   "version.json",
   "citysavings_logo.png",
