@@ -97,11 +97,7 @@
         <div style="display: flex; align-items: center; gap: 10px;">
             <!-- FIX: Added settings gear button in mobile header -->
             <!-- Date: 2026-07-07, Element: headerSettingsBtnMobile -->
-            <button class="settings-btn" id="headerSettingsBtnMobile" onclick="openCredentialsModal()"
-                title="Manage Credentials"
-                style="background: none; border: none; color: white; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center;">
-                <i class="bi bi-gear-fill"></i>
-            </button>
+         
             <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button>
         </div>
     </header>
@@ -243,10 +239,14 @@
         </div> -->
 
         <!-- Loading Indicator -->
-        <!-- Loading indicator with live progress counter - Date: 2026-07-08 -->
+        <!-- Modern CSS spinner with theme colors - Date: 2026-07-08 -->
         <div id="loadingIndicatorNetpay" class="loading-indicator">
-            <img src="loading.gif" alt="Loading...">
-            <span id="loadingProgressNetpay" style="display:block;font-size:0.8em;margin-top:4px;opacity:0.7;">Searching...</span>
+            <div class="modern-spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-inner"></div>
+                <div class="spinner-dot"></div>
+            </div>
+            <span id="loadingProgressNetpay" class="loading-text">Searching...</span>
         </div>
     </div>
 
@@ -526,7 +526,7 @@
     </div>
 
     <!-- Clear Cache Button - Visible to All Users -->
-    <div style="padding: 1.5rem 1rem 2rem; text-align: center; background: #f8f9fa;">
+    <div style="margin-top:100px;padding: 1.5rem 1rem 2rem; text-align: center;">
         <button id="clearCacheBtn" onclick="clearAllDataAndReload()" style="
             background: linear-gradient(135deg, #dc3545, #c82333);
             color: white;
@@ -1883,7 +1883,9 @@
         const remaining = coverageAllMonths.length - coverageVisibleCount;
         if (remaining > 0) {
             if (loadMoreRow) loadMoreRow.style.display = 'flex';
-            if (loadMoreLabel) loadMoreLabel.textContent = `Load More (${remaining} remaining)`;
+            if (loadMoreLabel) {
+                loadMoreLabel.innerHTML = `Load More <span style="display:inline-block;min-width:3rem;text-align:center;margin-left:0.25rem;">(${remaining})</span>`;
+            }
         } else {
             if (loadMoreRow) loadMoreRow.style.display = 'none';
         }

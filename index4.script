@@ -853,7 +853,9 @@ function renderLoadMoreButtonPLI() {
             transition: all 0.2s ease;
             width: auto;
         `;
-        loadMoreBtn.innerHTML = '<i class="bi bi-chevron-down"></i> Load More';
+        // Calculate remaining months to display count
+        const remainingPLI = existingFilesPLI.length - currentSearchPliIndex;
+        loadMoreBtn.innerHTML = `<i class="bi bi-chevron-down"></i> Load More<span style="display:inline-block;min-width:2.5rem;text-align:center;margin-left:0.25rem;">(${remainingPLI})</span>`;
 
         loadMoreBtn.addEventListener('mouseover', () => {
             loadMoreBtn.style.transform = 'translateY(-1px)';
@@ -869,7 +871,9 @@ function renderLoadMoreButtonPLI() {
                 const currentBtn = document.getElementById('loadMorePliBtn');
                 if (currentBtn) {
                     currentBtn.disabled = false;
-                    currentBtn.innerHTML = '<i class="bi bi-chevron-down"></i> Load More';
+                    // Update count after loading more
+                    const remainingAfterLoad = existingFilesPLI.length - currentSearchPliIndex;
+                    currentBtn.innerHTML = `<i class="bi bi-chevron-down"></i> Load More<span style="display:inline-block;min-width:2.5rem;text-align:center;margin-left:0.25rem;">(${remainingAfterLoad})</span>`;
                 }
             });
         });

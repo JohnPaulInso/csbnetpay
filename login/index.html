@@ -5,230 +5,414 @@
     <title>Netpay Login</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <link rel="manifest" href="/csbnetpay/manifest.json">
-
-    <!-- <link rel="manifest" href="manifest.json"> -->
-
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!--===============================================================================================-->
-    <link rel="icon" type="image/png" href="images/icons/favicon.ico" />
-    <!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.min.css">
-    <!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="fonts/font-awesome-4.7.0/css/font-awesome.min.css">
-    <!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="fonts/iconic/css/material-design-iconic-font.min.css">
-    <!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="vendor/animate/animate.css">
-    <!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="vendor/css-hamburgers/hamburgers.min.css">
-    <!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="vendor/animsition/css/animsition.min.css">
-    <!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="vendor/select2/select2.min.css">
-    <!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="vendor/daterangepicker/daterangepicker.css">
-    <!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="css/util.css">
-    <link rel="stylesheet" type="text/css" href="css/main.css">
-    <!--===============================================================================================-->
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Boldonse&family=Inter:wght@900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
-        rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
-
-
-</head>
-<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-
-<style>
-    /* Autofill text and background styling */
-    input:-webkit-autofill {
-        font-family: 'Montserrat';
-        background-color: #cfcfcf !important;
-        /* Dark background */
-        color: white !important;
-        /* White text */
-        border: 1px solid #222 !important;
-        /* Border color */
-        box-shadow: 0 0 0px 1000px #e7e7e7 inset !important;
-        /* Fix autofill background */
-    }
-
-    /* When autofill is active and the input field is focused */
-    input:-webkit-autofill:focus {
-        background-color: #717171 !important;
-        /* Dark background */
-        border: 1px solid #222 !important;
-        /* Border color */
-        color: white !important;
-        /* White text */
-    }
-
-    /* Ensure autofill placeholder text is white */
-    input:-webkit-autofill::placeholder {
-        color: white !important;
-        /* White placeholder text */
-        border: 1px solid #222 !important;
-        /* Border color */
-    }
-</style>
-
-<body>
-    <div class="limiter">
-        <div class="container-login100" style="background-image: url('images/bg-01.jpg');">
-            <div class="wrap-login100 p-l-20 p-r-20 p-t-65 p-b-54 px-4" style="background-color:#222;">
-                <form class="login100-form validate-form">
-                    <span class="login100-form-title p-b-49 text-white"
-                        style="font-family: 'Inter', sans-serif;font-size:30px">CSB Mobile Netpay</span>
-
-
-                    <div class="wrap-input100 validate-input m-b-23 " data-validate="Username is required">
-                        <span class="label-input100 text-white" style="font-family: 'Montserrat'">Username</span>
-                        <input class="input100 pl-5" type="text" id="username"
-                            style="font-size:15px; font-family: 'Montserrat';background-color: #222; color: white; border: 1px solid #222;"
-                            name="username" placeholder="Type your username">
-                        <span class="focus-input100 px-2" data-symbol="&#128100;"></span>
-                    </div>
-
-
-
-                    <div class="wrap-input100 validate-input" data-validate="Password is required">
-                        <span class="label-input100 text-white" style="font-family: 'Montserrat'">Password</span>
-                        <input class="input100 pl-5" type="password" id="password"
-                            style="font-size:15px; font-family: 'Montserrat'; background-color: #222; color: white; border: 1px solid #222;"
-                            name="pass" placeholder="Type your password">
-                        <span class="focus-input100 px-2" data-symbol="&#128274;"></span>
-                        <!-- Show/Hide Password Toggle -->
-                        <input type="checkbox" id="togglePassword" class="position-absolute"
-                            style="bottom: 10px; right: 10px;" onclick="togglePasswordVisibility()">
-                    </div>
-
-                    <script>
-                        // Toggle password visibility
-                        function togglePasswordVisibility() {
-                            const passwordField = document.getElementById("password");
-                            const togglePassword = document.getElementById("togglePassword");
-
-                            if (togglePassword.checked) {
-                                passwordField.type = "text";  // Show the password
-                            } else {
-                                passwordField.type = "password";  // Hide the password
-                            }
-                        }
-                    </script>
-
-
-                    <div class="container-login100-form-btn p-t-30">
-                        <div class="wrap-login100-form-btn">
-                            <div class="login100-form-bgbtn"></div>
-                            <button type="button" class="login100-form-btn" id="login-btn"
-                                style="font-family: 'Montserrat'" onclick="startLoading()">
-                                <span id="login-text"><b>Login</b></span>
-                                <div id="loading-spinner" class="spinner" style="display: none;"></div>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="flex-col-c p-t-55">
-                        <span class="txt1 p-b-17 text-gray" style="font-family:'Montserrat'">No Account? Contact
-                            Administrator</span>
-                        <a href="#" class="txt2 text-white"
-                            style="font-family:'Montserrat'; margin-bottom: 10px;">Contact</a>
-
-                        <!-- FIX: Added 'Change Credentials' button to allow editing usernames, emails and passwords -->
-                        <!-- Date: 2026-07-07, Element: change-credentials-link -->
-                        <a href="javascript:void(0);" id="change-credentials-link" onclick="openCredentialsModal()"
-                            class="txt2 text-white"
-                            style="font-family:'Montserrat'; text-decoration: underline; font-weight: bold; margin-top: 10px;">Change
-                            Credentials (Email/Password)</a>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- FIX: Added credentialsModal popup modal to configure stored user accounts -->
-    <!-- Date: 2026-07-07, Element: credentialsModal (id="credentialsModal") -->
-    <!-- Function: A modal overlay allowing users to change emails, usernames, and passwords of pre-existing accounts. -->
-    <div id="credentialsModal"
-        style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); justify-content: center; align-items: center;">
-        <div class="credentials-card"
-            style="background: #222; border: 1px solid #4F2683; border-radius: 12px; max-width: 400px; width: 90%; padding: 25px; color: white; font-family: 'Montserrat', sans-serif; box-shadow: 0 8px 32px rgba(0,0,0,0.5);">
-            <div
-                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px;">
-                <h5 style="margin: 0; font-family: 'Inter', sans-serif; font-size: 1.25rem; color: #fff;">Change
-                    Credentials</h5>
-                <button onclick="closeCredentialsModal()"
-                    style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; line-height: 1;">&times;</button>
-            </div>
-            <div>
-                <div style="margin-bottom: 15px;">
-                    <label style="display: block; margin-bottom: 5px; color: #bbb; font-size: 0.9rem;">Select
-                        Account</label>
-                    <select id="modalSelectAccount" onchange="onModalAccountChange()"
-                        style="width: 100%; padding: 8px 12px; background: #333; border: 1px solid #4F2683; color: white; border-radius: 6px;">
-                        <option value="0">Account 1 (Admin - jonathan77)</option>
-                        <option value="1">Account 2 (region7)</option>
-                    </select>
-                </div>
-                <div style="margin-bottom: 15px;">
-                    <label style="display: block; margin-bottom: 5px; color: #bbb; font-size: 0.9rem;">Username</label>
-                    <input type="text" id="modalUsername"
-                        style="width: 100%; padding: 8px 12px; background: #333; border: 1px solid #4F2683; color: white; border-radius: 6px;">
-                </div>
-                <div style="margin-bottom: 15px;">
-                    <label style="display: block; margin-bottom: 5px; color: #bbb; font-size: 0.9rem;">Email
-                        Address</label>
-                    <input type="email" id="modalEmail"
-                        style="width: 100%; padding: 8px 12px; background: #333; border: 1px solid #4F2683; color: white; border-radius: 6px;">
-                </div>
-                <div style="margin-bottom: 15px;">
-                    <label style="display: block; margin-bottom: 5px; color: #bbb; font-size: 0.9rem;">Password</label>
-                    <input type="text" id="modalPassword"
-                        style="width: 100%; padding: 8px 12px; background: #333; border: 1px solid #4F2683; color: white; border-radius: 6px;">
-                </div>
-                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px;">
-                    <button onclick="closeCredentialsModal()"
-                        style="background: #444; border: none; color: white; padding: 8px 16px; border-radius: 6px; cursor: pointer;">Cancel</button>
-                    <button onclick="saveCredentials()"
-                        style="background: #4F2683; border: none; color: white; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold;">Save
-                        Changes</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <link rel="icon" type="image/png" href="../favicon.png" />
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            position: fixed;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a0b2e 0%, #2d1657 25%, #4F2683 50%, #6b35a8 75%, #8b4fc7 100%);
+            position: relative;
+        }
+
+        /* Static background elements for depth */
+        .bg-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.3;
+            pointer-events: none;
+            will-change: transform;
+        }
+
+        .orb1 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, #f39c12 0%, transparent 70%);
+            top: -100px;
+            left: -100px;
+        }
+
+        .orb2 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, #8b4fc7 0%, transparent 70%);
+            bottom: -150px;
+            right: -150px;
+        }
+
+        .login-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 440px;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 48px 40px;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.3),
+                0 0 80px rgba(79, 38, 131, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #4F2683, #6b35a8);
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            color: white;
+            margin-bottom: 20px;
+            box-shadow: 
+                0 10px 30px rgba(79, 38, 131, 0.4),
+                0 0 60px rgba(79, 38, 131, 0.2);
+        }
+
+        h1 {
+            font-family: 'Inter', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: #9ca3af;
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 16px 14px 48px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #f9fafb;
+            color: #1f2937;
+        }
+
+        input:hover {
+            border-color: #d1d5db;
+            background: #ffffff;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #4F2683;
+            background: white;
+            box-shadow: 
+                0 0 0 4px rgba(79, 38, 131, 0.1),
+                0 8px 20px rgba(79, 38, 131, 0.15);
+            transform: translateY(-2px);
+        }
+
+        input:focus + .input-icon {
+            color: #4F2683;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 6px;
+            z-index: 2;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+        }
+
+        .password-toggle:hover {
+            color: #4F2683;
+            background: rgba(79, 38, 131, 0.1);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .password-toggle:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
+            color: #1a1a2e;
+            box-shadow: 0 4px 16px rgba(243, 156, 18, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .login-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .login-btn:hover::before {
+            opacity: 1;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 
+                0 8px 24px rgba(243, 156, 18, 0.5),
+                0 0 60px rgba(243, 156, 18, 0.3);
+        }
+
+        .login-btn:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .spinner {
             width: 20px;
             height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-top: 3px solid white;
+            border: 3px solid rgba(26, 26, 46, 0.3);
+            border-top: 3px solid #1a1a2e;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            animation: spin 0.8s linear infinite;
             display: inline-block;
+            margin-left: 8px;
+            vertical-align: middle;
         }
 
         @keyframes spin {
-            0% {
-                transform: rotate(0deg);
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .footer-links {
+            margin-top: 32px;
+            text-align: center;
+        }
+
+        .footer-text {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .footer-link {
+            color: #4F2683;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+
+        .footer-link:hover {
+            background: rgba(79, 38, 131, 0.1);
+            color: #6b35a8;
+            transform: translateY(-2px);
+        }
+
+        .footer-link:active {
+            transform: translateY(0);
+        }
+
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
+            margin: 24px 0;
+        }
+
+        /* Autofill styling */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0px 1000px #f9fafb inset !important;
+            -webkit-text-fill-color: #1f2937 !important;
+            border-color: #4F2683 !important;
+        }
+
+        /* Ripple effect on button click */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            transform: scale(0);
+            animation: rippleEffect 0.6s ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes rippleEffect {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .login-card {
+                padding: 40px 32px;
             }
 
-            100% {
-                transform: rotate(360deg);
+            h1 {
+                font-size: 24px;
+            }
+
+            .logo {
+                width: 70px;
+                height: 70px;
+                font-size: 32px;
+            }
+
+            .bg-orb {
+                filter: blur(80px);
             }
         }
     </style>
+</head>
+
+<body>
+    <!-- Static background orbs -->
+    <div class="bg-orb orb1"></div>
+    <div class="bg-orb orb2"></div>
+
+    <!-- Login container -->
+    <div class="login-container">
+        <div class="login-card">
+            <div class="logo-section">
+                <div class="logo">
+                    <i class="bi bi-wallet2"></i>
+                </div>
+                <h1>CSB Mobile Netpay</h1>
+                <p class="subtitle">Secure payroll management system</p>
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username or Email</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="username" placeholder="Enter your username" autocomplete="username" required>
+                        <i class="bi bi-person-fill input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password" required>
+                        <i class="bi bi-lock-fill input-icon"></i>
+                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility()">
+                            <i class="bi bi-eye" id="toggleIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="login-btn" id="loginBtn">
+                    <span id="loginText">Login</span>
+                    <span id="loadingSpinner" class="spinner" style="display: none;"></span>
+                </button>
+            </form>
+
+            <div class="divider"></div>
+
+            <div class="footer-links">
+                <p class="footer-text">Need help accessing your account?</p>
+                <a href="#" class="footer-link">
+                    <i class="bi bi-envelope-fill"></i> Contact Administrator
+                </a>
+            </div>
+        </div>
+    </div>
 
     <script>
-        /* 
-         * CHANGE DETAILS:
-         * Element: netpay_accounts localStorage initialization
-         * Date: 2026-07-07
-         * Fix: Dynamically initialize user credentials list if not set in localStorage.
-         */
+        // Initialize accounts in localStorage
         function getAccounts() {
             let accounts = localStorage.getItem("netpay_accounts");
             if (!accounts) {
@@ -251,18 +435,56 @@
             return accounts;
         }
 
-        function startLoading() {
-            let loginText = document.getElementById("login-text");
-            let loadingSpinner = document.getElementById("loading-spinner");
-            let loginBtn = document.getElementById("login-btn");
+        // Toggle password visibility
+        function togglePasswordVisibility() {
+            const passwordField = document.getElementById("password");
+            const toggleIcon = document.getElementById("toggleIcon");
 
-            // Hide text and show spinner
+            if (passwordField.type === "password") {
+                passwordField.type = "text";
+                toggleIcon.className = "bi bi-eye-slash";
+            } else {
+                passwordField.type = "password";
+                toggleIcon.className = "bi bi-eye";
+            }
+        }
+
+        // Ripple effect on button click
+        function createRipple(event) {
+            const button = event.currentTarget;
+            const ripple = document.createElement('span');
+            const rect = button.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = event.clientX - rect.left - size / 2;
+            const y = event.clientY - rect.top - size / 2;
+
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            ripple.classList.add('ripple');
+
+            button.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+        }
+
+        // Form submission
+        document.getElementById("loginForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            startLoading();
+        });
+
+        document.getElementById("loginBtn").addEventListener("click", createRipple);
+
+        function startLoading() {
+            const loginText = document.getElementById("loginText");
+            const loadingSpinner = document.getElementById("loadingSpinner");
+            const loginBtn = document.getElementById("loginBtn");
+
             loginText.style.display = "none";
             loadingSpinner.style.display = "inline-block";
-            loginBtn.disabled = true; // Disable button during loading
+            loginBtn.disabled = true;
 
             setTimeout(() => {
-                // Restore button text and call login function
                 loadingSpinner.style.display = "none";
                 loginText.style.display = "inline";
                 loginBtn.disabled = false;
@@ -270,117 +492,31 @@
             }, 700);
         }
 
-        // Function to handle login
         function login() {
             const usernameInput = document.getElementById("username").value.trim().toLowerCase();
             const passwordInput = document.getElementById("password").value;
 
             const accounts = getAccounts();
-            /* 
-             * CHANGE DETAILS:
-             * Element: login form validation
-             * Date: 2026-07-07
-             * Fix: Match input username against either username or email in the dynamically loaded accounts database.
-             */
             const matchedAccount = accounts.find(acc =>
-                (acc.username.toLowerCase() === usernameInput || (acc.email && acc.email.toLowerCase() === usernameInput)) &&
+                (acc.username.toLowerCase() === usernameInput || 
+                (acc.email && acc.email.toLowerCase() === usernameInput)) &&
                 acc.password === passwordInput
             );
 
             if (matchedAccount) {
-                // Store the login time and username in localStorage
                 localStorage.setItem("loginTime", new Date().getTime());
-                localStorage.setItem("loggedInUser", matchedAccount.username); // Store logged-in username
-
-                // Redirect to index.html after successful login
+                localStorage.setItem("loggedInUser", matchedAccount.username);
                 window.location.href = "../index.html";
             } else {
                 alert("Invalid username/email or password");
             }
         }
 
-        // Credentials Modal Functions
-        function openCredentialsModal() {
-            const modal = document.getElementById("credentialsModal");
-            if (modal) {
-                modal.style.display = "flex";
-                onModalAccountChange();
-            }
-        }
-
-        function closeCredentialsModal() {
-            const modal = document.getElementById("credentialsModal");
-            if (modal) modal.style.display = "none";
-        }
-
-        function onModalAccountChange() {
-            const select = document.getElementById("modalSelectAccount");
-            const index = parseInt(select.value, 10);
-            const accounts = getAccounts();
-            const account = accounts[index];
-
-            if (account) {
-                document.getElementById("modalUsername").value = account.username;
-                document.getElementById("modalEmail").value = account.email || "";
-                document.getElementById("modalPassword").value = account.password;
-            }
-        }
-
-        function saveCredentials() {
-            const select = document.getElementById("modalSelectAccount");
-            const index = parseInt(select.value, 10);
-            const usernameVal = document.getElementById("modalUsername").value.trim();
-            const emailVal = document.getElementById("modalEmail").value.trim();
-            const passwordVal = document.getElementById("modalPassword").value;
-
-            if (!usernameVal || !passwordVal) {
-                alert("Username and Password are required.");
-                return;
-            }
-
-            const accounts = getAccounts();
-            accounts[index] = {
-                username: usernameVal,
-                email: emailVal,
-                password: passwordVal
-            };
-
-            localStorage.setItem("netpay_accounts", JSON.stringify(accounts));
-            alert("Account credentials updated successfully!");
-            closeCredentialsModal();
+        // Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('../service-worker.js');
         }
     </script>
-
-
 </body>
-
-
-
-<script>
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('service-worker.js');
-    }
-</script>
-
-
-
-<div id="dropDownSelect1"></div>
-
-<!--===============================================================================================-->
-<script src="vendor/jquery/jquery-3.2.1.min.js"></script>
-<!--===============================================================================================-->
-<script src="vendor/animsition/js/animsition.min.js"></script>
-<!--===============================================================================================-->
-<script src="vendor/bootstrap/js/popper.js"></script>
-<script src="vendor/bootstrap/js/bootstrap.min.js"></script>
-<!--===============================================================================================-->
-<script src="vendor/select2/select2.min.js"></script>
-<!--===============================================================================================-->
-<script src="vendor/daterangepicker/moment.min.js"></script>
-<script src="vendor/daterangepicker/daterangepicker.js"></script>
-<!--===============================================================================================-->
-<script src="vendor/countdowntime/countdowntime.js"></script>
-<!--===============================================================================================-->
-<script src="js/main.js"></script>
 
 </html>

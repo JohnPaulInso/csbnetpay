@@ -764,7 +764,7 @@ function displayResultsTablePos(allData) {
         if (displayedCount < allMonths.length) {
             const remaining = allMonths.length - displayedCount;
             loadMoreBtn.style.display = 'flex';
-            loadMoreBtn.innerHTML = `<i class="bi bi-chevron-down"></i> Load More &nbsp;<span style="opacity:0.75;font-size:0.75em;">(${remaining})</span>`;
+            loadMoreBtn.innerHTML = `<i class="bi bi-chevron-down"></i> Load More<span style="display:inline-block;min-width:2.5rem;text-align:center;margin-left:0.25rem;">(${remaining})</span>`;
         } else {
             loadMoreBtn.style.display = 'none';
         }

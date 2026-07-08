@@ -843,7 +843,9 @@ function renderLoadMoreButtonOnq() {
             transition: all 0.2s ease;
             width: auto;
         `;
-        loadMoreBtn.innerHTML = '<i class="bi bi-chevron-down"></i> Load More';
+        // Calculate remaining months to display count
+        const remainingOnq = existingFilesOnq.length - currentOnqFileIndex;
+        loadMoreBtn.innerHTML = `<i class="bi bi-chevron-down"></i> Load More<span style="display:inline-block;min-width:2.5rem;text-align:center;margin-left:0.25rem;">(${remainingOnq})</span>`;
 
         // Hover animations
         loadMoreBtn.addEventListener('mouseover', () => {
@@ -861,7 +863,9 @@ function renderLoadMoreButtonOnq() {
                 const currentBtn = document.getElementById('loadMoreOnqBtn');
                 if (currentBtn) {
                     currentBtn.disabled = false;
-                    currentBtn.innerHTML = '<i class="bi bi-chevron-down"></i> Load More';
+                    // Update count after loading more
+                    const remainingAfterLoad = existingFilesOnq.length - currentOnqFileIndex;
+                    currentBtn.innerHTML = `<i class="bi bi-chevron-down"></i> Load More<span style="display:inline-block;min-width:2.5rem;text-align:center;margin-left:0.25rem;">(${remainingAfterLoad})</span>`;
                 }
             });
         });

@@ -203,8 +203,14 @@
     </div>
 
     <!-- Loading Indicator -->
+    <!-- Modern CSS spinner with red theme - Date: 2026-07-08 -->
     <div id="loadingIndicatorPLI" class="loading-indicator">
-      <img src="loading.gif" alt="Loading...">
+      <div class="modern-spinner">
+        <div class="spinner-ring"></div>
+        <div class="spinner-inner"></div>
+        <div class="spinner-dot"></div>
+      </div>
+      <span class="loading-text">Searching...</span>
     </div>
   </div>
 
@@ -217,31 +223,6 @@
     <div id="resultsPLI" class="table-container">
       <!-- Table will be dynamically inserted here -->
     </div>
-  </div>
-
-  <!-- Clear Cache Button - Visible to All Users -->
-  <div style="padding: 1.5rem 1rem 5rem; text-align: center; background: #f8f9fa;">
-      <button id="clearCacheBtn" onclick="clearAllDataAndReload()" style="
-          background: linear-gradient(135deg, #dc3545, #c82333);
-          color: white;
-          border: none;
-          padding: 0.75rem 1.5rem;
-          border-radius: 10px;
-          font-size: 0.875rem;
-          font-weight: 600;
-          cursor: pointer;
-          display: inline-flex;
-          align-items: center;
-          gap: 0.5rem;
-          box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
-          transition: all 0.3s ease;
-      " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(220, 53, 69, 0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(220, 53, 69, 0.3)';">
-          <i class="bi bi-trash3"></i>
-          Clear Cache & Reload
-      </button>
-      <div style="margin-top: 0.5rem; font-size: 0.75rem; color: #6c757d;">
-          Clears all stored data and refreshes the page
-      </div>
   </div>
 
   <!-- Bottom Navigation -->
