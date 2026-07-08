@@ -291,6 +291,123 @@
         </div>
     </div>
 
+    <!-- =====================================================
+         ADMIN · UPLOAD COVERAGE SECTION
+         Added: 2026-07-08
+         Purpose: Shows which months have NETPAY/POS/ONQ/PLI
+                  CSVs uploaded. Reads from available_files.json.
+                  Initially shows last 12 months; Load More adds
+                  6 months at a time on demand.
+         Elements: coverageSection, coverageTbody, coverageLoadMore, coverageRefreshBtn
+    ====================================================== -->
+    <div class="admin-section coverage-section container-admin" id="coverageSection" style="display: none;">
+        <div class="admin-card">
+
+            <!-- Coverage Card Header -->
+            <div class="admin-card__header" style="margin-bottom: 1rem;">
+                <div>
+                    <!-- Label: admin-card__eyebrow — small eyebrow label for admin coverage -->
+                    <div class="admin-card__eyebrow">Admin · Upload Coverage</div>
+                    <p style="margin: 0.25rem 0 0; font-size: 0.875rem; opacity: 0.75;">
+                        Shows which months have been uploaded. Checks the last 12 months automatically.
+                    </p>
+                </div>
+                <!-- Label: coverage-badge — pill badge showing section name -->
+                <div class="summary-chip coverage-badge" style="background: linear-gradient(135deg, #4F2683, #7b3fc4); color: white; font-size: 0.75rem; padding: 4px 12px; border-radius: 999px; white-space: nowrap;">
+                    Coverage
+                </div>
+            </div>
+
+            <!-- Coverage Table -->
+            <div style="overflow-x: auto;">
+                <table class="coverage-table" id="coverageTable" style="
+                    width: 100%;
+                    border-collapse: collapse;
+                    font-size: 0.875rem;
+                ">
+                    <!-- Label: coverage-table-head — sticky header row with gradient purple background -->
+                    <thead>
+                        <tr style="
+                            background: linear-gradient(135deg, #2d1657 0%, #4F2683 60%, #6a35a8 100%);
+                            color: white;
+                        ">
+                            <th style="padding: 10px 16px; text-align: left; border-radius: 6px 0 0 0;">Month</th>
+                            <th style="padding: 10px 16px; text-align: center;">NETPAY</th>
+                            <th style="padding: 10px 16px; text-align: center;">POS</th>
+                            <th style="padding: 10px 16px; text-align: center;">ONQ</th>
+                            <th style="padding: 10px 16px; text-align: center; border-radius: 0 6px 0 0;">PLI</th>
+                        </tr>
+                    </thead>
+                    <!-- Label: coverageTbody — dynamically filled table body rows -->
+                    <tbody id="coverageTbody">
+                        <tr>
+                            <td colspan="5" style="text-align:center; padding: 20px; opacity: 0.5;">
+                                Loading coverage data...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Load More Button Row -->
+            <!-- Label: coverageLoadMoreRow — container for load more button, hidden when all loaded -->
+            <div id="coverageLoadMoreRow" style="display: flex; justify-content: center; margin-top: 1rem;">
+                <!-- Label: coverageLoadMore — load more button, appends 6 months per click -->
+                <button id="coverageLoadMore" class="btn" onclick="coverageLoadMore()" style="
+                    background: linear-gradient(135deg, #2d1657 0%, #4F2683 60%, #6a35a8 100%);
+                    color: white;
+                    border: none;
+                    padding: 8px 24px;
+                    border-radius: 999px;
+                    font-size: 0.85rem;
+                    font-weight: 600;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                ">
+                    <i class="bi bi-chevron-down"></i>
+                    <span id="coverageLoadMoreLabel">Load More</span>
+                </button>
+            </div>
+
+            <!-- Legend + Refresh Row -->
+            <!-- Label: coverage-legend-row — bottom row with Uploaded/Missing legend and Refresh button -->
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 1rem; flex-wrap: wrap; gap: 8px;">
+                <div style="display: flex; align-items: center; gap: 16px; font-size: 0.8rem; opacity: 0.8;">
+                    <span style="display: flex; align-items: center; gap: 4px;">
+                        <!-- Label: legend-uploaded — green checkmark legend item -->
+                        <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;background:#22c55e;border-radius:4px;color:white;font-size:0.75rem;">✓</span>
+                        Uploaded
+                    </span>
+                    <span style="display: flex; align-items: center; gap: 4px;">
+                        <!-- Label: legend-missing — red X legend item -->
+                        <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;background:#ef4444;border-radius:4px;color:white;font-size:0.75rem;">✕</span>
+                        Missing
+                    </span>
+                </div>
+                <!-- Label: coverageRefreshBtn — refreshes coverage data from available_files.json -->
+                <button id="coverageRefreshBtn" onclick="initCoverageTable()" class="btn" style="
+                    background: linear-gradient(135deg, #2d1657 0%, #4F2683 60%, #6a35a8 100%);
+                    color: white;
+                    border: none;
+                    padding: 6px 18px;
+                    border-radius: 999px;
+                    font-size: 0.8rem;
+                    font-weight: 600;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                ">
+                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                </button>
+            </div>
+
+        </div>
+    </div>
+    <!-- END ADMIN · UPLOAD COVERAGE SECTION -->
+
 
 
 
@@ -1333,6 +1450,167 @@ setTimeout(() => {
     </script>
 
     <script src="index.script"></script>
+
+    <!-- =====================================================
+         ADMIN · UPLOAD COVERAGE — JavaScript
+         Added: 2026-07-08
+         Purpose: Fetches available_files.json to build a
+                  Month × DataType coverage grid. Shows last
+                  12 months initially. Load More appends 6
+                  months per click. Refresh re-fetches manifest.
+         Functions: initCoverageTable(), renderCoverageRows(), coverageLoadMore()
+    ====================================================== -->
+    <script>
+    // --- Coverage Table State ---
+    // coverageAllMonths: full ordered list from newest to oldest
+    // coverageVisibleCount: how many rows are currently shown
+    // coverageFileSet: Set of filenames from available_files.json
+    let coverageAllMonths = [];
+    let coverageVisibleCount = 0;
+    const COVERAGE_INITIAL = 12; // rows shown on load
+    const COVERAGE_STEP = 6;     // rows added per Load More click
+
+    /**
+     * Function: initCoverageTable
+     * Added: 2026-07-08
+     * Purpose: Fetches available_files.json and builds the
+     *          full month list, then renders the first 12 rows.
+     */
+    async function initCoverageTable() {
+        const tbody = document.getElementById('coverageTbody');
+        const loadMoreRow = document.getElementById('coverageLoadMoreRow');
+        const loadMoreLabel = document.getElementById('coverageLoadMoreLabel');
+
+        if (!tbody) return;
+
+        // Show loading state
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:20px;opacity:0.5;">Loading coverage data...</td></tr>`;
+        if (loadMoreRow) loadMoreRow.style.display = 'none';
+
+        let fileSet = new Set();
+        try {
+            const res = await fetch('available_files.json?_=' + Date.now());
+            const files = await res.json();
+            files.forEach(f => fileSet.add(f));
+        } catch (e) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:16px;color:#ef4444;">Failed to load coverage data.</td></tr>`;
+            return;
+        }
+
+        // Build all months from Dec 2023 to current month (newest first)
+        // (oldest data in the system is from sep23/oct23 range)
+        const MONTH_ABBR = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+        const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+        const now = new Date();
+        const endYear = now.getFullYear();
+        const endMonth = now.getMonth(); // 0-indexed
+
+        // Start from: Aug 2023 (earliest file found in available_files.json)
+        const startYear = 2023;
+        const startMonth = 7; // August (0-indexed)
+
+        const months = [];
+        for (let y = endYear; y >= startYear; y--) {
+            const mEnd = (y === endYear) ? endMonth : 11;
+            const mStart = (y === startYear) ? startMonth : 0;
+            for (let m = mEnd; m >= mStart; m--) {
+                months.push({ year: y, month: m, abbr: MONTH_ABBR[m], name: MONTH_NAMES[m] });
+            }
+        }
+
+        coverageAllMonths = months;
+        coverageFileSet = fileSet;
+        coverageVisibleCount = 0;
+
+        // Render initial 12 rows
+        tbody.innerHTML = '';
+        renderCoverageRows(COVERAGE_INITIAL);
+    }
+
+    /**
+     * Function: renderCoverageRows
+     * Added: 2026-07-08
+     * Purpose: Renders the next `count` rows into the coverage table body.
+     *          Checks fileSet for each of the 4 data types per month.
+     */
+    function renderCoverageRows(count) {
+        const tbody = document.getElementById('coverageTbody');
+        const loadMoreRow = document.getElementById('coverageLoadMoreRow');
+        const loadMoreLabel = document.getElementById('coverageLoadMoreLabel');
+
+        const start = coverageVisibleCount;
+        const end = Math.min(start + count, coverageAllMonths.length);
+
+        for (let i = start; i < end; i++) {
+            const { year, month, abbr, name } = coverageAllMonths[i];
+            const yy = String(year).slice(2); // e.g. "26"
+
+            // File name patterns per data type
+            const hasNetpay = coverageFileSet.has(`${abbr}${yy}.csv`);
+            const hasPos    = coverageFileSet.has(`pos_${abbr}${yy}.csv`);
+            const hasOnq    = coverageFileSet.has(`onq_${abbr}${yy}.csv`);
+            const hasPli    = coverageFileSet.has(`pli_${abbr}${yy}.csv`);
+
+            // Alternating row background
+            const bg = (i % 2 === 0) ? 'transparent' : 'rgba(79,38,131,0.04)';
+
+            const row = document.createElement('tr');
+            row.style.background = bg;
+            row.style.borderBottom = '1px solid rgba(0,0,0,0.06)';
+            row.innerHTML = `
+                <td style="padding: 10px 16px; font-weight: 500; color: #1e1e2e;">${name} ${year}</td>
+                <td style="padding: 10px 16px; text-align: center;">${coverageBadge(hasNetpay)}</td>
+                <td style="padding: 10px 16px; text-align: center;">${coverageBadge(hasPos)}</td>
+                <td style="padding: 10px 16px; text-align: center;">${coverageBadge(hasOnq)}</td>
+                <td style="padding: 10px 16px; text-align: center;">${coverageBadge(hasPli)}</td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        coverageVisibleCount = end;
+
+        // Update Load More button
+        const remaining = coverageAllMonths.length - coverageVisibleCount;
+        if (remaining > 0) {
+            if (loadMoreRow) loadMoreRow.style.display = 'flex';
+            if (loadMoreLabel) loadMoreLabel.textContent = `Load More (${remaining} remaining)`;
+        } else {
+            if (loadMoreRow) loadMoreRow.style.display = 'none';
+        }
+    }
+
+    /**
+     * Function: coverageBadge
+     * Added: 2026-07-08
+     * Purpose: Returns HTML for a ✓ (green) or ✕ (red) badge icon.
+     */
+    function coverageBadge(present) {
+        if (present) {
+            return `<span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;background:#22c55e;border-radius:5px;color:white;font-weight:700;font-size:0.85rem;">✓</span>`;
+        } else {
+            return `<span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;background:#ef4444;border-radius:5px;color:white;font-weight:700;font-size:0.9rem;">✕</span>`;
+        }
+    }
+
+    /**
+     * Function: coverageLoadMore
+     * Added: 2026-07-08
+     * Purpose: Called by the Load More button. Renders the next 6 months
+     *          without re-fetching — purely appends to existing table.
+     */
+    function coverageLoadMore() {
+        renderCoverageRows(COVERAGE_STEP);
+    }
+
+    // Auto-initialize coverage table when DOM is ready (admin-only section)
+    document.addEventListener('DOMContentLoaded', function() {
+        // Only init if the coverage section is in the DOM
+        // (it will remain hidden until admin logs in)
+        initCoverageTable();
+    });
+    </script>
+    <!-- END ADMIN · UPLOAD COVERAGE JavaScript -->
 
 </body>
 </html>
