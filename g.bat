@@ -34,7 +34,7 @@ echo.
 
 :: -- Step 1: Stage all changes --
 echo [1/3] Generating available_files.json manifest...
-powershell -Command "Get-ChildItem -Path @('onq_*.csv.gz', 'pli_*.csv.gz') | Select-Object -Property @{Name='Name';Expression={`$_.Name -replace '\.gz$'}} | Select-Object -ExpandProperty Name | ConvertTo-Json -Compress | Out-File -Encoding utf8 available_files.json"
+powershell -Command "Get-ChildItem -Path @('onq_*.csv.gz', 'pli_*.csv.gz') | ForEach-Object { `$_.Name.Replace('.gz', '') } | ConvertTo-Json -Compress | Out-File -Encoding utf8 available_files.json"
 
 echo [1/3] Staging all changes...
 git add .
