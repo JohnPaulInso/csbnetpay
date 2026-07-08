@@ -243,10 +243,8 @@
         </div> -->
 
         <!-- Loading Indicator -->
-        <!-- Loading indicator with live progress counter - Date: 2026-07-08 -->
         <div id="loadingIndicatorNetpay" class="loading-indicator">
             <img src="loading.gif" alt="Loading...">
-            <span id="loadingProgressNetpay" style="display:block;font-size:0.8em;margin-top:4px;opacity:0.7;">Searching...</span>
         </div>
     </div>
 
@@ -367,124 +365,19 @@
                     </div>
                     <div class="summary-footer">
                         <span
-                            style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#4F2683;"></span>
-                        <span>Keep this purple by picking month, year, and file.</span>
+                            style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#16a34a;"></span>
+                        <span>Keep this green by picking month, year, and file.</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- =====================================================
-         ADMIN · UPLOAD COVERAGE SECTION
-         Added: 2026-07-08
-         Purpose: Shows which months have NETPAY/POS/ONQ/PLI
-                  CSVs uploaded. Reads from available_files.json.
-                  Initially shows last 12 months; Load More adds
-                  6 months at a time on demand.
-         Elements: coverageSection, coverageTbody, coverageLoadMore, coverageRefreshBtn
-    ====================================================== -->
-    <div class="admin-section coverage-section container-admin" id="coverageSection" style="display: none;">
-        <div class="admin-card" style="padding: 2rem;">
-
-            <!-- Coverage Card Header -->
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid #e5e7eb;">
-                <div>
-                    <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.1em; color: #6b7280; margin-bottom: 0.35rem; text-transform: uppercase;">
-                        Admin · Upload Coverage
-                    </div>
-                    <h3 style="margin: 0; font-size: 1.25rem; font-weight: 700; color: #111827;">
-                        File Coverage Status
-                    </h3>
-                </div>
-                <button id="coverageRefreshBtn" onclick="initCoverageTable()" style="
-                    background: transparent;
-                    border: 1px solid #d1d5db;
-                    color: #6b7280;
-                    padding: 0.5rem 1rem;
-                    border-radius: 8px;
-                    font-size: 0.875rem;
-                    font-weight: 600;
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                    transition: all 0.2s;
-                " onmouseover="this.style.background='#f9fafb'; this.style.borderColor='#9ca3af';" onmouseout="this.style.background='transparent'; this.style.borderColor='#d1d5db';">
-                    <i class="bi bi-arrow-clockwise"></i> Refresh
-                </button>
-            </div>
-
-            <!-- Coverage Table -->
-            <div style="overflow-x: auto; border-radius: 12px; border: 1px solid #e5e7eb;">
-                <table id="coverageTable" style="
-                    width: 100%;
-                    border-collapse: collapse;
-                    background: white;
-                ">
-                    <thead>
-                        <tr style="background: #f9fafb; border-bottom: 2px solid #e5e7eb;">
-                            <th style="padding: 1rem 1.25rem; text-align: left; font-weight: 600; color: #374151; font-size: 0.9rem;">Month</th>
-                            <th style="padding: 1rem 1.25rem; text-align: center; font-weight: 600; color: #374151; font-size: 0.9rem;">NETPAY</th>
-                            <th style="padding: 1rem 1.25rem; text-align: center; font-weight: 600; color: #374151; font-size: 0.9rem;">POS</th>
-                            <th style="padding: 1rem 1.25rem; text-align: center; font-weight: 600; color: #374151; font-size: 0.9rem;">ONQ</th>
-                            <th style="padding: 1rem 1.25rem; text-align: center; font-weight: 600; color: #374151; font-size: 0.9rem;">PLI</th>
-                        </tr>
-                    </thead>
-                    <tbody id="coverageTbody">
-                        <tr>
-                            <td colspan="5" style="text-align:center; padding: 2rem; color: #9ca3af; font-size: 0.95rem;">
-                                <i class="bi bi-hourglass-split" style="font-size: 1.5rem; display: block; margin-bottom: 0.5rem;"></i>
-                                Loading coverage data...
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Load More Button Row -->
-            <div id="coverageLoadMoreRow" style="display: flex; justify-content: center; margin-top: 1rem;">
-                <button id="coverageLoadMore" onclick="coverageLoadMore()" style="
-                    background: transparent;
-                    border: 1px solid #d1d5db;
-                    color: #6b7280;
-                    padding: 0.5rem 1.25rem;
-                    border-radius: 8px;
-                    font-size: 0.8125rem;
-                    font-weight: 600;
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                    transition: all 0.2s;
-                " onmouseover="this.style.background='#f9fafb'; this.style.borderColor='#9ca3af';" onmouseout="this.style.background='transparent'; this.style.borderColor='#d1d5db';">
-                    <i class="bi bi-chevron-down"></i>
-                    <span id="coverageLoadMoreLabel">Load More</span>
-                </button>
-            </div>
-
-            <!-- Legend -->
-            <div style="display: flex; align-items: center; justify-content: center; margin-top: 1.25rem; gap: 1.5rem; font-size: 0.8125rem; color: #6b7280;">
-                <span style="display: flex; align-items: center; gap: 0.35rem;">
-                    <i class="bi bi-check-circle-fill" style="color: #22c55e; font-size: 1rem;"></i>
-                    Uploaded
-                </span>
-                <span style="display: flex; align-items: center; gap: 0.35rem;">
-                    <i class="bi bi-x-circle-fill" style="color: #ef4444; font-size: 1rem;"></i>
-                    Missing
-                </span>
-            </div>
-
-        </div>
-    </div>
-    <!-- END ADMIN · UPLOAD COVERAGE SECTION -->
-
     </div>
 
     <!-- Bottom Navigation -->
     <div class="bottom-nav" style="--theme-color: #4F2683; --theme-rgb: 79, 38, 131;">
         <a href="index.html" class="bottom-nav-link active">
-            <i class="bi bi-wallet-fill"></i>
+            <i class="bi bi-wallet2"></i>
             <span>NETPAY</span>
         </a>
         <a href="index2.html" class="bottom-nav-link">
@@ -507,7 +400,7 @@
     <div class="admin-section container-admin" style="display: none;">
         <div class="admin-chip">
             <div class="admin-card">
-                <h5>Already have the Netpay for <span style="color: #4F2683;" id="month-name"></span>?</h5>
+                <h5>Already have the Netpay for <span style="color: #00c12d;" id="month-name"></span>?</h5>
                 <p>Please double check the month and year and make sure it's a CSV File. Example: <u
                         id="example-file">feb26.csv</u></p>
 
@@ -571,83 +464,6 @@
 
             // Ensure hidden on first load
             if (resultsSection) resultsSection.style.display = "none";
-
-            // === Bottom Navigation Enhancement ===
-            // Map of icon classes: [outlined, filled]
-            const iconMap = {
-                'wallet': ['bi-wallet', 'bi-wallet-fill'],
-                'cash': ['bi-cash-stack', 'bi-cash-stack'],
-                'hourglass': ['bi-hourglass-split', 'bi-hourglass-split'],
-                'file': ['bi-file-earmark-text', 'bi-file-earmark-text-fill'],
-                'calculator': ['bi-calculator', 'bi-calculator-fill']
-            };
-
-            // Function to update bottom nav icons based on active state
-            function updateBottomNavIcons() {
-                const navLinks = document.querySelectorAll('.bottom-nav-link');
-                navLinks.forEach((link, index) => {
-                    const icon = link.querySelector('i');
-                    const isActive = link.classList.contains('active');
-                    
-                    // Determine icon type based on index
-                    let iconType;
-                    switch(index) {
-                        case 0: iconType = 'wallet'; break;
-                        case 1: iconType = 'cash'; break;
-                        case 2: iconType = 'hourglass'; break;
-                        case 3: iconType = 'file'; break;
-                        case 4: iconType = 'calculator'; break;
-                    }
-                    
-                    if (iconType && iconMap[iconType]) {
-                        const [outlined, filled] = iconMap[iconType];
-                        icon.className = `bi ${isActive ? filled : outlined}`;
-                    }
-                });
-            }
-
-            // Add ripple effect on tap
-            function createRipple(event) {
-                const link = event.currentTarget;
-                const ripple = document.createElement('span');
-                ripple.style.position = 'absolute';
-                ripple.style.borderRadius = '50%';
-                ripple.style.background = 'rgba(var(--theme-rgb, 79, 38, 131), 0.3)';
-                ripple.style.width = ripple.style.height = '60px';
-                ripple.style.left = event.offsetX - 30 + 'px';
-                ripple.style.top = event.offsetY - 30 + 'px';
-                ripple.style.transform = 'scale(0)';
-                ripple.style.animation = 'ripple 0.5s ease-out';
-                ripple.style.pointerEvents = 'none';
-                
-                link.style.position = 'relative';
-                link.appendChild(ripple);
-                
-                setTimeout(() => ripple.remove(), 500);
-            }
-
-            // Add ripple animation style if not exists
-            if (!document.querySelector('#ripple-animation')) {
-                const style = document.createElement('style');
-                style.id = 'ripple-animation';
-                style.textContent = `
-                    @keyframes ripple {
-                        to {
-                            transform: scale(2);
-                            opacity: 0;
-                        }
-                    }
-                `;
-                document.head.appendChild(style);
-            }
-
-            // Attach ripple to all nav links
-            document.querySelectorAll('.bottom-nav-link').forEach(link => {
-                link.addEventListener('click', createRipple);
-            });
-
-            // Initialize icons on page load
-            updateBottomNavIcons();
         });
 
         // Ripple Effect for Buttons
@@ -827,7 +643,6 @@
 
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="fflate.min.js"></script>
 
     <script>
         let currentUtterance = null;
@@ -1348,15 +1163,9 @@
                             blankrows: false
                         });
 
-                        /*
-                         * CHANGE DETAILS:
-                         * Element: convertExcelToCSV
-                         * Date: 2026-07-08
-                         * Fix: Reverted to saving plain CSV files directly without gzip compression to restore raw CSV usage.
-                         */
                         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
 
-                        if (sheetConfig.output.startsWith('pli_') && csv.length > 25 * 1024 * 1024) {
+                        if (sheetConfig.output.startsWith('pli_') && blob.size > 25 * 1024 * 1024) {
                             if (pliWarning) pliWarning.style.display = "block";
                         }
 
@@ -1598,184 +1407,6 @@
         }
         updateVersionDisplay();
     </script>
-
-    <!-- =====================================================
-         ADMIN · UPLOAD COVERAGE — JavaScript
-         Added: 2026-07-08
-         Purpose: Fetches available_files.json to build a
-                  Month × DataType coverage grid. Shows last
-                  12 months initially. Load More appends 6
-                  months per click. Refresh re-fetches manifest.
-         Functions: initCoverageTable(), renderCoverageRows(), coverageLoadMore()
-    ====================================================== -->
-    <script>
-    // --- Coverage Table State ---
-    // coverageAllMonths: full ordered list from newest to oldest
-    // coverageVisibleCount: how many rows are currently shown
-    // coverageFileSet: Set of filenames from available_files.json
-    let coverageAllMonths = [];
-    let coverageVisibleCount = 0;
-    const COVERAGE_INITIAL = 12; // rows shown on load
-    const COVERAGE_STEP = 6;     // rows added per Load More click
-
-    /**
-     * Function: initCoverageTable
-     * Added: 2026-07-08
-     * Purpose: Fetches available_files.json and builds the
-     *          full month list, then renders the first 12 rows.
-     */
-    async function initCoverageTable() {
-        const tbody = document.getElementById('coverageTbody');
-        const loadMoreRow = document.getElementById('coverageLoadMoreRow');
-        const loadMoreLabel = document.getElementById('coverageLoadMoreLabel');
-
-        if (!tbody) return;
-
-        // Show loading state
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:20px;opacity:0.5;">Loading coverage data...</td></tr>`;
-        if (loadMoreRow) loadMoreRow.style.display = 'none';
-
-        let fileSet = new Set();
-        try {
-            const res = await fetch('available_files.json?_=' + Date.now());
-            const files = await res.json();
-            files.forEach(f => fileSet.add(f));
-        } catch (e) {
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:16px;color:#ef4444;">Failed to load coverage data.</td></tr>`;
-            return;
-        }
-
-        // Build all months from Dec 2023 to current month (newest first)
-        // (oldest data in the system is from sep23/oct23 range)
-        const MONTH_ABBR = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
-        const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-
-        const now = new Date();
-        const endYear = now.getFullYear();
-        const endMonth = now.getMonth(); // 0-indexed
-
-        // Start from: Aug 2023 (earliest file found in available_files.json)
-        const startYear = 2023;
-        const startMonth = 7; // August (0-indexed)
-
-        const months = [];
-        for (let y = endYear; y >= startYear; y--) {
-            const mEnd = (y === endYear) ? endMonth : 11;
-            const mStart = (y === startYear) ? startMonth : 0;
-            for (let m = mEnd; m >= mStart; m--) {
-                months.push({ year: y, month: m, abbr: MONTH_ABBR[m], name: MONTH_NAMES[m] });
-            }
-        }
-
-        coverageAllMonths = months;
-        coverageFileSet = fileSet;
-        coverageVisibleCount = 0;
-
-        // Render initial 12 rows
-        tbody.innerHTML = '';
-        renderCoverageRows(COVERAGE_INITIAL);
-    }
-
-    /**
-     * Function: renderCoverageRows
-     * Added: 2026-07-08
-     * Updated: 2026-07-08 - Improved styling for minimal, professional look
-     * Purpose: Renders the next `count` rows into the coverage table body.
-     *          Checks fileSet for each of the 4 data types per month.
-     */
-    function renderCoverageRows(count) {
-        const tbody = document.getElementById('coverageTbody');
-        const loadMoreRow = document.getElementById('coverageLoadMoreRow');
-        const loadMoreLabel = document.getElementById('coverageLoadMoreLabel');
-
-        const start = coverageVisibleCount;
-        const end = Math.min(start + count, coverageAllMonths.length);
-
-        for (let i = start; i < end; i++) {
-            const { year, month, abbr, name } = coverageAllMonths[i];
-            const yy = String(year).slice(2); // e.g. "26"
-
-            // File name patterns per data type
-            const hasNetpay = coverageFileSet.has(`${abbr}${yy}.csv`);
-            const hasPos    = coverageFileSet.has(`pos_${abbr}${yy}.csv`);
-            const hasOnq    = coverageFileSet.has(`onq_${abbr}${yy}.csv`);
-            const hasPli    = coverageFileSet.has(`pli_${abbr}${yy}.csv`);
-
-            const row = document.createElement('tr');
-            row.style.borderBottom = '1px solid #f3f4f6';
-            row.style.transition = 'background-color 0.15s';
-            row.onmouseover = function() { this.style.backgroundColor = '#f9fafb'; };
-            row.onmouseout = function() { this.style.backgroundColor = 'transparent'; };
-            
-            row.innerHTML = `
-                <td style="padding: 1rem 1.25rem; font-weight: 500; color: #111827; font-size: 0.95rem;">${name} ${year}</td>
-                <td style="padding: 1rem 1.25rem; text-align: center;">${coverageBadge(hasNetpay)}</td>
-                <td style="padding: 1rem 1.25rem; text-align: center;">${coverageBadge(hasPos)}</td>
-                <td style="padding: 1rem 1.25rem; text-align: center;">${coverageBadge(hasOnq)}</td>
-                <td style="padding: 1rem 1.25rem; text-align: center;">${coverageBadge(hasPli)}</td>
-            `;
-            tbody.appendChild(row);
-        }
-
-        coverageVisibleCount = end;
-
-        // Update Load More button
-        const remaining = coverageAllMonths.length - coverageVisibleCount;
-        if (remaining > 0) {
-            if (loadMoreRow) loadMoreRow.style.display = 'flex';
-            if (loadMoreLabel) loadMoreLabel.textContent = `Load More (${remaining} remaining)`;
-        } else {
-            if (loadMoreRow) loadMoreRow.style.display = 'none';
-        }
-    }
-
-    /**
-     * Function: coverageBadge
-     * Added: 2026-07-08
-     * Updated: 2026-07-08 - Changed to use Bootstrap icons instead of emojis
-     * Purpose: Returns HTML for a checkmark (green) or X (red) icon.
-     */
-    function coverageBadge(present) {
-        if (present) {
-            return `<i class="bi bi-check-circle-fill" style="color: #22c55e; font-size: 1.25rem;"></i>`;
-        } else {
-            return `<i class="bi bi-x-circle-fill" style="color: #ef4444; font-size: 1.25rem;"></i>`;
-        }
-    }
-
-    /**
-     * Function: coverageLoadMore
-     * Added: 2026-07-08
-     * Purpose: Called by the Load More button. Renders the next 6 months
-     *          without re-fetching — purely appends to existing table.
-     */
-    function coverageLoadMore() {
-        renderCoverageRows(COVERAGE_STEP);
-    }
-
-    // Auto-initialize coverage table when DOM is ready (admin-only section)
-    document.addEventListener('DOMContentLoaded', function() {
-        // Only init if the coverage section is in the DOM
-        // (it will remain hidden until admin logs in)
-        initCoverageTable();
-
-        // FIX: 2026-07-08 — Coverage section visibility watcher
-        // The admin section starts as display:none. When checkLoggedInUser() shows it,
-        // the table may already be populated but the section invisible. Use a
-        // MutationObserver on the body to re-init whenever coverageSection becomes visible.
-        const coverageSec = document.getElementById('coverageSection');
-        if (coverageSec) {
-            const observer = new MutationObserver(() => {
-                if (coverageSec.style.display !== 'none' && coverageAllMonths.length === 0) {
-                    initCoverageTable();
-                }
-            });
-            observer.observe(coverageSec, { attributes: true, attributeFilter: ['style'] });
-        }
-    });
-    </script>
-    <!-- END ADMIN · UPLOAD COVERAGE JavaScript -->
-
 </body>
 
 </html>

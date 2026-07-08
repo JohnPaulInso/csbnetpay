@@ -926,18 +926,19 @@ body {
     font-weight: 600;
 }
 
-/* Convert button green */
+/* Convert button purple */
 #convertButton {
-    background: #22c55e;
-    border: 1px solid #16a34a;
+    background: linear-gradient(135deg, #4F2683, #6832a8);
+    border: 1px solid #4F2683;
     color: #fff;
     min-width: 170px;
     border-radius: 12px;
-    box-shadow: 0 8px 18px rgba(34, 197, 94, 0.28);
+    box-shadow: 0 8px 18px rgba(79, 38, 131, 0.28);
 }
 
 #convertButton:hover {
-    background: #16a34a;
+    background: linear-gradient(135deg, #6832a8, #7d3eb8);
+    box-shadow: 0 10px 22px rgba(79, 38, 131, 0.4);
 }
 
 .convert-actions {
@@ -1020,19 +1021,17 @@ body {
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 75px;
-    /* Bigger bar for breathing room */
+    height: 65px;
     background: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
-    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.08);
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
     z-index: 2000;
     display: flex;
     justify-content: space-around;
     align-items: center;
-    padding: 8px 1.5rem calc(8px + env(safe-area-inset-bottom));
-    /* Balanced padding */
+    padding: 0 0.5rem calc(env(safe-area-inset-bottom));
 }
 
 .bottom-nav-link {
@@ -1041,34 +1040,74 @@ body {
     align-items: center;
     justify-content: center;
     text-decoration: none;
-    color: #8e8e93;
+    color: #9ca3af;
     font-size: 10px;
     font-weight: 600;
-    transition: all 0.25s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     flex: 1;
     height: 100%;
+    position: relative;
+    padding: 0.5rem 0.25rem;
+    gap: 3px;
 }
 
 .bottom-nav-link i {
-    font-size: 16px;
-    padding: 6px;
-    /* Reduced padding from 10px */
-    border-radius: 12px;
-    margin-bottom: 2px;
-    transition: all 0.2s ease;
-    -webkit-text-stroke: 1px transparent;
+    font-size: 22px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
+/* Active state with filled icons and NO background */
 .bottom-nav-link.active {
     color: var(--theme-color, var(--primary-color));
-    font-weight: 900 !important;
-    /* Bolder active label */
+    font-weight: 700;
 }
 
 .bottom-nav-link.active i {
-    transform: translateY(-2px);
-    background: rgba(var(--theme-rgb, 79, 38, 131), 0.12);
-    -webkit-text-stroke: 1.8px var(--theme-color, var(--primary-color));
+    color: var(--theme-color, var(--primary-color));
+    transform: scale(1.05);
+}
+
+/* Top indicator bar spanning full width of link */
+.bottom-nav-link.active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--theme-color, var(--primary-color));
+    border-radius: 0 0 2px 2px;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-3px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Hover effect for non-active items - subtle scale only */
+.bottom-nav-link:not(.active):hover i {
+    transform: scale(1.1);
+    color: #6b7280;
+}
+
+/* Tap/Active press effect */
+.bottom-nav-link:active {
+    transform: scale(0.96);
+}
+
+.bottom-nav-link:active i {
+    transform: scale(1) !important;
 }
 
 .logout-btn {
@@ -1105,6 +1144,19 @@ body {
 
     .bottom-nav {
         display: flex;
+    }
+
+    /* Enhance bottom nav on mobile */
+    .bottom-nav-link {
+        padding: 0.4rem 0.2rem;
+    }
+
+    .bottom-nav-link i {
+        font-size: 24px;
+    }
+
+    .bottom-nav-link span {
+        font-size: 10px;
     }
 
     .page-header {
