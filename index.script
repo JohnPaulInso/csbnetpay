@@ -203,11 +203,29 @@
         }
     }
 
+    /*
+     * CHANGE DETAILS:
+     * Element: filterExistingFiles
+     * Date: 2026-07-08
+     * Fix: Updated to check available_files.json manifest first, falling back to HEAD checking of .gz and raw file.
+     */
     async function filterExistingFiles(fileList) {
+        try {
+            const res = await fetch('available_files.json');
+            if (res.ok) {
+                const files = await res.json();
+                return fileList.filter(f => files.includes(f));
+            }
+        } catch (err) {
+            console.warn("Could not fetch available_files.json, running fallback HEAD checks:", err);
+        }
+
         const existingFiles = await Promise.all(fileList.map(async (file) => {
             try {
-                const response = await fetch(file, { method: 'HEAD' });
-                return response.ok ? file : null;
+                const response = await fetch(file + '.gz', { method: 'HEAD' });
+                if (response.ok) return file;
+                const responseRaw = await fetch(file, { method: 'HEAD' });
+                return responseRaw.ok ? file : null;
             } catch {
                 return null;
             }
