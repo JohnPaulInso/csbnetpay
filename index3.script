@@ -146,7 +146,8 @@ function searchEmployeeOnq() {
             return;
         }
 
-        loadMoreMonthsOnq().then(() => {
+        // FIX 2026-07-10: Initial load now fetches 6 months (was 3) so past 6 months are visible upfront
+        loadMoreMonthsOnq(6).then(() => {
             updateUISearchComplete();
         }).catch(err => {
             console.error("Error loading initial months:", err);
@@ -181,8 +182,10 @@ async function getAvailableFilesOnq() {
     return results.filter(file => file !== null);
 }
 
-async function loadMoreMonthsOnq() {
-    const filesToFetch = existingFilesOnq.slice(currentOnqFileIndex, currentOnqFileIndex + 3);
+// loadMoreMonthsOnq — fetches next batch of months (6 for initial load, 3 for manual "Load More")
+// FIX 2026-07-10: Changed initial batch size from 3 → 6 so 6 months appear without clicking Load More
+async function loadMoreMonthsOnq(batchSize = 3) {
+    const filesToFetch = existingFilesOnq.slice(currentOnqFileIndex, currentOnqFileIndex + batchSize);
     if (filesToFetch.length === 0) {
         return;
     }
@@ -653,8 +656,53 @@ async function displayEmployeeInfoOnq(monthName, csvData) {
         tableContainer.appendChild(tableWrapper);
         resultsSectionOnq.appendChild(tableContainer);
         tbody = table.querySelector('tbody');
+
+        /*
+         * CHANGE DETAILS:
+         * Element: appendResultsToTableOnq — accordion event delegation
+         * Date: 2026-07-10
+         * Fix: Single delegated click listener on tbody replaces unreliable per-row listeners.
+         *      Per-row approach caused only the first month row to be toggleable when
+         *      Promise.all resolved multiple months simultaneously.
+         *      closest('.accordion-toggle-row') works for clicks on any child element
+         *      (b tag, i arrow, td) and correctly ignores clicks inside detail rows (checkboxes).
+         */
+        tbody.addEventListener('click', (e) => {
+            // Find the accordion toggle row from the click target (handles child element clicks)
+            const toggleRow = e.target.closest('.accordion-toggle-row');
+            if (!toggleRow) return; // Click was on a detail row, checkbox, or N/A row — ignore
+
+            // Detail row is always the immediate next sibling of the toggle row
+            const detailRow = toggleRow.nextElementSibling;
+            if (!detailRow || !detailRow.classList.contains('detail-row')) return;
+
+            // Last TD of toggle row holds the accordion arrow icon
+            const dedamtCell = toggleRow.cells[toggleRow.cells.length - 1];
+            const isExpanded = detailRow.getAttribute('data-expanded') === 'true';
+
+            if (isExpanded) {
+                // Collapse: hide detail row, reset arrow to chevron-right (closed state)
+                detailRow.setAttribute('data-expanded', 'false');
+                detailRow.style.display = 'none';
+                const arrow = dedamtCell && dedamtCell.querySelector('.accordion-arrow');
+                if (arrow) {
+                    arrow.classList.remove('bi-chevron-down');
+                    arrow.classList.add('bi-chevron-right');
+                }
+            } else {
+                // Expand: show detail row, flip arrow to chevron-down (open state)
+                detailRow.setAttribute('data-expanded', 'true');
+                detailRow.style.display = 'table-row';
+                const arrow = dedamtCell && dedamtCell.querySelector('.accordion-arrow');
+                if (arrow) {
+                    arrow.classList.remove('bi-chevron-right');
+                    arrow.classList.add('bi-chevron-down');
+                }
+            }
+        });
     } else {
         tbody = table.querySelector('tbody');
+        // Delegation listener already attached when table was first created — no duplicate needed
     }
 
     validResults.forEach(data => {
@@ -694,23 +742,26 @@ async function displayEmployeeInfoOnq(monthName, csvData) {
                 initialSum += parseFloat(data.csvData[i][13]) || 0;
             }
 
+            // FIX 2026-07-10: Arrow starts as chevron-right (collapsed state); becomes chevron-down when expanded
             dedamtCell.innerHTML = `
                 <div class="onq-total-container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                     <b class="onq-total-value" style="text-align: left;" id="totalAmount-${data.monthName.replace(/\s/g, '-')}">₱${initialSum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</b>
-                    <i class="bi bi-chevron-left accordion-arrow" style="font-weight: bold; color: #00641a; font-size: 0.95rem; margin-left: 0.5rem;"></i>
+                    <i class="bi bi-chevron-right accordion-arrow" style="font-weight: bold; color: #00641a; font-size: 0.95rem; margin-left: 0.5rem;"></i>
                 </div>
             `;
             tbody.appendChild(monthRow);
 
-            // Create detail row
+            // Create detail row (accordion content)
+            // FIX 2026-07-10: Added data-expanded attribute for reliable toggle across ALL month rows
             const detailRow = document.createElement('tr');
             detailRow.classList.add('detail-row');
+            detailRow.setAttribute('data-expanded', 'false'); // Track expanded state explicitly
             detailRow.style.display = 'none'; // Closed by default
             const detailCell = document.createElement('td');
             detailCell.setAttribute('colspan', '2');
             detailCell.style.padding = '0';
 
-            // Create detail table
+            // Build detail rows data array
             const resultsMapDetails = [];
             for (let i = 1; i < data.csvData.length; i++) {
                 const row = data.csvData[i];
@@ -739,7 +790,7 @@ async function displayEmployeeInfoOnq(monthName, csvData) {
                         </thead>
                         <tbody>
                             ${resultsMapDetails.map((d, idx) => `
-                                <tr style="background: ${idx % 2 === 0 ? 'white' : 'rgba(0, 100, 26, 0.02)'};">
+                                <tr style="background: ${idx % 2 === 0 ? 'white' : 'rgba(0, 100, 26, 0.02)'};">  
                                     <td style="text-align: left; width: 20px !important; min-width: 20px !important; max-width: 20px !important; padding: 0.5rem 0 !important; line-height: 1;">
                                         <input type="checkbox" class="dedamt-checkbox" 
                                                data-dedamt="${d.dedamt}" 
@@ -763,21 +814,8 @@ async function displayEmployeeInfoOnq(monthName, csvData) {
             detailRow.appendChild(detailCell);
             tbody.appendChild(detailRow);
 
-            // Toggle details logic
-            monthRow.addEventListener('click', () => {
-                const isCollapsed = detailRow.style.display === 'none';
-                detailRow.style.display = isCollapsed ? 'table-row' : 'none';
-                const arrow = dedamtCell.querySelector('.accordion-arrow');
-                if (arrow) {
-                    if (isCollapsed) {
-                        arrow.classList.remove('bi-chevron-left');
-                        arrow.classList.add('bi-chevron-right');
-                    } else {
-                        arrow.classList.remove('bi-chevron-right');
-                        arrow.classList.add('bi-chevron-left');
-                    }
-                }
-            });
+            // Accordion toggle is handled by the delegated click listener on tbody (set up above)
+            // Removed per-row listeners 2026-07-10 — they caused only the first row to be clickable
 
             // Set up checkbox listeners for this month
             const monthCheckboxes = detailRow.querySelectorAll('.dedamt-checkbox');
