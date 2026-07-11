@@ -1,1375 +1,2332 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <title>Historical Netpay</title>
+    <meta charset="UTF-8">
+    <title>CitySavings Credit Portal - Loan Evaluation Console</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="styles.css">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="manifest" href="manifest.json">
-    
     <link rel="icon" href="favicon.ico" type="image/x-icon">
-<link rel="icon" href="favicon.png" type="image/png" sizes="any">
+    <link rel="icon" href="favicon.png" type="image/png" sizes="any">
+    
+    <!-- Load custom fonts & icons for modern glassmorphism UI -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <script src="fflate.min.js"></script>
 
+    <!-- 
+      CHANGE DETAILS:
+      Date: 2026-07-10
+      Fix: Refactored card border outlines, drop shadow offsets, and unified corner-radii.
+           - Borders: 1px solid rgba(255, 255, 255, 0.08)
+           - Corner Radius: 12px for cards, 8px for buttons, inputs, and internal panels
+           - Shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4)
+      Changed Elements:
+      - Updated CSS styles for `.bank-card`, `.bank-input`, `.bank-select`, `.bank-accordion-btn`, and `.history-run-card`.
+      - Replaced generic inline `.rounded` classes with specific style declarations.
+    -->
+    <style>
+        :root {
+            --bg-deep: #020617;
+            --bg-surface: #0F172A;
+            --bg-panel: #1E293B;
+            --bg-panel-soft: rgba(30, 41, 59, 0.55);
+            --border-hairline: rgba(255, 255, 255, 0.08);
+            --border-hairline-soft: rgba(255, 255, 255, 0.06);
+            --accent: #E5A93C;
+            --accent-strong: #F59E0B;
+            --accent-soft: rgba(229, 169, 60, 0.35);
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --text-muted: #64748B;
+            --value-neutral: #F1F5F9;
+            --value-deduction: #E9B949;
+            --value-final: #10B981;
+            --value-danger: #EF4444;
+            --radius-lg: 14px;
+            --radius-md: 10px;
+            --radius-sm: 8px;
+            --sidebar-width: 224px;
+            --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+            --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.3);
+            --shadow-card-hover: 0 8px 28px rgba(0, 0, 0, 0.38);
+        }
 
+        body {
+            font-family: 'Montserrat', sans-serif !important;
+            background: radial-gradient(circle at 50% 0%, #0F172A 0%, #020617 100%) !important;
+            color: var(--text-primary) !important;
+            min-height: 100vh;
+            margin: 0;
+            padding-bottom: 100px;
+        }
+
+        /* ============ LEFT SIDEBAR NAVIGATION ============ */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border-hairline);
+            flex-direction: column;
+            padding: 22px 14px;
+            z-index: 1000;
+            box-sizing: border-box;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 8px 20px 8px;
+            margin-bottom: 6px;
+            border-bottom: 1px solid var(--border-hairline-soft);
+        }
+
+        .sidebar-brand img {
+            height: 24px;
+            filter: brightness(0) invert(1);
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            margin-top: 14px;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.18s ease;
+        }
+
+        .sidebar-link i {
+            font-size: 1rem;
+            width: 18px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar-link:hover {
+            background: rgba(255, 255, 255, 0.04);
+            color: #FFFFFF;
+            text-decoration: none;
+        }
+
+        .sidebar-link.active {
+            background: rgba(229, 169, 60, 0.12);
+            color: #FFFFFF;
+            border-left-color: var(--accent);
+        }
+
+        .sidebar-link.active i {
+            color: var(--accent);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 14px;
+            border-top: 1px solid var(--border-hairline-soft);
+        }
+
+        .content-area {
+            min-height: 100vh;
+        }
+
+        @media (min-width: 768px) {
+            .sidebar {
+                display: flex;
+            }
+            .content-area {
+                margin-left: var(--sidebar-width);
+            }
+        }
+
+        .main-container {
+            margin-top: 30px !important;
+        }
+
+        /* ============ CARD SHELL — uniform glassmorphism ============ */
+        .card, .bank-card, .phase-block {
+            background: rgba(15, 23, 42, 0.6) !important;
+            backdrop-filter: blur(16px) !important;
+            -webkit-backdrop-filter: blur(16px) !important;
+            border: 1px solid var(--border-hairline-soft) !important;
+            border-radius: var(--radius-lg) !important;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-card) !important;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .bank-card:hover {
+            border-color: var(--accent-soft) !important;
+            box-shadow: var(--shadow-card-hover) !important;
+        }
+
+        /* Action buttons live in their own full-width row, decoupled from either column's height */
+        .action-btn-row {
+            margin-top: 4px;
+            margin-bottom: 24px;
+        }
+
+        /* Matrix layout row — top-aligned so unequal-height columns never leave a stretched empty void */
+        .matrix-grid-row {
+            align-items: flex-start !important;
+        }
+
+        .bank-label {
+            font-size: 11px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.05em !important;
+            color: var(--text-muted) !important;
+            font-weight: 700 !important;
+        }
+
+        .tabular-nums, .bank-table td, input, select, [id^="val-"], [id^="lbl-"] {
+            font-variant-numeric: tabular-nums !important;
+        }
+
+        /* Monospace numerals — peso figures align digit-for-digit, especially in the audit trail */
+        .tabular-nums, .bank-table td, input, [id^="val-"], [id^="lbl-"], .stat-tile-value, .history-cell {
+            font-family: var(--font-mono) !important;
+        }
+
+        /* ============ FORM CONTROLS — uniform height / radius / interactive states ============ */
+        select, input[type="text"], input[type="number"], .bank-input, .bank-select {
+            padding: 10px 14px !important;
+            line-height: 1.5 !important;
+            display: flex !important;
+            align-items: center !important;
+            min-height: 42px !important;
+            box-sizing: border-box !important;
+        }
+
+        .bank-input {
+            background: rgba(10, 14, 23, 0.6) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: #FFFFFF !important;
+            border-radius: var(--radius-sm) !important;
+            font-family: 'Montserrat', sans-serif !important;
+            font-size: 0.9rem !important;
+            transition: all 0.2s ease;
+        }
+
+        .bank-select {
+            background: rgba(10, 14, 23, 0.6) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: #FFFFFF !important;
+            border-radius: var(--radius-sm) !important;
+            font-family: 'Montserrat', sans-serif !important;
+            font-size: 0.9rem !important;
+            transition: all 0.2s ease;
+            appearance: none !important;
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 14px center !important;
+            background-size: 12px !important;
+            padding-right: 36px !important;
+        }
+
+        .bank-select.select-sm {
+            padding: 8px 12px !important;
+            padding-right: 32px !important;
+            min-height: 38px !important;
+            font-size: 0.85rem !important;
+        }
+
+        .bank-select option {
+            background: var(--bg-panel) !important;
+            color: #FFFFFF !important;
+        }
+
+        .bank-input:focus, .bank-select:focus {
+            border-color: var(--accent) !important;
+            box-shadow: 0 0 0 2px rgba(229, 169, 60, 0.15) !important;
+            outline: none !important;
+        }
+
+        /* Primary CTA button — matched height/radius/border to the input/select row it sits beside */
+        .bank-btn-primary {
+            min-height: 42px !important;
+            border-radius: var(--radius-sm) !important;
+            border: 1px solid transparent !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 8px;
+            padding: 10px 16px !important;
+            box-sizing: border-box !important;
+            transition: all 0.2s ease;
+        }
+
+        .bank-btn-primary:hover {
+            filter: brightness(1.05);
+            transform: translateY(-1px);
+        }
+
+        .bank-btn-secondary {
+            min-height: 42px !important;
+            border-radius: var(--radius-sm) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 8px;
+            padding: 10px 18px !important;
+            box-sizing: border-box !important;
+            transition: all 0.2s ease;
+        }
+
+        .bank-btn-secondary:hover {
+            filter: brightness(1.15);
+            transform: translateY(-1px);
+        }
+
+        .bank-btn-outline {
+            min-height: 42px !important;
+            border-radius: var(--radius-sm) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 8px;
+            padding: 10px 18px !important;
+            box-sizing: border-box !important;
+            transition: all 0.2s ease;
+        }
+
+        .bank-btn-outline:hover {
+            background: rgba(229, 169, 60, 0.1) !important;
+            transform: translateY(-1px);
+        }
+
+        /* ============ CURRENCY INPUT PREFIX ============ */
+        .currency-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .currency-input-wrapper .currency-prefix {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted) !important;
+            background: transparent !important;
+            border: none !important;
+            font-weight: 500 !important;
+            font-size: 0.95rem !important;
+            pointer-events: none;
+            z-index: 10;
+            line-height: 1;
+        }
+
+        .currency-input-wrapper .bank-input {
+            padding-left: 32px !important;
+        }
+
+        /* ============ DATA TABLES ============ */
+        .bank-table {
+            width: 100%;
+            margin-top: 10px;
+            border-collapse: collapse;
+            border: none !important;
+        }
+
+        .bank-table th {
+            background: var(--bg-panel);
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 10px 16px !important;
+            border: none !important;
+        }
+
+        .bank-table td {
+            padding: 10px 16px !important;
+            font-size: 0.85rem;
+            border: none !important;
+            color: #E2E8F0;
+        }
+
+        .bank-table tbody tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.01) !important;
+        }
+
+        .bank-table tbody tr:hover td {
+            background: rgba(255, 255, 255, 0.03) !important;
+        }
+
+        /* ============ SECTION LABELS (formerly "orange-node") — muted, uppercase, no underline ============
+           Color discipline: orange is reserved for primary CTAs (Search, Log Session) and the page brand icon only.
+           Every section/panel heading is now a quiet gray caption; the tooltip trigger behavior is unchanged. */
+        .orange-node {
+            cursor: pointer;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            border-bottom: none;
+            padding-bottom: 0;
+            white-space: normal !important;
+            flex-wrap: wrap !important;
+        }
+
+        .orange-node:hover {
+            color: var(--text-secondary);
+        }
+
+        /* Section/panel header labels used inconsistent mb-1/mb-2/mb-3 utility classes across the markup —
+           unify every header's spacing to one value regardless of which bootstrap class it happened to carry */
+        .orange-node.mb-1, .orange-node.mb-2, .orange-node.mb-3 {
+            margin-bottom: 10px !important;
+        }
+
+        .bank-node-icon {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 6px;
+            flex-shrink: 0;
+            stroke: var(--text-muted);
+            stroke-width: 1.5px;
+        }
+
+        .math-popover {
+            display: none;
+            position: absolute;
+            bottom: 130%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0F172A;
+            border: 1px solid var(--border-hairline);
+            padding: 14px 18px;
+            border-radius: var(--radius-sm);
+            width: 310px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+            z-index: 1050;
+            color: #E2E8F0;
+            font-size: 0.8rem;
+            font-weight: 400;
+            line-height: 1.4;
+            text-align: left;
+            white-space: normal;
+            text-transform: none;
+            letter-spacing: normal;
+        }
+
+        .math-popover::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -6px;
+            border-width: 6px;
+            border-style: solid;
+            border-color: #0F172A transparent transparent transparent;
+        }
+
+        .orange-node.show-popover .math-popover {
+            display: block !important;
+        }
+
+        /* ============ ACCORDIONS (LESS ONQUEUE / PLI 1-5) ============ */
+        .bank-accordion-btn {
+            background: var(--bg-panel) !important;
+            border: 1px solid var(--border-hairline) !important;
+            border-radius: var(--radius-sm) !important;
+            text-align: left;
+            padding: 9px 14px;
+            width: 100%;
+            color: #FFFFFF;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            min-height: 40px;
+            box-sizing: border-box;
+            transition: all 0.2s ease !important;
+        }
+
+        .bank-accordion-btn:hover {
+            background: rgba(30, 41, 59, 0.8) !important;
+            border-color: var(--accent-soft) !important;
+        }
+
+        /* Right-hand value+chevron cluster — fixed so every accordion row's chevron sits on one strict vertical axis */
+        .bank-accordion-btn > span.orange-node {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        .bank-accordion-btn > span:last-child {
+            flex: 0 0 auto;
+            display: flex !important;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bank-accordion-btn > span:last-child > span[id^="lbl-pli-"],
+        .bank-accordion-btn > span:last-child > #lbl-onqueuetotal {
+            min-width: 84px;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .bank-accordion-btn .bi-chevron-down {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            transition: transform 0.2s ease;
+        }
+
+        /* PLI 1–5 — borderless list (not 5 boxed cards). Rows separated by hairline dividers;
+           only the currently expanded row gets a highlighted background + accent left border.
+           NOTE: no overflow:hidden here — that would clip the math-popover tooltips; corners are
+           rounded explicitly on the first/last row instead. */
+        #pliAccordions {
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-hairline-soft);
+            border-radius: var(--radius-sm);
+        }
+        #pliAccordions .card {
+            margin-bottom: 0 !important;
+            border-radius: 0 !important;
+        }
+        #pliAccordions .card:not(:last-child) {
+            border-bottom: 1px solid var(--border-hairline-soft);
+        }
+        #pliAccordions .card:first-child .bank-accordion-btn {
+            border-top-left-radius: var(--radius-sm) !important;
+            border-top-right-radius: var(--radius-sm) !important;
+        }
+        #pliAccordions .card:last-child .bank-accordion-btn {
+            border-bottom-left-radius: var(--radius-sm) !important;
+            border-bottom-right-radius: var(--radius-sm) !important;
+        }
+        #pliAccordions .bank-accordion-btn {
+            background: transparent !important;
+            border: none !important;
+            border-left: 3px solid transparent !important;
+            padding: 11px 13px 11px 11px;
+        }
+        #pliAccordions .bank-accordion-btn:hover {
+            background: rgba(255, 255, 255, 0.03) !important;
+        }
+        #pliAccordions .card.accordion-active {
+            background: rgba(229, 169, 60, 0.05);
+        }
+        #pliAccordions .card.accordion-active .bank-accordion-btn {
+            background: rgba(229, 169, 60, 0.07) !important;
+            border-left-color: var(--accent) !important;
+        }
+        #pliAccordions .card.accordion-active .bank-accordion-btn .orange-node {
+            color: var(--text-secondary);
+        }
+
+        /* LESS ONQUEUE keeps its boxed accordion treatment but also picks up the active-state highlight */
+        .less-onqueue-accordion .card.accordion-active .bank-accordion-btn {
+            border-color: var(--accent) !important;
+            background: rgba(30, 41, 59, 0.9) !important;
+        }
+
+        /* ============ AUDIT TRAIL — CSS Grid columns mapped 1:1 to headers ============ */
+        .bottom-history-panel {
+            margin-top: 30px;
+            border-top: 2px solid var(--border-hairline);
+            padding-top: 24px;
+        }
+
+        .history-grid-header {
+            display: grid;
+            grid-template-columns: 120px minmax(160px, 1fr) 140px 140px 32px;
+            gap: 16px;
+            padding: 0 20px;
+            margin-top: 18px;
+        }
+
+        .history-grid-header span {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .history-ledger-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .history-ledger-row {
+            display: grid;
+            grid-template-columns: 120px minmax(160px, 1fr) 140px 140px 32px;
+            align-items: center;
+            gap: 16px;
+            background: rgba(30, 41, 59, 0.4) !important;
+            border: 1px solid var(--border-hairline) !important;
+            border-radius: var(--radius-sm) !important;
+            padding: 14px 20px !important;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .history-ledger-row:hover {
+            background: rgba(30, 41, 59, 0.8) !important;
+            border-color: var(--accent-soft) !important;
+        }
+
+        /* The currently active/restored run stays distinct regardless of mouse position */
+        .history-ledger-row.is-active-run {
+            border-color: var(--accent) !important;
+            background: rgba(229, 169, 60, 0.08) !important;
+        }
+
+        .history-cell {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #FFFFFF;
+            font-family: var(--font-mono);
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .history-cell-label {
+            display: none;
+        }
+
+        .history-cell .muted {
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* Delete icon stays hidden until the row is hovered — decluttered list, not a persistent action */
+        .history-delete-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            opacity: 0;
+            transition: opacity 0.15s ease, color 0.2s ease, background 0.2s ease;
+            justify-self: end;
+        }
+
+        .history-ledger-row:hover .history-delete-btn,
+        .history-ledger-row:focus-within .history-delete-btn {
+            opacity: 1;
+        }
+
+        .history-delete-btn:hover {
+            color: var(--value-danger);
+            background: rgba(239, 68, 68, 0.12);
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-secondary);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            color: #FFFFFF;
+            border-color: #FFFFFF;
+        }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 1024px) {
+            .col-lg-6 {
+                width: 100% !important;
+                flex: 0 0 100% !important;
+                max-width: 100% !important;
+            }
+            .table-responsive {
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .bank-table, .bank-table thead, .bank-table tbody, .bank-table th, .bank-table td, .bank-table tr {
+                display: block;
+            }
+
+            .bank-table thead {
+                display: none;
+            }
+
+            .bank-table tr {
+                background: rgba(255, 255, 255, 0.01);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                border-radius: var(--radius-sm);
+                padding: 12px;
+                margin-bottom: 12px;
+            }
+
+            .bank-table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 8px 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            }
+
+            .bank-table td:last-child {
+                border-bottom: none;
+            }
+
+            .bank-table td::before {
+                content: attr(data-label);
+                font-weight: 700;
+                color: var(--text-muted);
+                margin-right: 12px;
+                font-size: 0.75rem;
+            }
+
+            /* Audit trail collapses to a stacked label:value card on small screens */
+            .history-grid-header {
+                display: none;
+            }
+
+            .history-ledger-row {
+                grid-template-columns: 1fr;
+                row-gap: 10px;
+            }
+
+            .history-cell {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                white-space: normal;
+            }
+
+            .history-cell-label {
+                display: inline-block;
+                font-size: 11px;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: var(--text-muted);
+                font-weight: 700;
+            }
+
+            .history-delete-btn {
+                justify-self: start;
+                opacity: 1;
+            }
+        }
+
+        .muted-currency {
+            color: var(--text-muted) !important;
+            font-weight: 500 !important;
+            margin-right: 3px !important;
+            user-select: none;
+            display: inline-block;
+        }
+
+        /* ============ FINANCIAL VALUE COLOR SEMANTICS ============
+           White/light gray  -> labels + intermediate/transitional values
+           Soft amber        -> deduction figures (amounts subtracted)
+           Unified green     -> final/positive outputs — with a red variant for negative deltas
+        */
+        .bank-value-display {
+            font-size: 1.05rem !important;
+            font-weight: 700 !important;
+            color: var(--value-neutral) !important;
+            letter-spacing: -0.01em !important;
+            font-variant-numeric: tabular-nums !important;
+            line-height: 1.4 !important;
+            white-space: nowrap !important;
+            overflow: visible !important;
+        }
+
+        /* Neutral transitional subtotals — always white, never wrap the currency symbol from its value */
+        #val-plisubtotal, #val-anticipated, #val-papsubtotal {
+            font-size: 1.05rem !important;
+            font-weight: 700 !important;
+            color: var(--value-neutral) !important;
+            font-variant-numeric: tabular-nums !important;
+            line-height: 1.4 !important;
+            white-space: nowrap !important;
+            overflow: visible !important;
+        }
+
+        /* val-baseline lives inside a .stat-tile now — keep it neutral white but let .stat-tile-value's larger size stand */
+        #val-baseline {
+            color: var(--value-neutral) !important;
+            white-space: nowrap !important;
+            overflow: visible !important;
+        }
+
+        /* Deduction figures — soft amber, signals "this is being subtracted" */
+        #lbl-dedamt, #lbl-onqueuetotal, #val-amortization {
+            color: var(--value-deduction) !important;
+        }
+
+        #val-amortization {
+            font-size: 1.05rem !important;
+            font-weight: 700 !important;
+            white-space: nowrap !important;
+            overflow: visible !important;
+        }
+
+        /* Final / positive-output totals — green by default; a `.is-negative` class (toggled in JS
+           from the same sign check already driving the calculations) swaps to red for a negative delta. */
+        #val-netpayplitotal, #val-newnetpay, #val-semitotal, #val-promomargin {
+            color: var(--value-final) !important;
+            white-space: nowrap !important;
+            overflow: visible !important;
+        }
+
+        /* NetPay+PLI Total isn't a stat-tile — keeps its original compact sizing in the PLI panel */
+        #val-netpayplitotal {
+            font-size: 1.15rem !important;
+            font-weight: 800 !important;
+        }
+
+        /* Semitotal & New NetPay ARE stat-tiles now — sizing comes from .inner-summary-card .bank-value-display,
+           with New NetPay bumped up one notch as the single most important figure on the screen */
+        #box-new-netpay-summary #val-newnetpay {
+            font-size: 1.45rem !important;
+            font-weight: 800 !important;
+        }
+
+        #val-promomargin.is-negative,
+        #val-semitotal.is-negative,
+        #val-newnetpay.is-negative {
+            color: var(--value-danger) !important;
+        }
+
+        /* ============ LAYOUT PRIMITIVES ============ */
+        .baseline-row {
+            display: flex !important;
+            align-items: baseline !important;
+            justify-content: space-between !important;
+            width: 100%;
+            gap: 12px;
+        }
+
+        /* Label side is allowed to shrink/wrap; the currency value never does (fixes the ₱ wrapping above its number) */
+        .baseline-row > span:first-child,
+        .baseline-row > .orange-node {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        .baseline-row > span:last-child,
+        .baseline-row > [id^="val-"] {
+            flex: 0 0 auto;
+            white-space: nowrap !important;
+        }
+
+        .section-panel-inner {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-hairline-soft);
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+        }
+
+        .pli-total-col {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .equal-height-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 0 -6px;
+        }
+        .equal-height-row > [class*="col-"] {
+            display: flex;
+            flex-direction: column;
+            padding: 0 6px;
+        }
+
+        /* Promotion column breathing room — dropdowns no longer crowd the "New Salary" readout beneath them */
+        #lbl-promoted-salary {
+            margin-top: 12px !important;
+            padding-top: 10px;
+            border-top: 1px dashed var(--border-hairline);
+        }
+
+        /* ============ STAT TILES — muted uppercase label + large bold value, flat, no border ============
+           Applied to Baseline Subtotal, Semitotal, New NetPay, and Margin Delta per the finance-dashboard spec. */
+        .stat-tile {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            margin-top: 10px;
+        }
+
+        .stat-tile-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .stat-tile-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+            color: var(--value-neutral);
+        }
+
+        /* ============ STATUS PILL — Eligible / Needs Review indicator ============ */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 13px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+        .status-pill::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            flex-shrink: 0;
+        }
+        .status-pill-success {
+            background: rgba(16, 185, 129, 0.14);
+            color: var(--value-final);
+        }
+        .status-pill-danger {
+            background: rgba(239, 68, 68, 0.14);
+            color: var(--value-danger);
+        }
+        .status-pill-neutral {
+            background: rgba(148, 163, 184, 0.14);
+            color: var(--text-secondary);
+        }
+
+        /* ============ CLIENT ORIENTATION BANNER — separate from the search/filter controls ============ */
+        .client-banner-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .client-banner-fields {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 28px;
+        }
+
+        .client-banner-field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .client-banner-value {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+
+        /* ============ SUMMARY MINI-CARDS (Incoming / Semitotal / Amortization / New NetPay) ============
+           Flat, borderless stat tiles — consistent with the finance-dashboard "no nested boxes" rule. */
+        .inner-summary-card {
+            background: rgba(255, 255, 255, 0.03) !important;
+            border: none !important;
+            border-radius: var(--radius-sm) !important;
+            padding: 14px 16px !important;
+            height: 100% !important;
+            min-height: 104px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            box-shadow: none !important;
+            transition: background 0.2s ease !important;
+        }
+        .inner-summary-card:hover {
+            background: rgba(255, 255, 255, 0.05) !important;
+        }
+
+        .inner-summary-card .bank-value-display {
+            font-size: 1.3rem !important;
+            font-weight: 800 !important;
+        }
+
+        /* Vertically centers the value/input in the space beneath the header — fixes the floating "INCOMING" input */
+        .inner-summary-card > .bank-value-display,
+        .inner-summary-card > .currency-input-wrapper {
+            margin-top: auto !important;
+            margin-bottom: auto !important;
+        }
+
+        /* ============ SCROLLBARS ============ */
+        .table-responsive::-webkit-scrollbar,
+        #onqTableContainer::-webkit-scrollbar,
+        #pliAccordions::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .table-responsive::-webkit-scrollbar-track,
+        #onqTableContainer::-webkit-scrollbar-track,
+        #pliAccordions::-webkit-scrollbar-track {
+            background: #0F172A;
+            border-radius: 4px;
+        }
+        .table-responsive::-webkit-scrollbar-thumb,
+        #onqTableContainer::-webkit-scrollbar-thumb,
+        #pliAccordions::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        .table-responsive::-webkit-scrollbar-thumb:hover,
+        #onqTableContainer::-webkit-scrollbar-thumb:hover,
+        #pliAccordions::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+    </style>
 </head>
-
-
-
-
-
-
 
 <body>
 
-<div id="searchSection" class="container  mt-5">
-    <h1 class="text-center pt-5 pb-3 mb-2">Historical Netpay</h1>
-    <div class="row pt-2">
-        <div class="col-12 d-flex">
-            <input type="text" id="searchInput" class="form-control" placeholder="Employee Number..." style="flex-grow: 1;">
-            <button id="searchButton" class="btn btn-primary ml-2">Search</button>
+    <!-- Mobile Header -->
+    <header class="mobile-header d-md-none" style="background-color: #0F172A; padding: 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08);">
+        <img src="citysavings_logo.png" alt="CitySavings" style="height: 20px; filter: brightness(0) invert(1);">
+        <div>
+            <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button>
         </div>
+    </header>
 
-        
-
-
-        <!-- Loading GIF -->
-<div id="loadingIndicator" style="display: none; text-align: center;">
-    <img src="loading.gif" alt="Loading..." style="max-width: 100px;">
-</div>
-
-    </div>
-</div>
-
-<br/>
-
-<!-- Section to display employee details -->
-<div class="container">
-    <div class="row">
-        <div class="col-md-12">
-            <h3 id="employeeInfo" class="text-white"></h3>
+    <!-- Persistent Left Sidebar Navigation (desktop) -->
+    <aside class="sidebar d-none d-md-flex">
+        <div class="sidebar-brand">
+            <img src="citysavings_logo.png" alt="CitySavings Logo">
         </div>
-    </div>
-    <div class="row results rounded-bottom rounded-top" id="results">
-        <!-- Table will be dynamically inserted here -->
-    </div>
-</div>
-
-
-
-
-
-
-<script>
-    
-    document.addEventListener('DOMContentLoaded', () => {
-        const prompt = document.getElementById('fullscreenPrompt');
-
-        // Show the prompt when the mouse moves
-        document.addEventListener('mousemove', () => {
-            prompt.style.display = 'block';
-        });
-
-        // Enter fullscreen when the prompt is clicked
-        prompt.addEventListener('click', () => {
-            openFullscreen();
-            prompt.style.display = 'none'; // Hide prompt after entering full-screen
-        });
-    });
-
-    function openFullscreen() {
-        const elem = document.documentElement;
-        if (elem.requestFullscreen) {
-            elem.requestFullscreen();
-        } else if (elem.mozRequestFullScreen) {
-            elem.mozRequestFullScreen();
-        } else if (elem.webkitRequestFullscreen) {
-            elem.webkitRequestFullscreen();
-        } else if (elem.msRequestFullscreen) {
-            elem.msRequestFullscreen();
-        }
-    }
-
-
-
-    
-        const csvFilesNetpay = [
-            'aug24.csv'
-        ];
-        
-    document.getElementById('searchButton').addEventListener('click', searchEmployee);
-
-    function searchEmployee() {
-    const searchInput = document.getElementById('searchInput').value.trim();
-    const loadingIndicator = document.getElementById('loadingIndicator');
-
-    if (!searchInput) {
-        alert('Please enter an employee number.');
-        return;
-    }
-
-    const resultsSection = document.getElementById('results');
-    const employeeInfoSection = document.getElementById('employeeInfo');
-    resultsSection.innerHTML = ''; // Clear previous results
-    employeeInfoSection.innerHTML = ''; // Clear previous employee info
-    loadingIndicator.style.display = 'block'; // Show loading indicator
-
-    // Automatically limit to the last 12 months (latest first)
-    const last12MonthsFiles = csvFilesNetpay.slice(0, 12);
-
-    let fetchedData = [];
-    let latestCsvData = null;
-
-    Promise.all(last12MonthsFiles.map(csvFile => fetchCSV(csvFile)))
-        .then(allData => {
-            fetchedData = allData;
-            fetchedData.sort((a, b) => b.date - a.date);
-            latestCsvData = fetchedData[0].csvData;
-            displayEmployeeInfo(fetchedData[0].monthName, latestCsvData);
-            displayResultsTable(fetchedData);
-        })
-        .catch(error => {
-            console.error('Error fetching CSV data:', error);
-        })
-        .finally(() => {
-            loadingIndicator.style.display = 'none'; // Hide loading indicator
-        });
-}
-
-
-    function fetchCSV(csvFile) {
-        return new Promise((resolve, reject) => {
-            const monthName = getMonthNameFromCsv(csvFile);
-            const date = getDateFromCsv(csvFile);
-
-            fetch(csvFile)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`Unable to fetch ${csvFile}`);
-                    }
-                    return response.text();
-                })
-                .then(text => {
-                    const csvData = parseCSV(text);
-                    resolve({ monthName, csvData, date });
-                })
-                .catch(error => {
-                    console.error(`Error fetching data for ${monthName}:`, error);
-                    reject(error);
-                });
-        });
-    }
-
-    function getDateFromCsv(csvFile) {
-        const monthMap = {
-            'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'may': 4, 'jun': 5,
-            'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11
-        };
-        const monthPart = csvFile.slice(0, 3);
-        const yearPart = '20' + csvFile.slice(3, 5);
-        const monthIndex = monthMap[monthPart];
-        return new Date(yearPart, monthIndex);
-    }
-
-    function getMonthNameFromCsv(csvFile) {
-        const monthMap = {
-            'jan': 'January', 'feb': 'February', 'mar': 'March', 'apr': 'April', 'may': 'May', 'jun': 'June',
-            'jul': 'July', 'aug': 'August', 'sep': 'September', 'oct': 'October', 'nov': 'November', 'dec': 'December'
-        };
-        const monthPart = csvFile.slice(0, 3);
-        const yearPart = '20' + csvFile.slice(3, 5);
-        return `${monthMap[monthPart]} ${yearPart}`;
-    }
-
-    function parseCSV(data) {
-        const rows = data.trim().split('\n');
-        return rows.map(row => {
-            const result = [];
-            let current = '';
-            let inQuotes = false;
-            for (let i = 0; i < row.length; i++) {
-                const char = row[i];
-                if (char === '"') {
-                    inQuotes = !inQuotes;
-                } else if (char === ',' && !inQuotes) {
-                    result.push(current.trim());
-                    current = '';
-                } else {
-                    current += char;
-                }
-            }
-            result.push(current.trim());
-            return result.map(val => val.replace(/^"|"$/g, '').trim());
-        });
-    }
-
-    function displayEmployeeInfo(monthName, csvData) {
-        const employeeInfoSection = document.getElementById('employeeInfo');
-        let employeeFound = false;
-
-        for (let i = 1; i < csvData.length; i++) {
-            const row = csvData[i];
-            if (row.length < 4) continue;
-            const empno = row[3];
-            if (empno.replace(/^0+/, '') === document.getElementById('searchInput').value.trim().replace(/^0+/, '')) {
-                employeeFound = true;
-
-                const div = row[1];
-                const sta = row[2];
-                const fname = row[4];
-                const mi = row[5];
-                const lname = row[6];
-                const account = row[8];
-
-                employeeInfoSection.innerHTML = `
-                    <strong>NAME:</strong><b style="color:orange"> ${fname} ${mi} ${lname}</b><br/>
-                    <strong>EMPNO:</strong><b style="color:orange">   ${empno} </b><br/>
-                    <strong>DIV / STA:</strong><b style="color:orange"> ${div} / ${sta}</b><br/>
-                    <strong>ACC:</strong><b style="color:orange">  ${account}</b>
-                `;
-                break;
-            }
-        }
-
-        if (!employeeFound) {
-            employeeInfoSection.innerHTML = 'No employee found in the latest data.';
-        }
-    }
-
-    function displayResultsTable(fetchedData) {
-        const resultsSection = document.getElementById('results');
-        
-        // Create a table with a single header row
-        const table = document.createElement('table');
-        table.classList.add('table', 'table-borderless', 'text-white');
-
-        const thead = document.createElement('thead');
-        const headerRow = document.createElement('tr');
-        headerRow.innerHTML = `
-            <th class="font-weight-bold">MONTH</th>
-            <th class="font-weight-bold">TAKEHOME</th>
-        `;
-        thead.appendChild(headerRow);
-        table.appendChild(thead);
-
-        const tbody = document.createElement('tbody');
-
-        // Iterate over the fetched data and add rows to the table body
-        fetchedData.forEach(data => {
-            data.csvData.forEach((row, index) => {
-                if (index === 0) return; // Skip header row
-                if (row.length < 4) return; // Skip malformed rows
-
-                const empno = row[3];
-                if (empno.replace(/^0+/, '') === document.getElementById('searchInput').value.trim().replace(/^0+/, '')) {
-                    const monthName = data.monthName;
-                    const takehome = parseFloat(row[7]).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
-
-                    const rowElement = document.createElement('tr');
-                    rowElement.innerHTML = `
-                        <td>${monthName}</td>
-                        <td><b>${takehome}</b></td>
-                    `;
-                    tbody.appendChild(rowElement);
-                }
-            });
-        });
-
-        if (tbody.children.length > 0) {
-            table.appendChild(tbody);
-            resultsSection.appendChild(table);
-        }
-    }
-</script>
-</body>
-</html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Historical Netpay</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="styles.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="manifest" href="manifest.json">
-    
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-<link rel="icon" href="favicon.png" type="image/png" sizes="any">
-
-
-</head>
-
-
-
-
-
-
-<body>
-
-<div id="searchSection" class="container  mt-5">
-    <h1 class="text-center pt-5 pb-3 mb-2">DEDAMT</h1>
-    <div class="row pt-2">
-        <div class="col-12 d-flex">
-            <input type="text" id="searchInput" class="form-control" placeholder="Employee Number..." style="flex-grow: 1;">
-            <button id="searchButton" class="btn btn-primary ml-2">Search</button>
+        <nav class="sidebar-nav">
+            <a class="sidebar-link" href="index.html"><i class="bi bi-wallet2"></i><span>NETPAY</span></a>
+            <a class="sidebar-link" href="index2.html"><i class="bi bi-cash-stack"></i><span>DEDAMT</span></a>
+            <a class="sidebar-link" href="index3.html"><i class="bi bi-hourglass-split"></i><span>ONQ</span></a>
+            <a class="sidebar-link" href="index4.html"><i class="bi bi-file-earmark-text"></i><span>PLI</span></a>
+            <a class="sidebar-link active" href="index5.html"><i class="bi bi-calculator-fill"></i><span>EVALUATION</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <button class="logout-btn w-100" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Log out</button>
         </div>
+    </aside>
 
+    <!-- Main Revamped Interface Content -->
+    <div class="content-area">
+    <div class="container py-4 main-container">
         
-
-
-        <!-- Loading GIF -->
-<div id="loadingIndicator" style="display: none; text-align: center;">
-    <img src="loading.gif" alt="Loading..." style="max-width: 100px;">
-</div>
-
-    </div>
-</div>
-
-<br/>
-
-<!-- Section to display employee details -->
-<div class="container">
-    <div class="row">
-        <div class="col-md-12">
-            <h3 id="employeeInfo" class="text-white"></h3>
-        </div>
-    </div>
-    <div class="row results rounded-bottom rounded-top" id="results">
-        <!-- Table will be dynamically inserted here -->
-    </div>
-</div>
-
-
-
-
-
-
-
-
-
-<script>
-    
-    document.addEventListener('DOMContentLoaded', () => {
-        const prompt = document.getElementById('fullscreenPrompt');
-
-        // Show the prompt when the mouse moves
-        document.addEventListener('mousemove', () => {
-            prompt.style.display = 'block';
-        });
-
-        // Enter fullscreen when the prompt is clicked
-        prompt.addEventListener('click', () => {
-            openFullscreen();
-            prompt.style.display = 'none'; // Hide prompt after entering full-screen
-        });
-    });
-
-    function openFullscreen() {
-        const elem = document.documentElement;
-        if (elem.requestFullscreen) {
-            elem.requestFullscreen();
-        } else if (elem.mozRequestFullScreen) {
-            elem.mozRequestFullScreen();
-        } else if (elem.webkitRequestFullscreen) {
-            elem.webkitRequestFullscreen();
-        } else if (elem.msRequestFullscreen) {
-            elem.msRequestFullscreen();
-        }
-    }
-
-
-
-const csvFilesPos = [
-    'pos_aug24.csv'
-];
-
-document.getElementById('searchButton').addEventListener('click', searchEmployee);
-
-function searchEmployee() {
-    const searchInput = document.getElementById('searchInput').value.trim();
-    const loadingIndicator = document.getElementById('loadingIndicator');
-
-    if (!searchInput) {
-        alert('Please enter an employee number.');
-        return;
-    }
-
-    const resultsSection = document.getElementById('results');
-    const employeeInfoSection = document.getElementById('employeeInfo');
-    resultsSection.innerHTML = ''; // Clear previous results
-    employeeInfoSection.innerHTML = ''; // Clear previous employee info
-    loadingIndicator.style.display = 'block'; // Show loading indicator
-
-    // Automatically limit to the last 12 months (latest first)
-    const last12MonthsFiles = csvFilesPos.slice(0, 12);
-
-    let fetchedData = [];
-
-    Promise.all(last12MonthsFiles.map(csvFile => fetchCSV(csvFile)))
-        .then(allData => {
-            fetchedData = allData.filter(data => data !== null); // Filter out failed fetches
-            if (fetchedData.length === 0) {
-                alert('No valid data found in the provided files.');
-                return;
-            }
-            fetchedData.sort((a, b) => b.date - a.date);
-            displayEmployeeInfo(fetchedData[0].monthName, fetchedData[0].csvData);
-            displayResultsTable(fetchedData);
-        })
-        .catch(error => {
-            console.error('Error fetching CSV data:', error);
-            alert('Error fetching data. Check the console for more details.');
-        })
-        .finally(() => {
-            loadingIndicator.style.display = 'none'; // Hide loading indicator
-        });
-}
-
-function fetchCSV(csvFile) {
-    return new Promise((resolve, reject) => {
-        const monthName = getMonthNameFromCsv(csvFile);
-        const date = getDateFromCsv(csvFile);
-
-        console.log(`Fetching data from file: ${csvFile}`);
-
-        fetch(csvFile)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Unable to fetch ${csvFile}. Status: ${response.status}`);
-                }
-                return response.text();
-            })
-            .then(text => {
-                console.log(`Successfully fetched data from ${csvFile}`);
-                const csvData = parseCSV(text);
-                resolve({ monthName, csvData, date });
-            })
-            .catch(error => {
-                console.error(`Error fetching data for ${monthName}:`, error);
-                resolve(null); // Return null for failed fetches, don't reject to allow Promise.all to proceed
-            });
-    });
-}
-
-function getDateFromCsv(csvFile) {
-    const fileName = csvFile.replace('pos_', ''); // Remove 'pos_' prefix
-    const monthMap = {
-        'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'may': 4, 'jun': 5,
-        'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11
-    };
-    const monthPart = fileName.slice(0, 3);
-    const yearPart = '20' + fileName.slice(3, 5);
-    const monthIndex = monthMap[monthPart];
-    return new Date(yearPart, monthIndex);
-}
-
-function getMonthNameFromCsv(csvFile) {
-    const fileName = csvFile.replace('pos_', ''); // Remove 'pos_' prefix
-    const monthMap = {
-        'jan': 'January', 'feb': 'February', 'mar': 'March', 'apr': 'April', 'may': 'May', 'jun': 'June',
-        'jul': 'July', 'aug': 'August', 'sep': 'September', 'oct': 'October', 'nov': 'November', 'dec': 'December'
-    };
-    const monthPart = fileName.slice(0, 3);
-    const yearPart = '20' + fileName.slice(3, 5);
-    return `${monthMap[monthPart]} ${yearPart}`;
-}
-
-function parseCSV(data) {
-    const rows = data.trim().split('\n');
-    return rows.map(row => row.split(','));
-}
-
-function displayEmployeeInfo(monthName, csvData) {
-    const employeeInfoSection = document.getElementById('employeeInfo');
-    let employeeFound = false;
-
-    for (let i = 1; i < csvData.length; i++) {
-        const row = csvData[i];
-        if (row.length < 4) continue;
-        const empno = row[3];
-        if (empno.replace(/^0+/, '') === document.getElementById('searchInput').value.trim().replace(/^0+/, '')) {
-            employeeFound = true;
-
-            const div = row[1];
-            const sta = row[2];
-            const fname = row[4];
-            const mi = row[5];
-            const lname = row[6];
-
-            employeeInfoSection.innerHTML = `
-                <strong>NAME:</strong><b style="color:orange"> ${fname} ${mi} ${lname}</b><br/>
-                <strong>EMPNO:</strong><b style="color:orange">   ${empno} </b><br/>
-                <strong>DIV / STA:</strong><b style="color:orange"> ${div} / ${sta}</b><br/>
-            `;
-            break;
-        }
-    }
-
-    if (!employeeFound) {
-        employeeInfoSection.innerHTML = 'No employee found in the latest data.';
-    }
-}
-
-
-function displayResultsTable(fetchedData) {
-    const resultsSection = document.getElementById('results');
-    
-    // Create a table with a single header row
-    const table = document.createElement('table');
-    table.classList.add('table', 'table-borderless', 'text-white');
-
-    const thead = document.createElement('thead');
-    const headerRow = document.createElement('tr');
-    headerRow.innerHTML = `
-        <th class="font-weight-bold">MONTH</th>
-        <th class="font-weight-bold">DEDAMT</th>
-    `;
-    thead.appendChild(headerRow);
-    table.appendChild(thead);
-
-    const tbody = document.createElement('tbody');
-    const resultsMap = new Map(); // To store sums and details for dropdown
-
-    fetchedData.forEach(data => {
-        data.csvData.forEach((row, index) => {
-            if (index === 0) return; // Skip header row
-            if (row.length < 4) return; // Skip malformed rows
-
-            const empno = row[3];
-            if (empno.replace(/^0+/, '') === document.getElementById('searchInput').value.trim().replace(/^0+/, '')) {
-                const monthName = data.monthName;
-                const dedamt = parseFloat(row[13]);
-                
-                // Accumulate amounts
-                if (!resultsMap.has(monthName)) {
-                    resultsMap.set(monthName, { sum: 0, details: [] });
-                }
-                const entry = resultsMap.get(monthName);
-                entry.sum += dedamt;
-                entry.details.push(dedamt.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' }));
-            }
-        });
-    });
-
-    // Add aggregated results to the table
-    resultsMap.forEach((value, monthName) => {
-        const totalDedAmt = value.sum.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
-        
-        const rowElement = document.createElement('tr');
-        rowElement.innerHTML = `
-            <td>${monthName}</td>
-            <td>
-                <div class="position-relative">
-                    <u><b class="sum-amount" style="cursor: pointer;">${totalDedAmt}</b></u>
-                    <div class="dropdown-menu" style="display: none; position: absolute; z-index: 1;">
-                        ${value.details.map(detail => `<div class="dropdown-item">${detail}</div>`).join('')}
-                    </div>
+        <!-- [2026-07-10 Fix: Added descriptive label class names, IDs, and data-labels per global rules] -->
+        <!-- Search & Client Configuration Widget -->
+        <div class="bank-card search-config-card" id="searchConfigurationCard" data-label="Search & Client Configuration Card">
+            <div class="row align-items-center">
+                <div class="col-lg-3 col-md-12">
+                    <h5 class="mb-lg-0 font-weight-bold" style="color: #F59E0B; letter-spacing: 0.5px;"><i class="bi bi-shield-check"></i> Credit Assessment</h5>
                 </div>
-            </td>
-        `;
-        
-        // Add hover event listeners
-        const sumAmount = rowElement.querySelector('.sum-amount');
-        const dropdownMenu = rowElement.querySelector('.dropdown-menu');
+                <div class="col-lg-3 col-md-4">
+                    <select id="activeMonthSelect" class="form-control bank-select">
+                        <option value="jun26" selected>June 2026</option>
+                        <option value="may26">May 2026</option>
+                        <option value="apr26">April 2026</option>
+                        <option value="mar26">March 2026</option>
+                        <option value="feb26">February 2026</option>
+                        <option value="jan26">January 2026</option>
+                        <option value="nov25">November 2025</option>
+                        <option value="oct25">October 2025</option>
+                        <option value="sep25">September 2025</option>
+                        <option value="aug25">August 2025</option>
+                        <option value="jul25">July 2025</option>
+                        <option value="jun25">June 2025</option>
+                    </select>
+                </div>
+                <div class="col-lg-4 col-md-5">
+                    <input type="text" id="employeeNumber" class="form-control bank-input" value="4694264" placeholder="Search Employee ID...">
+                </div>
+                <div class="col-lg-2 col-md-3">
+                    <button id="searchBtn" class="btn btn-warning bank-btn-primary w-100 font-weight-bold" onclick="performSearch()" style="background-color: #F59E0B; color: #020617;">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                </div>
+            </div>
 
-        sumAmount.addEventListener('mouseenter', () => {
-            dropdownMenu.style.display = 'block';
-        });
-
-        sumAmount.addEventListener('mouseleave', () => {
-            dropdownMenu.style.display = 'none';
-        });
-
-        tbody.appendChild(rowElement);
-    });
-
-    if (tbody.children.length > 0) {
-        table.appendChild(tbody);
-        resultsSection.appendChild(table);
-    }
-}
-
-
-</script>
-</body>
-</html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Historical Netpay</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="styles.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="manifest" href="manifest.json">
-    
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-<link rel="icon" href="favicon.png" type="image/png" sizes="any">
-
-
-</head>
-
-
-<body>
-
-    
-
-<div id="searchSection" class="container mt-5">
-    <h1 class="text-center pt-5 pb-3 mb-2">ONQUEUE</h1>
-    <div class="row pt-2">
-        <div class="col-12 d-flex">
-            <input type="text" id="searchInput" class="form-control" placeholder="Employee Number..." style="flex-grow: 1;">
-            <button id="searchButton" class="btn btn-primary ml-2">Search</button>
+            <!-- Search Loading Indicator -->
+            <div id="loadingIndicator" class="text-center mt-3 d-none">
+                <div class="spinner-border text-warning" role="status" style="width: 1.5rem; height: 1.5rem;">
+                    <span class="sr-only">Loading...</span>
+                </div>
+                <div class="text-muted mt-2 small">Ingesting client profiles & records...</div>
+            </div>
         </div>
-        <!-- Loading GIF -->
-        <div id="loadingIndicator" style="display: none; text-align: center;">
-            <img src="loading.gif" alt="Loading..." style="max-width: 100px;">
+
+        <!-- Client Orientation Banner — separate from the search/filter controls above -->
+        <div id="empSummaryCard" class="bank-card client-banner-card d-none" data-label="Employee Details Summary Card">
+            <div class="client-banner-fields">
+                <div class="client-banner-field">
+                    <span class="stat-tile-label">Client Name</span>
+                    <span id="empSummaryName" class="client-banner-value">-</span>
+                </div>
+                <div class="client-banner-field">
+                    <span class="stat-tile-label">Employee ID</span>
+                    <span id="empSummaryID" class="client-banner-value">-</span>
+                </div>
+                <div class="client-banner-field">
+                    <span class="stat-tile-label">Div / Station</span>
+                    <span id="empSummaryDiv" class="client-banner-value">-</span>
+                </div>
+            </div>
+            <span id="empEligibilityPill" class="status-pill status-pill-neutral">Pending</span>
         </div>
-    </div>
-</div>
 
-<br/>
+        <!-- Main Evaluation Workspace -->
+        <div id="evaluationWorkspace" class="d-none">
+            
+            <!-- Matrix Phase Grid Layout -->
+            <div class="row matrix-grid-row">
+                
+                <!-- Left Column (Phases A, B) -->
+                <div class="col-lg-6 col-md-12">
+                    
+                    <!-- Card: Setup & Capital Base -->
+                    <div class="bank-card baseline-setup-card" id="card-baseline-netpay" data-label="Setup & Capital Base Card">
+                        
+                        <!-- [2026-07-10 Fix: Replaced informal emojis with monochrome SVG stroke icons per user rule] -->
+                        <!-- [2026-07-11 Fix: section-panel-inner class replaces inline styles for NETPAY & DEDAMT BASELINE panel — uniform spacing, no overflow] -->
+                        <div class="section-panel-inner mb-3" id="panel-baseline-inner">
+                            <div class="orange-node mb-3" id="node-baseline">
+                                <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10"/></svg>
+                                NETPAY &amp; DEDAMT BASELINE
+                                <span class="math-popover">
+                                    <strong>Baseline Subtotal = NetPay + DEDAMT</strong><br>
+                                    Combines NetPay (from june26.csv) and DEDAMT components (from pos_june26.csv).
+                                </span>
+                            </div>
+                            <!-- [2026-07-11 Fix: Label rows use baseline-row for left-label right-value alignment] -->
+                            <div class="baseline-row small text-white-50 mb-2">
+                                <span>Base NetPay</span>
+                                <span id="lbl-netpay" class="tabular-nums font-weight-bold text-white">₱0.00</span>
+                            </div>
+                            <div class="baseline-row small text-white-50 mb-3">
+                                <span>Base Positive Deductions</span>
+                                <span id="lbl-dedamt" class="tabular-nums font-weight-bold text-white">₱0.00</span>
+                            </div>
+                            <div class="stat-tile">
+                                <div class="stat-tile-label">Baseline Subtotal</div>
+                                <div id="val-baseline" class="stat-tile-value">₱0.00</div>
+                            </div>
+                        </div>
 
-<!-- Section to display employee details -->
-<div class="container pb-5 mb-5">
-    <div class="row">
-        <div class="col-md-12">
-            <h3 id="employeeInfo" class="text-white"></h3>
+                        <!-- [2026-07-11 Fix: section-panel-inner for LOAN AMOUNT panel] -->
+                        <div class="section-panel-inner" id="panel-loanamt-inner">
+                            <div class="orange-node mb-2" id="node-loanamt">
+                                <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg>
+                                LOAN AMOUNT
+                                <span class="math-popover">
+                                    <strong>Remaining Value = NetPay + DEDAMT - OnQueue</strong><br>
+                                    <strong>Initial Loan = floor(Remaining Value / 20.01) * 1000</strong>
+                                </span>
+                            </div>
+                            <!-- [2026-07-10 Fix: Integrated currency text prefix inside wrapper with text-white input styling] -->
+                            <div class="currency-input-wrapper mb-1">
+                                <span class="currency-prefix">₱</span>
+                                <input type="text" id="loanAmount" class="form-control bank-input font-weight-bold text-white tabular-nums" oninput="formatLoanAmountField(); runCalculations();">
+                            </div>
+                            <div id="lbl-total-interest" class="text-white-50 small tabular-nums" style="font-size: 0.8rem; font-weight: 500;">
+                                Total Interest: ₱0.00
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-6">
+                                    <div class="orange-node mb-1" id="node-term">
+                                        <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                        LOAN TERM
+                                        <span class="math-popover">
+                                            Amortization period from 6 to 60 months.
+                                        </span>
+                                    </div>
+                                    <select id="loanTerm" class="form-control bank-select tabular-nums" onchange="runCalculations()">
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <div class="orange-node mb-1" id="node-rate">
+                                        <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+                                        INTEREST RATE
+                                        <span class="math-popover">
+                                            Lending rate. Defaults to 7.5%.
+                                        </span>
+                                    </div>
+                                    <select id="interestRate" class="form-control bank-select" onchange="runCalculations()">
+                                        <option value="7.5" selected>7.5%</option>
+                                        <option value="9">9.0%</option>
+                                        <option value="9.66">9.66%</option>
+                                        <option value="12">12.0%</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- [2026-07-10 Fix: Added descriptive IDs, label classnames, and uniform numeric display classes per global rules] -->
+                    <!-- Card: Private Liabilities (PLI) -->
+                    <div class="bank-card private-liabilities-card" id="card-private-liabilities" data-label="Private Liabilities (PLI) Assessment Card">
+                        
+                        <div id="pliAccordions" class="accordion mb-3">
+                            <!-- Populated dynamically -->
+                        </div>
+
+                        <!-- [2026-07-11 Fix: PLI Subtotal row — section-panel-inner + pli-total-col stacked layout to prevent text overlap in narrow viewports] -->
+                        <div class="section-panel-inner" id="panel-pli-totals">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="pli-total-col">
+                                        <div class="orange-node font-weight-bold" id="node-plisubtotal">
+                                            <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
+                                            PLI SUBTOTAL
+                                            <span class="math-popover">
+                                                Sum of selected PLI deductions.
+                                            </span>
+                                        </div>
+                                        <div id="val-plisubtotal" class="bank-value-display mt-2">₱0.00</div>
+                                    </div>
+                                </div>
+                                <div class="col-6" style="border-left: 1px solid rgba(255,255,255,0.06); padding-left: 16px;">
+                                    <div class="pli-total-col">
+                                        <div class="orange-node font-weight-bold" id="node-netpayplitotal">
+                                            <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                            NETPAY + PLI TOTAL
+                                            <span class="math-popover">
+                                                <strong>NetPay + PLI Total Margin</strong>
+                                            </span>
+                                        </div>
+                                        <div id="val-netpayplitotal" class="bank-value-display mt-2">₱0.00</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Column (Compensation, Final Underwriting) -->
+                <div class="col-lg-6 col-md-12">
+                    
+                    <!-- [2026-07-10 Fix: Added descriptive ID, label classnames, and standardized bank-value-display classes per global rules] -->
+                    <!-- Card: Compensation Adjustments (Merged ANTICIPATED and PROMOTION) -->
+                    <div class="bank-card compensation-adjustments-card" id="card-compensation-adjustments" data-label="Compensation Adjustments Assessment Card">
+                        
+                        <!-- [2026-07-11 Fix: ANTICIPATED and PROMOTION columns — stacked label-then-value layout prevents horizontal text cramping and overflow] -->
+                        <div class="section-panel-inner" id="panel-comp-adjustments">
+                            <div class="row">
+                                <!-- ANTICIPATED Column -->
+                                <div class="col-6" style="border-right: 1px solid rgba(255,255,255,0.06);">
+                                    <div class="orange-node mb-3" id="node-anticipated">
+                                        <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                                        ANTICIPATED
+                                        <span class="math-popover">
+                                            Original Step Salary pulled from tranch2026.csv.
+                                        </span>
+                                    </div>
+                                    <!-- [2026-07-11 Fix: Stacked label-then-value (not inline) — avoids text overlap on SG-11 Step-5 long values] -->
+                                    <div class="mb-3">
+                                        <div class="small text-white-50 mb-1">Original SG / Step</div>
+                                        <div id="lbl-originalsg" class="font-weight-bold text-white tabular-nums" style="font-size: 0.95rem;">-</div>
+                                    </div>
+                                    <div>
+                                        <div class="small text-white-50 mb-1">Remarks Value</div>
+                                        <div id="val-anticipated" class="bank-value-display">₱0.00</div>
+                                    </div>
+                                </div>
+
+                                <!-- PROMOTION Column -->
+                                <div class="col-6" style="padding-left: 16px;">
+                                    <div class="orange-node mb-3" id="node-promotion">
+                                        <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+                                        PROMOTION
+                                        <span class="math-popover">
+                                            Select promotional overrides inside tranch2026.csv.
+                                        </span>
+                                    </div>
+                                    <!-- [2026-07-11 Fix: Label above dropdowns, New Salary readout BELOW dropdowns so nothing overlaps] -->
+                                    <div class="mb-3">
+                                        <div class="small text-white-50 mb-1">Promotional Override</div>
+                                        <div class="d-flex" style="gap: 6px;">
+                                            <select id="promoGrade" class="form-control bank-select select-sm tabular-nums" style="flex: 1; min-width: 0;" onchange="runCalculations()">
+                                            </select>
+                                            <select id="promoStep" class="form-control bank-select select-sm tabular-nums" style="flex: 1; min-width: 0;" onchange="runCalculations()">
+                                            </select>
+                                        </div>
+                                        <!-- New Salary display below dropdowns — no horizontal clash -->
+                                        <div id="lbl-promoted-salary" class="text-white-50 tabular-nums mt-1" style="font-size: 0.75rem; font-weight: 500; opacity: 0.85;">
+                                            New Salary: ₱0.00
+                                        </div>
+                                    </div>
+                                    <div class="stat-tile">
+                                        <div class="stat-tile-label">Margin Delta</div>
+                                        <div id="val-promomargin" class="stat-tile-value">₱0.00</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- [2026-07-11 Fix: PAP Subtotal uses section-panel-inner + mt-3 spacing] -->
+                        <div class="section-panel-inner mt-3" id="panel-papsubtotal">
+                            <div class="baseline-row">
+                                <div class="orange-node font-weight-bold" id="node-papsubtotal">
+                                    <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16v1a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v1"/><path d="M18 8h4a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-4"/><circle cx="8" cy="12" r="2"/></svg>
+                                    PLI + ANTICIPATED + PROMOTION SUBTOTAL
+                                    <span class="math-popover">
+                                        <strong>PLI + ANTICIPATED + PROMOTION = 5 PLIs Sum + Anticipated Value + Promotion Margin</strong>
+                                    </span>
+                                </div>
+                                <div id="val-papsubtotal" class="bank-value-display">₱0.00</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- [2026-07-10 Fix: Replaced informal emojis with SVG icons, added comma formatting to incomingDeduction, tabular-nums, & styled as official bank certificate] -->
+                    <!-- [2026-07-10 Fix: Added card ID, inner summary box IDs, single-line amortization title, and non-overlapping bank-value-display classes per user rules] -->
+                    <!-- Card: Final Underwriting & PMT -->
+                    <div class="bank-card final-underwriting-card" id="card-final-underwriting" data-label="Final Underwriting & PMT Certificate Card" style="background: linear-gradient(145deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.95)) !important; border: 1px solid rgba(229, 169, 60, 0.25) !important; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;">
+
+                        <!-- OnQueue accordion section -->
+                        <div class="accordion mb-3 less-onqueue-accordion" id="onqAccordionParent">
+                            <div class="card bg-transparent border-0">
+                                <button class="bank-accordion-btn" type="button" onclick="toggleCustomAccordion('collapseOnq')">
+                                    <span class="orange-node" id="node-lessonqueue" onclick="event.stopPropagation()">
+                                        <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                                        LESS ONQUEUE
+                                        <span class="math-popover">
+                                            Outstanding deductions checked inside queue from onq_june26.csv.
+                                        </span>
+                                    </span>
+                                    <span class="d-flex align-items-center">
+                                        <span id="lbl-onqueuetotal" class="text-white mr-3 tabular-nums" style="font-weight: 700;">₱0.00</span>
+                                        <i class="bi bi-chevron-down"></i>
+                                    </span>
+                                </button>
+                                <div id="collapseOnq" class="collapse" aria-labelledby="onqHeading" data-parent="#onqAccordionParent">
+                                    <!-- [2026-07-11 Fix: section-panel-inner class for LESS ONQUEUE accordion body panel] -->
+                                    <div class="card-body section-panel-inner mt-2" id="panel-onq-table">
+                                        <div id="onqTableContainer" class="table-responsive">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- [2026-07-11 Fix: 2x2 inner summary card grid uses equal-height-row for uniform card height across all 4 boxes] -->
+                        <!-- manual inputs & calculations results grids -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6 d-flex">
+                                <div class="inner-summary-card incoming-panel w-100" id="box-incoming-deduction" data-label="Incoming Deduction Override Panel">
+                                    <div class="orange-node mb-2" id="node-incoming">
+                                        <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17V3"/><path d="m6 11 6 6 6-6"/><path d="M19 21H5"/></svg>
+                                        INCOMING
+                                        <span class="math-popover">
+                                            Open manual input field for extra deductions. Defaults to 0.
+                                        </span>
+                                    </div>
+                                    <div class="currency-input-wrapper mt-2">
+                                        <span class="currency-prefix">₱</span>
+                                        <input type="text" id="incomingDeduction" class="form-control bank-input w-100 font-weight-bold text-white tabular-nums" value="0" oninput="formatNumberInput(this); runCalculations()">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 d-flex">
+                                <div class="inner-summary-card semitotal-panel w-100" id="box-semitotal-summary" data-label="SemiTotal Summary Panel">
+                                    <div class="orange-node mb-2" id="node-semitotal">
+                                        <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="16" y1="18" x2="16" y2="18"/><line x1="12" y1="18" x2="12" y2="18"/><line x1="8" y1="18" x2="8" y2="18"/></svg>
+                                        SEMITOTAL
+                                        <span class="math-popover">
+                                            <strong>SemiTotal = PAP Subtotal + Active OnQueue Total - Incoming Deduction</strong>
+                                        </span>
+                                    </div>
+                                    <div id="val-semitotal" class="bank-value-display mt-2">₱0.00</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6 d-flex">
+                                <div class="inner-summary-card amortization-panel w-100" id="box-amortization-summary" data-label="CSB Amortization Summary Panel">
+                                    <div class="orange-node mb-2" id="node-amortization">
+                                        <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                        CSB AMORTIZATION
+                                        <span class="math-popover">
+                                            <strong>Amortization = RoundUp(-PMT(Interest/12, Term, Loan Amount, 0), 2)</strong>
+                                        </span>
+                                    </div>
+                                    <div id="val-amortization" class="bank-value-display mt-2">₱0.00</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 d-flex">
+                                <div class="inner-summary-card new-netpay-panel w-100" id="box-new-netpay-summary" data-label="New NetPay Final Settlement Panel">
+                                    <div class="orange-node mb-2" id="node-newnetpay">
+                                        <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                        NEW NETPAY
+                                        <span class="math-popover">
+                                            <strong>New NetPay = SemiTotal - Amortization</strong><br>
+                                            Statutory minimum limit warning checks (₱5,000.00).
+                                        </span>
+                                    </div>
+                                    <div id="val-newnetpay" class="bank-value-display mt-2">₱0.00</div>
+                                    <div id="lbl-threshold-error" class="text-danger small font-weight-bold mt-2 d-none">
+                                        <i class="bi bi-exclamation-triangle-fill"></i> statutory limit warning (Below ₱5,000.00)!
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Underwriting Screen Control Buttons — full-width row, independent of either column's height -->
+            <div class="d-flex justify-content-end action-btn-row">
+                <button class="btn btn-outline-warning bank-btn-outline mr-2 font-weight-bold" onclick="logCurrentState()" style="border-color: #F59E0B; color: #F59E0B;">
+                    <i class="bi bi-save"></i> Log Session
+                </button>
+                <button class="btn btn-secondary bank-btn-secondary font-weight-bold" onclick="clearInputsAndReload()" style="background: #475569; border: none;">
+                    <i class="bi bi-arrow-counterclockwise"></i> Reset Evaluator
+                </button>
+            </div>
+
+            <!-- Full-width Bottom Panel: Computation State History Logger -->
+            <div class="bottom-history-panel" id="historyLogPanel">
+                <h5 class="text-white font-weight-bold d-flex align-items-center">
+                    <i class="bi bi-clock-history text-warning mr-2"></i> Session Runs Audit Trail
+                </h5>
+                <p class="text-white-50 small">Click on any run card below to restore its complete evaluation states and parameter overrides.</p>
+                <div class="history-grid-header">
+                    <span>Timestamp</span>
+                    <span>ID &amp; Term</span>
+                    <span>Loan Amount</span>
+                    <span>New NetPay</span>
+                    <span></span>
+                </div>
+                <div class="history-ledger-list" id="historyLogList">
+                    <!-- Loaded dynamically via JS -->
+                    <div class="text-white-50 text-center py-4 w-100">No historical assess runs recorded in this session.</div>
+                </div>
+            </div>
+
         </div>
+
     </div>
-    <div class="row results rounded-bottom rounded-top pb-5 mb-5" id="results">
-        <!-- Table will be dynamically inserted here -->
     </div>
-</div>
 
+    <!-- Bottom Navigation Bar (Mobile) -->
+    <div class="bottom-nav d-md-none" style="position: fixed; bottom: 0; left: 0; right: 0; background: #0F172A; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.08); z-index: 1000;">
+        <a href="index.html" style="color: #94A3B8; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.7rem;">
+            <i class="bi bi-wallet" style="font-size: 1.2rem;"></i>
+            <span>NETPAY</span>
+        </a>
+        <a href="index2.html" style="color: #94A3B8; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.7rem;">
+            <i class="bi bi-cash-stack" style="font-size: 1.2rem;"></i>
+            <span>DEDAMT</span>
+        </a>
+        <a href="index3.html" style="color: #94A3B8; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.7rem;">
+            <i class="bi bi-hourglass-split" style="font-size: 1.2rem;"></i>
+            <span>ONQ</span>
+        </a>
+        <a href="index4.html" style="color: #94A3B8; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.7rem;">
+            <i class="bi bi-file-earmark-text" style="font-size: 1.2rem;"></i>
+            <span>PLI</span>
+        </a>
+        <a href="index5.html" style="color: #F59E0B; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.7rem;">
+            <i class="bi bi-calculator-fill" style="font-size: 1.2rem;"></i>
+            <span>EVAL</span>
+        </a>
+    </div>
 
+    <!-- JavaScript logical matrix code -->
+    <script>
+        // Check for login session constraints
+        document.addEventListener("DOMContentLoaded", async function () {
+            const loginTime = localStorage.getItem("loginTime");
+            if (!loginTime || (new Date().getTime() - loginTime) > 3 * 60 * 60 * 1000) {
+                window.location.href = "login/index.html";
+            }
+            
+            // Build dynamic inline term ranges
+            buildLoanTermOptions();
+            
+            // Build salary overrides selectors
+            buildSalaryGradeOverrideOptions();
+            
+            // Initial load of logs
+            renderHistoryLog();
 
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-        const prompt = document.getElementById('fullscreenPrompt');
-
-        // Show the prompt when the mouse moves
-        document.addEventListener('mousemove', () => {
-            prompt.style.display = 'block';
+            // Load and restore last active evaluation state from localStorage
+            const savedState = localStorage.getItem('le_active_state');
+            if (savedState) {
+                try {
+                    const state = JSON.parse(savedState);
+                    if (state && state.empNum && state.month) {
+                        await restoreActiveState(state);
+                    }
+                } catch (e) {
+                    console.error("Failed to restore last active evaluation session state:", e);
+                }
+            }
         });
 
-        // Enter fullscreen when the prompt is clicked
-        prompt.addEventListener('click', () => {
-            openFullscreen();
-            prompt.style.display = 'none'; // Hide prompt after entering full-screen
-        });
-    });
-
-    function openFullscreen() {
-        const elem = document.documentElement;
-        if (elem.requestFullscreen) {
-            elem.requestFullscreen();
-        } else if (elem.mozRequestFullScreen) {
-            elem.mozRequestFullScreen();
-        } else if (elem.webkitRequestFullscreen) {
-            elem.webkitRequestFullscreen();
-        } else if (elem.msRequestFullscreen) {
-            elem.msRequestFullscreen();
+        // Dropdowns build helpers
+        function buildLoanTermOptions() {
+            const termSelect = document.getElementById('loanTerm');
+            termSelect.innerHTML = '';
+            for (let t = 6; t <= 60; t++) {
+                const opt = document.createElement('option');
+                opt.value = t;
+                opt.textContent = `${t} months`;
+                if (t === 60) opt.selected = true;
+                termSelect.appendChild(opt);
+            }
         }
-    }
 
+        // SG override selector lists builder
+        function buildSalaryGradeOverrideOptions() {
+            const gradeSelect = document.getElementById('promoGrade');
+            gradeSelect.innerHTML = '';
+            for (let g = 1; g <= 33; g++) {
+                const opt = document.createElement('option');
+                opt.value = g;
+                opt.textContent = `SG-${g}`;
+                gradeSelect.appendChild(opt);
+            }
 
+            const stepSelect = document.getElementById('promoStep');
+            stepSelect.innerHTML = '';
+            for (let s = 1; s <= 8; s++) {
+                const opt = document.createElement('option');
+                opt.value = s;
+                opt.textContent = `Step ${s}`;
+                stepSelect.appendChild(opt);
+            }
+        }
 
+        // Sanitization and numeric helper functions to prevent NaN values
+        function safeFloat(val) {
+            if (typeof val === 'number') return isNaN(val) ? 0 : val;
+            if (!val) return 0;
+            const cleaned = val.toString().replace(/[₱$a-zA-Z\s,]/g, '');
+            const num = parseFloat(cleaned);
+            return isNaN(num) ? 0 : num;
+        }
 
+        // Parse integers safely
+        function safeInt(val) {
+            if (typeof val === 'number') return isNaN(val) ? 0 : Math.round(val);
+            if (!val) return 0;
+            const cleaned = val.toString().replace(/[₱$a-zA-Z\s,]/g, '');
+            const num = parseInt(cleaned, 10);
+            return isNaN(num) ? 0 : num;
+        }
 
+        /* [2026-07-10 Fix: Format currency values nicely with a muted currency span per user request] */
+        function formatPHP(val) {
+            const formattedNum = parseFloat(val).toLocaleString('en-PH', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+            return `<span class="muted-currency">₱</span>${formattedNum}`;
+        }
 
-
-
-
-
-
-
-const csvFilesOnq = [
-    'onq_aug24.csv'
-];
-
-document.getElementById('searchButton').addEventListener('click', searchEmployee);
-
-function searchEmployee() {
-    const searchInput = document.getElementById('searchInput').value.trim();
-    const loadingIndicator = document.getElementById('loadingIndicator');
-
-    if (!searchInput) {
-        alert('Please enter an employee number.');
-        return;
-    }
-
-    const resultsSection = document.getElementById('results');
-    const employeeInfoSection = document.getElementById('employeeInfo');
-    resultsSection.innerHTML = ''; // Clear previous results
-    employeeInfoSection.innerHTML = ''; // Clear previous employee info
-    loadingIndicator.style.display = 'block'; // Show loading indicator
-
-    const last12MonthsFiles = csvFilesOnq.slice(0, 12);
-
-    let fetchedData = [];
-
-    Promise.all(last12MonthsFiles.map(csvFile => fetchCSV(csvFile)))
-        .then(allData => {
-            fetchedData = allData.filter(data => data !== null);
-            if (fetchedData.length === 0) {
-                alert('No valid data found in the provided files.');
+        /* [2026-07-10 Fix: Real-time comma formatting for financial inputs while preserving cursor position and decimal points] */
+        function formatNumberInput(field) {
+            if (!field) return;
+            let cursor = field.selectionStart;
+            let oldLen = field.value.length;
+            
+            let raw = field.value.replace(/[^0-9.]/g, '');
+            if (!raw) {
+                field.value = '';
                 return;
             }
-            fetchedData.sort((a, b) => b.date - a.date);
-            displayEmployeeInfo(fetchedData[0].monthName, fetchedData[0].csvData);
-            displayResultsTable(fetchedData);
-        })
-        .catch(error => {
-            console.error('Error fetching CSV data:', error);
-            alert('Error fetching data. Check the console for more details.');
-        })
-        .finally(() => {
-            loadingIndicator.style.display = 'none'; // Hide loading indicator
-        });
-}
-
-function fetchCSV(csvFile) {
-    return new Promise((resolve, reject) => {
-        const monthName = getMonthNameFromCsv(csvFile);
-        const date = getDateFromCsv(csvFile);
-
-        fetch(csvFile)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Unable to fetch ${csvFile}. Status: ${response.status}`);
-                }
-                return response.text();
-            })
-            .then(text => {
-                const csvData = parseCSV(text);
-                resolve({ monthName, csvData, date });
-            })
-            .catch(error => {
-                console.error(`Error fetching data for ${monthName}:`, error);
-                resolve(null);
-            });
-    });
-}
-
-function getDateFromCsv(csvFile) {
-    const fileName = csvFile.replace('onq_', '');
-    const monthMap = {
-        'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'may': 4, 'jun': 5,
-        'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11
-    };
-    const monthPart = fileName.slice(0, 3);
-    const yearPart = '20' + fileName.slice(3, 5);
-    const monthIndex = monthMap[monthPart];
-    return new Date(yearPart, monthIndex);
-}
-
-function getMonthNameFromCsv(csvFile) {
-    const fileName = csvFile.replace('onq_', '');
-    const monthMap = {
-        'jan': 'January', 'feb': 'February', 'mar': 'March', 'apr': 'April', 'may': 'May', 'jun': 'June',
-        'jul': 'July', 'aug': 'August', 'sep': 'September', 'oct': 'October', 'nov': 'November', 'dec': 'December'
-    };
-    const monthPart = fileName.slice(0, 3);
-    const yearPart = '20' + fileName.slice(3, 5);
-    return `${monthMap[monthPart]} ${yearPart}`;
-}
-
-function parseCSV(data) {
-    const rows = data.trim().split('\n');
-    return rows.map(row => row.split(','));
-}
-
-function displayEmployeeInfo(monthName, csvData) {
-    const employeeInfoSection = document.getElementById('employeeInfo');
-    let employeeFound = false;
-
-    for (let i = 1; i < csvData.length; i++) {
-        const row = csvData[i];
-        if (row.length < 4) continue;
-        const empno = row[3];
-        if (empno === document.getElementById('searchInput').value.trim()) {
-            employeeFound = true;
-
-            const div = row[1];
-            const sta = row[2];
-            const fname = row[4];
-            const mi = row[5];
-            const lname = row[6];
-
-            employeeInfoSection.innerHTML = `
-                <strong>NAME:</strong><b style="color:orange"> ${fname} ${mi} ${lname}</b><br/>
-                <strong>EMPNO:</strong><b style="color:orange">   ${empno} </b><br/>
-                <strong>DIV / STA:</strong><b style="color:orange"> ${div} / ${sta}</b><br/>
-            `;
-            break;
-        }
-    }
-
-    if (!employeeFound) {
-        employeeInfoSection.innerHTML = 'No employee found in the latest data.';
-    }
-}
-
-function displayResultsTable(fetchedData) {
-    const resultsSection = document.getElementById('results');
-    
-    const table = document.createElement('table');
-    table.classList.add('table', 'table-borderless', 'text-white');
-
-    const thead = document.createElement('thead');
-    const headerRow = document.createElement('tr');
-    headerRow.innerHTML = `
-        <th class="font-weight-bold">MONTH</th>
-        <th class="font-weight-bold">DEDAMT</th>
-    `;
-    thead.appendChild(headerRow);
-    table.appendChild(thead);
-
-    const tbody = document.createElement('tbody');
-    const resultsMap = new Map();
-
-    fetchedData.forEach(data => {
-        data.csvData.forEach((row, index) => {
-            if (index === 0) return;
-
-            const empno = row[3];
-            if (empno.replace(/^0+/, '') === document.getElementById('searchInput').value.trim().replace(/^0+/, '')) {
-                const monthName = data.monthName;
-                const dedamt = parseFloat(row[13]);
-                
-                if (!resultsMap.has(monthName)) {
-                    resultsMap.set(monthName, { sum: 0, details: [] });
-                }
-
-                const dedcode = row[7];
-                const effyy = row[9];
-                const effmm = convertMonth(row[10]); // Convert month number
-                const termyy = row[11];
-                const termmm = convertMonth(row[12]); // Convert month number
-                const policyno = row[15];
-
-                const entry = resultsMap.get(monthName);
-                entry.sum += dedamt;
-                entry.details.push({ dedcode, policyno, effyy, effmm, termyy, termmm, dedamt });
+            let parts = raw.split('.');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            let formatted = parts.length > 1 ? parts[0] + '.' + parts.slice(1).join('') : parts[0];
+            
+            field.value = formatted;
+            
+            if (cursor !== null && field.type === 'text') {
+                let newLen = formatted.length;
+                let newCursor = Math.max(0, cursor + (newLen - oldLen));
+                field.setSelectionRange(newCursor, newCursor);
             }
-        });
-    });
-
-    resultsMap.forEach((data, monthName) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${monthName}</td>
-                <!-- <td>₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td> -->
-            <td id="totalAmount">₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td> <!-- Start with ₱0.00 -->
-
-
-        `;
-        tbody.appendChild(row);
-        const detailRow = document.createElement('tr');
-const detailCell = document.createElement('td');
-detailCell.setAttribute('colspan', 2);
-detailCell.innerHTML = `
-<table class="table table-sm text-white" style="font-size:11px">
-    <thead>
-        <tr>
-            <th>/</th>
-            <th>PLI</th>
-            <th>EFFECTIVE</th>
-            <th>TERMINATE</th>
-            <th>DEDAMT</th>
-            <th>POLICYNO</th>
-        </tr>
-    </thead>
-    <tbody>
-        ${data.details.map(d => `
-            <tr>
-                <td><input type="checkbox" class="dedamt-checkbox" data-dedamt="${d.dedamt}" checked /></td>
-                <td>${d.dedcode.toString().padStart(5, '0')}</td>
-                <td>${d.effmm.toString().padStart(2, '0')}/${d.effyy}</td>
-                <td>${d.termmm.toString().padStart(2, '0')}/${d.termyy}</td>
-                <td><b>₱${d.dedamt.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</b></td>
-                <td>${d.policyno}</td>
-            </tr>
-        `).join('')}
-    </tbody>
-</table>
-`;
-
-
-
-
-
-
-
-function calculateTotal() {
-const checkboxes = document.querySelectorAll('.dedamt-checkbox');
-let total = 0;
-
-checkboxes.forEach(checkbox => {
-    if (checkbox.checked) {
-        total += parseFloat(checkbox.dataset.dedamt);
-    }
-});
-
-// Update the total display
-const totalDisplay = document.querySelector('#totalAmount');
-totalDisplay.innerText = `₱${total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
-}
-
-// Event listener for checkbox changes
-document.addEventListener('change', (event) => {
-if (event.target.classList.contains('dedamt-checkbox')) {
-    calculateTotal();
-}
-});
-
-// Initial calculation on page load
-document.addEventListener('DOMContentLoaded', calculateTotal);
-
-
-
-
-
-
-
-
-detailRow.appendChild(detailCell);
-tbody.appendChild(detailRow);
-
-    });
-
-    table.appendChild(tbody);
-    resultsSection.appendChild(table);
-}
-
-function convertMonth(monthNumber) {
-    const monthNames = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
-    return monthNames[parseInt(monthNumber, 10) - 1];
-}
-
-</script>
-
-</body>
-</html>
-
-
-
-
-
-
-
-
-
-
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Historical Netpay</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="styles.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="manifest" href="manifest.json">
-    
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-<link rel="icon" href="favicon.png" type="image/png" sizes="any">
-
-    
-
-</head>
-
-<body>
-
-
-<div id="searchSection" class="container mt-5">
-    <h1 class="text-center pt-5 pb-3 mb-2">PLI DEDUCTION</h1>
-    <div class="row pt-2">
-        <div class="col-12 d-flex">
-            <input type="text" id="searchInput" class="form-control" placeholder="Employee Number..." style="flex-grow: 1;">
-            <button id="searchButton" class="btn btn-primary ml-2">Search</button>
-        </div>
-        <!-- Loading GIF -->
-        <div id="loadingIndicator" style="display: none; text-align: center;">
-            <img src="loading.gif" alt="Loading..." style="max-width: 100px;">
-        </div>
-    </div>
-</div>
-
-<br/>
-
-<!-- Section to display employee details -->
-<div class="container pb-5 mb-5">
-    <div class="row">
-        <div class="col-md-12">
-            <h3 id="employeeInfo" class="text-white"></h3>
-        </div>
-    </div>
-    <div class="row results rounded-bottom rounded-top pb-5 mb-5" id="results">
-        <!-- Table will be dynamically inserted here -->
-    </div>
-</div>
-
-
-
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-        const prompt = document.getElementById('fullscreenPrompt');
-
-        // Show the prompt when the mouse moves
-        document.addEventListener('mousemove', () => {
-            prompt.style.display = 'block';
-        });
-
-        // Enter fullscreen when the prompt is clicked
-        prompt.addEventListener('click', () => {
-            openFullscreen();
-            prompt.style.display = 'none'; // Hide prompt after entering full-screen
-        });
-    });
-
-    function openFullscreen() {
-        const elem = document.documentElement;
-        if (elem.requestFullscreen) {
-            elem.requestFullscreen();
-        } else if (elem.mozRequestFullScreen) {
-            elem.mozRequestFullScreen();
-        } else if (elem.webkitRequestFullscreen) {
-            elem.webkitRequestFullscreen();
-        } else if (elem.msRequestFullscreen) {
-            elem.msRequestFullscreen();
         }
-    }
 
+        function formatLoanAmountField() {
+            formatNumberInput(document.getElementById('loanAmount'));
+        }
 
+        // Custom accordion collapse triggers
+        function toggleCustomAccordion(id) {
+            const content = document.getElementById(id);
+            if (!content) return;
 
+            const card = content.closest('.card');
+            const isVisible = content.classList.contains('show');
+            if (isVisible) {
+                content.classList.remove('show');
+                if (card) card.classList.remove('accordion-active');
+            } else {
+                content.classList.add('show');
+                if (card) card.classList.add('accordion-active');
+            }
+        }
 
-const csvFilesPLI = [
-    'pli_aug24.csv'
-];
+        // Unified multi-file asynchronous data ingestion pipeline
+        async function fetchCSVText(filename) {
+            const response = await fetch(filename);
+            if (!response.ok) throw new Error(`HTTP Error: Could not read ${filename}`);
+            return await response.text();
+        }
 
-document.getElementById('searchButton').addEventListener('click', searchEmployee);
+        // Parse standard CSV columns
+        function parseCSV(text) {
+            const lines = text.split('\n');
+            const result = [];
+            for (let line of lines) {
+                line = line.trim();
+                if (!line) continue;
+                const row = [];
+                let inQuotes = false;
+                let current = '';
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        row.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                row.push(current.trim());
+                result.push(row.map(cell => cell.replace(/^"|"$/g, '').trim()));
+            }
+            return result;
+        }
 
-function searchEmployee() {
-    const searchInput = document.getElementById('searchInput').value.trim();
-    const loadingIndicator = document.getElementById('loadingIndicator');
-
-    if (!searchInput) {
-        alert('Please enter an employee number.');
-        return;
-    }
-
-    const resultsSection = document.getElementById('results');
-    const employeeInfoSection = document.getElementById('employeeInfo');
-    resultsSection.innerHTML = ''; // Clear previous results
-    employeeInfoSection.innerHTML = ''; // Clear previous employee info
-    loadingIndicator.style.display = 'block'; // Show loading indicator
-
-    const last12MonthsFiles = csvFilesPLI.slice(0, 12);
-
-    let fetchedData = [];
-
-    Promise.all(last12MonthsFiles.map(csvFile => fetchCSV(csvFile)))
-        .then(allData => {
-            fetchedData = allData.filter(data => data !== null);
-            if (fetchedData.length === 0) {
-                alert('No valid data found in the provided files.');
+        async function performSearch(skipHistoryLog = false) {
+            const empNumInput = document.getElementById('employeeNumber').value.trim();
+            if (!empNumInput) {
+                alert("Please enter a valid Employee Number.");
                 return;
             }
-            fetchedData.sort((a, b) => b.date - a.date);
-            displayEmployeeInfo(fetchedData[0].monthName, fetchedData[0].csvData);
-            displayResultsTable(fetchedData);
-        })
-        .catch(error => {
-            console.error('Error fetching CSV data:', error);
-            alert('Error fetching data. Check the console for more details.');
-        })
-        .finally(() => {
-            loadingIndicator.style.display = 'none'; // Hide loading indicator
-        });
-}
 
-function fetchCSV(csvFile) {
-    return new Promise((resolve, reject) => {
-        const monthName = getMonthNameFromCsv(csvFile);
-        const date = getDateFromCsv(csvFile);
+            document.getElementById('loadingIndicator').classList.remove('d-none');
+            document.getElementById('empSummaryCard').classList.add('d-none');
+            document.getElementById('evaluationWorkspace').classList.add('d-none');
 
-        fetch(csvFile)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Unable to fetch ${csvFile}. Status: ${response.status}`);
+            const month = document.getElementById('activeMonthSelect').value;
+
+            // Formulate file lookup variables relative path matching
+            const files = {
+                netpay: `${month}.csv`,
+                pos: `pos_${month}.csv`,
+                onq: `onq_${month}.csv`,
+                pli: `pli_${month}.csv`,
+                tranch: `tranch2026.csv`
+            };
+
+            try {
+                // Parallel async promises
+                const [netpayTxt, posTxt, onqTxt, pliTxt, tranchTxt] = await Promise.all([
+                    fetchCSVText(files.netpay),
+                    fetchCSVText(files.pos),
+                    fetchCSVText(files.onq),
+                    fetchCSVText(files.pli),
+                    fetchCSVText(files.tranch)
+                ]);
+
+                const netpayData = parseCSV(netpayTxt);
+                const posData = parseCSV(posTxt);
+                const onqData = parseCSV(onqTxt);
+                const pliData = parseCSV(pliTxt);
+                const tranchData = parseCSV(tranchTxt);
+
+                // Store in unified global state context
+                window.currentData = {
+                    empNum: empNumInput,
+                    month: month,
+                    netpay: netpayData,
+                    pos: posData,
+                    onq: onqData,
+                    pli: pliData,
+                    tranch: tranchData
+                };
+
+                processIngestedSession(skipHistoryLog);
+
+            } catch (err) {
+                console.error(err);
+                alert("Lookup failed. Ensure CSV data records are available for month: " + month);
+            } finally {
+                document.getElementById('loadingIndicator').classList.add('d-none');
+            }
+        }
+
+        function processIngestedSession(skipHistoryLog) {
+            const empNum = window.currentData.empNum;
+            const netpayRows = window.currentData.netpay;
+            
+            // Search for NetPay baseline employee row (index 3 is EMPNO)
+            let empRow = null;
+            for (let i = 1; i < netpayRows.length; i++) {
+                if (netpayRows[i][3] && netpayRows[i][3].replace(/^0+/, '') === empNum.replace(/^0+/, '')) {
+                    empRow = netpayRows[i];
+                    break;
                 }
-                return response.text();
-            })
-            .then(text => {
-                const csvData = parseCSV(text);
-                resolve({ monthName, csvData, date });
-            })
-            .catch(error => {
-                console.error(`Error fetching data for ${monthName}:`, error);
-                resolve(null);
-            });
-    });
-}
+            }
 
-function getDateFromCsv(csvFile) {
-    const fileName = csvFile.replace('pli_', '');
-    const monthMap = {
-        'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'may': 4, 'jun': 5,
-        'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11
-    };
-    const monthPart = fileName.slice(0, 3);
-    const yearPart = '20' + fileName.slice(3, 5);
-    const monthIndex = monthMap[monthPart];
-    return new Date(yearPart, monthIndex);
-}
+            if (!empRow) {
+                alert("Employee ID " + empNum + " not found in baseline " + window.currentData.month + ".csv records.");
+                return;
+            }
 
-function getMonthNameFromCsv(csvFile) {
-    const fileName = csvFile.replace('pli_', '');
-    const monthMap = {
-        'jan': 'January', 'feb': 'February', 'mar': 'March', 'apr': 'April', 'may': 'May', 'jun': 'June',
-        'jul': 'July', 'aug': 'August', 'sep': 'September', 'oct': 'October', 'nov': 'November', 'dec': 'December'
-    };
-    const monthPart = fileName.slice(0, 3);
-    const yearPart = '20' + fileName.slice(3, 5);
-    return `${monthMap[monthPart]} ${yearPart}`;
-}
+            // Extract baseline parameters
+            const fname = empRow[4] || '';
+            const mi = empRow[5] || '';
+            const lname = empRow[6] || '';
+            const netPayVal = safeFloat(empRow[7]);
+            const originalGrade = safeInt(empRow[9]);
+            const originalStep = safeInt(empRow[10]);
 
-function parseCSV(data) {
-    const rows = data.trim().split('\n');
-    return rows.map(row => row.split(','));
-}
+            // Update Summary Card UI elements
+            document.getElementById('empSummaryName').textContent = `${fname} ${mi} ${lname}`;
+            document.getElementById('empSummaryID').textContent = empRow[3] || empNum;
+            document.getElementById('empSummaryDiv').textContent = `${empRow[1] || '-'} / ${empRow[2] || '-'}`;
+            document.getElementById('empSummaryCard').classList.remove('d-none');
 
-function displayEmployeeInfo(monthName, csvData) {
-    const employeeInfoSection = document.getElementById('employeeInfo');
-    let employeeFound = false;
+            // Reset the eligibility pill to neutral until runCalculations() determines the actual status
+            const eligibilityPill = document.getElementById('empEligibilityPill');
+            if (eligibilityPill) {
+                eligibilityPill.textContent = 'Pending';
+                eligibilityPill.className = 'status-pill status-pill-neutral';
+            }
 
-    for (let i = 1; i < csvData.length; i++) {
-        const row = csvData[i];
-        if (row.length < 4) continue;
-        const empno = row[3];
-        if (empno === document.getElementById('searchInput').value.trim()) {
-            employeeFound = true;
+            // Save details to active session context
+            window.activeSession = {
+                netPay: netPayVal,
+                origGrade: originalGrade,
+                origStep: originalStep
+            };
 
-            const div = row[1];
-            const sta = row[2];
-            const fname = row[5];
-            const mi = row[6];
-            const lname = row[7];
+            // Parse DEDAMT Positive values matching searched employee (index 3 is EMPNO)
+            const posRows = window.currentData.pos;
+            let posSum = 0;
+            for (let i = 1; i < posRows.length; i++) {
+                if (posRows[i][3] && posRows[i][3].replace(/^0+/, '') === empNum.replace(/^0+/, '')) {
+                    posSum += safeFloat(posRows[i][13]); // Index 13 is DEDAMT
+                }
+            }
 
-            employeeInfoSection.innerHTML = `
-                <strong>NAME:</strong><b style="color:orange"> ${fname} ${mi} ${lname}</b><br/>
-                <strong>EMPNO:</strong><b style="color:orange">   ${empno} </b><br/>
-                <strong>DIV / STA:</strong><b style="color:orange"> ${div} / ${sta}</b><br/>
+            /* [2026-07-10 Fix: Changed textContent to innerHTML to render muted currency span correctly] */
+            document.getElementById('lbl-netpay').innerHTML = formatPHP(netPayVal);
+            document.getElementById('lbl-dedamt').innerHTML = formatPHP(posSum);
+            const baselineSub = netPayVal + posSum;
+            document.getElementById('val-baseline').innerHTML = formatPHP(baselineSub);
+
+            // Fetch OnQueue rows matching employee (index 3 is EMPNO)
+            const onqRows = window.currentData.onq;
+            const matchingOnq = [];
+            let initialOnqSum = 0;
+            for (let i = 1; i < onqRows.length; i++) {
+                if (onqRows[i][3] && onqRows[i][3].replace(/^0+/, '') === empNum.replace(/^0+/, '')) {
+                    matchingOnq.push(onqRows[i]);
+                    initialOnqSum += safeFloat(onqRows[i][13]); // Index 13 is DEDAMT
+                }
+            }
+
+            // Determine Initial Loan Amount
+            const remVal = baselineSub - initialOnqSum;
+            const initLoan = Math.max(0, Math.floor(remVal / 20.01) * 1000);
+            document.getElementById('loanAmount').value = initLoan.toLocaleString('en');
+
+            // Build Phase B PLI Accordions dynamically
+            const pliRows = window.currentData.pli;
+            const matchingPli = [];
+            for (let i = 1; i < pliRows.length; i++) {
+                if (pliRows[i][3] && pliRows[i][3].replace(/^0+/, '') === empNum.replace(/^0+/, '')) {
+                    matchingPli.push(pliRows[i]);
+                }
+            }
+            renderPLIAccordions(matchingPli);
+
+            // Phase C baseline steps matching
+            document.getElementById('lbl-originalsg').textContent = `SG-${originalGrade} Step-${originalStep}`;
+            
+            // Search remarks in tranch2026.csv (Salary Grade matches column 0)
+            const tranchRows = window.currentData.tranch;
+            let originalRemarks = 0;
+            for (let i = 1; i < tranchRows.length; i++) {
+                if (safeInt(tranchRows[i][0]) === originalGrade) {
+                    originalRemarks = safeFloat(tranchRows[i][originalStep]); // step index matches column index
+                    break;
+                }
+            }
+            /* [2026-07-10 Fix: Changed textContent to innerHTML to render muted currency span correctly] */
+            document.getElementById('val-anticipated').innerHTML = formatPHP(originalRemarks);
+            window.activeSession.anticipatedVal = originalRemarks;
+
+            // Load dual-dropdown override defaults
+            document.getElementById('promoGrade').value = originalGrade;
+            document.getElementById('promoStep').value = originalStep;
+
+            // Build Phase D OnQueue rows
+            renderOnQueueTable(matchingOnq);
+
+            // Make workspace section visible
+            document.getElementById('evaluationWorkspace').classList.remove('d-none');
+
+            // Trigger matrix run computations
+            runCalculations();
+
+            // Log the initial state if requested
+            if (!skipHistoryLog) {
+                logCurrentState();
+            }
+        }
+
+        // Render PLIs tables dynamically inside accordions
+        function renderPLIAccordions(pliRows) {
+            const container = document.getElementById('pliAccordions');
+            container.innerHTML = '';
+
+            for (let i = 1; i <= 5; i++) {
+                const accordionId = `collapsePLI${i}`;
+                const headingId = `pliHeading${i}`;
+
+                let tableHTML = '';
+                if (pliRows.length === 0) {
+                    tableHTML = `
+                        <table class="bank-table text-white" style="font-size: 11px;">
+                            <tbody>
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted">No active records found for PLI slot.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    `;
+                } else {
+                    tableHTML = `
+                        <table class="bank-table text-white" style="font-size: 11px;">
+                            <thead>
+                                <tr>
+                                    <th>Select</th>
+                                    <th>PLI Code</th>
+                                    <th>EFF</th>
+                                    <th>TERM</th>
+                                    <th>DEDPLI</th>
+                                    <th>Policy No</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td data-label="Select">
+                                        <input type="radio" name="pli_radio_${i}" class="pli-radio" data-dedpli="0" data-row-index="none" checked onchange="updatePLIHeaderValue(${i}); runCalculations();">
+                                    </td>
+                                    <td data-label="PLI Code" class="text-muted">None</td>
+                                    <td data-label="EFF" class="text-muted">-</td>
+                                    <td data-label="TERM" class="text-muted">-</td>
+                                    <td data-label="DEDPLI" class="text-muted">₱0.00</td>
+                                    <td data-label="Policy No" class="text-muted">-</td>
+                                </tr>
+                                ${pliRows.map((row, idx) => {
+                                    const pliCode = row[9] || '';
+                                    const eff = `${row[12] || ''}/${row[11] || ''}`;
+                                    const term = `${row[14] || ''}/${row[13] || ''}`;
+                                    const dedpli = safeFloat(row[15]);
+                                    const plcyno = row[16] || '';
+                                    return `
+                                        <tr>
+                                            <td data-label="Select">
+                                                <input type="radio" name="pli_radio_${i}" class="pli-radio" data-dedpli="${dedpli}" data-row-index="${idx}" onchange="updatePLIHeaderValue(${i}); runCalculations();">
+                                            </td>
+                                            <td data-label="PLI Code">${pliCode}</td>
+                                            <td data-label="EFF">${eff}</td>
+                                            <td data-label="TERM">${term}</td>
+                                            <td data-label="DEDPLI" class="font-weight-bold text-white">${formatPHP(dedpli)}</td>
+                                            <td data-label="Policy No">${plcyno}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                }
+
+                /* [2026-07-10 Fix: Replaced informal emoji in PLI accordion titles with clean SVG line art icon] */
+                const accordionHTML = `
+                    <div class="card bg-transparent border-0 mb-2">
+                        <div class="card-header p-0" id="${headingId}">
+                            <button class="bank-accordion-btn" type="button" onclick="toggleCustomAccordion('${accordionId}')">
+                                <span class="orange-node font-weight-bold" onclick="event.stopPropagation()">
+                                    <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
+                                    PLI ${i}
+                                    <span class="math-popover">
+                                        Private Lending Institution slot ${i}. Rendered from pli_june26.csv.
+                                    </span>
+                                </span>
+                                <span class="d-flex align-items-center">
+                                    <span id="lbl-pli-${i}-selected" class="text-white mr-3 tabular-nums" style="font-weight: 700;">₱0.00</span>
+                                    <i class="bi bi-chevron-down"></i>
+                                </span>
+                            </button>
+                        </div>
+                        <div id="${accordionId}" class="collapse" aria-labelledby="${headingId}" data-parent="#pliAccordions">
+                            <!-- [2026-07-11 Fix: section-panel-inner class for PLI accordion body panels, replacing inline style] -->
+                            <div class="card-body section-panel-inner mt-2">
+                                <div id="pliTableContainer-${i}" class="table-responsive">
+                                    ${tableHTML}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                container.innerHTML += accordionHTML;
+            }
+
+            attachTooltipBehaviors();
+        }
+
+        /* [2026-07-10 Fix: Changed textContent to innerHTML for PLI accordion header value] */
+        function updatePLIHeaderValue(pliIndex) {
+            const checkedRadio = document.querySelector(`input[name="pli_radio_${pliIndex}"]:checked`);
+            const val = checkedRadio ? safeFloat(checkedRadio.getAttribute('data-dedpli')) : 0;
+            document.getElementById(`lbl-pli-${pliIndex}-selected`).innerHTML = formatPHP(val);
+        }
+
+        // Render OnQueue table checklist
+        function renderOnQueueTable(onqRows) {
+            const container = document.getElementById('onqTableContainer');
+            if (onqRows.length === 0) {
+                container.innerHTML = `<div class="text-muted text-center py-2">No active records in queue.</div>`;
+                return;
+            }
+
+            let html = `
+                <table class="bank-table text-white" style="font-size: 11px;">
+                    <thead>
+                        <tr>
+                            <th>Select</th>
+                            <th>PLI Code</th>
+                            <th>EFF</th>
+                            <th>TERM</th>
+                            <th>DEDAMT</th>
+                            <th>Policy No</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${onqRows.map((row, idx) => {
+                            const pliCode = row[7] || '';
+                            const eff = `${row[10] || ''}/${row[9] || ''}`;
+                            const term = `${row[12] || ''}/${row[11] || ''}`;
+                            const dedamt = safeFloat(row[13]);
+                            const plcyno = row[15] || '';
+                            return `
+                                <tr>
+                                    <td data-label="Select">
+                                        <input type="checkbox" class="onq-checkbox" data-dedamt="${dedamt}" checked onchange="runCalculations()">
+                                    </td>
+                                    <td data-label="PLI Code">${pliCode}</td>
+                                    <td data-label="EFF">${eff}</td>
+                                    <td data-label="TERM">${term}</td>
+                                    <td data-label="DEDAMT" class="font-weight-bold text-white">${formatPHP(dedamt)}</td>
+                                    <td data-label="Policy No">${plcyno}</td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
             `;
-            break;
+            container.innerHTML = html;
         }
-    }
 
-    if (!employeeFound) {
-        employeeInfoSection.innerHTML = 'No employee found in the latest data.';
-    }
-}
+        // Hover or click popup modal bindings
+        function attachTooltipBehaviors() {
+            document.querySelectorAll('.orange-node').forEach(node => {
+                node.onclick = null;
+                node.onmouseenter = null;
+                node.onmouseleave = null;
 
-function displayResultsTable(fetchedData) {
-    const resultsSection = document.getElementById('results');
-    
-    const table = document.createElement('table');
-    table.classList.add('table', 'table-borderless', 'text-white');
-
-    const thead = document.createElement('thead');
-    const headerRow = document.createElement('tr');
-    headerRow.innerHTML = `
-        <th class="font-weight-bold">MONTH</th>
-        <th class="font-weight-bold">DEDAMT</th>
-    `;
-    thead.appendChild(headerRow);
-    table.appendChild(thead);
-
-    const tbody = document.createElement('tbody');
-    const resultsMap = new Map();
-
-    fetchedData.forEach(data => {
-        data.csvData.forEach((row, index) => {
-            if (index === 0) return;
-
-            const empno = row[3];
-            if (empno.replace(/^0+/, '') === document.getElementById('searchInput').value.trim().replace(/^0+/, '')) {
-                const monthName = data.monthName;
-                const dedamt = parseFloat(row[13]);
+                node.addEventListener('mouseenter', () => {
+                    node.classList.add('show-popover');
+                });
                 
-                if (!resultsMap.has(monthName)) {
-                    resultsMap.set(monthName, { sum: 0, details: [] });
-                }
+                node.addEventListener('mouseleave', () => {
+                    node.classList.remove('show-popover');
+                });
 
-                const dedcode = row[9];
-                const effyy = row[11];
-                const effmm = convertMonth(row[12]); // Convert month number
-                const termyy = row[13];
-                const termmm = convertMonth(row[14]); // Convert month number
-                const policyno = row[16];
-
-                const entry = resultsMap.get(monthName);
-                entry.sum += dedamt;
-                entry.details.push({ dedcode, policyno, effyy, effmm, termyy, termmm, dedamt });
-            }
-        });
-    });
-
-    resultsMap.forEach((data, monthName) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-         <td>${monthName}</td>
-                    <!-- <td>₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td> -->
-                <td id="totalAmount">₱${data.sum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td> <!-- Start with ₱0.00 -->
-
-        `;
-        tbody.appendChild(row);
-        const detailRow = document.createElement('tr');
-const detailCell = document.createElement('td');
-detailCell.setAttribute('colspan', 2);
-detailCell.innerHTML = `
-    <table class="table table-sm text-white" style="font-size:11px">
-        <thead>
-            <tr>
-                <th>/</th>
-                <th>PLI</th>
-                <th>EFFECTIVE</th>
-                <th>TERMINATE</th>
-                <th>DEDAMT</th>
-                <th>POLICYNO</th>
-            </tr>
-        </thead>
-        <tbody>
-            ${data.details.map(d => `
-                <tr>
-                    <td><input type="checkbox" class="dedamt-checkbox" data-dedamt="${d.dedamt}" checked /></td>
-                   <td>${d.dedcode.toString().padStart(5, '0')}</td>
-
-                   <td>${d.effmm.toString().padStart(2, '0')}/${d.effyy}</td>
-                   <td>${d.termmm.toString().padStart(2, '0')}/${d.termyy}</td>
-                   
-                    <td><b>₱${d.dedamt.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</b></td>
-                    <td>${d.policyno}</td>
-                </tr>
-            `).join('')}
-        </tbody>
-    </table>
-`;
-
-
-
-
-
-
-
-
-
-
-function calculateTotal() {
-    const checkboxes = document.querySelectorAll('.dedamt-checkbox');
-    let total = 0;
-
-    checkboxes.forEach(checkbox => {
-        if (checkbox.checked) {
-            total += parseFloat(checkbox.dataset.dedamt);
+                node.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    document.querySelectorAll('.orange-node').forEach(other => {
+                        if (other !== node) other.classList.remove('show-popover');
+                    });
+                    node.classList.toggle('show-popover');
+                });
+            });
         }
-    });
 
-    // Update the total display
-    const totalDisplay = document.querySelector('#totalAmount');
-    totalDisplay.innerText = `₱${total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
-}
-
-// Event listener for checkbox changes
-document.addEventListener('change', (event) => {
-    if (event.target.classList.contains('dedamt-checkbox')) {
-        const checkboxes = document.querySelectorAll('.dedamt-checkbox');
-        checkboxes.forEach(checkbox => {
-            if (checkbox !== event.target) {
-                checkbox.checked = false; // Uncheck other checkboxes
-            }
+        // Close math popovers on outer click window bounds
+        window.addEventListener('click', () => {
+            document.querySelectorAll('.orange-node').forEach(node => {
+                node.classList.remove('show-popover');
+            });
         });
-        calculateTotal(); // Recalculate total after changing checkboxes
-    }
-});
 
+        // Precise Excel PMT Equivalent formula
+        function calculatePMT(rate, term, pv) {
+            if (rate === 0) return pv / term;
+            const pmt = (pv * rate * Math.pow(1 + rate, term)) / (Math.pow(1 + rate, term) - 1);
+            return pmt;
+        }
 
-// Initial calculation on page load
-document.addEventListener('DOMContentLoaded', calculateTotal);
+        // Phase calculations trigger logic
+        function runCalculations() {
+            if (!window.currentData || !window.activeSession) return;
 
+            // Ingest variables safely
+            const loanAmount = safeFloat(document.getElementById('loanAmount').value);
+            const loanTerm = safeInt(document.getElementById('loanTerm').value);
+            const interestRate = safeFloat(document.getElementById('interestRate').value);
 
+            // Phase B deductions calculations
+            let pliSubtotal = 0;
+            for (let i = 1; i <= 5; i++) {
+                const checkedRadio = document.querySelector(`input[name="pli_radio_${i}"]:checked`);
+                if (checkedRadio) {
+                    pliSubtotal += safeFloat(checkedRadio.getAttribute('data-dedpli'));
+                }
+            }
+            /* [2026-07-10 Fix: Changed all calculation result assignments from textContent to innerHTML to render muted currency span HTML cleanly] */
+            document.getElementById('val-plisubtotal').innerHTML = formatPHP(pliSubtotal);
 
+            const netPayPliTotal = window.activeSession.netPay + pliSubtotal;
+            document.getElementById('val-netpayplitotal').innerHTML = formatPHP(netPayPliTotal);
 
+            // Phase C Salary Adjustments & overrides query matrix
+            const selectedGrade = safeInt(document.getElementById('promoGrade').value);
+            const selectedStep = safeInt(document.getElementById('promoStep').value);
 
+            const tranchRows = window.currentData.tranch;
+            let promotedRemarks = 0;
+            for (let i = 1; i < tranchRows.length; i++) {
+                if (safeInt(tranchRows[i][0]) === selectedGrade) {
+                    promotedRemarks = safeFloat(tranchRows[i][selectedStep]);
+                    break;
+                }
+            }
 
+            // Update New Basic Pay label in gray text
+            document.getElementById('lbl-promoted-salary').innerHTML = `New Salary: ${formatPHP(promotedRemarks)}`;
 
+            const anticipatedVal = window.activeSession.anticipatedVal;
+            const promotionMargin = promotedRemarks - anticipatedVal;
+            const marginEl = document.getElementById('val-promomargin');
+            marginEl.innerHTML = formatPHP(promotionMargin);
+            marginEl.classList.toggle('is-negative', promotionMargin < 0);
 
+            const papSubtotal = pliSubtotal + anticipatedVal + promotionMargin;
+            document.getElementById('val-papsubtotal').innerHTML = formatPHP(papSubtotal);
 
+            // Phase D Deductions totals
+            let activeOnqSum = 0;
+            document.querySelectorAll('.onq-checkbox').forEach(cb => {
+                if (cb.checked) {
+                    activeOnqSum += safeFloat(cb.getAttribute('data-dedamt'));
+                }
+            });
+            document.getElementById('lbl-onqueuetotal').innerHTML = formatPHP(activeOnqSum);
 
+            const incoming = safeFloat(document.getElementById('incomingDeduction').value);
+            
+            const semiTotal = papSubtotal + activeOnqSum - incoming;
+            const semiTotalEl = document.getElementById('val-semitotal');
+            semiTotalEl.innerHTML = formatPHP(semiTotal);
+            semiTotalEl.classList.toggle('is-negative', semiTotal < 0);
 
+            // Calculate Amortization
+            const monthlyRate = interestRate / 100 / 12;
+            const pmtResult = calculatePMT(monthlyRate, loanTerm, loanAmount);
+            const amortization = Math.ceil(pmtResult * 100) / 100; // Round upward to two decimal points
+            document.getElementById('val-amortization').innerHTML = formatPHP(amortization);
 
+            // Compute Total Interest Paid over the loan term
+            const totalRepayment = amortization * loanTerm;
+            const totalInterest = Math.max(0, totalRepayment - loanAmount);
+            document.getElementById('lbl-total-interest').innerHTML = `<i class="bi bi-percent text-warning mr-1"></i>Est. Interest: <strong class="text-white-50">${formatPHP(totalInterest)}</strong>`;
 
+            // Determine final New NetPay
+            const newNetPay = semiTotal - amortization;
+            const netPayElement = document.getElementById('val-newnetpay');
+            netPayElement.innerHTML = formatPHP(newNetPay);
 
+            // Safety limit threshold guard trigger check
+            const thresholdErr = document.getElementById('lbl-threshold-error');
+            const eligibilityPill = document.getElementById('empEligibilityPill');
+            if (newNetPay < 5000.00) {
+                netPayElement.classList.add('is-negative');
+                thresholdErr.classList.remove('d-none');
+                if (eligibilityPill) {
+                    eligibilityPill.textContent = 'Needs Review';
+                    eligibilityPill.className = 'status-pill status-pill-danger';
+                }
+            } else {
+                netPayElement.classList.remove('is-negative');
+                thresholdErr.classList.add('d-none');
+                if (eligibilityPill) {
+                    eligibilityPill.textContent = 'Eligible';
+                    eligibilityPill.className = 'status-pill status-pill-success';
+                }
+            }
 
-detailRow.appendChild(detailCell);
-tbody.appendChild(detailRow);
+            // Save currently active state values to local storage for restore after reload
+            saveActiveEvaluationState();
+        }
 
-    });
+        function saveActiveEvaluationState() {
+            if (!window.currentData || !window.activeSession) return;
+            
+            const pliSelections = [];
+            for (let i = 1; i <= 5; i++) {
+                const checkedRadio = document.querySelector(`input[name="pli_radio_${i}"]:checked`);
+                pliSelections.push(checkedRadio ? checkedRadio.getAttribute('data-row-index') : 'none');
+            }
 
-    table.appendChild(tbody);
-    resultsSection.appendChild(table);
-}
+            const onqSelections = [];
+            document.querySelectorAll('.onq-checkbox').forEach((cb, idx) => {
+                if (cb.checked) onqSelections.push(idx);
+            });
 
-function convertMonth(monthNumber) {
-    const monthNames = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
-    return monthNames[parseInt(monthNumber, 10) - 1];
-}
+            const activeState = {
+                empNum: window.currentData.empNum,
+                month: window.currentData.month,
+                loanAmount: safeFloat(document.getElementById('loanAmount').value),
+                loanTerm: safeInt(document.getElementById('loanTerm').value),
+                interestRate: safeFloat(document.getElementById('interestRate').value),
+                pliSelections: pliSelections,
+                promoGrade: safeInt(document.getElementById('promoGrade').value),
+                promoStep: safeInt(document.getElementById('promoStep').value),
+                onqSelections: onqSelections,
+                incomingDeduction: safeFloat(document.getElementById('incomingDeduction').value)
+            };
 
-</script>
+            localStorage.setItem('le_active_state', JSON.stringify(activeState));
+        }
 
+        // State history logger card controls
+        function logCurrentState() {
+            if (!window.currentData || !window.activeSession) {
+                alert("Please run a successful employee lookup session first.");
+                return;
+            }
+
+            // Capture selections indices
+            const pliSelections = [];
+            for (let i = 1; i <= 5; i++) {
+                const checkedRadio = document.querySelector(`input[name="pli_radio_${i}"]:checked`);
+                pliSelections.push(checkedRadio ? checkedRadio.getAttribute('data-row-index') : 'none');
+            }
+
+            const onqSelections = [];
+            document.querySelectorAll('.onq-checkbox').forEach((cb, idx) => {
+                if (cb.checked) onqSelections.push(idx);
+            });
+
+            const stateRun = {
+                empNum: window.currentData.empNum,
+                month: window.currentData.month,
+                loanAmount: safeFloat(document.getElementById('loanAmount').value),
+                loanTerm: safeInt(document.getElementById('loanTerm').value),
+                interestRate: safeFloat(document.getElementById('interestRate').value),
+                pliSelections: pliSelections,
+                promoGrade: safeInt(document.getElementById('promoGrade').value),
+                promoStep: safeInt(document.getElementById('promoStep').value),
+                onqSelections: onqSelections,
+                incomingDeduction: safeFloat(document.getElementById('incomingDeduction').value),
+                newNetPay: safeFloat(document.getElementById('val-newnetpay').textContent),
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+            };
+
+            let history = JSON.parse(localStorage.getItem('le_history') || '[]');
+            history.unshift(stateRun);
+            localStorage.setItem('le_history', JSON.stringify(history));
+
+            // Mark this freshly-logged run as the active/current one for the highlighted-row indicator
+            window.activeHistoryKey = `${stateRun.timestamp}_${stateRun.empNum}`;
+
+            renderHistoryLog();
+        }
+
+        /* [2026-07-10 Fix: Render streamlined ledger rows for audit trail with custom SVG trash icon and hover lift] */
+        function renderHistoryLog() {
+            const list = document.getElementById('historyLogList');
+            const history = JSON.parse(localStorage.getItem('le_history') || '[]');
+
+            if (history.length === 0) {
+                list.innerHTML = `<div class="text-white-50 text-center py-4 w-100 font-italic">No historical assess runs recorded in this session.</div>`;
+                return;
+            }
+
+            list.innerHTML = history.map((item, index) => {
+                const isSafe = item.newNetPay >= 5000.00;
+                const runKey = `${item.timestamp}_${item.empNum}`;
+                const isActive = window.activeHistoryKey && runKey === window.activeHistoryKey;
+                return `
+                    <div class="history-ledger-row${isActive ? ' is-active-run' : ''}" onclick="restoreHistoryState(${index})" title="Click to restore this computational state">
+                        <div class="history-cell">
+                            <span class="history-cell-label">Timestamp</span>
+                            <span>${item.timestamp}</span>
+                        </div>
+                        <div class="history-cell" style="color: #94A3B8;">
+                            <span class="history-cell-label">ID &amp; Term</span>
+                            <span>#${item.empNum} <span class="muted">(${item.loanTerm}m @ ${item.interestRate}%)</span></span>
+                        </div>
+                        <div class="history-cell">
+                            <span class="history-cell-label">Loan Amount</span>
+                            <span>${formatPHP(item.loanAmount)}</span>
+                        </div>
+                        <div class="history-cell" style="color: ${isSafe ? '#10B981' : '#EF4444'};">
+                            <span class="history-cell-label">New NetPay</span>
+                            <span>${formatPHP(item.newNetPay)}</span>
+                        </div>
+                        <button onclick="event.stopPropagation(); deleteHistoryState(${index})" class="history-delete-btn" title="Delete this run">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function deleteHistoryState(index) {
+            if (confirm("Delete this saved evaluation run session?")) {
+                let history = JSON.parse(localStorage.getItem('le_history') || '[]');
+                history.splice(index, 1);
+                localStorage.setItem('le_history', JSON.stringify(history));
+                renderHistoryLog();
+            }
+        }
+
+        async function restoreHistoryState(index) {
+            const history = JSON.parse(localStorage.getItem('le_history') || '[]');
+            const state = history[index];
+            if (!state) return;
+
+            // Mark this run as the active/current one for the highlighted-row indicator
+            window.activeHistoryKey = `${state.timestamp}_${state.empNum}`;
+
+            await restoreActiveState(state);
+            renderHistoryLog();
+        }
+
+        async function restoreActiveState(state) {
+            document.getElementById('employeeNumber').value = state.empNum;
+            document.getElementById('activeMonthSelect').value = state.month;
+
+            // Trigger lookup reload first asynchronously
+            await performSearch(true); // skip auto-logging initial state to avoid loop duplication
+
+            /* [2026-07-10 Fix: Restore and cleanly format financial inputs using comma formatting] */
+            document.getElementById('loanAmount').value = state.loanAmount.toLocaleString('en');
+            document.getElementById('loanTerm').value = state.loanTerm;
+            document.getElementById('interestRate').value = state.interestRate;
+            document.getElementById('promoGrade').value = state.promoGrade;
+            document.getElementById('promoStep').value = state.promoStep;
+            document.getElementById('incomingDeduction').value = state.incomingDeduction.toLocaleString('en');
+            formatNumberInput(document.getElementById('incomingDeduction'));
+
+            // Restore PLI radio selections
+            for (let i = 1; i <= 5; i++) {
+                const selIndex = state.pliSelections[i - 1];
+                const radio = document.querySelector(`input[name="pli_radio_${i}"][data-row-index="${selIndex}"]`);
+                if (radio) {
+                    radio.checked = true;
+                    updatePLIHeaderValue(i);
+                }
+            }
+
+            // Restore OnQueue checkboxes
+            const checkboxes = document.querySelectorAll('.onq-checkbox');
+            checkboxes.forEach((cb, idx) => {
+                cb.checked = state.onqSelections.includes(idx);
+            });
+
+            // Re-run calculations matrix
+            runCalculations();
+        }
+
+        function logout() {
+            localStorage.removeItem("loginTime");
+            window.location.href = "login/index.html";
+        }
+
+        function clearInputsAndReload() {
+            if (confirm("Reset current evaluation screen inputs?")) {
+                localStorage.removeItem('le_active_state');
+                document.getElementById('employeeNumber').value = '4694264';
+                document.getElementById('activeMonthSelect').value = 'jun26';
+                document.getElementById('evaluationWorkspace').classList.add('d-none');
+                document.getElementById('empSummaryCard').classList.add('d-none');
+            }
+        }
+    </script>
 </body>
+
 </html>
+<!-- Error card styling markup elements placeholder helper -->
+<script>
+    function showErrorCard(container, message) {
+        container.innerHTML = `<div class='p-3 my-2 text-danger rounded' style='background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); font-size: 0.85rem;'><i class='bi bi-exclamation-circle-fill mr-2'></i><span>${message}</span></div>`;
+    }
+</script>

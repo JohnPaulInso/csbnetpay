@@ -5,19 +5,25 @@ This document outlines the revamp of the **Loan Evaluation (LE)** tool in [index
 
 ---
 
-## 1. Design & Typography (Professional Banking Dark Theme)
+## 1. Design & Typography (Premium Glassmorphism Dark Theme)
 - **Typography**: Refined Montserrat headers and body typography.
-- **Banking Theme**: Replaced transparent glass styles with a dark-slate banking color system:
+- **Glassmorphic Layout**:
   - Deep blue slate gradient background (`#0F172A` to `#020617`).
-  - Dark Slate cards (`#1E293B` or semi-opaque `#0F2147`) with structured light borders (`rgba(255, 255, 255, 0.08)`).
-  - High-contrast text layout (`#F8FAFC` for primary content, `#94A3B8` for secondary labels).
-- **Layout Alignment (Side-by-Side Flex Cards)**:
-  - Merged the Anticipated and Promotional override controls into a single wide flex grid card.
-  - Stacked labels vertically above values (e.g. `Original SG / Step` above `SG-11 Step-5`) to guarantee no text wrapping or linebreaks occur.
-  - Form overrides are set with balanced `flex` attributes to fill row spaces cleanly.
+  - Translucent slate cards (`rgba(15, 23, 42, 0.45)`) backed by backdrop filter blur (`18px`).
+  - Crisp hairline border frames (`1px solid rgba(255, 255, 255, 0.08)`) with glowing amber borders on hover (`rgba(245, 158, 11, 0.25)`).
+  - High-contrast text layout (`#F8FAFC` for primary content, `#94A3B8` for secondary labels, `#64748B` for muted labels).
+- **Custom-Styled Controls**:
+  - Native checkboxes and radio selectors styled with custom CSS indicators that glow amber when active.
+- **Unnested Margins**:
+  - Dynamically rendered items within accordion slots (e.g. PLIs or OnQueue tables) are stripped of duplicate padding, margins, and borders to keep layout grid columns aligned.
+- **Proportional History Ledger**:
+  - Audit trail runs use proportional column grid sizes (`110px 1.5fr 1.2fr 1.2fr 44px`) to scale cleanly on diverse viewport resolutions.
+- **Layout Alignment**:
+  - Flex columns stack labels vertically above value nodes to ensure horizontal values never clash or wrap.
 - **Responsive Hybrid Grid**:
   - **PC View**: Renders all assessment phases in structured tables.
   - **Mobile View**: Tables automatically collapse into vertical stack cards. Utilizes custom `data-label` CSS pseudo-elements to maintain clear labeling.
+  - Mobile bottom navigation uses glassmorphism and active tab glow colors.
 
 ---
 

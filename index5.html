@@ -11,108 +11,219 @@
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="icon" href="favicon.png" type="image/png" sizes="any">
     
-    <!-- Load custom fonts & icons for modern glassmorphism UI -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- [2026-07-11 Fix: Upgraded to Inter font family for premium financial UI readability; added Montserrat as fallback] -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <script src="fflate.min.js"></script>
 
-    <!-- 
+            <!-- 
       CHANGE DETAILS:
-      Date: 2026-07-10
-      Fix: Refactored card border outlines, drop shadow offsets, and unified corner-radii.
-           - Borders: 1px solid rgba(255, 255, 255, 0.08)
-           - Corner Radius: 12px for cards, 8px for buttons, inputs, and internal panels
-           - Shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4)
-      Changed Elements:
-      - Updated CSS styles for `.bank-card`, `.bank-input`, `.bank-select`, `.bank-accordion-btn`, and `.history-run-card`.
-      - Replaced generic inline `.rounded` classes with specific style declarations.
+      Date: 2026-07-11
+      Fix: Implemented ultra-premium UI/UX design updates.
+           - Background: Indigo-indigo dark space radial glow (#1e1b4b to #09090 zinc black).
+           - Reflections: Card borders with 1.5px top highlights and inset white glows.
+           - Text Gradients: Dynamic financial values styled using linear text clipping (emerald, amber, and slate-white gradients).
+           - Capsule Badges: Orange nodes refactored as sleek pill badges with light amber borders and interactive glows.
+           - Custom Inputs: Form checkbox & radio buttons resized to 20px with high-contrast inner indicators.
+           - Hover Transitions: Lift translateY(-4px) and soft ambient glows.
     -->
     <style>
+        /* [2026-07-11 Fix: CSS vars updated — deeper shadow, wider emerald green added, liquid glass vars] */
+        :root {
+            --bg-deep: #040407;
+            --bg-surface: rgba(8, 10, 22, 0.6);
+            --bg-panel: rgba(14, 18, 36, 0.5);
+            --bg-panel-soft: rgba(14, 18, 36, 0.25);
+            --border-hairline: rgba(255, 255, 255, 0.07);
+            --border-hairline-soft: rgba(255, 255, 255, 0.04);
+            --accent: #E5A93C;
+            --accent-strong: #F59E0B;
+            --accent-soft: rgba(245, 158, 11, 0.18);
+            --emerald: #059669;
+            --emerald-mid: #10B981;
+            --emerald-light: #34D399;
+            --text-primary: #F0F4F8;
+            --text-secondary: #8B9BB4;
+            --text-muted: #4E5F77;
+            --radius-lg: 20px;
+            --radius-md: 14px;
+            --radius-sm: 9px;
+            /* Liquid glass shadow system */
+            --shadow-glass: 0 8px 32px rgba(0,0,0,0.55), 0 2px 8px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.2);
+            --shadow-glass-hover: 0 16px 48px rgba(0,0,0,0.65), 0 4px 16px rgba(0,0,0,0.4), 0 0 0 1px rgba(245,158,11,0.15), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.25);
+            --shadow-card: var(--shadow-glass);
+            --shadow-card-hover: var(--shadow-glass-hover);
+        }
+
+        /* [2026-07-11 Fix: Deeper background — near-black space dark with indigo-violet radial glow; uniform Montserrat font] */
         body {
             font-family: 'Montserrat', sans-serif !important;
-            background: radial-gradient(circle at 50% 0%, #0F172A 0%, #020617 100%) !important;
-            color: #F8FAFC !important;
+            background: radial-gradient(ellipse 80% 60% at 50% -5%, #1a1645 0%, #06060f 55%, #000000 100%) !important;
+            color: var(--text-primary) !important;
             min-height: 100vh;
             margin: 0;
             padding-bottom: 100px;
+            letter-spacing: 0em;
+            font-weight: 500;
         }
 
-        /* Nav Overrides to clear fixed styles.css */
+        /* ============ NAVIGATION ============ */
         nav {
             position: sticky !important;
             top: 0 !important;
             width: 100% !important;
             z-index: 1000 !important;
-            background-color: #0F172A !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+            background-color: rgba(9, 9, 11, 0.75) !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            border-bottom: 1px solid var(--border-hairline) !important;
             padding: 12px 0 !important;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4) !important;
         }
 
         .main-container {
-            margin-top: 30px !important;
+            margin-top: 28px !important;
         }
 
-        /* [2026-07-10 Fix: Crisp Glass Edge Card Borders & Professional Bank Brand Card Styles per user rules] */
+        /* [2026-07-11 Fix: Widen desktop container to 1400px for more breathing room on large screens] */
+        .container, .container-xl {
+            max-width: 1380px !important;
+            width: 100% !important;
+            padding-left: 24px !important;
+            padding-right: 24px !important;
+        }
+
+        .navbar-nav {
+            gap: 6px;
+        }
+
+        .nav-link {
+            font-size: 0.8rem !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.05em !important;
+            color: var(--text-secondary) !important;
+            padding: 8px 16px !important;
+            border-radius: var(--radius-sm) !important;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+
+        .nav-link:hover {
+            color: #FFFFFF !important;
+            background: rgba(255, 255, 255, 0.04) !important;
+        }
+
+        .nav-link.active {
+            color: #FFFFFF !important;
+            background: var(--accent-soft) !important;
+            border: 1px solid rgba(245, 158, 11, 0.2) !important;
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.1) !important;
+        }
+
+        /* ============ CARD SHELL — Liquid Glass (iPhone-style) [2026-07-11 Fix: Frosted glass with layered specular highlights, inner shine, soft reflection] ============ */
+        /* [2026-07-11 Fix: overflow changed from hidden to visible so math-popover tooltips can escape card bounds without clipping] */
         .card, .bank-card, .phase-block {
-            background: rgba(15, 23, 42, 0.6) !important;
-            backdrop-filter: blur(16px) !important;
-            -webkit-backdrop-filter: blur(16px) !important;
-            border: 1px solid rgba(255, 255, 255, 0.06) !important;
-            border-radius: 12px !important;
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3) !important;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            /* Layered liquid glass background */
+            background:
+                linear-gradient(160deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 40%, rgba(0,0,0,0.08) 100%),
+                linear-gradient(135deg, rgba(14,18,38,0.72) 0%, rgba(6,8,20,0.82) 100%) !important;
+            backdrop-filter: blur(40px) saturate(180%) brightness(1.08) !important;
+            -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.08) !important;
+            /* Glass edge borders: top-left brighter, bottom-right darker */
+            border: 1px solid rgba(255,255,255,0.09) !important;
+            border-top: 1px solid rgba(255,255,255,0.18) !important;
+            border-left: 1px solid rgba(255,255,255,0.11) !important;
+            border-bottom: 1px solid rgba(0,0,0,0.3) !important;
+            border-right: 1px solid rgba(0,0,0,0.2) !important;
+            border-radius: var(--radius-lg) !important;
+            padding: 22px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-glass) !important;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease;
+            position: relative;
+            overflow: visible; /* Changed: was 'hidden' — allows popover tooltips to escape card boundary */
+        }
+
+        /* Liquid glass specular sheen line at top of card */
+        .bank-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 12px;
+            right: 12px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.22) 30%, rgba(255,255,255,0.35) 50%, rgba(255,255,255,0.22) 70%, transparent 100%);
+            border-radius: 1px;
+            pointer-events: none;
+            z-index: 1;
         }
 
         .bank-card:hover {
-            border-color: rgba(229, 169, 60, 0.3) !important;
-            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35) !important;
+            background:
+                linear-gradient(160deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.02) 40%, rgba(0,0,0,0.06) 100%),
+                linear-gradient(135deg, rgba(18,22,48,0.75) 0%, rgba(8,10,26,0.85) 100%) !important;
+            border-top-color: rgba(255,255,255,0.28) !important;
+            border-color: rgba(245,158,11,0.18) !important;
+            box-shadow: var(--shadow-glass-hover) !important;
+            transform: translateY(-3px);
         }
 
-        /* [2026-07-10 Fix: Sizing Hierarchy - Small 11px to 12px capitalized subtitles with 0.05em letter spacing] */
+        .search-config-card {
+            border-top: 2px solid rgba(245, 158, 11, 0.35) !important;
+        }
+
+        /* Action buttons live in their own full-width row, decoupled from either column's height */
+        .action-btn-row {
+            margin-top: 4px;
+            margin-bottom: 24px;
+        }
+
+        /* Matrix layout row — top-aligned so unequal-height columns never leave a stretched empty void */
+        .matrix-grid-row {
+            align-items: flex-start !important;
+        }
+
         .bank-label {
             font-size: 11px !important;
             text-transform: uppercase !important;
             letter-spacing: 0.05em !important;
-            color: #64748B !important;
+            color: var(--text-muted) !important;
             font-weight: 700 !important;
         }
 
-        /* [2026-07-10 Fix: Tabular numbers for clean vertical alignment across ledgers and outputs] */
         .tabular-nums, .bank-table td, input, select, [id^="val-"], [id^="lbl-"] {
             font-variant-numeric: tabular-nums !important;
         }
 
-        /* [2026-07-10 Fix: Input & Dropdown Text Alignment - Uniform vertical padding 10px 14px and line-height 1.5 per user rules] */
+        /* ============ FORM CONTROLS ============ */
         select, input[type="text"], input[type="number"], .bank-input, .bank-select {
             padding: 10px 14px !important;
             line-height: 1.5 !important;
             display: flex !important;
             align-items: center !important;
-            min-height: 42px !important;
-        }
-
-        /* [2026-07-10 Fix: Financial Input Fields & Select Dropdowns with dark terminal backgrounds & custom focus states] */
-        .bank-input {
-            background: rgba(10, 14, 23, 0.6) !important;
+            min-height: 44px !important;
+            box-sizing: border-box !important;
+            background: rgba(10, 14, 23, 0.5) !important;
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
             color: #FFFFFF !important;
-            border-radius: 8px !important;
+            border-radius: var(--radius-sm) !important;
             font-family: 'Montserrat', sans-serif !important;
             font-size: 0.9rem !important;
-            transition: all 0.2s ease;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+
+        .bank-input:hover, .bank-select:hover {
+            border-color: rgba(255, 255, 255, 0.2) !important;
+            background: rgba(10, 14, 23, 0.65) !important;
+        }
+
+        .bank-input:focus, .bank-select:focus {
+            border-color: var(--accent-strong) !important;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.2) !important;
+            outline: none !important;
+            background: rgba(10, 14, 23, 0.8) !important;
         }
 
         .bank-select {
-            background: rgba(10, 14, 23, 0.6) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            color: #FFFFFF !important;
-            border-radius: 8px !important;
-            font-family: 'Montserrat', sans-serif !important;
-            font-size: 0.9rem !important;
-            transition: all 0.2s ease;
             appearance: none !important;
             -webkit-appearance: none !important;
             -moz-appearance: none !important;
@@ -130,20 +241,175 @@
             font-size: 0.85rem !important;
         }
 
-        /* [2026-07-10 Fix: Option list menu matching dark glassmorphism scheme] */
         .bank-select option {
-            background: #1E293B !important;
+            background: #0F172A !important;
             color: #FFFFFF !important;
         }
 
-        /* [2026-07-10 Fix: Interactive states with custom gold border (#E5A93C) and soft box-shadow ring] */
-        .bank-input:focus, .bank-select:focus {
-            border-color: #E5A93C !important;
-            box-shadow: 0 0 0 2px rgba(229, 169, 60, 0.15) !important;
-            outline: none !important;
+        /* Custom Checkboxes and Radios */
+        input[type="checkbox"].onq-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            border-radius: 6px;
+            background: rgba(10, 14, 23, 0.5);
+            cursor: pointer;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            vertical-align: middle;
+            outline: none;
         }
 
-        /* [2026-07-10 Fix: Treat currency sign as integrated text prefix inside input container with transparent background and muted slate gray #64748B per user request] */
+        input[type="checkbox"].onq-checkbox:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.15);
+        }
+
+        input[type="checkbox"].onq-checkbox:checked {
+            background: var(--accent-strong);
+            border-color: var(--accent-strong);
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
+        }
+
+        input[type="checkbox"].onq-checkbox:checked::after {
+            content: "\F26E";
+            font-family: "bootstrap-icons" !important;
+            color: #020617;
+            font-size: 11px;
+            font-weight: 900;
+            display: block;
+            line-height: 1;
+        }
+
+        input[type="radio"].pli-radio {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            border-radius: 50%;
+            background: rgba(10, 14, 23, 0.5);
+            cursor: pointer;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            vertical-align: middle;
+            outline: none;
+        }
+
+        input[type="radio"].pli-radio:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.15);
+        }
+
+        input[type="radio"].pli-radio:checked {
+            border-color: var(--accent-strong);
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
+        }
+
+        input[type="radio"].pli-radio:checked::after {
+            content: "";
+            width: 8px;
+            height: 8px;
+            /* [2026-07-11 Old: background: #020617; ] */
+            /* [2026-07-11 Fix: Gold fill inside circle instead of black/slate fill] */
+            background: var(--accent-strong);
+            border-radius: 50%;
+            display: block;
+        }
+
+        /* [2026-07-11 Fix: Removed white outline ring on :focus/:focus-visible for all buttons, inputs, and accordions] */
+        *:focus,
+        *:focus-visible,
+        button:focus,
+        button:focus-visible,
+        .bank-accordion-btn:focus,
+        .bank-accordion-btn:focus-visible,
+        .bank-btn-primary:focus,
+        .bank-btn-primary:focus-visible,
+        .bank-btn-secondary:focus,
+        .bank-btn-secondary:focus-visible,
+        .bank-btn-outline:focus,
+        .bank-btn-outline:focus-visible,
+        select:focus,
+        input:focus {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Buttons overrides — [2026-07-11 Fix: Added :focus styles to eliminate white browser outline ring] */
+        .bank-btn-primary {
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%) !important;
+            color: #020617 !important;
+            font-weight: 700 !important;
+            /* [2026-07-11 Old: font-family: 'Inter', sans-serif !important;] */
+            font-family: 'Montserrat', sans-serif !important;
+            letter-spacing: 0.04em !important;
+            min-height: 44px !important;
+            border-radius: var(--radius-sm) !important;
+            border: none !important;
+            outline: none !important;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            text-transform: uppercase;
+        }
+
+        .bank-btn-primary:hover {
+            background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%) !important;
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+            transform: translateY(-2px) !important;
+        }
+
+        .bank-btn-secondary {
+            background: rgba(71, 85, 105, 0.2) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            color: var(--text-primary) !important;
+            font-weight: 700 !important;
+            /* [2026-07-11 Old: font-family: 'Inter', sans-serif !important;] */
+            font-family: 'Montserrat', sans-serif !important;
+            letter-spacing: 0.04em !important;
+            min-height: 44px !important;
+            border-radius: var(--radius-sm) !important;
+            outline: none !important;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            text-transform: uppercase;
+        }
+
+        .bank-btn-secondary:hover {
+            background: rgba(71, 85, 105, 0.4) !important;
+            border-color: rgba(255, 255, 255, 0.15) !important;
+            transform: translateY(-2px) !important;
+        }
+
+        .bank-btn-outline {
+            background: transparent !important;
+            border: 1px solid rgba(245, 158, 11, 0.3) !important;
+            color: var(--accent-strong) !important;
+            font-weight: 700 !important;
+            /* [2026-07-11 Old: font-family: 'Inter', sans-serif !important;] */
+            font-family: 'Montserrat', sans-serif !important;
+            letter-spacing: 0.04em !important;
+            min-height: 44px !important;
+            border-radius: var(--radius-sm) !important;
+            outline: none !important;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            text-transform: uppercase;
+        }
+
+        .bank-btn-outline:hover {
+            background: rgba(245, 158, 11, 0.08) !important;
+            border-color: var(--accent-strong) !important;
+            transform: translateY(-2px) !important;
+        }
+
+        /* ============ CURRENCY INPUT PREFIX ============ */
         .currency-input-wrapper {
             position: relative;
             display: flex;
@@ -156,7 +422,7 @@
             left: 14px;
             top: 50%;
             transform: translateY(-50%);
-            color: #64748B !important;
+            color: var(--text-muted) !important;
             background: transparent !important;
             border: none !important;
             font-weight: 500 !important;
@@ -170,7 +436,7 @@
             padding-left: 32px !important;
         }
 
-        /* [2026-07-10 Fix: Premium Bank Tables with explicit row padding 12px 16px, zero flat borders, and subtle zebra backgrounds] */
+        /* ============ DATA TABLES [2026-07-11 Fix: Near-transparent table headers, stronger blur glass rows] ============ */
         .bank-table {
             width: 100%;
             margin-top: 10px;
@@ -179,153 +445,623 @@
         }
 
         .bank-table th {
-            background: #1E293B;
-            color: #64748B;
+            background: rgba(10, 14, 23, 0.15);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: var(--text-secondary);
             font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
             font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.06em;
             padding: 12px 16px !important;
             border: none !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
         }
 
         .bank-table td {
             padding: 12px 16px !important;
             font-size: 0.85rem;
             border: none !important;
-            color: #E2E8F0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.025) !important;
+            color: #CBD5E1;
+            vertical-align: middle;
+            background: rgba(255, 255, 255, 0.01);
         }
 
-        .bank-table tbody tr:nth-child(even) {
-            background: rgba(255, 255, 255, 0.01) !important;
+        .bank-table tbody tr:nth-child(even) td {
+            background: rgba(255, 255, 255, 0.015) !important;
         }
 
         .bank-table tbody tr:hover td {
-            background: rgba(255, 255, 255, 0.03) !important;
+            background: rgba(245, 158, 11, 0.04) !important;
+            color: #F1F5F9;
         }
 
-        /* [2026-07-10 Fix: Eliminated emojis, upgraded node titles to sleek SVG systems with muted gold #E5A93C accent] */
+        /* ============ ORANGE NODE (section titles w/ tooltip) ============ */
+        /* [2026-07-11 Fix: Use plain color (not background-clip) so hover filter works correctly. Gradient done via color property directly] */
+        /* [2026-07-11 Fix: orange-node overflow:visible ensures math-popover child is not clipped; z-index:auto prevents new stacking context so popover can float freely] */
         .orange-node {
-            cursor: pointer;
             position: relative;
             display: inline-flex;
             align-items: center;
-            color: #E5A93C;
+            color: #F59E0B;
             font-weight: 700;
-            font-size: 0.8rem;
-            letter-spacing: 0.5px;
-            border-bottom: 1px dashed rgba(229, 169, 60, 0.4);
-            padding-bottom: 2px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border: none;
+            background: none;
+            padding: 3px 0;
+            cursor: help;
+            overflow: visible; /* Ensure popover child escapes element boundary */
+            transition: color 0.25s ease, filter 0.25s ease;
         }
 
+        /* [2026-07-11 Fix: Hover now correctly brightens text color and adds glow — fixed by not using -webkit-text-fill-color transparent] */
         .orange-node:hover {
-            color: #FBBF24;
+            color: #FCD34D;
+            filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.6));
         }
 
+        /* [2026-07-11 Fix: orange-node margin helpers preserved; -webkit-text-fill-color reset needed for icon SVG stroke] */
+        .orange-node.mb-1, .orange-node.mb-2, .orange-node.mb-3 {
+            margin-bottom: 10px !important;
+        }
+
+        /* [2026-07-11 Fix: SVG icon plain stroke, no transparent text-fill needed since orange-node now uses color not gradient] */
         .bank-node-icon {
             display: inline-block;
             vertical-align: middle;
-            margin-right: 6px;
+            margin-right: 5px;
             flex-shrink: 0;
-            stroke: #E5A93C;
+            stroke: #F59E0B;
             stroke-width: 1.5px;
+            opacity: 0.85;
+            transition: stroke 0.25s ease, opacity 0.25s ease;
         }
 
+        .orange-node:hover .bank-node-icon {
+            stroke: #FCD34D;
+            opacity: 1;
+        }
+
+        /* [2026-07-11 Fix: math-popover elements are now HIDDEN data holders only.
+           All visual rendering is done via #global-math-popover singleton (position:fixed).
+           This bypasses all backdrop-filter stacking context issues on adjacent cards. */
         .math-popover {
-            display: none;
-            position: absolute;
-            bottom: 130%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #0F172A;
-            border: 1px solid rgba(229, 169, 60, 0.4);
-            padding: 14px 18px;
-            border-radius: 8px;
-            width: 310px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
-            z-index: 1050;
-            color: #E2E8F0;
-            font-size: 0.8rem;
-            font-weight: 400;
-            line-height: 1.4;
-            text-align: left;
+            display: none !important; /* Data holder only — not rendered in place */
         }
 
-        .math-popover::after {
+        /* [2026-07-11 Fix: Global singleton tooltip — position:fixed escapes ALL stacking contexts.
+           backdrop-filter on sibling cards cannot trap this element. z-index:999999 guaranteed top. */
+        #global-math-popover {
+            position: fixed;
+            z-index: 999999;
+            display: none;
+            background: rgba(8, 11, 22, 0.97);
+            backdrop-filter: blur(24px) saturate(160%);
+            -webkit-backdrop-filter: blur(24px) saturate(160%);
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            border-top: 2px solid rgba(245, 158, 11, 0.65);
+            padding: 14px 18px;
+            border-radius: 10px;
+            width: 300px;
+            max-width: 90vw;
+            box-shadow:
+                0 32px 64px rgba(0, 0, 0, 0.75),
+                0 0 0 1px rgba(245, 158, 11, 0.12),
+                0 0 30px rgba(245, 158, 11, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            color: #E8EEFF;
+            font-size: 0.82rem;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            line-height: 1.6;
+            white-space: normal;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(-6px);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        #global-math-popover.visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* Arrow pointer on the global tooltip */
+        #global-math-popover::before {
             content: "";
             position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -6px;
-            border-width: 6px;
+            bottom: 100%;
+            left: 22px;
+            border-width: 7px;
             border-style: solid;
-            border-color: #0F172A transparent transparent transparent;
+            border-color: transparent transparent rgba(245, 158, 11, 0.65) transparent;
+        }
+        /* Strong tags inside global tooltip */
+        #global-math-popover strong {
+            display: block;
+            font-weight: 700;
+            font-size: 0.84rem;
+            color: #F59E0B;
+            margin-bottom: 6px;
+            line-height: 1.4;
+            white-space: normal;
+            word-break: normal;
         }
 
-        .orange-node.show-popover .math-popover {
-            display: block !important;
-        }
-
-        /* [2026-07-10 Fix: Premium accordion structural headers with smooth CSS transitions] */
+        /* ============ ACCORDIONS (LESS ONQUEUE / PLI 1-5) ============ */
         .bank-accordion-btn {
-            background: #1E293B !important;
-            border: 1px solid rgba(255, 255, 255, 0.08) !important;
-            border-radius: 8px !important;
+            background:
+                linear-gradient(160deg, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0.06) 100%),
+                rgba(14, 18, 36, 0.55) !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.07) !important;
+            border-top-color: rgba(255,255,255,0.13) !important;
+            /* [2026-07-11 Fix: border-radius set to 0 — fully flat/sharp accordion rows per user request 2026-07-11] */
+            border-radius: 0px !important;
             text-align: left;
-            padding: 16px;
+            padding: 14px 18px !important;
             width: 100%;
-            color: #FFFFFF;
-            font-weight: 600;
+            color: #E8EEFF;
+            font-weight: 700;
+            font-family: 'Montserrat', sans-serif !important;
+            font-size: 0.9rem !important; /* Larger text size */
+            letter-spacing: 0.06em !important;
+            text-transform: uppercase;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: all 0.3s ease !important;
+            gap: 12px;
+            min-height: 52px !important;
+            box-sizing: border-box;
+            outline: none !important;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            cursor: pointer;
         }
 
         .bank-accordion-btn:hover {
-            background: rgba(30, 41, 59, 0.8) !important;
-            border-color: rgba(229, 169, 60, 0.4) !important;
+            background:
+                linear-gradient(160deg, rgba(255,255,255,0.07) 0%, rgba(0,0,0,0.04) 100%),
+                rgba(20, 26, 52, 0.72) !important;
+            border-color: rgba(245, 158, 11, 0.28) !important;
+            border-top-color: rgba(245, 158, 11, 0.45) !important;
+            box-shadow: 0 0 16px rgba(245, 158, 11, 0.08), inset 0 1px 0 rgba(255,255,255,0.1) !important;
         }
 
-        /* [2026-07-10 Fix: Streamlined ledger audit trail rows replacing heavy dark boxes] */
+        /* Opened accordion button selected glow styling */
+        .bank-accordion-btn[aria-expanded="true"] {
+            background:
+                linear-gradient(160deg, rgba(245, 158, 11, 0.12) 0%, rgba(20, 26, 52, 0.75) 100%),
+                rgba(20, 26, 52, 0.9) !important;
+            border-color: var(--accent-strong) !important;
+            border-top-color: rgba(255, 200, 80, 0.6) !important;
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+            color: #FFFFFF !important;
+        }
+
+        .bank-accordion-btn:active {
+            transform: scale(0.995);
+        }
+
+        /* Expand/Collapse Custom Animations */
+        .collapse {
+            display: block !important;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease, padding 0.4s ease !important;
+        }
+
+        .collapse.show {
+            max-height: 600px;
+            opacity: 1;
+            overflow: visible;
+        }
+
+        .bank-accordion-btn > span.orange-node {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        .bank-accordion-btn > span:last-child {
+            flex: 0 0 auto;
+            display: flex !important;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bank-accordion-btn > span:last-child > span[id^="lbl-pli-"],
+        .bank-accordion-btn > span:last-child > #lbl-onqueuetotal {
+            min-width: 84px;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .bank-accordion-btn .bi-chevron-down {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* [2026-07-11 Fix: PLI accordion gap tightened for better vertical space on smaller screens] */
+        #pliAccordions {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        /* [2026-07-11 Fix: PLI and OnQueue accordion wrappers — strip ALL border-radius from every layer:
+           .card wrapper, .card-header, .card-body, and the button itself are all set to 0.
+           The base .card rule applies var(--radius-lg) which was causing visible corners even with 0 on the button. */
+        #pliAccordions .card,
+        .less-onqueue-accordion .card,
+        #onqAccordionParent .card {
+            margin-bottom: 0 !important;
+            padding: 0 !important;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+            border-radius: 0 !important; /* Kill card wrapper radius — was clipping the button visually */
+        }
+
+        #pliAccordions .card-header,
+        .less-onqueue-accordion .card-header,
+        #onqAccordionParent .card-header {
+            border-radius: 0 !important; /* Kill Bootstrap card-header radius */
+            padding: 0 !important;
+        }
+
+        #pliAccordions .card-body,
+        .less-onqueue-accordion .card-body,
+        #onqAccordionParent .card-body {
+            border-radius: 0 !important;
+        }
+
+        /* [2026-07-11 Fix: PLI table rescaled — smaller font, tighter row padding, compact layout] */
+        #pliAccordions .bank-table {
+            font-size: 10px !important;
+        }
+
+        #pliAccordions .bank-table th {
+            padding: 7px 10px !important;
+            font-size: 9px !important;
+        }
+
+        #pliAccordions .bank-table td {
+            padding: 7px 10px !important;
+            font-size: 10px !important;
+        }
+
+        /* [2026-07-11 Fix: PLI section-panel-inner gets slightly more padding for readability] */
+        #pliAccordions .section-panel-inner {
+            padding: 12px 14px !important;
+        }
+
+        /* [2026-07-11 Fix: Table clip wrapper uses overflow:hidden + border-radius to clip table rows to corners,
+           while keeping the parent section-panel-inner overflow:visible so popovers can still escape] */
+        .pli-table-clip-wrapper,
+        .onq-table-clip-wrapper {
+            overflow: hidden;
+            border-radius: calc(var(--radius-md) - 4px); /* Slightly smaller radius than panel */
+        }
+
+        /* [2026-07-11 Fix: Anticipated + Promotion col padding balanced for even spacing] */
+        .anticipated-comp-col, .promotion-comp-col {
+            padding: 0 14px !important;
+        }
+
+        /* [2026-07-11 Fix: 40/60 split — Anticipated takes 40%, Promotion takes 60% for better use of space] */
+        .anticipated-comp-col {
+            flex: 0 0 40% !important;
+            max-width: 40% !important;
+            padding-right: 16px !important;
+            border-right: 1px solid rgba(255,255,255,0.07) !important;
+        }
+        .promotion-comp-col {
+            flex: 0 0 60% !important;
+            max-width: 60% !important;
+            padding-left: 20px !important;
+        }
+
+        /* [2026-07-11 Fix: Section sub-label typography — uppercase micro-label for card field names] */
+        .anticipated-comp-col .comp-field-label,
+        .promotion-comp-col .comp-field-label {
+            font-size: 11px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.09em !important;
+            color: var(--text-secondary) !important;
+            font-weight: 700 !important;
+            font-family: 'Montserrat', sans-serif !important;
+            margin-bottom: 5px !important;
+            display: block;
+        }
+
+        /* [2026-07-11 Fix: SG/Step value — prominent display value] */
+        #lbl-originalsg {
+            font-size: 1.28rem !important;
+            font-weight: 700 !important;
+            color: #FFFFFF !important;
+            letter-spacing: -0.01em !important;
+            /* [2026-07-11 Old: font-family: 'Inter', sans-serif !important;] */
+            font-family: 'Montserrat', sans-serif !important;
+            line-height: 1.3 !important;
+        }
+
+        /* [2026-07-11 Fix: Anticipated value display size — bigger for readability] */
+        #val-anticipated {
+            font-size: 1.38rem !important;
+            font-weight: 800 !important;
+            letter-spacing: -0.03em !important;
+        }
+
+        /* [2026-07-11 Fix: Promotion margin delta value display size] */
+        #val-promomargin {
+            font-size: 1.38rem !important;
+            font-weight: 800 !important;
+            letter-spacing: -0.03em !important;
+        }
+
+        /* [2026-07-11 Fix: New Salary readout in Promotion column — slightly larger] */
+        #lbl-promoted-salary {
+            font-size: 0.82rem !important;
+            font-weight: 500 !important;
+            color: rgba(255,255,255,0.45) !important;
+            margin-top: 6px !important;
+        }
+
+        /* [2026-07-11 Fix: Toggle label text slightly larger so ANTICIPATED / PROMOTION reads clearly] */
+        .toggle-label-text {
+            font-size: 0.72rem !important;
+            letter-spacing: 0.09em !important;
+        }
+
+        /* [2026-07-11 Fix: Baseline panel label rows — larger text for Base NetPay and Base Positive Deductions] */
+        #panel-baseline-inner .baseline-row {
+            font-size: 0.9rem !important;
+        }
+        #panel-baseline-inner .baseline-row span:first-child {
+            color: rgba(255,255,255,0.62) !important;
+            font-size: 0.88rem !important;
+        }
+        #panel-baseline-inner #lbl-netpay,
+        #panel-baseline-inner #lbl-dedamt {
+            font-size: 1.02rem !important;
+            font-weight: 700 !important;
+        }
+        /* [2026-07-11 Fix: BASELINE SUBTOTAL label uppercase micro-label — clearer hierarchy] */
+        #panel-baseline-inner .baseline-row:last-child > span:first-child {
+            font-size: 0.8rem !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.07em !important;
+            color: rgba(255,255,255,0.5) !important;
+            font-weight: 700 !important;
+        }
+        /* [2026-07-11 Fix: Baseline Subtotal value — main total, bigger and bolder] */
+        #val-baseline {
+            font-size: 1.35rem !important;
+            font-weight: 800 !important;
+            letter-spacing: -0.03em !important;
+        }
+
+        /* [2026-07-11 Fix: PAP subtotal panel spacing improved] */
+        .pap-subtotal-inner-panel {
+            padding: 14px 18px !important;
+        }
+
+        /* OnQueue and PLI Table Sizing / Line Break Prevention */
+        .less-onqueue-accordion .bank-table,
+        #pliAccordions .bank-table {
+            table-layout: auto !important;
+            font-size: 0.8rem !important;
+        }
+        .less-onqueue-accordion .bank-table th,
+        .less-onqueue-accordion .bank-table td,
+        #pliAccordions .bank-table th,
+        #pliAccordions .bank-table td {
+            padding: 8px 10px !important;
+            white-space: nowrap !important;
+        }
+
+        /* [2026-07-11 Fix: orange-node.show-popover just elevates the node slightly; visual tooltip handled by global singleton] */
+        .orange-node.show-popover {
+            color: #FCD34D !important;
+            filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.5)) !important;
+        }
+        .bank-table th:first-child,
+        .bank-table td[data-label="Select"]::before {
+            color: var(--accent-strong) !important;
+        }
+
+
+
+        /* ============ ANTICIPATED + PROMOTION TOGGLE SWITCHES ============ */
+        /* [2026-07-11 Improved: Larger, more premium pill toggle; cleaner active state; Montserrat label] */
+        .toggle-switch-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 10px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 22px;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            position: absolute;
+        }
+
+        /* Liquid glass pill track */
+        .toggle-track {
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(160deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.1) 100%),
+                rgba(30, 40, 60, 0.6);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-top-color: rgba(255,255,255,0.18);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* Thumb knob */
+        .toggle-track::after {
+            content: '';
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background: linear-gradient(135deg, #6B7A99 0%, #4E5F77 100%);
+            border-radius: 50%;
+            top: 50%;
+            left: 3px;
+            transform: translateY(-50%);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.2);
+        }
+
+        /* Active/checked state — amber pill */
+        .toggle-switch input:checked + .toggle-track {
+            background:
+                linear-gradient(160deg, rgba(255,200,50,0.12) 0%, rgba(245,158,11,0.06) 100%),
+                rgba(30, 22, 5, 0.5);
+            border-color: rgba(245, 158, 11, 0.4);
+            border-top-color: rgba(255,200,80,0.55);
+        }
+
+        .toggle-switch input:checked + .toggle-track::after {
+            left: calc(100% - 18px);
+            background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%);
+            box-shadow: 0 2px 8px rgba(245,158,11,0.45), inset 0 1px 0 rgba(255,255,255,0.3);
+        }
+
+        /* Toggle label text */
+        .toggle-label-text {
+            font-size: 9.5px !important;
+            font-weight: 800 !important;
+            letter-spacing: 0.1em !important;
+            text-transform: uppercase;
+            font-family: 'Montserrat', sans-serif !important;
+            color: var(--text-muted);
+            transition: color 0.25s ease;
+            user-select: none;
+            cursor: pointer;
+        }
+
+        .toggle-label-text.is-active {
+            color: #FBBF24;
+        }
+
+        /* ============ AUDIT TRAIL ============ */
         .bottom-history-panel {
-            margin-top: 30px;
-            border-top: 2px solid rgba(255, 255, 255, 0.08);
-            padding-top: 24px;
+            margin-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 30px;
+        }
+
+        .history-grid-header, .history-ledger-row {
+            display: grid;
+            grid-template-columns: 110px 1.5fr 1.2fr 1.2fr 44px;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .history-grid-header {
+            padding: 10px 20px;
+            margin-top: 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .history-grid-header span {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 700;
         }
 
         .history-ledger-list {
             display: flex;
             flex-direction: column;
             gap: 8px;
-            margin-top: 16px;
+            margin-top: 10px;
         }
 
         .history-ledger-row {
-            background: rgba(30, 41, 59, 0.4) !important;
-            border: 1px solid rgba(255, 255, 255, 0.08) !important;
-            border-radius: 8px !important;
-            padding: 14px 20px !important;
+            background: rgba(30, 41, 59, 0.2) !important;
+            border: 1px solid rgba(255, 255, 255, 0.05) !important;
+            border-radius: var(--radius-sm) !important;
+            padding: 12px 20px !important;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: all 0.2s ease;
+            transition: all 0.25s ease;
         }
 
         .history-ledger-row:hover {
-            background: rgba(30, 41, 59, 0.8) !important;
-            border-color: #E5A93C !important;
+            background: rgba(30, 41, 59, 0.45) !important;
+            border-color: rgba(245, 158, 11, 0.25) !important;
             transform: translateY(-2px);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+        }
+
+        .history-cell {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #FFFFFF;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .history-cell-label {
+            display: none;
+        }
+
+        .history-cell .muted {
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .history-delete-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+            justify-self: end;
+        }
+
+        .history-delete-btn:hover {
+            color: var(--value-danger);
+            background: rgba(239, 68, 68, 0.12);
         }
 
         .logout-btn {
             background: transparent;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #94A3B8;
+            color: var(--text-secondary);
             padding: 6px 12px;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s ease;
         }
@@ -335,148 +1071,214 @@
             border-color: #FFFFFF;
         }
 
-        /* [2026-07-10 Fix: Fluid Media Queries for <=1024px column stacking and responsive table layouts] */
-        @media (max-width: 1024px) {
-            .col-lg-6 {
-                width: 100% !important;
-                flex: 0 0 100% !important;
-                max-width: 100% !important;
-            }
-            .table-responsive {
-                overflow-x: auto !important;
-                -webkit-overflow-scrolling: touch;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .bank-table, .bank-table thead, .bank-table tbody, .bank-table th, .bank-table td, .bank-table tr {
-                display: block;
-            }
-
-            .bank-table thead {
-                display: none;
-            }
-
-            .bank-table tr {
-                background: rgba(255, 255, 255, 0.01);
-                border: 1px solid rgba(255, 255, 255, 0.05);
-                border-radius: 8px;
-                padding: 12px;
-                margin-bottom: 12px;
-            }
-
-            .bank-table td {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 8px 0;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-            }
-
-            .bank-table td:last-child {
-                border-bottom: none;
-            }
-
-            .bank-table td::before {
-                content: attr(data-label);
-                font-weight: 700;
-                color: #64748B;
-                margin-right: 12px;
-                font-size: 0.75rem;
-            }
-        }
-
-        /* [2026-07-10 Fix: Mute all currency symbols globally across index5.html per user request so peso signs are soft and professional] */
+        /* [2026-07-11 Fix: Ghost peso prefix — tiny, very dimmed (0.35 opacity), smaller than number to feel like a quiet prefix] */
         .muted-currency {
-            color: #64748B !important;
-            font-weight: 500 !important;
-            margin-right: 3px !important;
+            opacity: 0.35;
+            font-weight: 300 !important;
+            font-size: 0.75em !important;
+            margin-right: 1px !important;
+            letter-spacing: 0.02em !important;
             user-select: none;
             display: inline-block;
+            vertical-align: baseline;
+            position: relative;
+            top: 0.02em;
+            color: inherit !important;
+            font-style: normal !important;
+            font-family: 'Montserrat', sans-serif !important;
         }
 
-        /* [2026-07-11 Fix: Pure White (#FFFFFF) for transitional subtotals — removed overflow/ellipsis/nowrap that was clipping numbers] */
+        /* ============ FINANCIAL VALUE DISPLAY [2026-07-11 Fix: Changed numbers from Inter to Montserrat; thicker weights on major totals] ============ */
         .bank-value-display {
-            font-size: 1.05rem !important;
+            font-size: 1.1rem !important;
             font-weight: 700 !important;
-            color: #FFFFFF !important;
-            letter-spacing: -0.01em !important;
+            font-family: 'Montserrat', sans-serif !important;
+            background: linear-gradient(135deg, #F1F5F9 0%, #CBD5E1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.03em !important;
             font-variant-numeric: tabular-nums !important;
             line-height: 1.4 !important;
-            white-space: normal !important;
-            overflow: visible !important;
-            word-break: break-word !important;
+            white-space: nowrap !important;
         }
 
-        /* Specific transitional value IDs — white, compact, never clipped */
-        #val-baseline, #val-plisubtotal, #val-anticipated,
-        #val-promomargin, #val-papsubtotal, #val-amortization,
-        #lbl-onqueuetotal {
-            font-size: 1.05rem !important;
-            font-weight: 700 !important;
-            color: #FFFFFF !important;
+        /* [2026-07-11 Fix: Baseline and secondary values Montserrat, baseline weight bumped to 800] */
+        #val-baseline, #val-anticipated, #val-promomargin {
+            font-size: 1.15rem !important;
+            font-weight: 800 !important;
+            font-family: 'Montserrat', sans-serif !important;
+            background: linear-gradient(135deg, #F1F5F9 0%, #CBD5E1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             font-variant-numeric: tabular-nums !important;
+            letter-spacing: -0.03em !important;
             line-height: 1.4 !important;
-            white-space: normal !important;
-            overflow: visible !important;
+            white-space: nowrap !important;
         }
 
-        /* [2026-07-11 Fix: Practical color accents — high-level final totals only, gold/green] */
+        #val-plisubtotal {
+            font-size: 1.15rem !important;
+            font-weight: 700 !important;
+            font-family: 'Montserrat', sans-serif !important;
+            background: linear-gradient(135deg, #F1F5F9 0%, #94A3B8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-variant-numeric: tabular-nums !important;
+            letter-spacing: -0.03em !important;
+            line-height: 1.4 !important;
+            white-space: nowrap !important;
+        }
+
+        /* [2026-07-11 Fix: PAP Subtotal — major total, Montserrat, thicker weight 900] */
+        #val-papsubtotal {
+            font-size: 1.3rem !important;
+            font-weight: 900 !important;
+            font-family: 'Montserrat', sans-serif !important;
+            background: linear-gradient(135deg, #FFFFFF 0%, #E2E8F0 50%, #CBD5E1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-variant-numeric: tabular-nums !important;
+            letter-spacing: -0.04em !important;
+            line-height: 1.3 !important;
+            white-space: nowrap !important;
+        }
+
+        /* [2026-07-11 Fix: SemiTotal — prominent mid-total, Montserrat, thicker weight 900] */
         #val-semitotal {
-            font-size: 1.15rem !important;
-            font-weight: 800 !important;
-            color: #FBBF24 !important;
-            white-space: normal !important;
-            overflow: visible !important;
+            font-size: 1.45rem !important;
+            font-weight: 900 !important;
+            font-family: 'Montserrat', sans-serif !important;
+            background: linear-gradient(135deg, #FFFFFF 0%, #E2E8F0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.04em !important;
+            white-space: nowrap !important;
         }
 
-        #val-netpayplitotal {
-            font-size: 1.15rem !important;
-            font-weight: 800 !important;
-            color: #34D399 !important;
-            white-space: normal !important;
-            overflow: visible !important;
+        /* [2026-07-11 Fix: Deduction amber values — subtle gold gradient] */
+        #lbl-dedamt, #lbl-onqueuetotal, #val-amortization {
+            background: linear-gradient(110deg, #F59E0B 0%, #FBBF24 50%, #FCD34D 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        #val-newnetpay {
+        #val-amortization {
             font-size: 1.25rem !important;
-            font-weight: 800 !important;
-            color: #34D399 !important;
-            white-space: normal !important;
-            overflow: visible !important;
+            font-weight: 900 !important;
+            font-family: 'Montserrat', sans-serif !important;
+            letter-spacing: -0.03em !important;
+            white-space: nowrap !important;
         }
 
-        /* [2026-07-11 Fix: .baseline-row for label+value pairs sharing same row with baseline text alignment] */
+        /* [2026-07-11 Fix: Stronger pure emerald — #059669 base, richer green, NOT teal. Montserrat] */
+        #val-netpayplitotal, #val-newnetpay {
+            background: linear-gradient(135deg, #047857 0%, #059669 30%, #10B981 70%, #34D399 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            white-space: nowrap !important;
+        }
+
+        /* [2026-07-11 Fix: NetPay+PLI total, Montserrat, thicker weight 900] */
+        #val-netpayplitotal {
+            font-size: 1.4rem !important;
+            font-weight: 900 !important;
+            font-family: 'Montserrat', sans-serif !important;
+            letter-spacing: -0.04em !important;
+        }
+
+        /* [2026-07-11 Fix: New NetPay — hero value; Montserrat, weight 900] */
+        #val-newnetpay {
+            font-size: 1.7rem !important;
+            font-weight: 900 !important;
+            font-family: 'Montserrat', sans-serif !important;
+            letter-spacing: -0.05em !important;
+            transition: filter 0.3s ease;
+        }
+
+        /* Glow activates only when parent card is hovered */
+        .new-netpay-panel:hover #val-newnetpay,
+        #box-new-netpay-summary:hover #val-newnetpay {
+            filter: drop-shadow(0 0 10px rgba(5, 150, 105, 0.5));
+        }
+
+        /* ============ LAYOUT PRIMITIVES ============ */
         .baseline-row {
             display: flex !important;
             align-items: baseline !important;
             justify-content: space-between !important;
             width: 100%;
-            gap: 8px;
+            gap: 12px;
         }
 
-        /* [2026-07-11 Fix: .section-panel-inner replaces inline background #1E293B divs for consistent inner panel styling] */
+        .baseline-row > span:first-child,
+        .baseline-row > .orange-node {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        .baseline-row > span:last-child,
+        .baseline-row > [id^="val-"] {
+            flex: 0 0 auto;
+            white-space: nowrap !important;
+        }
+
+        /* ============ SECTION PANEL INNER — Liquid glass inner panels [2026-07-11 Fix: Frosted liquid panel inside cards] ============ */
+        /* [2026-07-11 Fix: overflow set to visible (not hidden) so math-popover children can escape this panel's border-radius boundary] */
         .section-panel-inner {
-            background: #1E293B;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 8px;
+            background:
+                linear-gradient(160deg, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0.08) 100%),
+                rgba(8, 12, 28, 0.45);
+            backdrop-filter: blur(24px) saturate(150%) !important;
+            -webkit-backdrop-filter: blur(24px) saturate(150%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.065);
+            border-top-color: rgba(255,255,255,0.12);
+            border-radius: var(--radius-md);
             padding: 14px 16px;
+            overflow: visible; /* Must be visible — hidden would clip popover children and round-corner table */
         }
 
-        /* [2026-07-11 Fix: .orange-node wraps cleanly on narrow widths — no more overflow] */
-        .orange-node {
-            white-space: normal !important;
-            flex-wrap: wrap !important;
+        /* [2026-07-11 Fix: Uniform Montserrat on all body text elements for consistency] */
+        .bank-label, .bank-table th, .bank-table td, .history-cell,
+        .baseline-row span, .small, p, h1, h2, h3, h4, h5, h6 {
+            font-family: 'Montserrat', sans-serif !important;
         }
 
-        /* [2026-07-11 Fix: PLI Subtotal row — stacked label+value inside each col so text never overlaps] */
+        /* [2026-07-11 Old:
+        .bank-value-display, #val-baseline, #val-semitotal, #val-anticipated,
+        #val-promomargin, #val-papsubtotal, #val-plisubtotal, #val-netpayplitotal,
+        #val-newnetpay, #val-amortization, #lbl-netpay, #lbl-dedamt,
+        #lbl-onqueuetotal, [id^="lbl-pli-"], #lbl-total-interest {
+            font-family: 'Inter', sans-serif !important;
+        }
+        ] */
+        /* [2026-07-11 Fix: Set all numeric display values to use Montserrat font-family per brand request] */
+        .bank-value-display, #val-baseline, #val-semitotal, #val-anticipated,
+        #val-promomargin, #val-papsubtotal, #val-plisubtotal, #val-netpayplitotal,
+        #val-newnetpay, #val-amortization, #lbl-netpay, #lbl-dedamt,
+        #lbl-onqueuetotal, [id^="lbl-pli-"], #lbl-total-interest {
+            font-family: 'Montserrat', sans-serif !important;
+        }
+
+        /* [2026-07-11 Fix: Employee summary card — liquid glass] */
+        .employee-summary-card {
+            background:
+                linear-gradient(160deg, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0.08) 100%),
+                rgba(8, 12, 28, 0.4) !important;
+            backdrop-filter: blur(28px) saturate(160%) !important;
+            -webkit-backdrop-filter: blur(28px) saturate(160%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.065) !important;
+            border-top-color: rgba(255,255,255,0.14) !important;
+            border-radius: var(--radius-md) !important;
+            padding: 14px 16px !important;
+            transition: all 0.3s ease;
+        }
+
         .pli-total-col {
             display: flex;
             flex-direction: column;
             gap: 4px;
         }
 
-        /* [2026-07-11 Fix: inner-summary-card uniform height grid — equal-height-row ensures both cols grow to same height] */
         .equal-height-row {
             display: flex;
             flex-wrap: wrap;
@@ -489,26 +1291,48 @@
             padding: 0 6px;
         }
 
-        /* [2026-07-10 Fix: Phase D Inner Summary Boxes styled with uniform height, crisp glass borders, and clean padding] */
-        .inner-summary-card {
-            background: #1E293B !important;
-            border: 1px solid rgba(255, 255, 255, 0.06) !important;
-            border-radius: 8px !important;
-            padding: 16px 18px !important;
-            height: 100% !important;
-            min-height: 115px !important;
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: space-between !important;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3) !important;
-            transition: all 0.25s ease !important;
-        }
-        .inner-summary-card:hover {
-            border-color: rgba(229, 169, 60, 0.3) !important;
-            background: rgba(30, 41, 59, 0.9) !important;
+        #lbl-promoted-salary {
+            margin-top: 12px !important;
+            padding-top: 10px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.08);
         }
 
-        /* [2026-07-10 Fix: Custom dark scrollbars to eliminate ugly white browser default scrollbars inside tables & accordions] */
+        /* ============ SUMMARY MINI-CARDS — Liquid glass [2026-07-11 Fix: iPhone liquid glass treatment, amber glow only on hover] ============ */
+        .inner-summary-card {
+            background:
+                linear-gradient(160deg, rgba(255,255,255,0.055) 0%, rgba(0,0,0,0.1) 100%),
+                rgba(8, 12, 28, 0.55) !important;
+            backdrop-filter: blur(32px) saturate(170%) !important;
+            -webkit-backdrop-filter: blur(32px) saturate(170%) !important;
+            border: 1px solid rgba(255,255,255,0.075) !important;
+            border-top-color: rgba(255,255,255,0.16) !important;
+            border-radius: var(--radius-md) !important;
+            padding: 16px !important;
+            height: 100% !important;
+            min-height: 105px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.07) !important;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        /* [2026-07-11 Fix: Glow ONLY on hover — amber top highlight appears on mouse-enter only] */
+        .inner-summary-card:hover {
+            border-top-color: rgba(245, 158, 11, 0.5) !important;
+            border-color: rgba(245, 158, 11, 0.18) !important;
+            background:
+                linear-gradient(160deg, rgba(255,200,50,0.06) 0%, rgba(0,0,0,0.08) 100%),
+                rgba(10, 14, 32, 0.62) !important;
+            box-shadow: 0 12px 36px rgba(0,0,0,0.5), 0 0 20px rgba(245,158,11,0.07), inset 0 1px 0 rgba(255,255,255,0.1) !important;
+            transform: translateY(-2px);
+        }
+
+        .inner-summary-card > .bank-value-display,
+        .inner-summary-card > .currency-input-wrapper {
+            margin-top: auto !important;
+            margin-bottom: auto !important;
+        }
+
+        /* ============ SCROLLBARS ============ */
         .table-responsive::-webkit-scrollbar,
         #onqTableContainer::-webkit-scrollbar,
         #pliAccordions::-webkit-scrollbar {
@@ -532,13 +1356,169 @@
         #pliAccordions::-webkit-scrollbar-thumb:hover {
             background: #475569;
         }
+
+        /* ============ RESPONSIVE MOBILE NAVIGATION & STYLES ============ */
+        /* [2026-07-11 Fix: Scoped display:flex to max-width:767px only — prevents d-md-none override on desktop where Bootstrap sets display:none] */
+        @media (max-width: 767.98px) {
+            .mobile-header {
+                background-color: rgba(15, 23, 42, 0.9) !important;
+                backdrop-filter: blur(12px) !important;
+                -webkit-backdrop-filter: blur(12px) !important;
+                padding: 12px 20px !important;
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+                position: sticky !important;
+                top: 0 !important;
+                z-index: 1001 !important;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+            }
+        }
+
+        .bottom-nav {
+            position: fixed !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            background: rgba(15, 23, 42, 0.85) !important;
+            backdrop-filter: blur(18px) !important;
+            -webkit-backdrop-filter: blur(18px) !important;
+            display: none !important; /* Hide on desktop */
+            justify-content: space-around !important;
+            padding: 10px 0 !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+            z-index: 1000 !important;
+            box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .bottom-nav a {
+            color: var(--text-secondary) !important;
+            text-decoration: none !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            font-size: 0.7rem !important;
+            font-weight: 600 !important;
+            transition: all 0.2s ease !important;
+            flex: 1 !important;
+        }
+
+        .bottom-nav a i {
+            font-size: 1.2rem !important;
+            margin-bottom: 2px !important;
+            transition: transform 0.2s ease !important;
+        }
+
+        .bottom-nav a:hover {
+            color: #FFFFFF !important;
+        }
+
+        .bottom-nav a:hover i {
+            transform: translateY(-2px);
+        }
+
+        .bottom-nav a.active-tab {
+            color: var(--accent-strong) !important;
+            text-shadow: 0 0 10px rgba(245, 158, 11, 0.3) !important;
+        }
+
+        @media (max-width: 1024px) {
+            .col-lg-6 {
+                width: 100% !important;
+                flex: 0 0 100% !important;
+                max-width: 100% !important;
+            }
+            .table-responsive {
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .bottom-nav {
+                display: flex !important; /* Show bottom-nav on mobile only */
+            }
+
+            /* [2026-07-11 Old:
+            .bank-table, .bank-table thead, .bank-table tbody, .bank-table th, .bank-table td, .bank-table tr {
+                display: block;
+            }
+
+            .bank-table thead {
+                display: none;
+            }
+
+            .bank-table tr {
+                background: rgba(255, 255, 255, 0.01);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                border-radius: var(--radius-sm);
+                padding: 12px;
+                margin-bottom: 12px;
+            }
+
+            .bank-table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 8px 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            }
+
+            .bank-table td:last-child {
+                border-bottom: none;
+            }
+
+            .bank-table td::before {
+                content: attr(data-label);
+                font-weight: 700;
+                color: var(--text-muted);
+                margin-right: 12px;
+                font-size: 0.75rem;
+            }
+            ] */
+            /* [2026-07-11 Fix: Retain regular table columns on mobile with horizontal scroll wrapper instead of display:block card lists] */
+
+            .history-grid-header {
+                display: none;
+            }
+
+            .history-ledger-row {
+                grid-template-columns: 1fr;
+                row-gap: 10px;
+                padding: 16px !important;
+            }
+
+            .history-cell {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                white-space: normal;
+            }
+
+            .history-cell-label {
+                display: inline-block;
+                font-size: 11px;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: var(--text-muted);
+                font-weight: 700;
+            }
+
+            .history-delete-btn {
+                justify-self: start;
+            }
+        }
     </style>
+
+
 </head>
 
 <body>
 
     <!-- Mobile Header -->
-    <header class="mobile-header d-md-none" style="background-color: #0F172A; padding: 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08);">
+    <!-- Mobile Header (Polished: Inline styles removed; style handled by .mobile-header in stylesheet) -->
+    <header class="mobile-header d-md-none">
         <img src="citysavings_logo.png" alt="CitySavings" style="height: 20px; filter: brightness(0) invert(1);">
         <div>
             <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button>
@@ -572,7 +1552,7 @@
         <div class="bank-card search-config-card" id="searchConfigurationCard" data-label="Search & Client Configuration Card">
             <div class="row align-items-center">
                 <div class="col-lg-3 col-md-12">
-                    <h5 class="mb-lg-0 font-weight-bold" style="color: #F59E0B; letter-spacing: 0.5px;"><i class="bi bi-shield-check"></i> Credit Assessment</h5>
+                    <h5 class="mb-lg-0 font-weight-bold credit-assessment-title" id="titleCreditAssessment"><i class="bi bi-shield-check"></i> Credit Assessment</h5>
                 </div>
                 <div class="col-lg-3 col-md-4">
                     <select id="activeMonthSelect" class="form-control bank-select">
@@ -594,7 +1574,8 @@
                     <input type="text" id="employeeNumber" class="form-control bank-input" value="4694264" placeholder="Search Employee ID...">
                 </div>
                 <div class="col-lg-2 col-md-3">
-                    <button id="searchBtn" class="btn btn-warning w-100 font-weight-bold py-2" onclick="performSearch()" style="background-color: #F59E0B; border: none; color: #020617; border-radius: 8px !important;">
+                    <!-- Search Button (Polished: Inline background and color styles removed in favor of bank-btn-primary class styles) -->
+                    <button id="searchBtn" class="btn btn-warning bank-btn-primary w-100 font-weight-bold" onclick="performSearch()">
                         <i class="bi bi-search"></i> Search
                     </button>
                 </div>
@@ -609,8 +1590,9 @@
             </div>
 
             <!-- Employee Details Summary Display Card -->
-            <div id="empSummaryCard" class="mt-3 p-3 employee-summary-card" data-label="Employee Details Summary Card" style="background: #1E293B; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px !important;">
-                <div class="row small text-white-50">
+            <!-- Employee Details Summary Display Card (Polished: Styled glassmorphic background using class instead of solid panel inline styles) -->
+            <div id="empSummaryCard" class="mt-3 p-3 employee-summary-card" data-label="Employee Details Summary Card">
+                <div class="row text-white-50">
                     <div class="col-md-4">Client Name: <span id="empSummaryName" class="text-white font-weight-bold ml-1">-</span></div>
                     <div class="col-md-4">Employee ID: <span id="empSummaryID" class="text-white font-weight-bold ml-1">-</span></div>
                     <div class="col-md-4">Div / Station: <span id="empSummaryDiv" class="text-white font-weight-bold ml-1">-</span></div>
@@ -622,7 +1604,7 @@
         <div id="evaluationWorkspace" class="d-none">
             
             <!-- Matrix Phase Grid Layout -->
-            <div class="row">
+            <div class="row matrix-grid-row">
                 
                 <!-- Left Column (Phases A, B) -->
                 <div class="col-lg-6 col-md-12">
@@ -630,34 +1612,8 @@
                     <!-- Card: Setup & Capital Base -->
                     <div class="bank-card baseline-setup-card" id="card-baseline-netpay" data-label="Setup & Capital Base Card">
                         
-                        <!-- [2026-07-10 Fix: Replaced informal emojis with monochrome SVG stroke icons per user rule] -->
-                        <!-- [2026-07-11 Fix: section-panel-inner class replaces inline styles for NETPAY & DEDAMT BASELINE panel — uniform spacing, no overflow] -->
-                        <div class="section-panel-inner mb-3" id="panel-baseline-inner">
-                            <div class="orange-node mb-3" id="node-baseline">
-                                <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10"/></svg>
-                                NETPAY &amp; DEDAMT BASELINE
-                                <span class="math-popover">
-                                    <strong>Baseline Subtotal = NetPay + DEDAMT</strong><br>
-                                    Combines NetPay (from june26.csv) and DEDAMT components (from pos_june26.csv).
-                                </span>
-                            </div>
-                            <!-- [2026-07-11 Fix: Label rows use baseline-row for left-label right-value alignment] -->
-                            <div class="baseline-row small text-white-50 mb-2">
-                                <span>Base NetPay</span>
-                                <span id="lbl-netpay" class="tabular-nums font-weight-bold text-white">₱0.00</span>
-                            </div>
-                            <div class="baseline-row small text-white-50 mb-3">
-                                <span>Base Positive Deductions</span>
-                                <span id="lbl-dedamt" class="tabular-nums font-weight-bold text-white">₱0.00</span>
-                            </div>
-                            <div class="baseline-row font-weight-bold pt-2" style="border-top: 1px solid rgba(255,255,255,0.08);">
-                                <span class="small text-white-50" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.05em;">Baseline Subtotal</span>
-                                <span id="val-baseline" class="bank-value-display">₱0.00</span>
-                            </div>
-                        </div>
-
-                        <!-- [2026-07-11 Fix: section-panel-inner for LOAN AMOUNT panel] -->
-                        <div class="section-panel-inner" id="panel-loanamt-inner">
+                        <!-- [2026-07-11 Fix: section-panel-inner for LOAN AMOUNT panel moved on top (higher in document order) with mb-3 spacing class] -->
+                        <div class="section-panel-inner mb-3" id="panel-loanamt-inner">
                             <div class="orange-node mb-2" id="node-loanamt">
                                 <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg>
                                 LOAN AMOUNT
@@ -680,8 +1636,9 @@
                                     <div class="orange-node mb-1" id="node-term">
                                         <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                                         LOAN TERM
+                                        <!-- [2026-07-11 Fix: Updated term limit in popover text to 84 months] -->
                                         <span class="math-popover">
-                                            Amortization period from 6 to 60 months.
+                                            Amortization period from 6 to 84 months.
                                         </span>
                                     </div>
                                     <select id="loanTerm" class="form-control bank-select tabular-nums" onchange="runCalculations()">
@@ -695,13 +1652,37 @@
                                             Lending rate. Defaults to 7.5%.
                                         </span>
                                     </div>
-                                    <select id="interestRate" class="form-control bank-select" onchange="runCalculations()">
-                                        <option value="7.5" selected>7.5%</option>
-                                        <option value="9">9.0%</option>
-                                        <option value="9.66">9.66%</option>
-                                        <option value="12">12.0%</option>
-                                    </select>
+                                    <!-- [2026-07-11 Fix: Changed select to direct custom text input for Interest Rate to allow any custom rate value, defaulting to 7.5%] -->
+                                    <div class="currency-input-wrapper">
+                                        <input type="text" id="interestRate" class="form-control bank-input font-weight-bold text-white tabular-nums" value="7.5" style="padding-left: 12px !important; padding-right: 28px !important;" oninput="runCalculations()">
+                                        <span style="position: absolute; right: 12px; color: rgba(255, 255, 255, 0.4); font-size: 0.85rem; font-weight: 700; pointer-events: none;">%</span>
+                                    </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- [2026-07-11 Fix: section-panel-inner for NETPAY & DEDAMT BASELINE panel moved below the Loan Amount setup panel] -->
+                        <div class="section-panel-inner" id="panel-baseline-inner">
+                            <div class="orange-node mb-3" id="node-baseline">
+                                <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10"/></svg>
+                                NETPAY &amp; DEDAMT BASELINE
+                                <span class="math-popover">
+                                    <strong>Baseline Subtotal = NetPay + DEDAMT</strong><br>
+                                    Combines NetPay (from june26.csv) and DEDAMT components (from pos_june26.csv).
+                                </span>
+                            </div>
+                            <!-- [2026-07-11 Fix: Label rows use baseline-row for left-label right-value alignment] -->
+                            <div class="baseline-row small text-white-50 mb-2">
+                                <span>Base NetPay</span>
+                                <span id="lbl-netpay" class="tabular-nums font-weight-bold text-white">₱0.00</span>
+                            </div>
+                            <div class="baseline-row small text-white-50 mb-3">
+                                <span>Base Positive Deductions</span>
+                                <span id="lbl-dedamt" class="tabular-nums font-weight-bold text-white">₱0.00</span>
+                            </div>
+                            <div class="baseline-row font-weight-bold pt-2" style="border-top: 1px solid rgba(255,255,255,0.08);">
+                                <span class="small text-white-50" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.05em;">Baseline Subtotal</span>
+                                <span id="val-baseline" class="bank-value-display">₱0.00</span>
                             </div>
                         </div>
                     </div>
@@ -710,14 +1691,38 @@
                     <!-- Card: Private Liabilities (PLI) -->
                     <div class="bank-card private-liabilities-card" id="card-private-liabilities" data-label="Private Liabilities (PLI) Assessment Card">
                         
-                        <div id="pliAccordions" class="accordion mb-3">
-                            <!-- Populated dynamically -->
+                        <!-- [2026-07-11 New: Master toggle switch to check/include the entire Private Liabilities Card (PLIs, Anticipated, Promotion) in calculations] -->
+                        <div class="toggle-switch-wrapper mb-3" id="wrapperMasterPliToggle">
+                            <label class="toggle-switch" id="labelMasterPliSwitch" title="Toggle entire Private Liabilities section (PLIs, Anticipated, Promotion) in calculations">
+                                <input type="checkbox" id="toggleMasterPli" checked onchange="onToggleMasterPli(); runCalculations();">
+                                <span class="toggle-track"></span>
+                            </label>
+                            <!-- [2026-07-11 Fix: Set default label state to is-active] -->
+                            <span class="toggle-label-text is-active" id="lblToggleMasterPliText">INCLUDE PRIVATE LIABILITIES &amp; COMPENSATION</span>
                         </div>
 
-                        <!-- [2026-07-11 Fix: PLI Subtotal row — section-panel-inner + pli-total-col stacked layout to prevent text overlap in narrow viewports] -->
-                        <div class="section-panel-inner" id="panel-pli-totals">
+                        <!-- [2026-07-11 Fix: Wrapped title and accordions in section-panel-inner container to match design guidelines] -->
+                        <div class="section-panel-inner" id="panel-pli-inner">
+                            <!-- [2026-07-11 Fix: Added Card Header Title for Private Liabilities (PLI) to unify with baseline setup & compensation adjustments card design] -->
+                            <div class="orange-node mb-3" id="node-private-liabilities-title">
+                                <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
+                                PRIVATE LIABILITIES (PLI)
+                                <span class="math-popover">
+                                    <strong>Private Liabilities Section</strong><br>
+                                    Select and assess private lending institution deductions.
+                                </span>
+                            </div>
+                            
+                            <div id="pliAccordions" class="accordion">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- [2026-07-11 Fix: PLI Subtotal row — section-panel-inner + mt-3 layout] -->
+                        <div class="section-panel-inner mt-3" id="panel-pli-totals">
                             <div class="row">
-                                <div class="col-6">
+                                <!-- PLI Subtotal Column (Polished: Added class name .pli-subtotal-col, ID and data-desc) -->
+                                <div class="col-6 pli-subtotal-col" id="colPLISubtotal" data-desc="Column displaying the computed PLI subtotal value.">
                                     <div class="pli-total-col">
                                         <div class="orange-node font-weight-bold" id="node-plisubtotal">
                                             <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
@@ -729,7 +1734,8 @@
                                         <div id="val-plisubtotal" class="bank-value-display mt-2">₱0.00</div>
                                     </div>
                                 </div>
-                                <div class="col-6" style="border-left: 1px solid rgba(255,255,255,0.06); padding-left: 16px;">
+                                <!-- NetPay + PLI Total Column (Polished: Added class name .netpay-pli-col and data-desc, styled using CSS class rather than inline borders) -->
+                                <div class="col-6 netpay-pli-col" id="colNetPayPLITotal" style="border-left: 1px solid rgba(255,255,255,0.06); padding-left: 16px;" data-desc="Column displaying combined NetPay and PLI subtotal.">
                                     <div class="pli-total-col">
                                         <div class="orange-node font-weight-bold" id="node-netpayplitotal">
                                             <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -750,58 +1756,85 @@
                 <!-- Right Column (Compensation, Final Underwriting) -->
                 <div class="col-lg-6 col-md-12">
                     
-                    <!-- [2026-07-10 Fix: Added descriptive ID, label classnames, and standardized bank-value-display classes per global rules] -->
+                    <!-- [2026-07-11 Fix: Added descriptive ID, label classnames, and standardized bank-value-display classes per global rules] -->
+                    <!-- [2026-07-11 New: Anticipated & Promotion now toggleable — checkbox disables them from total calculation] -->
                     <!-- Card: Compensation Adjustments (Merged ANTICIPATED and PROMOTION) -->
                     <div class="bank-card compensation-adjustments-card" id="card-compensation-adjustments" data-label="Compensation Adjustments Assessment Card">
                         
                         <!-- [2026-07-11 Fix: ANTICIPATED and PROMOTION columns — stacked label-then-value layout prevents horizontal text cramping and overflow] -->
                         <div class="section-panel-inner" id="panel-comp-adjustments">
                             <div class="row">
-                                <!-- ANTICIPATED Column -->
-                                <div class="col-6" style="border-right: 1px solid rgba(255,255,255,0.06);">
+                                <!-- ANTICIPATED Column — toggleable via switch; disabled state grays out the value -->
+                                <div class="col-6 anticipated-comp-col" id="colAnticipatedCompensation" data-desc="Anticipated compensation step details display column.">
+                                    <!-- [2026-07-11 New: Toggle switch for Anticipated — controls whether value is included in PAP subtotal] -->
+                                    <div class="toggle-switch-wrapper mb-2" id="wrapperAnticipatedToggle">
+                                        <label class="toggle-switch" id="labelAnticipatedSwitch" title="Toggle Anticipated in total">
+                                            <!-- [2026-07-11 Old: <input type="checkbox" id="toggleAnticipated" checked ...>] -->
+                                            <!-- [2026-07-11 Fix: Default to off (unchecked)] -->
+                                            <input type="checkbox" id="toggleAnticipated" onchange="onToggleAnticipated(); runCalculations();">
+                                            <span class="toggle-track"></span>
+                                        </label>
+                                        <!-- [2026-07-11 Old: <span class="toggle-label-text is-active" ...>] -->
+                                        <!-- [2026-07-11 Fix: Label defaults to inactive gray text] -->
+                                        <span class="toggle-label-text" id="lblToggleAnticipatedText">ANTICIPATED</span>
+                                    </div>
                                     <div class="orange-node mb-3" id="node-anticipated">
                                         <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
                                         ANTICIPATED
                                         <span class="math-popover">
-                                            Original Step Salary pulled from tranch2026.csv.
+                                            Original Step Salary pulled from tranch2026.csv.<br>Toggle switch above to include/exclude from total.
                                         </span>
                                     </div>
                                     <!-- [2026-07-11 Fix: Stacked label-then-value (not inline) — avoids text overlap on SG-11 Step-5 long values] -->
-                                    <div class="mb-3">
-                                        <div class="small text-white-50 mb-1">Original SG / Step</div>
-                                        <div id="lbl-originalsg" class="font-weight-bold text-white tabular-nums" style="font-size: 0.95rem;">-</div>
+                                    <div class="mb-3" id="anticipated-sg-wrapper">
+                                        <!-- [2026-07-11 Fix: Changed from small text-white-50 to comp-field-label class for unified uppercase label typography] -->
+                                        <div class="comp-field-label mb-1">Original SG / Step</div>
+                                        <div id="lbl-originalsg" class="font-weight-bold text-white tabular-nums">-</div>
                                     </div>
-                                    <div>
-                                        <div class="small text-white-50 mb-1">Remarks Value</div>
+                                    <div id="anticipated-value-wrapper">
+                                        <div class="comp-field-label mb-1">Remarks Value</div>
                                         <div id="val-anticipated" class="bank-value-display">₱0.00</div>
                                     </div>
                                 </div>
 
-                                <!-- PROMOTION Column -->
-                                <div class="col-6" style="padding-left: 16px;">
+                                <!-- PROMOTION Column — toggleable via switch; disabled state grays out the value -->
+                                <div class="col-6 promotion-comp-col" id="colPromotionCompensation" data-desc="Promotional grade and step override selector column.">
+                                    <!-- [2026-07-11 New: Toggle switch for Promotion — controls whether margin is included in PAP subtotal] -->
+                                    <div class="toggle-switch-wrapper mb-2" id="wrapperPromotionToggle">
+                                        <label class="toggle-switch" id="labelPromotionSwitch" title="Toggle Promotion in total">
+                                            <!-- [2026-07-11 Old: <input type="checkbox" id="togglePromotion" checked ...>] -->
+                                            <!-- [2026-07-11 Fix: Default to off (unchecked)] -->
+                                            <input type="checkbox" id="togglePromotion" onchange="onTogglePromotion(); runCalculations();">
+                                            <span class="toggle-track"></span>
+                                        </label>
+                                        <!-- [2026-07-11 Old: <span class="toggle-label-text is-active" ...>] -->
+                                        <!-- [2026-07-11 Fix: Label defaults to inactive gray text] -->
+                                        <span class="toggle-label-text" id="lblTogglePromotionText">PROMOTION</span>
+                                    </div>
                                     <div class="orange-node mb-3" id="node-promotion">
                                         <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
                                         PROMOTION
                                         <span class="math-popover">
-                                            Select promotional overrides inside tranch2026.csv.
+                                            Select promotional overrides inside tranch2026.csv.<br>Toggle switch above to include/exclude margin from total.
                                         </span>
                                     </div>
                                     <!-- [2026-07-11 Fix: Label above dropdowns, New Salary readout BELOW dropdowns so nothing overlaps] -->
-                                    <div class="mb-3">
-                                        <div class="small text-white-50 mb-1">Promotional Override</div>
-                                        <div class="d-flex" style="gap: 6px;">
+                                    <div class="mb-3" id="promotion-controls-wrapper">
+                                        <!-- [2026-07-11 Fix: Changed from small text-white-50 to comp-field-label class for unified uppercase label typography] -->
+                                        <div class="comp-field-label mb-2">Promotional Override</div>
+                                        <div class="d-flex" style="gap: 8px;">
                                             <select id="promoGrade" class="form-control bank-select select-sm tabular-nums" style="flex: 1; min-width: 0;" onchange="runCalculations()">
                                             </select>
                                             <select id="promoStep" class="form-control bank-select select-sm tabular-nums" style="flex: 1; min-width: 0;" onchange="runCalculations()">
                                             </select>
                                         </div>
                                         <!-- New Salary display below dropdowns — no horizontal clash -->
-                                        <div id="lbl-promoted-salary" class="text-white-50 tabular-nums mt-1" style="font-size: 0.75rem; font-weight: 500; opacity: 0.85;">
+                                        <div id="lbl-promoted-salary" class="tabular-nums mt-2">
                                             New Salary: ₱0.00
                                         </div>
                                     </div>
-                                    <div>
-                                        <div class="small text-white-50 mb-1">Margin Delta</div>
+                                    <div id="promotion-value-wrapper">
+                                        <div class="comp-field-label mb-1">Margin Delta</div>
                                         <div id="val-promomargin" class="bank-value-display">₱0.00</div>
                                     </div>
                                 </div>
@@ -809,13 +1842,14 @@
                         </div>
 
                         <!-- [2026-07-11 Fix: PAP Subtotal uses section-panel-inner + mt-3 spacing] -->
+                        <!-- [2026-07-11 Note: PAP label updates dynamically based on which toggles are active] -->
                         <div class="section-panel-inner mt-3" id="panel-papsubtotal">
                             <div class="baseline-row">
                                 <div class="orange-node font-weight-bold" id="node-papsubtotal">
                                     <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16v1a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v1"/><path d="M18 8h4a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-4"/><circle cx="8" cy="12" r="2"/></svg>
-                                    PLI + ANTICIPATED + PROMOTION SUBTOTAL
+                                    <span id="lbl-papsubtotal-title">PLI + ANTICIPATED + PROMOTION SUBTOTAL</span>
                                     <span class="math-popover">
-                                        <strong>PLI + ANTICIPATED + PROMOTION = 5 PLIs Sum + Anticipated Value + Promotion Margin</strong>
+                                        <strong>Sum of active PLI deductions + toggled components (Anticipated / Promotion Margin)</strong>
                                     </span>
                                 </div>
                                 <div id="val-papsubtotal" class="bank-value-display">₱0.00</div>
@@ -826,13 +1860,14 @@
                     <!-- [2026-07-10 Fix: Replaced informal emojis with SVG icons, added comma formatting to incomingDeduction, tabular-nums, & styled as official bank certificate] -->
                     <!-- [2026-07-10 Fix: Added card ID, inner summary box IDs, single-line amortization title, and non-overlapping bank-value-display classes per user rules] -->
                     <!-- Card: Final Underwriting & PMT -->
-                    <div class="bank-card final-underwriting-card" id="card-final-underwriting" data-label="Final Underwriting & PMT Certificate Card" style="background: linear-gradient(145deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.95)) !important; border: 1px solid rgba(229, 169, 60, 0.25) !important; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;">
+                    <!-- Final Underwriting Card (Polished: Styled glass certificate appearance using .final-underwriting-card class variables in CSS, removing inline styles) -->
+                    <div class="bank-card final-underwriting-card" id="card-final-underwriting" data-label="Final Underwriting & PMT Certificate Card">
 
                         <!-- OnQueue accordion section -->
                         <div class="accordion mb-3 less-onqueue-accordion" id="onqAccordionParent">
                             <div class="card bg-transparent border-0">
-                                <button class="bank-accordion-btn" type="button" onclick="toggleCustomAccordion('collapseOnq')">
-                                    <span class="orange-node" id="node-lessonqueue" onclick="event.stopPropagation()">
+                                <button class="bank-accordion-btn" type="button" aria-expanded="false" onclick="toggleCustomAccordion('collapseOnq')">
+                                    <span class="orange-node" id="node-lessonqueue">
                                         <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
                                         LESS ONQUEUE
                                         <span class="math-popover">
@@ -847,7 +1882,10 @@
                                 <div id="collapseOnq" class="collapse" aria-labelledby="onqHeading" data-parent="#onqAccordionParent">
                                     <!-- [2026-07-11 Fix: section-panel-inner class for LESS ONQUEUE accordion body panel] -->
                                     <div class="card-body section-panel-inner mt-2" id="panel-onq-table">
-                                        <div id="onqTableContainer" class="table-responsive">
+                                        <!-- [2026-07-11 Fix: onq-table-clip-wrapper clips table rows to rounded border-radius while section-panel-inner stays overflow:visible for popovers] -->
+                                        <div class="onq-table-clip-wrapper">
+                                            <div id="onqTableContainer" class="table-responsive">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -855,9 +1893,10 @@
                         </div>
 
                         <!-- [2026-07-11 Fix: 2x2 inner summary card grid uses equal-height-row for uniform card height across all 4 boxes] -->
-                        <!-- manual inputs & calculations results grids -->
+                        <!-- manual inputs & calculations results grids (Polished: Added clean wrapper classnames and semantic ids for columns structure) -->
                         <div class="row g-3 mb-3">
-                            <div class="col-md-6 d-flex">
+                            <!-- Incoming Deduction Grid Wrapper (Allows flexible layout wrapping) -->
+                            <div class="col-md-6 d-flex incoming-adjustment-wrapper" id="wrapperIncomingAdjustment" data-desc="Wrapper layout for the incoming deduction override panel.">
                                 <div class="inner-summary-card incoming-panel w-100" id="box-incoming-deduction" data-label="Incoming Deduction Override Panel">
                                     <div class="orange-node mb-2" id="node-incoming">
                                         <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17V3"/><path d="m6 11 6 6 6-6"/><path d="M19 21H5"/></svg>
@@ -872,7 +1911,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6 d-flex">
+                            <!-- Semitotal Computation Grid Wrapper (Displays baseline calculations minus deductions) -->
+                            <div class="col-md-6 d-flex semitotal-summary-wrapper" id="wrapperSemitotalSummary" data-desc="Wrapper layout for the semitotal computation display panel.">
                                 <div class="inner-summary-card semitotal-panel w-100" id="box-semitotal-summary" data-label="SemiTotal Summary Panel">
                                     <div class="orange-node mb-2" id="node-semitotal">
                                         <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="16" y1="18" x2="16" y2="18"/><line x1="12" y1="18" x2="12" y2="18"/><line x1="8" y1="18" x2="8" y2="18"/></svg>
@@ -887,7 +1927,8 @@
                         </div>
 
                         <div class="row g-3">
-                            <div class="col-md-6 d-flex">
+                            <!-- Amortization Computation Grid Wrapper (Displays the calculated monthly loan installment) -->
+                            <div class="col-md-6 d-flex amortization-summary-wrapper" id="wrapperAmortizationSummary" data-desc="Wrapper layout for the amortization computation display panel.">
                                 <div class="inner-summary-card amortization-panel w-100" id="box-amortization-summary" data-label="CSB Amortization Summary Panel">
                                     <div class="orange-node mb-2" id="node-amortization">
                                         <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -899,7 +1940,8 @@
                                     <div id="val-amortization" class="bank-value-display mt-2">₱0.00</div>
                                 </div>
                             </div>
-                            <div class="col-md-6 d-flex">
+                            <!-- New NetPay Grid Wrapper (Displays the final net pay after all adjustments) -->
+                            <div class="col-md-6 d-flex newnetpay-summary-wrapper" id="wrapperNewNetPaySummary" data-desc="Wrapper layout for the final New NetPay display panel.">
                                 <div class="inner-summary-card new-netpay-panel w-100" id="box-new-netpay-summary" data-label="New NetPay Final Settlement Panel">
                                     <div class="orange-node mb-2" id="node-newnetpay">
                                         <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -918,18 +1960,18 @@
                         </div>
                     </div>
 
-                    <!-- Underwriting Screen Control Buttons -->
-                    <div class="d-flex justify-content-end mb-4">
-                        <button class="btn btn-outline-warning mr-2 font-weight-bold" onclick="logCurrentState()" style="border-color: #F59E0B; color: #F59E0B; border-radius: 8px !important;">
-                            <i class="bi bi-save"></i> Log Session
-                        </button>
-                        <button class="btn btn-secondary font-weight-bold px-4" onclick="clearInputsAndReload()" style="background: #475569; border: none; border-radius: 8px !important;">
-                            <i class="bi bi-arrow-counterclockwise"></i> Reset Evaluator
-                        </button>
-                    </div>
-
                 </div>
 
+            </div>
+
+            <!-- Underwriting Screen Control Buttons — full-width row, independent of either column's height (Polished: Inline styling cleaned in favor of centralized CSS classes) -->
+            <div class="d-flex justify-content-end action-btn-row">
+                <button class="btn btn-outline-warning bank-btn-outline mr-2 font-weight-bold" onclick="logCurrentState()">
+                    <i class="bi bi-save"></i> Log Session
+                </button>
+                <button class="btn btn-secondary bank-btn-secondary font-weight-bold" onclick="clearInputsAndReload()">
+                    <i class="bi bi-arrow-counterclockwise"></i> Reset Evaluator
+                </button>
             </div>
 
             <!-- Full-width Bottom Panel: Computation State History Logger -->
@@ -938,7 +1980,14 @@
                     <i class="bi bi-clock-history text-warning mr-2"></i> Session Runs Audit Trail
                 </h5>
                 <p class="text-white-50 small">Click on any run card below to restore its complete evaluation states and parameter overrides.</p>
-                <div class="history-grid" id="historyLogList">
+                <div class="history-grid-header">
+                    <span>Timestamp</span>
+                    <span>ID &amp; Term</span>
+                    <span>Loan Amount</span>
+                    <span>New NetPay</span>
+                    <span></span>
+                </div>
+                <div class="history-ledger-list" id="historyLogList">
                     <!-- Loaded dynamically via JS -->
                     <div class="text-white-50 text-center py-4 w-100">No historical assess runs recorded in this session.</div>
                 </div>
@@ -948,26 +1997,26 @@
 
     </div>
 
-    <!-- Bottom Navigation Bar (Mobile) -->
-    <div class="bottom-nav d-md-none" style="position: fixed; bottom: 0; left: 0; right: 0; background: #0F172A; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.08); z-index: 1000;">
-        <a href="index.html" style="color: #94A3B8; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.7rem;">
-            <i class="bi bi-wallet" style="font-size: 1.2rem;"></i>
+    <!-- Bottom Navigation Bar (Mobile) (Polished: Inline styling removed, layout classes and active capsules handle styling natively) -->
+    <div class="bottom-nav d-md-none">
+        <a href="index.html">
+            <i class="bi bi-wallet"></i>
             <span>NETPAY</span>
         </a>
-        <a href="index2.html" style="color: #94A3B8; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.7rem;">
-            <i class="bi bi-cash-stack" style="font-size: 1.2rem;"></i>
+        <a href="index2.html">
+            <i class="bi bi-cash-stack"></i>
             <span>DEDAMT</span>
         </a>
-        <a href="index3.html" style="color: #94A3B8; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.7rem;">
-            <i class="bi bi-hourglass-split" style="font-size: 1.2rem;"></i>
+        <a href="index3.html">
+            <i class="bi bi-hourglass-split"></i>
             <span>ONQ</span>
         </a>
-        <a href="index4.html" style="color: #94A3B8; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.7rem;">
-            <i class="bi bi-file-earmark-text" style="font-size: 1.2rem;"></i>
+        <a href="index4.html">
+            <i class="bi bi-file-earmark-text"></i>
             <span>PLI</span>
         </a>
-        <a href="index5.html" style="color: #F59E0B; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.7rem;">
-            <i class="bi bi-calculator-fill" style="font-size: 1.2rem;"></i>
+        <a href="index5.html" class="active-tab">
+            <i class="bi bi-calculator-fill"></i>
             <span>EVAL</span>
         </a>
     </div>
@@ -1005,10 +2054,11 @@
         });
 
         // Dropdowns build helpers
+        /* [2026-07-11 Fix: buildLoanTermOptions extends select list up to 84 months, defaulting to 60 months selected] */
         function buildLoanTermOptions() {
             const termSelect = document.getElementById('loanTerm');
             termSelect.innerHTML = '';
-            for (let t = 6; t <= 60; t++) {
+            for (let t = 6; t <= 84; t++) {
                 const opt = document.createElement('option');
                 opt.value = t;
                 opt.textContent = `${t} months`;
@@ -1098,11 +2148,16 @@
             const content = document.getElementById(id);
             if (!content) return;
             
+            // Find the trigger button
+            const btn = document.querySelector(`button[onclick*="${id}"]`);
+            
             const isVisible = content.classList.contains('show');
             if (isVisible) {
                 content.classList.remove('show');
+                if (btn) btn.setAttribute('aria-expanded', 'false');
             } else {
                 content.classList.add('show');
+                if (btn) btn.setAttribute('aria-expanded', 'true');
             }
         }
 
@@ -1387,7 +2442,7 @@
                     <div class="card bg-transparent border-0 mb-2">
                         <div class="card-header p-0" id="${headingId}">
                             <button class="bank-accordion-btn" type="button" onclick="toggleCustomAccordion('${accordionId}')">
-                                <span class="orange-node font-weight-bold" onclick="event.stopPropagation()">
+                                <span class="orange-node font-weight-bold">
                                     <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
                                     PLI ${i}
                                     <span class="math-popover">
@@ -1403,8 +2458,11 @@
                         <div id="${accordionId}" class="collapse" aria-labelledby="${headingId}" data-parent="#pliAccordions">
                             <!-- [2026-07-11 Fix: section-panel-inner class for PLI accordion body panels, replacing inline style] -->
                             <div class="card-body section-panel-inner mt-2">
-                                <div id="pliTableContainer-${i}" class="table-responsive">
-                                    ${tableHTML}
+                                <!-- [2026-07-11 Fix: pli-table-clip-wrapper clips table rows to rounded border-radius while section-panel-inner stays overflow:visible for popovers] -->
+                                <div class="pli-table-clip-wrapper">
+                                    <div id="pliTableContainer-${i}" class="table-responsive">
+                                        ${tableHTML}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1471,35 +2529,118 @@
         }
 
         // Hover or click popup modal bindings
+        /* [2026-07-11 Fix: Rebuilt tooltip system using a global fixed-position singleton (#global-math-popover).
+           This bypasses all stacking context issues created by backdrop-filter on adjacent bank-cards.
+           The .math-popover spans are now data holders only (display:none). The JS reads their innerHTML
+           and injects it into the global tooltip, then positions it using getBoundingClientRect(). */
         function attachTooltipBehaviors() {
+            // Ensure global tooltip singleton exists in body
+            let globalTip = document.getElementById('global-math-popover');
+            if (!globalTip) {
+                globalTip = document.createElement('div');
+                globalTip.id = 'global-math-popover';
+                document.body.appendChild(globalTip);
+            }
+
+            let hideTimer = null;
+
+            function showTooltip(node) {
+                const dataSpan = node.querySelector('.math-popover');
+                if (!dataSpan) return;
+
+                // Clear any pending hide
+                clearTimeout(hideTimer);
+
+                // Inject content
+                globalTip.innerHTML = dataSpan.innerHTML;
+
+                // Show first so we can measure its dimensions
+                globalTip.style.display = 'block';
+                globalTip.style.opacity = '0';
+                globalTip.style.transform = 'translateY(-6px)';
+
+                // Calculate position using fixed coords from node bounding rect
+                const rect = node.getBoundingClientRect();
+                const tipW = 300;
+                const gap = 10;
+
+                let left = rect.left;
+                let top = rect.bottom + gap;
+
+                // Clamp so it stays inside viewport
+                const vpW = window.innerWidth;
+                const vpH = window.innerHeight;
+                if (left + tipW > vpW - 16) left = vpW - tipW - 16;
+                if (left < 10) left = 10;
+
+                // If tooltip would go below viewport, show ABOVE the node instead
+                const tipH = globalTip.offsetHeight || 120;
+                if (top + tipH > vpH - 20) {
+                    top = rect.top - tipH - gap;
+                    globalTip.style.setProperty('--arrow-dir', 'bottom');
+                } else {
+                    globalTip.style.removeProperty('--arrow-dir');
+                }
+
+                globalTip.style.left = left + 'px';
+                globalTip.style.top = top + 'px';
+                globalTip.style.width = tipW + 'px';
+
+                // Animate in
+                requestAnimationFrame(() => {
+                    globalTip.classList.add('visible');
+                });
+
+                // Mark node active
+                node.classList.add('show-popover');
+            }
+
+            function hideTooltip(node) {
+                node.classList.remove('show-popover');
+                globalTip.classList.remove('visible');
+                // Delay actual display:none until transition finishes
+                hideTimer = setTimeout(() => {
+                    if (!globalTip.classList.contains('visible')) {
+                        globalTip.style.display = 'none';
+                    }
+                }, 250);
+            }
+
             document.querySelectorAll('.orange-node').forEach(node => {
-                node.onclick = null;
+                // Remove any old listeners by cloning
                 node.onmouseenter = null;
                 node.onmouseleave = null;
+                node.onclick = null;
 
-                node.addEventListener('mouseenter', () => {
-                    node.classList.add('show-popover');
-                });
-                
-                node.addEventListener('mouseleave', () => {
-                    node.classList.remove('show-popover');
-                });
+                node.addEventListener('mouseenter', () => showTooltip(node));
+                node.addEventListener('mouseleave', () => hideTooltip(node));
 
+                // Click toggle for touch / keyboard
                 node.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    document.querySelectorAll('.orange-node').forEach(other => {
-                        if (other !== node) other.classList.remove('show-popover');
-                    });
-                    node.classList.toggle('show-popover');
+                    if (node.classList.contains('show-popover')) {
+                        hideTooltip(node);
+                    } else {
+                        document.querySelectorAll('.orange-node').forEach(o => {
+                            if (o !== node) hideTooltip(o);
+                        });
+                        showTooltip(node);
+                    }
                 });
             });
         }
 
-        // Close math popovers on outer click window bounds
-        window.addEventListener('click', () => {
-            document.querySelectorAll('.orange-node').forEach(node => {
-                node.classList.remove('show-popover');
-            });
+        // Close tooltip when clicking outside any orange-node
+        window.addEventListener('click', (e) => {
+            if (!e.target.closest('.orange-node')) {
+                document.querySelectorAll('.orange-node').forEach(node => {
+                    node.classList.remove('show-popover');
+                });
+                const tip = document.getElementById('global-math-popover');
+                if (tip) {
+                    tip.classList.remove('visible');
+                    setTimeout(() => { if (tip && !tip.classList.contains('visible')) tip.style.display = 'none'; }, 250);
+                }
+            }
         });
 
         // Precise Excel PMT Equivalent formula
@@ -1510,6 +2651,7 @@
         }
 
         // Phase calculations trigger logic
+        // [2026-07-11 Fix: Anticipated and Promotion are now conditionally included based on toggle state]
         function runCalculations() {
             if (!window.currentData || !window.activeSession) return;
 
@@ -1552,8 +2694,92 @@
             const promotionMargin = promotedRemarks - anticipatedVal;
             document.getElementById('val-promomargin').innerHTML = formatPHP(promotionMargin);
 
-            const papSubtotal = pliSubtotal + anticipatedVal + promotionMargin;
+            // [2026-07-11 New: Read toggle states — only include in total if enabled]
+            const useMasterPli   = document.getElementById('toggleMasterPli')   ? document.getElementById('toggleMasterPli').checked   : true;
+            const useAnticipated = useMasterPli && (document.getElementById('toggleAnticipated') ? document.getElementById('toggleAnticipated').checked : false);
+            const usePromotion   = useMasterPli && (document.getElementById('togglePromotion')   ? document.getElementById('togglePromotion').checked   : false);
+
+            // Compute active components under master PLI toggle
+            const activePliSubtotal = useMasterPli ? pliSubtotal : 0;
+            document.getElementById('val-plisubtotal').innerHTML = formatPHP(activePliSubtotal);
+
+            const activeNetPayPliTotal = window.activeSession.netPay + activePliSubtotal;
+            document.getElementById('val-netpayplitotal').innerHTML = formatPHP(activeNetPayPliTotal);
+
+            // [2026-07-11 Fix: Overhauled visual dimming to gray out the entire column contents (nodes, labels, and inputs) except the toggle switch, and disable select elements]
+            const colAnticipated = document.getElementById('colAnticipatedCompensation');
+            const colPromotion = document.getElementById('colPromotionCompensation');
+            
+            const showAnticipated = useMasterPli && useAnticipated;
+            if (colAnticipated) {
+                const childDivs = Array.from(colAnticipated.children).filter(el => !el.classList.contains('toggle-switch-wrapper'));
+                childDivs.forEach(el => {
+                    el.style.opacity = showAnticipated ? '1' : '0.25';
+                    el.style.filter = showAnticipated ? 'none' : 'grayscale(100%)';
+                    el.style.transition = 'opacity 0.25s ease, filter 0.25s ease';
+                });
+                const antCb = document.getElementById('toggleAnticipated');
+                if (antCb) antCb.disabled = !useMasterPli;
+            }
+            
+            const showPromotion = useMasterPli && usePromotion;
+            if (colPromotion) {
+                const childDivs = Array.from(colPromotion.children).filter(el => !el.classList.contains('toggle-switch-wrapper'));
+                childDivs.forEach(el => {
+                    el.style.opacity = showPromotion ? '1' : '0.25';
+                    el.style.filter = showPromotion ? 'none' : 'grayscale(100%)';
+                    el.style.transition = 'opacity 0.25s ease, filter 0.25s ease';
+                });
+                
+                const gradeSelect = document.getElementById('promoGrade');
+                const stepSelect = document.getElementById('promoStep');
+                if (gradeSelect) gradeSelect.disabled = !showPromotion;
+                if (stepSelect) stepSelect.disabled = !showPromotion;
+
+                const proCb = document.getElementById('togglePromotion');
+                if (proCb) proCb.disabled = !useMasterPli;
+            }
+
+            // [2026-07-11 Fix: Dim entire PLI section panels and disable child interactives if master toggle is off]
+            const panelPliInner = document.getElementById('panel-pli-inner');
+            const panelPliTotals = document.getElementById('panel-pli-totals');
+            if (panelPliInner) {
+                panelPliInner.style.opacity = useMasterPli ? '1' : '0.25';
+                panelPliInner.style.filter = useMasterPli ? 'none' : 'grayscale(100%)';
+                panelPliInner.style.transition = 'opacity 0.25s ease, filter 0.25s ease';
+                
+                // Disable all radio buttons inside PLI accordions if master is off
+                panelPliInner.querySelectorAll('input[type="radio"]').forEach(radio => {
+                    radio.disabled = !useMasterPli;
+                });
+                
+                // Disable custom accordion buttons if master is off
+                panelPliInner.querySelectorAll('.bank-accordion-btn').forEach(btn => {
+                    btn.disabled = !useMasterPli;
+                    btn.style.pointerEvents = useMasterPli ? 'auto' : 'none';
+                });
+            }
+            if (panelPliTotals) {
+                panelPliTotals.style.opacity = useMasterPli ? '1' : '0.25';
+                panelPliTotals.style.filter = useMasterPli ? 'none' : 'grayscale(100%)';
+                panelPliTotals.style.transition = 'opacity 0.25s ease, filter 0.25s ease';
+            }
+
+            // Compute PAP subtotal based on active toggles
+            const activeAnticipated = useMasterPli && useAnticipated ? anticipatedVal    : 0;
+            const activePromotion   = useMasterPli && usePromotion   ? promotionMargin   : 0;
+            const papSubtotal = activePliSubtotal + activeAnticipated + activePromotion;
             document.getElementById('val-papsubtotal').innerHTML = formatPHP(papSubtotal);
+
+            // [2026-07-11 New: Update PAP subtotal label dynamically based on toggle state]
+            const titleParts = [];
+            if (useMasterPli) titleParts.push('PLI');
+            if (useMasterPli && useAnticipated) titleParts.push('ANTICIPATED');
+            if (useMasterPli && usePromotion)   titleParts.push('PROMOTION');
+            const papTitleEl = document.getElementById('lbl-papsubtotal-title');
+            if (papTitleEl) {
+                papTitleEl.textContent = titleParts.length > 0 ? (titleParts.join(' + ') + ' SUBTOTAL') : 'NO PLI/COMPENSATION SUBTOTAL';
+            }
 
             // Phase D Deductions totals
             let activeOnqSum = 0;
@@ -1591,12 +2817,39 @@
                 netPayElement.style.color = '#EF4444'; // professional warning red
                 thresholdErr.classList.remove('d-none');
             } else {
-                netPayElement.style.color = '#F8FAFC'; // professional clean off-white
+                netPayElement.style.color = ''; // reset to CSS gradient
                 thresholdErr.classList.add('d-none');
             }
 
             // Save currently active state values to local storage for restore after reload
             saveActiveEvaluationState();
+        }
+
+        // [2026-07-11 New: Toggle handler for Anticipated — updates label color when toggled]
+        function onToggleAnticipated() {
+            const isOn = document.getElementById('toggleAnticipated').checked;
+            const labelEl = document.getElementById('lblToggleAnticipatedText');
+            if (labelEl) {
+                labelEl.classList.toggle('is-active', isOn);
+            }
+        }
+
+        // [2026-07-11 New: Toggle handler for Promotion — updates label color when toggled]
+        function onTogglePromotion() {
+            const isOn = document.getElementById('togglePromotion').checked;
+            const labelEl = document.getElementById('lblTogglePromotionText');
+            if (labelEl) {
+                labelEl.classList.toggle('is-active', isOn);
+            }
+        }
+
+        // [2026-07-11 New: Toggle handler for Master PLI — updates label color when toggled]
+        function onToggleMasterPli() {
+            const isOn = document.getElementById('toggleMasterPli').checked;
+            const labelEl = document.getElementById('lblToggleMasterPliText');
+            if (labelEl) {
+                labelEl.classList.toggle('is-active', isOn);
+            }
         }
 
         function saveActiveEvaluationState() {
@@ -1623,7 +2876,10 @@
                 promoGrade: safeInt(document.getElementById('promoGrade').value),
                 promoStep: safeInt(document.getElementById('promoStep').value),
                 onqSelections: onqSelections,
-                incomingDeduction: safeFloat(document.getElementById('incomingDeduction').value)
+                incomingDeduction: safeFloat(document.getElementById('incomingDeduction').value),
+                /* [2026-07-11 Fix: Added saving toggle check states to localStorage activeState object] */
+                toggleAnticipated: document.getElementById('toggleAnticipated') ? document.getElementById('toggleAnticipated').checked : false,
+                togglePromotion: document.getElementById('togglePromotion') ? document.getElementById('togglePromotion').checked : false
             };
 
             localStorage.setItem('le_active_state', JSON.stringify(activeState));
@@ -1684,26 +2940,24 @@
                 const isSafe = item.newNetPay >= 5000.00;
                 return `
                     <div class="history-ledger-row" onclick="restoreHistoryState(${index})" title="Click to restore this computational state">
-                        <div class="d-flex align-items-center flex-wrap" style="gap: 24px;">
-                            <div>
-                                <div class="bank-label">TIMESTAMP</div>
-                                <div class="text-white font-weight-bold tabular-nums" style="font-size: 0.85rem;">${item.timestamp}</div>
-                            </div>
-                            <div>
-                                <div class="bank-label">ID & TERM</div>
-                                <div class="text-warning font-weight-bold tabular-nums" style="font-size: 0.85rem;">#${item.empNum} <span class="text-white-50 font-weight-normal">(${item.loanTerm}m @ ${item.interestRate}%)</span></div>
-                            </div>
-                            <div>
-                                <div class="bank-label">LOAN AMOUNT</div>
-                                <div class="text-white font-weight-bold tabular-nums" style="font-size: 0.9rem;">${formatPHP(item.loanAmount)}</div>
-                            </div>
-                            <div>
-                                <div class="bank-label">NEW NETPAY</div>
-                                <div class="font-weight-bold tabular-nums" style="font-size: 0.9rem; color: ${isSafe ? '#10B981' : '#EF4444'}">${formatPHP(item.newNetPay)}</div>
-                            </div>
+                        <div class="history-cell">
+                            <span class="history-cell-label">Timestamp</span>
+                            <span>${item.timestamp}</span>
                         </div>
-                        <button onclick="event.stopPropagation(); deleteHistoryState(${index})" class="btn text-white-50 p-1" style="border: none; background: transparent; transition: color 0.2s ease;" title="Delete this run" onmouseover="this.style.color='#EF4444'" onmouseout="this.style.color='#64748B'">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                        <div class="history-cell" style="color: #E5A93C;">
+                            <span class="history-cell-label">ID &amp; Term</span>
+                            <span>#${item.empNum} <span class="muted">(${item.loanTerm}m @ ${item.interestRate}%)</span></span>
+                        </div>
+                        <div class="history-cell">
+                            <span class="history-cell-label">Loan Amount</span>
+                            <span>${formatPHP(item.loanAmount)}</span>
+                        </div>
+                        <div class="history-cell" style="color: ${isSafe ? '#10B981' : '#EF4444'};">
+                            <span class="history-cell-label">New NetPay</span>
+                            <span>${formatPHP(item.newNetPay)}</span>
+                        </div>
+                        <button onclick="event.stopPropagation(); deleteHistoryState(${index})" class="history-delete-btn" title="Delete this run">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                         </button>
                     </div>
                 `;
@@ -1757,6 +3011,18 @@
             checkboxes.forEach((cb, idx) => {
                 cb.checked = state.onqSelections.includes(idx);
             });
+
+            /* [2026-07-11 Fix: Restore toggle states and trigger UI update functions, defaulting to false (off)] */
+            const toggleAnt = document.getElementById('toggleAnticipated');
+            if (toggleAnt) {
+                toggleAnt.checked = state.toggleAnticipated !== undefined ? state.toggleAnticipated : false;
+                onToggleAnticipated();
+            }
+            const togglePro = document.getElementById('togglePromotion');
+            if (togglePro) {
+                togglePro.checked = state.togglePromotion !== undefined ? state.togglePromotion : false;
+                onTogglePromotion();
+            }
 
             // Re-run calculations matrix
             runCalculations();
