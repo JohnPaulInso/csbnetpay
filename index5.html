@@ -26,7 +26,8 @@
            - Capsule Badges: Orange nodes refactored as sleek pill badges with light amber borders and interactive glows.
            - Custom Inputs: Form checkbox & radio buttons resized to 20px with high-contrast inner indicators.
            - Hover Transitions: Lift translateY(-4px) and soft ambient glows.
-    -->
+    <!-- Chart.js for premium dynamic dashboard data rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* [2026-07-11 Fix: CSS vars updated — deeper shadow, wider emerald green added, liquid glass vars] */
         :root {
@@ -247,7 +248,10 @@
         }
 
         /* Custom Checkboxes and Radios */
-        input[type="checkbox"].onq-checkbox {
+        input[type="checkbox"].onq-checkbox,
+        input[type="checkbox"].csb-deduction-cb,
+        input[type="checkbox"]#csb-select-all,
+        input[type="checkbox"]#onq-select-all {
             appearance: none;
             -webkit-appearance: none;
             width: 20px;
@@ -265,18 +269,27 @@
             outline: none;
         }
 
-        input[type="checkbox"].onq-checkbox:hover {
+        input[type="checkbox"].onq-checkbox:hover,
+        input[type="checkbox"].csb-deduction-cb:hover,
+        input[type="checkbox"]#csb-select-all:hover,
+        input[type="checkbox"]#onq-select-all:hover {
             border-color: var(--accent);
             box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.15);
         }
 
-        input[type="checkbox"].onq-checkbox:checked {
+        input[type="checkbox"].onq-checkbox:checked,
+        input[type="checkbox"].csb-deduction-cb:checked,
+        input[type="checkbox"]#csb-select-all:checked,
+        input[type="checkbox"]#onq-select-all:checked {
             background: var(--accent-strong);
             border-color: var(--accent-strong);
             box-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
         }
 
-        input[type="checkbox"].onq-checkbox:checked::after {
+        input[type="checkbox"].onq-checkbox:checked::after,
+        input[type="checkbox"].csb-deduction-cb:checked::after,
+        input[type="checkbox"]#csb-select-all:checked::after,
+        input[type="checkbox"]#onq-select-all:checked::after {
             content: "\F26E";
             font-family: "bootstrap-icons" !important;
             color: #020617;
@@ -603,8 +616,8 @@
             -webkit-backdrop-filter: blur(20px) !important;
             border: 1px solid rgba(255, 255, 255, 0.07) !important;
             border-top-color: rgba(255,255,255,0.13) !important;
-            /* [2026-07-11 Fix: border-radius set to 0 — fully flat/sharp accordion rows per user request 2026-07-11] */
-            border-radius: 0px !important;
+            /* [2026-07-12 Fix: border-radius set to var(--radius-sm) for a subtle rounded look] */
+            border-radius: var(--radius-sm) !important;
             text-align: left;
             padding: 14px 18px !important;
             width: 100%;
@@ -767,22 +780,121 @@
             border-radius: calc(var(--radius-md) - 4px); /* Slightly smaller radius than panel */
         }
 
-        /* [2026-07-11 Fix: Anticipated + Promotion col padding balanced for even spacing] */
-        .anticipated-comp-col, .promotion-comp-col {
-            padding: 0 24px !important;
-        }
-
-        /* [2026-07-11 Fix: 40/60 split — Anticipated takes 40%, Promotion takes 60% for better use of space] */
+        /* [2026-07-12 Fix: Layout changed to full width stacked layout to accommodate the anticipated comparison table] */
         .anticipated-comp-col {
-            flex: 0 0 40% !important;
-            max-width: 40% !important;
-            padding-right: 24px !important;
-            border-right: 1px solid rgba(255,255,255,0.08) !important;
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+            padding: 0 24px 24px 24px !important;
+            border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+            margin-bottom: 24px !important;
+        }
+        /* [2026-07-12 Fix: Enhanced table styling for a high-end dashboard appearance] */
+        #tableAnticipatedBreakdown, #tablePromotionBreakdown {
+            font-size: 0.52rem !important;
+            table-layout: auto !important;
+            width: 100% !important;
+            border: 1px solid rgba(255, 255, 255, 0.06) !important;
+            border-collapse: separate !important;
+            border-spacing: 0 !important;
+            border-radius: 6px !important;
+            overflow: hidden !important;
+            background: rgba(10, 14, 23, 0.15) !important;
+        }
+        #tableAnticipatedBreakdown th, #tablePromotionBreakdown th {
+            font-size: 0.48rem !important;
+            padding: 5px 6px !important;
+            letter-spacing: 0.03em !important;
+            text-align: right !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-top: none !important;
+            border-left: none !important;
+            border-right: none !important;
+            background: rgba(255, 255, 255, 0.02) !important;
+            color: rgba(255, 255, 255, 0.4) !important;
+            font-weight: 600 !important;
+            text-transform: uppercase !important;
+        }
+        #tableAnticipatedBreakdown th:first-child, #tablePromotionBreakdown th:first-child {
+            text-align: left !important;
+        }
+        #tableAnticipatedBreakdown td, #tablePromotionBreakdown td {
+            font-size: 0.52rem !important;
+            padding: 5px 6px !important;
+            text-align: right !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
+            border-top: none !important;
+            border-left: none !important;
+            border-right: none !important;
+            color: rgba(255, 255, 255, 0.75) !important;
+        }
+        #tableAnticipatedBreakdown td:first-child, #tablePromotionBreakdown td:first-child {
+            text-align: left !important;
+        }
+        #tableAnticipatedBreakdown tr:last-child td, #tablePromotionBreakdown tr:last-child td {
+            border-bottom: none !important;
+        }
+        #tableAnticipatedBreakdown tbody tr:hover td, #tablePromotionBreakdown tbody tr:hover td {
+            background: rgba(255, 255, 255, 0.02) !important;
+        }
+        /* Highlight the NET PAY column */
+        #tableAnticipatedBreakdown th:last-child, #tablePromotionBreakdown th:last-child {
+            background: rgba(255, 255, 255, 0.04) !important;
+            color: rgba(255, 255, 255, 0.6) !important;
+        }
+        #tableAnticipatedBreakdown td:last-child, #tablePromotionBreakdown td:last-child {
+            font-weight: 600 !important;
+            color: #FFFFFF !important;
+            background: rgba(255, 255, 255, 0.02) !important;
+        }
+        /* Style the DIFF row specifically */
+        #tableAnticipatedBreakdown tr.diff-row td, #tablePromotionBreakdown tr.diff-row td {
+            background: rgba(253, 126, 20, 0.03) !important;
+            color: rgba(253, 126, 20, 0.85) !important;
+            font-weight: 600 !important;
+        }
+        #tableAnticipatedBreakdown tr.diff-row td:last-child, #tablePromotionBreakdown tr.diff-row td:last-child {
+            color: var(--accent-orange) !important;
+            background: rgba(253, 126, 20, 0.08) !important;
+            font-weight: 700 !important;
+        }
+        /* [2026-07-12 New: Hide breakdown columns and restrict width when the hide-breakdown class is applied] */
+        #tableAnticipatedBreakdown.hide-breakdown, #tablePromotionBreakdown.hide-breakdown {
+            max-width: 320px !important;
+        }
+        #tableAnticipatedBreakdown.hide-breakdown .col-breakdown, #tablePromotionBreakdown.hide-breakdown .col-breakdown {
+            display: none !important;
+        }
+        /* [2026-07-12 New: Increase font size and padding for hidden columns state in PC view for optimal readability] */
+        @media (min-width: 768px) {
+            #tableAnticipatedBreakdown.hide-breakdown, #tablePromotionBreakdown.hide-breakdown {
+                font-size: 0.72rem !important;
+                max-width: 340px !important;
+            }
+            #tableAnticipatedBreakdown.hide-breakdown th, #tablePromotionBreakdown.hide-breakdown th {
+                font-size: 0.65rem !important;
+                padding: 6px 8px !important;
+            }
+            #tableAnticipatedBreakdown.hide-breakdown td, #tablePromotionBreakdown.hide-breakdown td {
+                font-size: 0.72rem !important;
+                padding: 6px 8px !important;
+            }
+        }
+        /* Premium button hover interactions */
+        #btnToggleAnticipatedDetails, #btnTogglePromotionDetails {
+            background: rgba(255, 255, 255, 0.03) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            color: rgba(255, 255, 255, 0.45) !important;
+            transition: all 0.2s ease !important;
+        }
+        #btnToggleAnticipatedDetails:hover, #btnTogglePromotionDetails:hover {
+            background: rgba(255, 255, 255, 0.08) !important;
+            border-color: rgba(255, 255, 255, 0.15) !important;
+            color: #FFFFFF !important;
         }
         .promotion-comp-col {
-            flex: 0 0 60% !important;
-            max-width: 60% !important;
-            padding-left: 24px !important;
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+            padding: 0 24px !important;
         }
 
         /* [2026-07-11 Fix: Section sub-label typography — uppercase micro-label for card field names] */
@@ -838,31 +950,69 @@
         }
 
         /* [2026-07-11 Fix: Baseline panel label rows — larger text for Base NetPay and Base Positive Deductions] */
+        /* 
+          CHANGE DETAILS:
+          Date: 2026-07-12
+          Fix: Refined font sizes based on visual importance (minor vs subtotal vs hero).
+               Restricted amber gradient color clip ONLY to actual subtotal rows.
+        */
         #panel-baseline-inner .baseline-row {
-            font-size: 0.9rem !important;
+            font-size: 0.92rem !important;
+            padding: 10px 14px !important;
+            border-radius: var(--radius-sm) !important;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            margin-bottom: 2px !important;
         }
-        #panel-baseline-inner .baseline-row span:first-child {
-            color: rgba(255,255,255,0.62) !important;
+        
+        #panel-baseline-inner .baseline-row:hover {
+            background: rgba(255, 255, 255, 0.025) !important;
+            transform: translateX(3px);
+        }
+
+        #panel-baseline-inner .netpay-label {
+            color: rgba(255, 255, 255, 0.72) !important;
             font-size: 0.88rem !important;
+            font-weight: 600 !important;
+            display: flex;
+            align-items: center;
         }
-        #panel-baseline-inner #lbl-netpay,
-        #panel-baseline-inner #lbl-dedamt {
-            font-size: 1.02rem !important;
+
+        #panel-baseline-inner .netpay-label-bold {
+            color: rgba(255, 255, 255, 0.88) !important;
+            font-size: 0.88rem !important;
             font-weight: 700 !important;
-        }
-        /* [2026-07-11 Fix: BASELINE SUBTOTAL label uppercase micro-label — clearer hierarchy] */
-        #panel-baseline-inner .baseline-row:last-child > span:first-child {
-            font-size: 0.8rem !important;
             text-transform: uppercase !important;
-            letter-spacing: 0.07em !important;
-            color: rgba(255,255,255,0.5) !important;
-            font-weight: 700 !important;
+            letter-spacing: 0.05em !important;
+            display: flex;
+            align-items: center;
         }
-        /* [2026-07-11 Fix: Baseline Subtotal value — main total, bigger and bolder] */
-        #val-baseline {
-            font-size: 1.35rem !important;
+
+        /* Non-subtotals: white values, smaller font sizes */
+        #lbl-netpay,
+        #lbl-dedamt,
+        #val-baseline-papsubtotal,
+        #val-less-onqueue,
+        #val-less-incoming,
+        #val-new-csb-amortization {
+            font-size: 0.98rem !important;
+            font-weight: 700 !important;
+            color: #FFFFFF !important;
+            background: none !important;
+            -webkit-text-fill-color: initial !important;
+        }
+
+        /* Subtotal ones: SUBTOTAL, SUBTOTAL AFTER REDEMPTION, TOTAL SUBTOTAL.
+           Styled with amber gradient colors and medium-large size. */
+        #val-baseline, 
+        #val-subtotal-after-redemption, 
+        #val-revised-baseline {
+            font-size: 1.25rem !important;
             font-weight: 800 !important;
-            letter-spacing: -0.03em !important;
+            font-family: 'Montserrat', sans-serif !important;
+            background: linear-gradient(110deg, #F59E0B 0%, #FBBF24 50%, #FCD34D 100%) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            letter-spacing: -0.02em !important;
         }
 
         /* [2026-07-11 Fix: PAP subtotal panel spacing improved] */
@@ -986,6 +1136,18 @@
 
         .toggle-label-text.is-active {
             color: #FBBF24;
+        }
+
+        /* [2026-07-12 Private Liabilities card collapsed styling overrides] */
+        .private-liabilities-card.collapsed-state {
+            padding: 14px 20px !important;
+            margin-bottom: 20px !important;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        .private-liabilities-card.collapsed-state #wrapperMasterPliToggleHeader {
+            border-bottom: 1px solid transparent !important;
+            margin-bottom: 0 !important;
+            padding-bottom: 0 !important;
         }
 
         /* ============ AUDIT TRAIL ============ */
@@ -1124,7 +1286,8 @@
         }
 
         /* [2026-07-11 Fix: Baseline and secondary values Montserrat, baseline weight bumped to 800] */
-        #val-baseline, #val-anticipated, #val-promomargin {
+        /* [2026-07-12 Fix: Excluded val-baseline to style it independently in the amber gradient list] */
+        #val-anticipated, #val-promomargin {
             font-size: 1.15rem !important;
             font-weight: 800 !important;
             font-family: 'Montserrat', sans-serif !important;
@@ -1176,8 +1339,7 @@
             white-space: nowrap !important;
         }
 
-        /* [2026-07-11 Fix: Deduction amber values — subtle gold gradient] */
-        #lbl-dedamt, #lbl-onqueuetotal, #val-amortization {
+        #lbl-onqueuetotal {
             background: linear-gradient(110deg, #F59E0B 0%, #FBBF24 50%, #FCD34D 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -1216,10 +1378,14 @@
             transition: filter 0.3s ease;
         }
 
-        /* Glow activates only when parent card is hovered */
-        .new-netpay-panel:hover #val-newnetpay,
-        #box-new-netpay-summary:hover #val-newnetpay {
-            filter: drop-shadow(0 0 10px rgba(5, 150, 105, 0.5));
+        /* Glow activates only when parent card is hovered and depending on status class */
+        .new-netpay-panel:hover #val-newnetpay.glow-green,
+        #box-new-netpay-summary:hover #val-newnetpay.glow-green {
+            filter: drop-shadow(0 0 10px rgba(5, 150, 105, 0.55));
+        }
+        .new-netpay-panel:hover #val-newnetpay.glow-red,
+        #box-new-netpay-summary:hover #val-newnetpay.glow-red {
+            filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.65));
         }
 
         /* ============ LAYOUT PRIMITIVES ============ */
@@ -1703,9 +1869,229 @@
                 font-weight: 700;
             }
 
-            .history-delete-btn {
-                justify-self: start;
-            }
+        /* Final Net Pay styling override */
+        /* [2026-07-12 Fix: Adjusted size to 1.48rem as the main hero final value] */
+        #val-final-new-netpay {
+            font-size: 2.35rem !important;
+            font-weight: 900 !important;
+            font-family: 'Montserrat', sans-serif !important;
+            letter-spacing: -0.05em !important;
+            color: #10B981 !important; /* Emerald green default */
+            background: none !important;
+            -webkit-text-fill-color: initial !important;
+        }
+
+        /* Premium Underwriting Status Badge Styles */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 12px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            border-radius: 20px;
+            margin-top: 8px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .status-badge-accommodated {
+            background: rgba(16, 185, 129, 0.1) !important;
+            border: 1px solid rgba(16, 185, 129, 0.3) !important;
+            color: #10B981 !important;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+            animation: pulse-accommodated 2s infinite ease-in-out;
+        }
+
+        .status-badge-declined {
+            background: rgba(239, 68, 68, 0.1) !important;
+            border: 1px solid rgba(239, 68, 68, 0.3) !important;
+            color: #EF4444 !important;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.2);
+            animation: pulse-declined 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse-accommodated {
+            0%, 100% { box-shadow: 0 0 12px rgba(16, 185, 129, 0.2); }
+            50% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.45); }
+        }
+
+        @keyframes pulse-declined {
+            0%, 100% { box-shadow: 0 0 12px rgba(239, 68, 68, 0.2); }
+            50% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.45); }
+        }
+
+
+        /* ============================================================
+           [2026-07-12 Uniform Dashboard Card Sizing Overhaul]
+           - Top 4 summary cards: equal fixed height 140px, equal padding
+           - Bottom 2 chart cards: fixed height 290px, equal padding
+           - All value displays: same font-size 1.75rem, weight 900
+           - Incoming input field: matches value display sizing
+           - orange-node labels: 0.72rem, consistent across all cards
+           - Legend grid cells in breakdown bar: uniform min-height
+           - BREAKDOWN card title: nowrap via font-size trim
+           ============================================================ */
+
+        /* TOP 4 cards: fixed equal height */
+        #box-incoming-deduction,
+        #box-semitotal-summary,
+        #box-amortization-summary,
+        #box-new-netpay-summary {
+            min-height: 148px !important;
+            max-height: 148px !important;
+            height: 148px !important;
+            padding: 16px 18px !important;
+            justify-content: flex-start !important;
+            overflow: hidden !important;
+        }
+
+        /* BOTTOM 2 chart cards: fixed equal height matching top cards */
+        #card-donut-chart,
+        #card-line-chart {
+            min-height: 148px !important;
+            max-height: 148px !important;
+            height: 148px !important;
+            padding: 10px 14px !important;
+            justify-content: flex-start !important;
+            overflow: hidden !important;
+        }
+
+        /* ALL 6 cards: uniform label header sizing */
+        #box-incoming-deduction .orange-node,
+        #box-semitotal-summary .orange-node,
+        #box-amortization-summary .orange-node,
+        #box-new-netpay-summary .orange-node,
+        #card-donut-chart .orange-node,
+        #card-line-chart .orange-node {
+            font-size: 0.68rem !important;
+            letter-spacing: 0.09em !important;
+            font-weight: 800 !important;
+            margin-bottom: 6px !important;
+            white-space: nowrap !important;
+        }
+
+        /* Normalize the BREAKDOWN title - shorten to single line */
+        #node-line-chart {
+            font-size: 0.63rem !important;
+            letter-spacing: 0.07em !important;
+        }
+
+        /* ALL top-card value displays: unified large number sizing */
+        #val-semitotal,
+        #val-amortization,
+        #val-newnetpay {
+            font-size: 1.75rem !important;
+            font-weight: 900 !important;
+            font-family: 'Montserrat', sans-serif !important;
+            letter-spacing: -0.045em !important;
+            line-height: 1.15 !important;
+            margin-top: 4px !important;
+            margin-bottom: 0 !important;
+        }
+
+        #val-amortization {
+            font-size: 2.1rem !important;
+        }
+
+        /* Incoming input field: matches value display sizing */
+        #incomingDeduction {
+            font-size: 1.75rem !important;
+            font-weight: 900 !important;
+            font-family: 'Montserrat', sans-serif !important;
+            letter-spacing: -0.045em !important;
+            color: #FFFFFF !important;
+            background: rgba(255, 255, 255, 0.025) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-radius: 6px !important;
+            height: 44px !important;
+            padding-left: 36px !important;
+            width: 100% !important;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+
+        /* Currency prefix glyph sits properly beside larger input */
+        #box-incoming-deduction .currency-prefix {
+            font-size: 1.1rem !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+        }
+
+        /* Incoming currency wrapper: push to bottom of card like other values */
+        #box-incoming-deduction .currency-input-wrapper {
+            margin-top: auto !important;
+            margin-bottom: 0 !important;
+            width: 100% !important;
+        }
+
+        /* Inner card value pushes to bottom */
+        .inner-summary-card > .bank-value-display {
+            margin-top: auto !important;
+            margin-bottom: 0 !important;
+        }
+
+        /* Status badge + threshold error: compact to prevent card overflow */
+        #underwriting-status-badge {
+            margin-top: 6px !important;
+            font-size: 0.62rem !important;
+            padding: 2px 8px !important;
+        }
+        #lbl-threshold-error {
+            font-size: 0.72rem !important;
+            margin-top: 4px !important;
+        }
+
+        /* Progress bar legend cells: uniform height */
+        #card-line-chart .flex-grow-1 > div:last-child > div {
+            min-height: 24px !important;
+        }
+
+        /* Allocation progress bar: taller for legibility */
+        .allocation-progress-bar {
+            height: 18px !important;
+        }
+
+        /* [2026-07-12 CSB Deductions Accordion Styles - display:block override to stay visible, plus expanded rotate transition] */
+        #dynamic-csb-deductions-container {
+            display: block !important;
+            margin: 0px 0 !important;
+        }
+        #dynamic-csb-deductions-container.expanded #csb-chevron {
+            transform: rotate(180deg);
+        }
+        #dynamic-csb-deductions-container.expanded #csbAccordionBody {
+            display: block !important;
+        }
+        #dynamic-csb-deductions-container input[type="checkbox"].csb-deduction-cb,
+        #dynamic-csb-deductions-container input[type="checkbox"]#csb-select-all {
+            width: 14px !important;
+            height: 14px !important;
+            border-radius: 4px !important;
+        }
+        #dynamic-csb-deductions-container input[type="checkbox"].csb-deduction-cb:checked::after,
+        #dynamic-csb-deductions-container input[type="checkbox"]#csb-select-all:checked::after {
+            font-size: 8px !important;
+        }
+        #dynamic-csb-deductions-container .bank-table th,
+        #dynamic-csb-deductions-container .bank-table td {
+            font-size: 0.54rem !important;
+            padding: 4px 2px !important;
+        }
+
+        #incomingDeduction:focus {
+            background: rgba(255, 255, 255, 0.055) !important;
+            border-color: rgba(245, 158, 11, 0.45) !important;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.15) !important;
+            outline: none !important;
+        }
+
+        #box-incoming-deduction .currency-prefix {
+            font-size: 1.25rem !important;
+            color: rgba(255, 255, 255, 0.35) !important;
+            left: 14px !important;
+            font-family: 'Montserrat', sans-serif !important;
+            font-weight: 800 !important;
         }
     </style>
 
@@ -1878,55 +2264,94 @@
                                     Combines NetPay (from june26.csv) and DEDAMT components (from pos_june26.csv).
                                 </span>
                             </div>
-                            <!-- [2026-07-11 Fix: Label rows use baseline-row for left-label right-value alignment] -->
-                            <div class="baseline-row small text-white-50 mb-2">
-                                <span>Current Net Pay</span>
-                                <span id="lbl-netpay" class="tabular-nums font-weight-bold text-white">₱0.00</span>
+                            <!-- [2026-07-12 Current Net Pay Row - Starting baseline net pay. Labeled netpay-row-current] -->
+                            <div class="baseline-row netpay-row-current mb-2" id="row-current-netpay">
+                                <span class="netpay-label"><i class="bi bi-wallet2 text-success mr-2"></i>Current Net Pay</span>
+                                <span id="lbl-netpay" class="netpay-value tabular-nums font-weight-bold">₱0.00</span>
                             </div>
-                            <div class="baseline-row small text-white-50 mb-3">
-                                <span>CSB Deductions</span>
-                                <span id="lbl-dedamt" class="tabular-nums font-weight-bold text-white">₱0.00</span>
-                            </div>
-                            <div class="baseline-row font-weight-bold pt-2" style="border-top: 1px solid rgba(255,255,255,0.08);">
-                                <span class="small text-white-50" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.05em;">Subtotal</span>
-                                <span id="val-baseline" class="bank-value-display">₱0.00</span>
-                            </div>
-                            <!-- [2026-07-11 New: Dynamic selected PLI records receipt container styled as a collapsible accordion] -->
-                            <div id="dynamic-pli-rows-container" class="receipt-container-accordion mt-2">
-                                <button type="button" class="receipt-accordion-header" onclick="toggleReceiptAccordion();">
-                                    <span class="receipt-title-text">PLI INCLUDED</span>
+                            
+                            <!-- [2026-07-12 CSB Deductions Accordion Row - Labeled dynamic-csb-deductions-container. Toggleable accordion styled like a transparent baseline row that drops down to show a responsive table of CSB positive deductions] -->
+                            <div id="dynamic-csb-deductions-container" class="mt-0 mb-2" style="background: transparent; border: none; overflow: hidden; width: 100%;">
+                                <button type="button" class="baseline-row netpay-row-csb-deductions-header w-100" id="btn-csb-accordion-header" onclick="toggleCsbAccordion();" style="background: transparent; border: none; outline: none !important; display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 10px 14px; border-radius: var(--radius-sm); transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);">
+                                    <span class="netpay-label"><i class="bi bi-plus-lg text-success mr-2"></i>CSB Deductions</span>
                                     <span class="d-flex align-items-center" style="gap: 8px;">
-                                        <span id="val-baseline-papsubtotal" class="tabular-nums font-weight-bold">₱0.00</span>
-                                        <i class="bi bi-chevron-down receipt-chevron"></i>
+                                        <span id="lbl-dedamt" class="tabular-nums font-weight-bold" style="font-size: 0.98rem; font-weight: 700; color: #FFFFFF;">₱0.00</span>
+                                        <i class="bi bi-chevron-down text-white-50" id="csb-chevron" style="font-size: 0.75rem; transition: transform 0.2s ease;"></i>
                                     </span>
                                 </button>
-                                <div id="receiptAccordionBody" class="receipt-accordion-body">
+                                <div id="csbAccordionBody" class="receipt-accordion-body" style="display: none; padding: 2px 14px 6px 14px; border-top: 1px solid rgba(255, 255, 255, 0.04); background: rgba(0, 0, 0, 0.22); border-radius: 6px; margin-top: 2px;">
+                                    <div class="table-responsive">
+                                        <table class="bank-table mb-0" style="width: 100%; min-width: 320px; border: none; background: transparent; font-size: 0.60rem !important;">
+                                            <thead>
+                                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+                                                    <th style="width: 32px; text-align: center; vertical-align: middle; padding: 4px 0;"><input type="checkbox" id="csb-select-all" checked onchange="toggleAllCsbDeductions(this)"></th>
+                                                    <th style="text-align: left; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.35) !important;">Code</th>
+                                                    <th style="text-align: left; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.35) !important;">Policy No</th>
+                                                    <th style="text-align: center; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.35) !important;">Date</th>
+                                                    <th style="text-align: right; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.35) !important;">Amount</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="csb-deductions-tbody">
+                                                <!-- Dynamic CSB rows populated on employee search load -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- [2026-07-12 Subtotal Row - Starting subtotal before adjustments. Labeled netpay-row-subtotal] -->
+                            <div class="baseline-row netpay-row-subtotal font-weight-bold pt-2 mb-2" id="row-subtotal" style="border-top: 1px solid rgba(255,255,255,0.08);">
+                                <span class="netpay-label-bold"><i class="bi bi-calculator text-muted mr-2"></i>Subtotal</span>
+                                <span id="val-baseline" class="bank-value-display">₱0.00</span>
+                            </div>
+                            
+                            <!-- [2026-07-12 Redemption Accordion Row - Labeled dynamic-pli-rows-container. Styled like a transparent baseline row that drops down to show dynamic PLIs] -->
+                            <div id="dynamic-pli-rows-container" class="receipt-container-accordion mt-2 mb-2" style="background: transparent; border: none; overflow: hidden; width: 100%;">
+                                <button type="button" class="baseline-row netpay-row-redemption-header w-100" id="btn-redemption-accordion-header" onclick="toggleReceiptAccordion();" style="background: transparent; border: none; outline: none !important; display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 10px 14px; border-radius: var(--radius-sm); transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);">
+                                    <span class="netpay-label"><i class="bi bi-plus-lg text-success mr-2"></i>Redemption</span>
+                                    <span class="d-flex align-items-center" style="gap: 8px;">
+                                        <span id="val-baseline-papsubtotal" class="tabular-nums font-weight-bold" style="font-size: 0.98rem; font-weight: 700; color: #FFFFFF;">₱0.00</span>
+                                        <i class="bi bi-chevron-down text-white-50" id="redemption-chevron" style="font-size: 0.75rem; transition: transform 0.2s ease;"></i>
+                                    </span>
+                                </button>
+                                <div id="receiptAccordionBody" class="receipt-accordion-body" style="display: none; padding: 2px 14px 6px 14px; border-top: 1px solid rgba(255, 255, 255, 0.04); background: rgba(0, 0, 0, 0.22); border-radius: 6px; margin-top: 2px;">
                                     <!-- Dynamic receipt rows will be appended here -->
                                 </div>
                             </div>
-                            <!-- [2026-07-11 New: Less OnQueue row showing value from activeOnqSum] -->
-                            <div class="baseline-row small text-white-50 pt-2" id="row-less-onqueue" style="border-top: 1px dashed rgba(255,255,255,0.08);">
-                                <span class="small text-white-50" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.05em;">Less OnQueue</span>
+
+                            <!-- [2026-07-12 Subtotal after Redemption Row (NEW) - Subtotal minus Redemption. Labeled netpay-row-subtotal-after-redemption. Hidden by default, shown dynamically via JS if Redemption toggle is ON and at least one PLI/adjustment is toggled] -->
+                            <div class="baseline-row netpay-row-subtotal-after-redemption font-weight-bold pt-2 mb-2 d-none" id="row-subtotal-after-redemption" style="border-top: 1px solid rgba(255,255,255,0.08);">
+                                <span class="netpay-label-bold"><i class="bi bi-calculator-fill text-muted mr-2"></i>Subtotal after Redemption</span>
+                                <span id="val-subtotal-after-redemption" class="bank-value-display">₱0.00</span>
+                            </div>
+                            
+                            <!-- [2026-07-12 Less OnQueue Row - Deductions in queue. Labeled netpay-row-less-onqueue] -->
+                            <div class="baseline-row netpay-row-less-onqueue pt-2 mb-2" id="row-less-onqueue" style="border-top: 1px dashed rgba(255,255,255,0.08);">
+                                <span class="netpay-label"><i class="bi bi-dash-lg text-warning mr-2"></i>Less OnQueue</span>
                                 <span id="val-less-onqueue" class="bank-value-display">₱0.00</span>
                             </div>
-                            <!-- [2026-07-11 New: Less Incoming row showing value from incomingDeduction field] -->
-                            <div class="baseline-row small text-white-50 pt-2" id="row-less-incoming" style="border-top: 1px dashed rgba(255,255,255,0.08);">
-                                <span class="small text-white-50" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.05em;">Less Incoming</span>
+                            
+                            <!-- [2026-07-12 Less Incoming Row - Manual adjustments. Labeled netpay-row-less-incoming] -->
+                            <div class="baseline-row netpay-row-less-incoming pt-2 mb-2" id="row-less-incoming" style="border-top: 1px dashed rgba(255,255,255,0.08);">
+                                <span class="netpay-label"><i class="bi bi-dash-lg text-warning mr-2"></i>Less Incoming</span>
                                 <span id="val-less-incoming" class="bank-value-display">₱0.00</span>
                             </div>
-                            <!-- [2026-07-11 New: Dynamic Revised Baseline calculation row, visible inline only when PLI Master Toggle is ON] -->
-                            <div class="baseline-row font-weight-bold pt-2 d-none" id="row-revised-baseline" style="border-top: 1px solid rgba(255,255,255,0.08);">
-                                <span class="small text-white-50" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.05em;">Total Subtotal</span>
+                            
+                            <!-- [2026-07-12 Total Subtotal Row - Subtotal after redemptions and queue checks. Labeled netpay-row-total-subtotal] -->
+                            <div class="baseline-row netpay-row-total-subtotal font-weight-bold pt-2 mb-2 d-none" id="row-revised-baseline" style="border-top: 1px solid rgba(255,255,255,0.08);">
+                                <span class="netpay-label-bold"><i class="bi bi-calculator-fill text-muted mr-2"></i>Total Subtotal</span>
                                 <span id="val-revised-baseline" class="bank-value-display">₱0.00</span>
                             </div>
-                            <!-- [2026-07-11 New: New CSB Amortization row showing computed amortization] -->
-                            <div class="baseline-row small text-white-50 pt-2" id="row-new-csb-amortization" style="border-top: 1px dashed rgba(255,255,255,0.08);">
-                                <span class="small text-white-50" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.05em;">New CSB Amortization</span>
+                            
+                            <!-- [2026-07-12 New CSB Amortization Row - Loan monthly amortization. Labeled netpay-row-new-csb-amortization] -->
+                            <div class="baseline-row netpay-row-new-csb-amortization pt-2 mb-2" id="row-new-csb-amortization" style="border-top: 1px dashed rgba(255,255,255,0.08);">
+                                <span class="netpay-label"><i class="bi bi-dash-lg text-warning mr-2"></i>New CSB Amortization</span>
                                 <span id="val-new-csb-amortization" class="bank-value-display">₱0.00</span>
                             </div>
-                            <!-- [2026-07-11 New: Final New Net Pay row displaying subtraction results inside computation block] -->
-                            <div class="baseline-row font-weight-bold pt-2" id="row-final-new-netpay" style="border-top: 1px solid rgba(255,255,255,0.08);">
-                                <span class="small text-white-50" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.05em;">New Net Pay</span>
+                            
+                            <!-- [2026-07-12 New Net Pay Row - Final calculated net pay. Labeled netpay-row-new-netpay] -->
+                            <div class="baseline-row netpay-row-new-netpay font-weight-bold pt-2" id="row-final-new-netpay" style="border-top: 1px solid rgba(255,255,255,0.08);">
+                                <span class="netpay-label-bold" id="lbl-new-net-pay-text"><i class="bi bi-check-circle-fill text-success mr-2" id="icon-final-netpay"></i>New Net Pay</span>
                                 <span id="val-final-new-netpay" class="bank-value-display">₱0.00</span>
                             </div>
                         </div>
@@ -1936,17 +2361,26 @@
                     <!-- Card: Private Liabilities (PLI) -->
                     <div class="bank-card private-liabilities-card" id="card-private-liabilities" data-label="Private Liabilities (PLI) Assessment Card">
                         
-                        <!-- [2026-07-11 New: Master toggle switch to check/include the entire Private Liabilities Card (PLIs, Anticipated, Promotion) in calculations] -->
-                        <div class="toggle-switch-wrapper mb-3" id="wrapperMasterPliToggle">
-                            <label class="toggle-switch" id="labelMasterPliSwitch" title="Toggle entire Private Liabilities section (PLIs, Anticipated, Promotion) in calculations">
-                                <!-- [2026-07-11 Old: <input type="checkbox" id="toggleMasterPli" checked ...>] -->
-                                <!-- [2026-07-11 Fix: Default master toggle switch to off (unchecked)] -->
-                                <input type="checkbox" id="toggleMasterPli" onchange="onToggleMasterPli(); runCalculations();">
-                                <span class="toggle-track toggle-track-master-pli"></span>
-                            </label>
-                            <!-- [2026-07-11 Old: <span class="toggle-label-text is-active" ...>] -->
-                            <!-- [2026-07-11 Fix: Default label text to inactive gray color state] -->
-                            <span class="toggle-label-text" id="lblToggleMasterPliText">INCLUDE PLI</span>
+                        <!-- [2026-07-12 Fix: Premium header row with always-visible title and master toggle switch] -->
+                        <div class="d-flex align-items-center justify-content-between mb-3 pb-2" id="wrapperMasterPliToggleHeader" style="border-bottom: 1px solid rgba(255,255,255,0.06); gap: 16px;">
+                            <div class="d-flex flex-column" id="pli-header-title-block" data-desc="Title text block for Private Liabilities section header.">
+                                <div class="orange-node mb-1" id="node-private-liabilities-title" style="margin-bottom: 2px !important;">
+                                    <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
+                                    REDEMPTION
+                                    <span class="math-popover">
+                                        <strong>Private Liabilities Section</strong><br>
+                                        Toggle to include private lending institution (PLI) redemptions in calculations.
+                                    </span>
+                                </div>
+                                <span class="text-muted" style="font-size: 0.68rem; font-weight: 500; font-family: 'Montserrat', sans-serif;">Manage and incorporate private lending institution deductions</span>
+                            </div>
+                            <div class="toggle-switch-wrapper mb-0" id="wrapperMasterPliToggle" style="margin-bottom: 0 !important;">
+                                <label class="toggle-switch m-0" id="labelMasterPliSwitch" title="Toggle entire Private Liabilities section (PLIs, Anticipated, Promotion) in calculations">
+                                    <input type="checkbox" id="toggleMasterPli" onchange="onToggleMasterPli(); runCalculations();">
+                                    <span class="toggle-track toggle-track-master-pli"></span>
+                                </label>
+                                <span class="toggle-label-text ml-1" id="lblToggleMasterPliText">EXCLUDED</span>
+                            </div>
                         </div>
 
                         <!-- [2026-07-11 Fix: Wrapped all PLI inner content blocks in a pli-card-collapse container to animate height expansion based on master toggle switch] -->
@@ -1954,15 +2388,6 @@
 
                             <!-- [2026-07-11 Fix: Wrapped title and accordions in section-panel-inner container to match design guidelines] -->
                             <div class="section-panel-inner" id="panel-pli-inner">
-                            <!-- [2026-07-11 Fix: Added Card Header Title for Private Liabilities (PLI) to unify with baseline setup & compensation adjustments card design] -->
-                            <div class="orange-node mb-3" id="node-private-liabilities-title">
-                                <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
-                                PRIVATE LIABILITIES (PLI)
-                                <span class="math-popover">
-                                    <strong>Private Liabilities Section</strong><br>
-                                    Select and assess private lending institution deductions.
-                                </span>
-                            </div>
                             
                             <div id="pliAccordions" class="accordion">
                                 <!-- Populated dynamically -->
@@ -1971,16 +2396,16 @@
 
                         <!-- [2026-07-11 Fix: Anticipated & Promotion integrated inside card-private-liabilities since they are part of liabilities/compensation calculations] -->
                         <div class="section-panel-inner mt-3" id="panel-comp-adjustments">
-                            <div class="row">
+                            <div class="row" id="row-comp-adjustments" data-desc="Row wrapping Anticipated and Promotion adjustment columns.">
                                 <!-- ANTICIPATED Column — toggleable via switch; disabled state grays out the value -->
-                                <div class="col-6 anticipated-comp-col" id="colAnticipatedCompensation" data-desc="Anticipated compensation step details display column.">
+                                <div class="col-12 anticipated-comp-col" id="colAnticipatedCompensation" data-desc="Anticipated compensation step details display column.">
                                     <!-- [2026-07-11 Fix: Inline alignment wrapper to put the toggle on the right side of the node title] -->
                                     <div class="d-flex align-items-center justify-content-between mb-3" style="min-height: 24px;">
                                         <div class="orange-node mb-0" id="node-anticipated" style="margin-bottom: 0 !important;">
                                             <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
                                             ANTICIPATED
-                                            <span class="math-popover">
-                                                Original Step Salary pulled from tranch2026.csv.<br>Toggle switch on the right to include/exclude from total.
+                                            <span class="math-popover" id="popover-anticipated" data-desc="Math popover description for Anticipated.">
+                                                Anticipated salary standardization increase (Net Pay difference between 4th Tranche 2027 and 3rd Tranche 2026) for the original Grade and Step.<br>Toggle switch on the right to include/exclude from total.
                                             </span>
                                         </div>
                                         <!-- [2026-07-11 New: Toggle switch on the right side of the header title] -->
@@ -1993,15 +2418,44 @@
                                             <span class="toggle-label-text d-none" id="lblToggleAnticipatedText">ANTICIPATED</span>
                                         </div>
                                     </div>
-                                    <!-- [2026-07-11 Fix: Stacked label-then-value (not inline) — avoids text overlap on SG-11 Step-5 long values] -->
-                                    <div class="mb-3" id="anticipated-sg-wrapper">
-                                        <!-- [2026-07-11 Fix: Changed from small text-white-50 to comp-field-label class for unified uppercase label typography] -->
-                                        <div class="comp-field-label mb-1">Original SG / Step</div>
-                                        <div id="lbl-originalsg" class="font-weight-bold text-white tabular-nums">-</div>
+                                    <!-- [2026-07-11 Fix: Stacked label-then-value — displays original baseline grade/step and dropdown overrides] -->
+                                    <div class="mb-3 d-flex align-items-center justify-content-between" id="anticipated-sg-wrapper">
+                                        <div>
+                                            <div class="comp-field-label mb-1">Original SG / Step</div>
+                                            <div id="lbl-originalsg" class="font-weight-bold text-white-50 tabular-nums" style="font-size: 0.9rem;">-</div>
+                                        </div>
+                                        <!-- [2026-07-12 New: Subtle details toggle button inside anticipated card (icon only)] -->
+                                        <button type="button" id="btnToggleAnticipatedDetails" class="btn btn-sm btn-outline-secondary" style="font-size: 0.72rem; padding: 4px 6px; border-color: rgba(255,255,255,0.08); color: rgba(255,255,255,0.45); border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px;" title="Toggle breakdown details" onclick="toggleAnticipatedDetails()">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
                                     </div>
-                                    <div id="anticipated-value-wrapper">
-                                        <div class="comp-field-label mb-1">Remarks Value</div>
-                                        <div id="val-anticipated" class="bank-value-display">₱0.00</div>
+                                    
+
+
+                                    <!-- [2026-07-12 New: Detailed comparison table showing breakdown of Basic, PERA, GSIS, PhilHealth, Pag-IBIG, WTAX, Net Pay for old vs new target] -->
+                                    <div class="mt-3" id="wrapperAnticipatedTable" style="width: 100%; overflow-x: hidden;" data-desc="Table breakdown wrapper for anticipated salary standardization details.">
+                                        <table class="table table-sm table-dark bank-table mb-0 hide-breakdown" id="tableAnticipatedBreakdown" style="font-size: 0.54rem; text-align: right; border: 1px solid rgba(255,255,255,0.06); width: 100%; table-layout: auto;">
+                                            <thead>
+                                                <tr style="color: rgba(255,255,255,0.45); font-weight: 600; text-transform: uppercase; font-size: 0.50rem; border-bottom: 2px solid rgba(255,255,255,0.1);">
+                                                    <th style="text-align: left; padding: 3px 2px;">YEAR</th>
+                                                    <th style="padding: 3px 2px;" title="Basic Salary from Tranche CSV based on Salary Grade and Step">BASIC</th>
+                                                    <th class="col-breakdown" style="padding: 3px 2px;" title="Personal Economic Relief Allowance (Constant ₱2,000.00)">PERA</th>
+                                                    <th class="col-breakdown" style="padding: 3px 2px;" title="GSIS Premium Deduction = Basic Pay × 9%">GSIS</th>
+                                                    <th class="col-breakdown" style="padding: 3px 2px;" title="PhilHealth Premium Deduction = Basic Pay × 2.5%">PHEALTH</th>
+                                                    <th class="col-breakdown" style="padding: 3px 2px;" title="Pag-IBIG Contribution = Constant ₱200.00">PAG-IBIG</th>
+                                                    <th class="col-breakdown" style="padding: 3px 2px;" title="Withholding Tax = (Annual Taxable Income - Bracket Threshold) × Rate / 12. Annual Taxable Income = (Basic Pay × 12 + 13th & 14th Month Bonus above 90k) - (GSIS + PH + Pag-IBIG) × 12">WTAX</th>
+                                                    <th style="padding: 3px 2px;" title="Net Pay = Basic Pay + PERA - GSIS - PhilHealth - Pag-IBIG - Withholding Tax">NET PAY</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="bodyAnticipatedBreakdown" class="tabular-nums">
+                                                <!-- Populated dynamically by runCalculations() -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    
+                                    <div id="anticipated-value-wrapper" class="mt-3">
+                                        <div class="comp-field-label mb-1" id="lbl-anticipated-value" data-desc="Label for anticipated salary standardization net increase.">Anticipated Net Increase</div>
+                                        <div id="val-anticipated" class="bank-value-display font-weight-bold" style="color: var(--accent-orange) !important;">₱0.00</div>
                                     </div>
                                 </div>
 
@@ -2026,10 +2480,21 @@
                                             <span class="toggle-label-text d-none" id="lblTogglePromotionText">PROMOTION</span>
                                         </div>
                                     </div>
+                                    <!-- [2026-07-12 New: Original SG / Step display for Promotion matching Anticipated card layout] -->
+                                    <div class="mb-3 d-flex align-items-center justify-content-between" id="promotion-sg-wrapper">
+                                        <div>
+                                            <div class="comp-field-label mb-1">Original SG / Step</div>
+                                            <div id="lbl-promo-originalsg" class="font-weight-bold text-white-50 tabular-nums" style="font-size: 0.9rem;">-</div>
+                                        </div>
+                                        <!-- [2026-07-12 New: Subtle details toggle button inside promotion card (icon only)] -->
+                                        <button type="button" id="btnTogglePromotionDetails" class="btn btn-sm btn-outline-secondary" style="font-size: 0.72rem; padding: 4px 6px; border-color: rgba(255,255,255,0.08); color: rgba(255,255,255,0.45); border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px;" title="Toggle breakdown details" onclick="togglePromotionDetails()">
+                                            <i class="bi bi-eye-slash"></i>
+                                        </button>
+                                    </div>
+
                                     <!-- [2026-07-11 Fix: Label above dropdowns, New Salary readout BELOW dropdowns so nothing overlaps] -->
                                     <div class="mb-3" id="promotion-controls-wrapper">
-                                        <!-- [2026-07-11 Fix: Changed from small text-white-50 to comp-field-label class for unified uppercase label typography] -->
-                                        <div class="comp-field-label mb-2">Promotional Override</div>
+                                        <div class="comp-field-label mb-2">COMPARE PROMOTION</div>
                                         <div class="d-flex" style="gap: 8px;">
                                             <select id="promoGrade" class="form-control bank-select select-sm tabular-nums" style="flex: 1; min-width: 0;" onchange="runCalculations()">
                                             </select>
@@ -2041,8 +2506,38 @@
                                             New Salary: ₱0.00
                                         </div>
                                     </div>
-                                    <div id="promotion-value-wrapper">
-                                        <div class="comp-field-label mb-1">Margin Delta</div>
+
+                                    <!-- [2026-07-12 New: Detailed comparison table for Promotion showing breakdown of Basic, PERA, GSIS, PhilHealth, Pag-IBIG, WTAX, Net Pay for old vs promoted target] -->
+                                    <div class="mt-3" id="wrapperPromotionTable" style="width: 100%; overflow-x: hidden;" data-desc="Table breakdown wrapper for promotion details.">
+                                        <table class="table table-sm table-dark bank-table mb-0" id="tablePromotionBreakdown" style="font-size: 0.54rem; text-align: right; border: 1px solid rgba(255,255,255,0.06); width: 100%; table-layout: auto;">
+                                            <thead>
+                                                <tr style="color: rgba(255,255,255,0.45); font-weight: 600; text-transform: uppercase; font-size: 0.50rem; border-bottom: 2px solid rgba(255,255,255,0.1);">
+                                                    <!-- th-promo-year: Table header displaying target year of promotion -->
+                                                    <th id="th-promo-year" style="text-align: left; padding: 3px 2px;" title="Target Tranche Year (2026 for Promotion)">YEAR</th>
+                                                    <!-- th-promo-basic: Table header displaying promoted basic salary -->
+                                                    <th id="th-promo-basic" style="padding: 3px 2px;" title="Basic Salary from Tranche CSV based on Promotional Salary Grade and Step">BASIC</th>
+                                                    <!-- th-promo-pera: Table header displaying PERA allowance -->
+                                                    <th id="th-promo-pera" class="col-breakdown" style="padding: 3px 2px;" title="Personal Economic Relief Allowance (Constant ₱2,000.00)">PERA</th>
+                                                    <!-- th-promo-gsis: Table header displaying GSIS premium deduction -->
+                                                    <th id="th-promo-gsis" class="col-breakdown" style="padding: 3px 2px;" title="GSIS Premium Deduction = Basic Pay × 9%">GSIS</th>
+                                                    <!-- th-promo-philhealth: Table header displaying PhilHealth premium deduction -->
+                                                    <th id="th-promo-philhealth" class="col-breakdown" style="padding: 3px 2px;" title="PhilHealth Premium Deduction = Basic Pay × 2.5%">PHILHEALTH</th>
+                                                    <!-- th-promo-pagibig: Table header displaying Pag-IBIG premium contribution -->
+                                                    <th id="th-promo-pagibig" class="col-breakdown" style="padding: 3px 2px;" title="Pag-IBIG Contribution = Constant ₱200.00">PAG-IBIG</th>
+                                                    <!-- th-promo-wtax: Table header displaying Withholding Tax calculation based on TRAIN Law -->
+                                                    <th id="th-promo-wtax" class="col-breakdown" style="padding: 3px 2px;" title="Withholding Tax = (Annual Taxable Income - Bracket Threshold) × Rate / 12. Annual Taxable Income = (Basic Pay × 12 + Annual Taxable Bonus) - (GSIS + PH + Pag-IBIG) × 12 (Note: No 90,000 exemption is subtracted from bonus for Promotion WTAX)">WTAX</th>
+                                                    <!-- th-promo-netpay: Table header displaying Net Take Home Pay calculation -->
+                                                    <th id="th-promo-netpay" style="padding: 3px 2px;" title="Net Pay = Basic Pay + PERA - GSIS - PhilHealth - Pag-IBIG - Withholding Tax">NET PAY</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="bodyPromotionBreakdown" class="tabular-nums">
+                                                <!-- Populated dynamically by runCalculations() -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    
+                                    <div id="promotion-value-wrapper" class="mt-3">
+                                        <div class="comp-field-label mb-1">PROMOTION</div>
                                         <div id="val-promomargin" class="bank-value-display">₱0.00</div>
                                     </div>
                                 </div>
@@ -2115,7 +2610,7 @@
                         <!-- OnQueue accordion section -->
                         <div class="accordion mb-3 less-onqueue-accordion" id="onqAccordionParent">
                             <div class="card bg-transparent border-0">
-                                <button class="bank-accordion-btn" type="button" aria-expanded="false" onclick="toggleCustomAccordion('collapseOnq')">
+                                <button class="bank-accordion-btn" type="button" aria-expanded="true" onclick="toggleCustomAccordion('collapseOnq')">
                                     <span class="orange-node" id="node-lessonqueue">
                                         <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
                                         LESS ONQUEUE
@@ -2128,7 +2623,7 @@
                                         <i class="bi bi-chevron-down"></i>
                                     </span>
                                 </button>
-                                <div id="collapseOnq" class="collapse" aria-labelledby="onqHeading" data-parent="#onqAccordionParent">
+                                <div id="collapseOnq" class="collapse show" aria-labelledby="onqHeading" data-parent="#onqAccordionParent">
                                     <!-- [2026-07-11 Fix: section-panel-inner class for LESS ONQUEUE accordion body panel] -->
                                     <div class="card-body section-panel-inner mt-2" id="panel-onq-table">
                                         <!-- [2026-07-11 Fix: onq-table-clip-wrapper clips table rows to rounded border-radius while section-panel-inner stays overflow:visible for popovers] -->
@@ -2144,6 +2639,19 @@
                         <!-- [2026-07-11 Fix: 2x2 inner summary card grid uses equal-height-row for uniform card height across all 4 boxes] -->
                         <!-- manual inputs & calculations results grids (Polished: Added clean wrapper classnames and semantic ids for columns structure) -->
                         <div class="row g-3 mb-3">
+                            <!-- Semitotal Computation Grid Wrapper (Displays baseline calculations minus deductions) -->
+                            <div class="col-md-6 d-flex semitotal-summary-wrapper" id="wrapperSemitotalSummary" data-desc="Wrapper layout for the semitotal computation display panel.">
+                                <div class="inner-summary-card semitotal-panel w-100" id="box-semitotal-summary" data-label="SemiTotal Summary Panel">
+                                    <div class="orange-node mb-2" id="node-semitotal">
+                                        <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="16" y1="18" x2="16" y2="18"/><line x1="12" y1="18" x2="12" y2="18"/><line x1="8" y1="18" x2="8" y2="18"/></svg>
+                                        LESS ONQUEUE
+                                        <span class="math-popover">
+                                            <strong>Less OnQueue = PAP Subtotal + Active OnQueue Total</strong>
+                                        </span>
+                                    </div>
+                                    <div id="val-semitotal" class="bank-value-display">₱0.00</div>
+                                </div>
+                            </div>
                             <!-- Incoming Deduction Grid Wrapper (Allows flexible layout wrapping) -->
                             <div class="col-md-6 d-flex incoming-adjustment-wrapper" id="wrapperIncomingAdjustment" data-desc="Wrapper layout for the incoming deduction override panel.">
                                 <div class="inner-summary-card incoming-panel w-100" id="box-incoming-deduction" data-label="Incoming Deduction Override Panel">
@@ -2160,19 +2668,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- Semitotal Computation Grid Wrapper (Displays baseline calculations minus deductions) -->
-                            <div class="col-md-6 d-flex semitotal-summary-wrapper" id="wrapperSemitotalSummary" data-desc="Wrapper layout for the semitotal computation display panel.">
-                                <div class="inner-summary-card semitotal-panel w-100" id="box-semitotal-summary" data-label="SemiTotal Summary Panel">
-                                    <div class="orange-node mb-2" id="node-semitotal">
-                                        <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="16" y1="18" x2="16" y2="18"/><line x1="12" y1="18" x2="12" y2="18"/><line x1="8" y1="18" x2="8" y2="18"/></svg>
-                                        LESS ONQUEUE
-                                        <span class="math-popover">
-                                            <strong>Less OnQueue = PAP Subtotal + Active OnQueue Total</strong>
-                                        </span>
-                                    </div>
-                                    <div id="val-semitotal" class="bank-value-display mt-2">₱0.00</div>
-                                </div>
-                            </div>
                         </div>
 
                         <div class="row g-3">
@@ -2186,7 +2681,7 @@
                                             <strong>Amortization = RoundUp(-PMT(Interest/12, Term, Loan Amount, 0), 2)</strong>
                                         </span>
                                     </div>
-                                    <div id="val-amortization" class="bank-value-display mt-2">₱0.00</div>
+                                    <div id="val-amortization" class="bank-value-display">₱0.00</div>
                                 </div>
                             </div>
                             <!-- New NetPay Grid Wrapper (Displays the final net pay after all adjustments) -->
@@ -2200,9 +2695,73 @@
                                             Statutory minimum limit warning checks (₱5,300.00).
                                         </span>
                                     </div>
-                                    <div id="val-newnetpay" class="bank-value-display mt-2">₱0.00</div>
+                                    <div id="val-newnetpay" class="bank-value-display">₱0.00</div>
+                                    <!-- [2026-07-12 Status Badge (NEW) - Labeled underwriting-status-badge] -->
+                                    <div id="underwriting-status-badge" class="status-badge status-badge-accommodated">CAN ACCOMMODATE</div>
                                     <div id="lbl-threshold-error" class="text-danger small font-weight-bold mt-2 d-none">
                                         <i class="bi bi-exclamation-triangle-fill"></i> statutory limit warning (Below ₱5,300.00)!
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- [2026-07-12 Dashboard Visualizations Row (NEW) - Labeled dashboard-visuals-row] -->
+                        <div class="row g-2 mt-3" id="dashboard-visuals-row">
+                            <!-- Column: Cash Flow Allocation Donut Chart -->
+                            <div class="col-md-6 d-flex">
+                                <div class="inner-summary-card w-100 d-flex flex-column" id="card-donut-chart" style="height: 148px;">
+                                    <div class="orange-node mb-1" id="node-donut-chart">
+                                        <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a7 7 0 1 0 10 10"/></svg>
+                                        CASH FLOW ALLOCATION
+                                    </div>
+                                    <div class="flex-grow-1 d-flex align-items-center justify-content-center" style="position: relative; height: 90px; width: 100%;">
+                                        <canvas id="donutChartCanvas"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Column: Cash Flow Breakdown Bar -->
+                            <div class="col-md-6 d-flex">
+                                <div class="inner-summary-card w-100 d-flex flex-column" id="card-line-chart" style="height: 148px;">
+                                    <div class="orange-node mb-1" id="node-line-chart">
+                                        <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><path d="M12 12h.01"/></svg>
+                                        CASH FLOW BREAKDOWN
+                                    </div>
+                                    <div class="flex-grow-1 d-flex flex-column justify-content-center px-1">
+                                        <!-- [2026-07-12 Fix: Updated cash flow breakdown progress bar colors to a uniform red-orange-amber-yellow sunset palette for improved readability] -->
+                                        <div class="progress allocation-progress-bar" style="height: 18px; background: rgba(255,255,255,0.05); border-radius: 9px; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);">
+                                            <!-- bar-new-net-pay: Progress bar segment showing Net Pay (Red) -->
+                                            <div class="progress-bar" id="bar-new-net-pay" role="progressbar" style="width: 0%; background: #EF4444; font-weight: 800; font-size: 0.68rem;" title="New Net Pay"></div>
+                                            <!-- bar-csb-amortization: Progress bar segment showing CSB Loan (Orange) -->
+                                            <div class="progress-bar" id="bar-csb-amortization" role="progressbar" style="width: 0%; background: #F97316; font-weight: 800; font-size: 0.68rem;" title="New CSB Amort"></div>
+                                            <!-- bar-pli-deductions: Progress bar segment showing PLIs (Amber) -->
+                                            <div class="progress-bar" id="bar-pli-deductions" role="progressbar" style="width: 0%; background: #F59E0B; font-weight: 800; font-size: 0.68rem;" title="Redemptions/PLIs"></div>
+                                            <!-- bar-onqueue: Progress bar segment showing OnQueue (Yellow) -->
+                                            <div class="progress-bar" id="bar-onqueue" role="progressbar" style="width: 0%; background: #FACC15; font-weight: 800; font-size: 0.68rem;" title="OnQueue"></div>
+                                        </div>
+                                        <!-- [2026-07-12 Fix: Updated legend items to use matching red-orange-amber-yellow colors and added semantic ID labels/comments] -->
+                                        <div class="mt-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 0.68rem; font-weight: 600;">
+                                            <!-- legend-net-pay: Legend item detailing Net Pay percentage contribution -->
+                                            <div class="d-flex align-items-center justify-content-between p-1 px-2" id="legend-net-pay" style="background: rgba(239, 68, 68, 0.08); border-radius: 4px; border: 1px solid rgba(239, 68, 68, 0.15); min-height: 24px;">
+                                                <span class="text-white-50"><span style="display:inline-block; width:6px; height:6px; background:#EF4444; border-radius:50%; margin-right:4px;"></span>Net Pay</span>
+                                                <span id="bar-val-net-pay" class="text-white font-weight-bold">0%</span>
+                                            </div>
+                                            <!-- legend-csb-loan: Legend item detailing CSB Loan percentage contribution -->
+                                            <div class="d-flex align-items-center justify-content-between p-1 px-2" id="legend-csb-loan" style="background: rgba(249, 115, 22, 0.08); border-radius: 4px; border: 1px solid rgba(249, 115, 22, 0.15); min-height: 24px;">
+                                                <span class="text-white-50"><span style="display:inline-block; width:6px; height:6px; background:#F97316; border-radius:50%; margin-right:4px;"></span>CSB Loan</span>
+                                                <span id="bar-val-csb" class="text-white font-weight-bold">0%</span>
+                                            </div>
+                                            <!-- legend-pli: Legend item detailing PLIs percentage contribution -->
+                                            <div class="d-flex align-items-center justify-content-between p-1 px-2" id="legend-pli" style="background: rgba(245, 158, 11, 0.08); border-radius: 4px; border: 1px solid rgba(245, 158, 11, 0.15); min-height: 24px;">
+                                                <span class="text-white-50"><span style="display:inline-block; width:6px; height:6px; background:#F59E0B; border-radius:50%; margin-right:4px;"></span>PLIs</span>
+                                                <span id="bar-val-pli" class="text-white font-weight-bold">0%</span>
+                                            </div>
+                                            <!-- legend-onqueue: Legend item detailing OnQueue percentage contribution -->
+                                            <div class="d-flex align-items-center justify-content-between p-1 px-2" id="legend-onqueue" style="background: rgba(250, 204, 21, 0.08); border-radius: 4px; border: 1px solid rgba(250, 204, 21, 0.15); min-height: 24px;">
+                                                <span class="text-white-50"><span style="display:inline-block; width:6px; height:6px; background:#FACC15; border-radius:50%; margin-right:4px;"></span>OnQueue</span>
+                                                <span id="bar-val-onq" class="text-white font-weight-bold">0%</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -2216,10 +2775,10 @@
             <!-- Underwriting Screen Control Buttons — full-width row, independent of either column's height (Polished: Inline styling cleaned in favor of centralized CSS classes) -->
             <div class="d-flex justify-content-end action-btn-row">
                 <button class="btn btn-outline-warning bank-btn-outline mr-2 font-weight-bold" onclick="logCurrentState()">
-                    <i class="bi bi-save"></i> Log Session
+                    <i class="bi bi-save"></i> SAVE
                 </button>
                 <button class="btn btn-secondary bank-btn-secondary font-weight-bold" onclick="clearInputsAndReload()">
-                    <i class="bi bi-arrow-counterclockwise"></i> Reset Evaluator
+                    <i class="bi bi-arrow-counterclockwise"></i> RESET
                 </button>
             </div>
 
@@ -2288,6 +2847,34 @@
             // Initial load of logs
             renderHistoryLog();
 
+            // [2026-07-12 New: Initialize Details button state based on localStorage preference, default hidden]
+            const antiHide = localStorage.getItem('le_anti_hide_breakdown');
+            const table = document.getElementById('tableAnticipatedBreakdown');
+            const btn = document.getElementById('btnToggleAnticipatedDetails');
+            if (table && btn) {
+                if (antiHide === '0') {
+                    table.classList.remove('hide-breakdown');
+                    btn.innerHTML = '<i class="bi bi-eye-slash"></i>';
+                } else {
+                    table.classList.add('hide-breakdown');
+                    btn.innerHTML = '<i class="bi bi-eye"></i>';
+                }
+            }
+
+            // [2026-07-12 New: Initialize Promotion Details button state based on localStorage preference, default hidden]
+            const promoHide = localStorage.getItem('le_promo_hide_breakdown');
+            const promoTable = document.getElementById('tablePromotionBreakdown');
+            const promoBtn = document.getElementById('btnTogglePromotionDetails');
+            if (promoTable && promoBtn) {
+                if (promoHide === '0') {
+                    promoTable.classList.remove('hide-breakdown');
+                    promoBtn.innerHTML = '<i class="bi bi-eye-slash"></i>';
+                } else {
+                    promoTable.classList.add('hide-breakdown');
+                    promoBtn.innerHTML = '<i class="bi bi-eye"></i>';
+                }
+            }
+
             // Load and restore last active evaluation state from localStorage
             const savedState = localStorage.getItem('le_active_state');
             if (savedState) {
@@ -2317,24 +2904,98 @@
         }
 
         // SG override selector lists builder
+        // [2026-07-12 Fix: Populated promotional (promoGrade, promoStep) dropdown override options]
         function buildSalaryGradeOverrideOptions() {
-            const gradeSelect = document.getElementById('promoGrade');
-            gradeSelect.innerHTML = '';
-            for (let g = 1; g <= 33; g++) {
-                const opt = document.createElement('option');
-                opt.value = g;
-                opt.textContent = `SG-${g}`;
-                gradeSelect.appendChild(opt);
-            }
+            // Helper to populate grade dropdown
+            const populateGrades = (selectId) => {
+                const sel = document.getElementById(selectId);
+                if (!sel) return;
+                sel.innerHTML = '';
+                for (let g = 1; g <= 33; g++) {
+                    const opt = document.createElement('option');
+                    opt.value = g;
+                    opt.textContent = `SG-${g}`;
+                    sel.appendChild(opt);
+                }
+            };
 
-            const stepSelect = document.getElementById('promoStep');
-            stepSelect.innerHTML = '';
-            for (let s = 1; s <= 8; s++) {
-                const opt = document.createElement('option');
-                opt.value = s;
-                opt.textContent = `Step ${s}`;
-                stepSelect.appendChild(opt);
+            // Helper to populate step dropdown
+            const populateSteps = (selectId) => {
+                const sel = document.getElementById(selectId);
+                if (!sel) return;
+                sel.innerHTML = '';
+                for (let s = 1; s <= 8; s++) {
+                    const opt = document.createElement('option');
+                    opt.value = s;
+                    opt.textContent = `Step ${s}`;
+                    sel.appendChild(opt);
+                }
+            };
+
+            populateGrades('promoGrade');
+            populateSteps('promoStep');
+        }
+
+        // [2026-07-12 Fix: Added parameter isPromotion to getNetPayBreakdown to toggle whether the 90,000 threshold is subtracted from the annual bonus (following Dad's spreadsheet calculation where promotion does not subtract the 90,000 exemption)]
+        function getNetPayBreakdown(basicPay, isPromotion = false) {
+            if (basicPay <= 0) {
+                return {
+                    basic: 0,
+                    pera: 0,
+                    gsis: 0,
+                    philhealth: 0,
+                    pagibig: 0,
+                    wtax: 0,
+                    netPay: 0
+                };
             }
+            const PERA = 2000.00;
+            const gsis = basicPay * 0.09;
+            const philhealth = basicPay * 0.025;
+            const pagibig = 200.00;
+            
+            // Annual calculations
+            const annualBasic = basicPay * 12;
+            // Promotion tax calculations do not subtract 90,000 exemption from taxable bonus in the Excel formulas
+            const annualBonus = (basicPay * 2 > 90000) ? (isPromotion ? (basicPay * 2) : (basicPay * 2 - 90000)) : 0;
+            const annualTotalComp = annualBasic + annualBonus;
+            
+            const annualPremiumDeductions = (gsis + philhealth + pagibig) * 12;
+            const taxableIncome = annualTotalComp - annualPremiumDeductions;
+            
+            // Annual Tax Brackets
+            let annualTax = 0;
+            if (taxableIncome <= 250000) {
+                annualTax = 0;
+            } else if (taxableIncome <= 400000) {
+                annualTax = (taxableIncome - 250000) * 0.15;
+            } else if (taxableIncome <= 800000) {
+                annualTax = 22500 + (taxableIncome - 400000) * 0.20;
+            } else if (taxableIncome <= 2000000) {
+                annualTax = 102500 + (taxableIncome - 800000) * 0.25;
+            } else if (taxableIncome <= 8000000) {
+                annualTax = 402500 + (taxableIncome - 2000000) * 0.30;
+            } else {
+                annualTax = 2202500 + (taxableIncome - 8000000) * 0.35;
+            }
+            
+            const monthlyTax = annualTax / 12;
+            const netPay = basicPay + PERA - gsis - philhealth - pagibig - monthlyTax;
+            
+            return {
+                basic: basicPay,
+                pera: PERA,
+                gsis: gsis,
+                philhealth: philhealth,
+                pagibig: pagibig,
+                wtax: monthlyTax,
+                netPay: netPay
+            };
+        }
+
+        // [2026-07-12 Fix: Helper function returns final calculated net pay calling the breakdown subroutine]
+        function calculateNetPayFromBasic(basicPay) {
+            return getNetPayBreakdown(basicPay).netPay;
         }
 
         // Sanitization and numeric helper functions to prevent NaN values
@@ -2458,22 +3119,26 @@
             const month = document.getElementById('activeMonthSelect').value;
 
             // Formulate file lookup variables relative path matching
+            // [2026-07-12 Fix: Added tranch2027.csv to parallel loading list to support new anticipated standardization calculations]
             const files = {
                 netpay: `${month}.csv`,
                 pos: `pos_${month}.csv`,
                 onq: `onq_${month}.csv`,
                 pli: `pli_${month}.csv`,
-                tranch: `tranch2026.csv`
+                tranch: `tranch2026.csv`,
+                tranch2027: `tranch2027.csv`
             };
 
             try {
                 // Parallel async promises
-                const [netpayTxt, posTxt, onqTxt, pliTxt, tranchTxt] = await Promise.all([
+                // [2026-07-12 Fix: Ingest tranch2027Txt along with 2026 tranche for salary Standardization Law comparison]
+                const [netpayTxt, posTxt, onqTxt, pliTxt, tranchTxt, tranch2027Txt] = await Promise.all([
                     fetchCSVText(files.netpay),
                     fetchCSVText(files.pos),
                     fetchCSVText(files.onq),
                     fetchCSVText(files.pli),
-                    fetchCSVText(files.tranch)
+                    fetchCSVText(files.tranch),
+                    fetchCSVText(files.tranch2027)
                 ]);
 
                 const netpayData = parseCSV(netpayTxt);
@@ -2481,8 +3146,10 @@
                 const onqData = parseCSV(onqTxt);
                 const pliData = parseCSV(pliTxt);
                 const tranchData = parseCSV(tranchTxt);
+                const tranch2027Data = parseCSV(tranch2027Txt);
 
                 // Store in unified global state context
+                // [2026-07-12 Fix: Added tranch2027 data storage key for computational access]
                 window.currentData = {
                     empNum: empNumInput,
                     month: month,
@@ -2490,7 +3157,8 @@
                     pos: posData,
                     onq: onqData,
                     pli: pliData,
-                    tranch: tranchData
+                    tranch: tranchData,
+                    tranch2027: tranch2027Data
                 };
 
                 await processIngestedSession(skipHistoryLog);
@@ -2545,9 +3213,42 @@
             // Parse DEDAMT Positive values matching searched employee (index 3 is EMPNO)
             const posRows = window.currentData.pos;
             let posSum = 0;
+            const matchingPos = [];
             for (let i = 1; i < posRows.length; i++) {
                 if (posRows[i][3] && posRows[i][3].replace(/^0+/, '') === empNum.replace(/^0+/, '')) {
+                    matchingPos.push(posRows[i]);
                     posSum += safeFloat(posRows[i][13]); // Index 13 is DEDAMT
+                }
+            }
+            window.activeSession.posSum = posSum;
+
+            // Populate the CSB Deductions table breakdown dynamically
+            const csbTbody = document.getElementById('csb-deductions-tbody');
+            if (csbTbody) {
+                if (matchingPos.length > 0) {
+                    csbTbody.innerHTML = matchingPos.map((row, idx) => {
+                        const code = row[7] || '-';
+                        const policy = row[15] || '-';
+                        const dateVal = row[16] || '-';
+                        const amount = safeFloat(row[13]);
+                        
+                        return `
+                            <tr>
+                                <td style="text-align: center; vertical-align: middle; padding: 4px 0;">
+                                    <input type="checkbox" class="csb-deduction-cb" data-amount="${amount}" checked onchange="runCalculations()">
+                                </td>
+                                <td style="text-align: left; vertical-align: middle; font-family: var(--font-mono); padding: 4px 2px; color: rgba(255, 255, 255, 0.45) !important;">${code}</td>
+                                <td style="text-align: left; vertical-align: middle; font-family: var(--font-mono); padding: 4px 2px; color: rgba(255, 255, 255, 0.45) !important;">${policy}</td>
+                                <td style="text-align: center; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.45) !important;">${dateVal}</td>
+                                <td style="text-align: right; vertical-align: middle; font-weight: 600; color: rgba(255, 255, 255, 0.55) !important; padding: 4px 2px;">${formatPHP(amount)}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                    
+                    const masterSelectAll = document.getElementById('csb-select-all');
+                    if (masterSelectAll) masterSelectAll.checked = true;
+                } else {
+                    csbTbody.innerHTML = `<tr><td colspan="5" class="text-white-50 text-center py-2">No positive CSB deductions found</td></tr>`;
                 }
             }
 
@@ -2569,38 +3270,63 @@
                 }
             }
 
-            // Determine Initial Loan Amount
-            const remVal = baselineSub - initialOnqSum;
-            const initLoan = Math.max(0, Math.floor(remVal / 20.01) * 1000);
-            document.getElementById('loanAmount').value = initLoan.toLocaleString('en');
-
             // Build Phase B PLI Accordions dynamically
             const pliRows = window.currentData.pli;
             const matchingPli = [];
+            let initialPliSum = 0;
             for (let i = 1; i < pliRows.length; i++) {
                 if (pliRows[i][3] && pliRows[i][3].replace(/^0+/, '') === empNum.replace(/^0+/, '')) {
                     matchingPli.push(pliRows[i]);
+                    initialPliSum += safeFloat(pliRows[i][15]); // Column 15 is DEDPLI
                 }
             }
             renderPLIAccordions(matchingPli);
 
+            // Determine Initial Loan Amount capacity
+            // Formula: Capacity = NETPAY + CSB Deductions + PLI INCLUDED - ONQUEUE - 5300 (where 5300 is constant)
+            // [2026-07-12 Initial loanable amount capacity pre-calc]
+            const initialCapacity = netPayVal + posSum + initialPliSum - initialOnqSum - 5300;
+            const initLoan = Math.max(0, Math.floor(initialCapacity / 20.01) * 1000);
+            document.getElementById('loanAmount').value = initLoan.toLocaleString('en');
+
             // Phase C baseline steps matching
-            document.getElementById('lbl-originalsg').textContent = `SG-${originalGrade} Step-${originalStep}`;
+            const stepLabel = `Step-${originalStep}`;
+            document.getElementById('lbl-originalsg').textContent = `SG-${originalGrade} ${stepLabel}`;
+            document.getElementById('lbl-promo-originalsg').textContent = `SG-${originalGrade} ${stepLabel}`;
             
-            // Search remarks in tranch2026.csv (Salary Grade matches column 0)
-            const tranchRows = window.currentData.tranch;
-            let originalRemarks = 0;
-            for (let i = 1; i < tranchRows.length; i++) {
-                if (safeInt(tranchRows[i][0]) === originalGrade) {
-                    originalRemarks = safeFloat(tranchRows[i][originalStep]); // step index matches column index
+            // Search basic pay in tranch2026.csv (3rd Tranche) and tranch2027.csv (4th Tranche)
+            // [2026-07-12 Fix: Query both tranches to compute baseline net pay and anticipated calculations]
+            const tranchRowsOld = window.currentData.tranch;
+            const tranchRowsNew = window.currentData.tranch2027;
+            let basicOld = 0;
+            let basicNew = 0;
+            
+            for (let i = 1; i < tranchRowsOld.length; i++) {
+                if (safeInt(tranchRowsOld[i][0]) === originalGrade) {
+                    basicOld = safeFloat(tranchRowsOld[i][originalStep]);
                     break;
                 }
             }
-            /* [2026-07-10 Fix: Changed textContent to innerHTML to render muted currency span correctly] */
-            document.getElementById('val-anticipated').innerHTML = formatPHP(originalRemarks);
-            window.activeSession.anticipatedVal = originalRemarks;
+            for (let i = 1; i < tranchRowsNew.length; i++) {
+                if (safeInt(tranchRowsNew[i][0]) === originalGrade) {
+                    basicNew = safeFloat(tranchRowsNew[i][originalStep]);
+                    break;
+                }
+            }
+
+            // Calculate Net Pay Old and New to find the Net Increase (anticipatedVal)
+            // [2026-07-12 Fix: Compute net pay differences using calculateNetPayFromBasic helper function]
+            const netPayOld = calculateNetPayFromBasic(basicOld);
+            const netPayNew = calculateNetPayFromBasic(basicNew);
+            const anticipatedVal = netPayNew - netPayOld;
+
+            /* [2026-07-12 Fix: Calculate the anticipated net increase (new net pay - old net pay) based on Salary standardization tranches] */
+            document.getElementById('val-anticipated').innerHTML = formatPHP(anticipatedVal);
+            window.activeSession.anticipatedVal = anticipatedVal;
+            window.activeSession.basicNew = basicNew; // save for promotion calculations
 
             // Load dual-dropdown override defaults
+            // [2026-07-12 Fix: Set default override dropdown values for Promotion section]
             document.getElementById('promoGrade').value = originalGrade;
             document.getElementById('promoStep').value = originalStep;
 
@@ -2756,8 +3482,7 @@
             let html = `
                 <table class="bank-table text-white" style="font-size: 11px;">
                     <thead>
-                        <tr>
-                            <th>Select</th>
+                            <th style="width: 32px; text-align: center; vertical-align: middle;"><input type="checkbox" id="onq-select-all" checked onchange="toggleAllOnqDeductions(this)"></th>
                             <th>PLI Code</th>
                             <th>EFF</th>
                             <th>TERM</th>
@@ -2948,23 +3673,157 @@
             document.getElementById('val-netpayplitotal').innerHTML = formatPHP(netPayPliTotal);
 
             // Phase C Salary Adjustments & overrides query matrix
+            // [2026-07-12 Fix: Dynamic anticipated calculation and comparison table population]
+            const originalGrade = window.activeSession.origGrade;
+            const originalStep = window.activeSession.origStep;
+
+            const tranchRowsOld = window.currentData.tranch;
+            const tranchRowsNew = window.currentData.tranch2027;
+
+            let basicOld = 0;
+            for (let i = 1; i < tranchRowsOld.length; i++) {
+                if (safeInt(tranchRowsOld[i][0]) === originalGrade) {
+                    basicOld = safeFloat(tranchRowsOld[i][originalStep]);
+                    break;
+                }
+            }
+
+            let basicNew = 0;
+            for (let i = 1; i < tranchRowsNew.length; i++) {
+                if (safeInt(tranchRowsNew[i][0]) === originalGrade) {
+                    basicNew = safeFloat(tranchRowsNew[i][originalStep]);
+                    break;
+                }
+            }
+
+            // Compute breakdowns and diffs
+            const breakdownOld = getNetPayBreakdown(basicOld);
+            const breakdownNew = getNetPayBreakdown(basicNew);
+            const breakdownDiff = {
+                basic: breakdownNew.basic - breakdownOld.basic,
+                pera: breakdownNew.pera - breakdownOld.pera,
+                gsis: breakdownNew.gsis - breakdownOld.gsis,
+                philhealth: breakdownNew.philhealth - breakdownOld.philhealth,
+                pagibig: breakdownNew.pagibig - breakdownOld.pagibig,
+                wtax: breakdownNew.wtax - breakdownOld.wtax,
+                netPay: breakdownNew.netPay - breakdownOld.netPay
+            };
+
+            // Render comparison table body
+            const tbody = document.getElementById('bodyAnticipatedBreakdown');
+            if (tbody) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td>FROM</td>
+                        <td>${breakdownOld.basic.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                        <td class="col-breakdown">${breakdownOld.pera.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                        <td class="col-breakdown">${breakdownOld.gsis.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                        <td class="col-breakdown">${breakdownOld.philhealth.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                        <td class="col-breakdown">${breakdownOld.pagibig.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                        <td class="col-breakdown">${breakdownOld.wtax.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                        <td>${breakdownOld.netPay.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                    </tr>
+                    <tr>
+                        <td>TO</td>
+                        <td>${breakdownNew.basic.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                        <td class="col-breakdown">${breakdownNew.pera.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                        <td class="col-breakdown">${breakdownNew.gsis.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                        <td class="col-breakdown">${breakdownNew.philhealth.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                        <td class="col-breakdown">${breakdownNew.pagibig.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                        <td class="col-breakdown">${breakdownNew.wtax.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                        <td>${breakdownNew.netPay.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                    </tr>
+                    <tr class="diff-row">
+                        <td>DIFF</td>
+                        <td>-</td>
+                        <td class="col-breakdown">-</td>
+                        <td class="col-breakdown">-</td>
+                        <td class="col-breakdown">-</td>
+                        <td class="col-breakdown">-</td>
+                        <td class="col-breakdown">-</td>
+                        <td>+${breakdownDiff.netPay.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                    </tr>
+                `;
+            }
+
+            const anticipatedVal = breakdownDiff.netPay;
+            document.getElementById('val-anticipated').innerHTML = formatPHP(anticipatedVal);
+            window.activeSession.anticipatedVal = anticipatedVal;
+
+            // [2026-07-12 Fix: Compute promotional override salary standard increase using tranch2026.csv and compare net pay deltas]
             const selectedGrade = safeInt(document.getElementById('promoGrade').value);
             const selectedStep = safeInt(document.getElementById('promoStep').value);
 
-            const tranchRows = window.currentData.tranch;
-            let promotedRemarks = 0;
-            for (let i = 1; i < tranchRows.length; i++) {
-                if (safeInt(tranchRows[i][0]) === selectedGrade) {
-                    promotedRemarks = safeFloat(tranchRows[i][selectedStep]);
+            let promoBasicNew = 0; // promoted basic pay under 3rd Tranche (2026)
+            for (let i = 1; i < tranchRowsOld.length; i++) {
+                if (safeInt(tranchRowsOld[i][0]) === selectedGrade) {
+                    promoBasicNew = safeFloat(tranchRowsOld[i][selectedStep]);
                     break;
                 }
             }
 
             // Update New Basic Pay label in gray text
-            document.getElementById('lbl-promoted-salary').innerHTML = `New Salary: ${formatPHP(promotedRemarks)}`;
+            document.getElementById('lbl-promoted-salary').innerHTML = `New Salary: ${formatPHP(promoBasicNew)}`;
 
-            const anticipatedVal = window.activeSession.anticipatedVal;
-            const promotionMargin = promotedRemarks - anticipatedVal;
+            // Calculate breakdowns and diffs for promotion (both FROM and TO queried from tranch2026.csv)
+            // [2026-07-12 Fix: Set isPromotion=true in getNetPayBreakdown to match Dad's spreadsheet WTAX calculations]
+            const breakdownPromoOld = getNetPayBreakdown(basicOld, true);
+            const breakdownPromoNew = getNetPayBreakdown(promoBasicNew, true);
+            const breakdownPromoDiff = {
+                basic: breakdownPromoNew.basic - breakdownPromoOld.basic,
+                pera: breakdownPromoNew.pera - breakdownPromoOld.pera,
+                gsis: breakdownPromoNew.gsis - breakdownPromoOld.gsis,
+                philhealth: breakdownPromoNew.philhealth - breakdownPromoOld.philhealth,
+                pagibig: breakdownPromoNew.pagibig - breakdownPromoOld.pagibig,
+                wtax: breakdownPromoNew.wtax - breakdownPromoOld.wtax,
+                netPay: breakdownPromoNew.netPay - breakdownPromoOld.netPay
+            };
+
+            // Helper for formatting diff cell text with sign prefixes
+            const formatDiffCell = (val) => {
+                if (val === 0) return '0.00';
+                const formatted = val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                return val > 0 ? `+${formatted}` : formatted;
+            };
+
+            // Render Promotion comparison table body dynamically
+            const tbodyPromo = document.getElementById('bodyPromotionBreakdown');
+            if (tbodyPromo) {
+                tbodyPromo.innerHTML = `
+                    <tr>
+                        <td>FROM</td>
+                        <td>${breakdownPromoOld.basic.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                        <td class="col-breakdown">${breakdownPromoOld.pera.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                        <td class="col-breakdown">${breakdownPromoOld.gsis.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                        <td class="col-breakdown">${breakdownPromoOld.philhealth.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                        <td class="col-breakdown">${breakdownPromoOld.pagibig.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                        <td class="col-breakdown">${breakdownPromoOld.wtax.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                        <td>${breakdownPromoOld.netPay.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                    </tr>
+                    <tr>
+                        <td>TO</td>
+                        <td>${breakdownPromoNew.basic.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                        <td class="col-breakdown">${breakdownPromoNew.pera.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                        <td class="col-breakdown">${breakdownPromoNew.gsis.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                        <td class="col-breakdown">${breakdownPromoNew.philhealth.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                        <td class="col-breakdown">${breakdownPromoNew.pagibig.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                        <td class="col-breakdown">${breakdownPromoNew.wtax.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                        <td>${breakdownPromoNew.netPay.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                    </tr>
+                    <tr class="diff-row">
+                        <td>DIFF</td>
+                        <td>${formatDiffCell(breakdownPromoDiff.basic)}</td>
+                        <td class="col-breakdown">${formatDiffCell(breakdownPromoDiff.pera)}</td>
+                        <td class="col-breakdown">${formatDiffCell(breakdownPromoDiff.gsis)}</td>
+                        <td class="col-breakdown">${formatDiffCell(breakdownPromoDiff.philhealth)}</td>
+                        <td class="col-breakdown">${formatDiffCell(breakdownPromoDiff.pagibig)}</td>
+                        <td class="col-breakdown">${formatDiffCell(breakdownPromoDiff.wtax)}</td>
+                        <td>${formatDiffCell(breakdownPromoDiff.netPay)}</td>
+                    </tr>
+                `;
+            }
+
+            const promotionMargin = breakdownPromoDiff.netPay;
             document.getElementById('val-promomargin').innerHTML = formatPHP(promotionMargin);
 
             // [2026-07-11 New: Read toggle states — only include in total if enabled]
@@ -3104,8 +3963,33 @@
                 }
             }
 
-            // [2026-07-11 New: Calculate and display the revised baseline (val-baseline - semiTotal) dynamically]
-            const baselineSubVal = window.activeSession.baselineSub || 0;
+            // [2026-07-12 New: Calculate CSB Deductions sum dynamically from table checkboxes]
+            let posSum = 0;
+            const csbCbs = document.querySelectorAll('.csb-deduction-cb');
+            if (csbCbs.length > 0) {
+                csbCbs.forEach(cb => {
+                    if (cb.checked) {
+                        posSum += parseFloat(cb.getAttribute('data-amount')) || 0;
+                    }
+                });
+            } else {
+                posSum = window.activeSession.posSum || 0;
+            }
+            
+            const lblDedAmt = document.getElementById('lbl-dedamt');
+            if (lblDedAmt) {
+                lblDedAmt.innerHTML = formatPHP(posSum);
+            }
+
+            const netPayVal = window.activeSession.netPay || 0;
+            const baselineSubVal = netPayVal + posSum;
+            
+            const valBaselineEl = document.getElementById('val-baseline');
+            if (valBaselineEl) {
+                valBaselineEl.innerHTML = formatPHP(baselineSubVal);
+            }
+            window.activeSession.baselineSub = baselineSubVal;
+
             // Calculations will update revisedBaseline below once semiTotal is computed. Let's declare variable scope here.
             let revisedBaseline = baselineSubVal;
             
@@ -3116,6 +4000,26 @@
             const rowBaselinePapEl = document.getElementById('row-baseline-papsubtotal');
             if (rowBaselinePapEl) {
                 rowBaselinePapEl.style.setProperty('display', useMasterPli ? 'flex' : 'none', 'important');
+            }
+
+            // [2026-07-12 New: Compute and update Subtotal after Redemption display value]
+            // [2026-07-12 Fix: Only show Subtotal after Redemption row if the Redemption toggle (useMasterPli) is ON AND at least one redemption gets toggled]
+            const subtotalAfterRedemption = baselineSubVal + papSubtotal;
+            const valSubtotalAfterRedemptionEl = document.getElementById('val-subtotal-after-redemption');
+            if (valSubtotalAfterRedemptionEl) {
+                valSubtotalAfterRedemptionEl.innerHTML = formatPHP(subtotalAfterRedemption);
+            }
+            
+            const hasActiveRedemptions = (selectedPlis.length > 0) || (useAnticipated && anticipatedVal > 0) || (usePromotion && promotionMargin !== 0);
+            const showSubtotalAfterRedemption = useMasterPli && hasActiveRedemptions;
+
+            const rowSubtotalAfterRedemptionEl = document.getElementById('row-subtotal-after-redemption');
+            if (rowSubtotalAfterRedemptionEl) {
+                if (showSubtotalAfterRedemption) {
+                    rowSubtotalAfterRedemptionEl.style.setProperty('display', 'flex', 'important');
+                } else {
+                    rowSubtotalAfterRedemptionEl.style.setProperty('display', 'none', 'important');
+                }
             }
 
 
@@ -3147,8 +4051,8 @@
                 valLessIncomingEl.innerHTML = formatPHP(incoming);
             }
 
-            // [2026-07-11 New: Calculate and display the revised baseline (Subtotal - PLIs - Less OnQueue - Less Incoming) subtraction dynamically]
-            revisedBaseline = baselineSubVal - papSubtotal - activeOnqSum - incoming;
+            // [2026-07-11 New: Calculate and display the revised baseline (Subtotal + PLIs - Less OnQueue - Less Incoming) addition dynamically]
+            revisedBaseline = baselineSubVal + papSubtotal - activeOnqSum - incoming;
             const valRevisedEl = document.getElementById('val-revised-baseline');
             if (valRevisedEl) {
                 valRevisedEl.innerHTML = formatPHP(revisedBaseline);
@@ -3179,29 +4083,167 @@
             // Determine final New NetPay
             // [2026-07-11 Fix: newNetPay is calculated from revisedBaseline (which is Subtotal - LESS ONQUEUE - LESS INCOMING) minus amortization]
             const newNetPay = revisedBaseline - amortization;
+            // [2026-07-12 Fix: Round newNetPay to 2 decimal places to resolve floating point precision errors during threshold comparisons]
+            const roundedNetPay = Math.round(newNetPay * 100) / 100;
             const netPayElement = document.getElementById('val-newnetpay');
             netPayElement.innerHTML = formatPHP(newNetPay);
 
+            // [2026-07-12 Fix: Determine statutory limit threshold dynamically based on active interest rate]
+            let thresholdLimit = 5300.00;
+            const warningMsg = `<i class="bi bi-exclamation-triangle-fill"></i> Cannot be accommodated`;
+
+            if (interestRate === 9.66) {
+                thresholdLimit = 5000.00;
+            }
+
             // [2026-07-11 New: Update Final New Net Pay display value in NetPay Computation block]
-            // [2026-07-11 Fix: Statutory limit updated to 5300.00 threshold]
             const valFinalNewNetPayEl = document.getElementById('val-final-new-netpay');
+            
             if (valFinalNewNetPayEl) {
                 valFinalNewNetPayEl.innerHTML = formatPHP(newNetPay);
-                if (newNetPay < 5300.00) {
-                    valFinalNewNetPayEl.style.color = '#EF4444'; // warning red below ₱5,300
+                const finalIcon = document.getElementById('icon-final-netpay');
+                if (roundedNetPay < thresholdLimit) {
+                    valFinalNewNetPayEl.style.setProperty('background', 'none', 'important');
+                    valFinalNewNetPayEl.style.setProperty('-webkit-background-clip', 'unset', 'important');
+                    valFinalNewNetPayEl.style.setProperty('-webkit-text-fill-color', '#EF4444', 'important');
+                    valFinalNewNetPayEl.style.setProperty('color', '#EF4444', 'important');
+                    if (finalIcon) {
+                        finalIcon.className = 'bi bi-exclamation-circle-fill text-danger mr-2';
+                    }
                 } else {
-                    valFinalNewNetPayEl.style.color = ''; // default green
+                    valFinalNewNetPayEl.style.setProperty('background', 'linear-gradient(135deg, #047857 0%, #059669 30%, #10B981 70%, #34D399 100%)', 'important');
+                    valFinalNewNetPayEl.style.setProperty('-webkit-background-clip', 'text', 'important');
+                    valFinalNewNetPayEl.style.setProperty('-webkit-text-fill-color', 'transparent', 'important');
+                    valFinalNewNetPayEl.style.removeProperty('color');
+                    if (finalIcon) {
+                        finalIcon.className = 'bi bi-check-circle-fill text-success mr-2';
+                    }
                 }
             }
 
-            // Safety limit threshold guard trigger check — ₱5,300 statutory minimum
+            // Safety limit threshold guard trigger check
             const thresholdErr = document.getElementById('lbl-threshold-error');
-            if (newNetPay < 5300.00) {
-                netPayElement.style.color = '#EF4444'; // professional warning red
-                thresholdErr.classList.remove('d-none');
+            if (thresholdErr) {
+                thresholdErr.innerHTML = warningMsg;
+            }
+            if (roundedNetPay < thresholdLimit) {
+                netPayElement.style.setProperty('background', 'none', 'important');
+                netPayElement.style.setProperty('-webkit-text-fill-color', '#EF4444', 'important');
+                netPayElement.style.setProperty('color', '#EF4444', 'important');
+                netPayElement.classList.add('glow-red');
+                netPayElement.classList.remove('glow-green');
+                if (thresholdErr) thresholdErr.classList.remove('d-none');
             } else {
-                netPayElement.style.color = ''; // reset to CSS gradient
-                thresholdErr.classList.add('d-none');
+                netPayElement.style.removeProperty('background');
+                netPayElement.style.removeProperty('-webkit-text-fill-color');
+                netPayElement.style.removeProperty('color');
+                netPayElement.classList.add('glow-green');
+                netPayElement.classList.remove('glow-red');
+                if (thresholdErr) thresholdErr.classList.add('d-none');
+            }
+
+            // [2026-07-12 New: Update Underwriting Status Badge dynamically]
+            const statusBadge = document.getElementById('underwriting-status-badge');
+            if (statusBadge) {
+                if (roundedNetPay >= thresholdLimit) {
+                    statusBadge.textContent = "ACCOMMODATED";
+                    statusBadge.className = "status-badge status-badge-accommodated";
+                    statusBadge.style.display = "inline-flex";
+                } else {
+                    statusBadge.style.display = "none"; // REMOVE DECLINED WORD entirely
+                }
+            }
+
+            // Update Donut Chart
+            const donutCanvas = document.getElementById('donutChartCanvas');
+            if (donutCanvas) {
+                if (!window.donutChart) {
+                    const ctx = donutCanvas.getContext('2d');
+                    window.donutChart = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Net Pay', 'CSB Loan', 'PLIs', 'OnQueue'],
+                            datasets: [{
+                                data: [0, 0, 0, 0],
+                                // [2026-07-12 Fix: Updated Chart colors to follow the red-orange-amber-yellow sunset theme]
+                                backgroundColor: ['#EF4444', '#F97316', '#F59E0B', '#FACC15'],
+                                borderColor: 'rgba(8, 12, 28, 0.65)',
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'right',
+                                    labels: {
+                                        color: 'rgba(255, 255, 255, 0.75)',
+                                        font: { family: 'Inter', size: 9, weight: '600' },
+                                        boxWidth: 8,
+                                        padding: 5
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const val = context.raw || 0;
+                                            return ` ₱${val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                                        }
+                                    }
+                                }
+                            },
+                            cutout: '50%'
+                        }
+                    });
+                }
+                window.donutChart.data.datasets[0].data = [
+                    Math.max(0, newNetPay),
+                    Math.max(0, amortization),
+                    Math.max(0, papSubtotal),
+                    Math.max(0, activeOnqSum)
+                ];
+                window.donutChart.update();
+            }
+
+            // Update Cash Flow Breakdown 
+            const barNewNetPay = document.getElementById('bar-new-net-pay');
+            const barCsbAmort = document.getElementById('bar-csb-amortization');
+            const barPliDeductions = document.getElementById('bar-pli-deductions');
+            const barOnqueue = document.getElementById('bar-onqueue');
+
+            const lblBarNetPay = document.getElementById('bar-val-net-pay');
+            const lblBarCsb = document.getElementById('bar-val-csb');
+            const lblBarPli = document.getElementById('bar-val-pli');
+            const lblBarOnq = document.getElementById('bar-val-onq');
+
+            if (barNewNetPay && barCsbAmort && barPliDeductions && barOnqueue) {
+                const totalBaseVal = baselineSubVal || 1; // prevent divide by zero
+                
+                // Calculate percentages (clamp to minimum 0)
+                const pctNetPay = Math.max(0, (newNetPay / totalBaseVal) * 100);
+                const pctCsb = Math.max(0, (amortization / totalBaseVal) * 100);
+                const pctPli = Math.max(0, (papSubtotal / totalBaseVal) * 100);
+                const pctOnq = Math.max(0, (activeOnqSum / totalBaseVal) * 100);
+
+                // Set widths
+                barNewNetPay.style.width = `${pctNetPay}%`;
+                barCsbAmort.style.width = `${pctCsb}%`;
+                barPliDeductions.style.width = `${pctPli}%`;
+                barOnqueue.style.width = `${pctOnq}%`;
+
+                // Set labels inside progress bars if width is visible
+                barNewNetPay.textContent = pctNetPay > 10 ? `${pctNetPay.toFixed(0)}%` : '';
+                barCsbAmort.textContent = pctCsb > 10 ? `${pctCsb.toFixed(0)}%` : '';
+                barPliDeductions.textContent = pctPli > 10 ? `${pctPli.toFixed(0)}%` : '';
+                barOnqueue.textContent = pctOnq > 10 ? `${pctOnq.toFixed(0)}%` : '';
+
+                // Set detail legend labels text
+                if (lblBarNetPay) lblBarNetPay.textContent = `${pctNetPay.toFixed(1)}%`;
+                if (lblBarCsb) lblBarCsb.textContent = `${pctCsb.toFixed(1)}%`;
+                if (lblBarPli) lblBarPli.textContent = `${pctPli.toFixed(1)}%`;
+                if (lblBarOnq) lblBarOnq.textContent = `${pctOnq.toFixed(1)}%`;
             }
 
             // Save currently active state values to local storage for restore after reload
@@ -3232,6 +4274,16 @@
             const labelEl = document.getElementById('lblToggleMasterPliText');
             if (labelEl) {
                 labelEl.classList.toggle('is-active', isOn);
+                labelEl.textContent = isOn ? 'INCLUDED' : 'EXCLUDED';
+            }
+
+            const cardEl = document.getElementById('card-private-liabilities');
+            if (cardEl) {
+                if (isOn) {
+                    cardEl.classList.remove('collapsed-state');
+                } else {
+                    cardEl.classList.add('collapsed-state');
+                }
             }
             
             // Toggle expansion collapse body wrapper for Private Liabilities card
@@ -3361,8 +4413,8 @@
             }
 
             list.innerHTML = history.map((item, index) => {
-                // [2026-07-11 Fix: Statutory limit updated to 5300.00 threshold in history log]
-                const isSafe = item.newNetPay >= 5300.00;
+                const threshold = (item.interestRate === 9.66) ? 5000.00 : 5300.00;
+                const isSafe = item.newNetPay >= threshold;
                 return `
                     <div class="history-ledger-row" onclick="restoreHistoryState(${index})" title="Click to restore this computational state">
                         <div class="history-cell">
@@ -3481,9 +4533,75 @@
         // [2026-07-11 New: Toggles expand/collapse states of the PLI INCLUDED receipt container accordion]
         function toggleReceiptAccordion() {
             const container = document.getElementById('dynamic-pli-rows-container');
-            if (container) {
-                container.classList.toggle('expanded');
+            const body = document.getElementById('receiptAccordionBody');
+            const chevron = document.getElementById('redemption-chevron');
+            if (container && body) {
+                const isExpanded = container.classList.toggle('expanded');
+                body.style.setProperty('display', isExpanded ? 'block' : 'none', 'important');
+                if (chevron) {
+                    chevron.style.transform = isExpanded ? 'rotate(180deg)' : 'rotate(0deg)';
+                }
             }
+        }
+
+        // [2026-07-12 New: Toggles expand/collapse states of the CSB Deductions receipt container accordion]
+        function toggleCsbAccordion() {
+            const container = document.getElementById('dynamic-csb-deductions-container');
+            const body = document.getElementById('csbAccordionBody');
+            const chevron = document.getElementById('csb-chevron');
+            if (container && body) {
+                const isExpanded = container.classList.toggle('expanded');
+                body.style.setProperty('display', isExpanded ? 'block' : 'none', 'important');
+                if (chevron) {
+                    chevron.style.transform = isExpanded ? 'rotate(180deg)' : 'rotate(0deg)';
+                }
+            }
+        }
+
+        // [2026-07-12 New: Toggles visibility of detailed columns (PERA, GSIS, PH, PAG-IBIG, WTAX) in comparison table]
+        function toggleAnticipatedDetails() {
+            const table = document.getElementById('tableAnticipatedBreakdown');
+            const btn = document.getElementById('btnToggleAnticipatedDetails');
+            if (table && btn) {
+                const isHidden = table.classList.toggle('hide-breakdown');
+                localStorage.setItem('le_anti_hide_breakdown', isHidden ? '1' : '0');
+                if (isHidden) {
+                    btn.innerHTML = '<i class="bi bi-eye"></i>';
+                } else {
+                    btn.innerHTML = '<i class="bi bi-eye-slash"></i>';
+                }
+            }
+        }
+
+        // [2026-07-12 New: Toggles visibility of detailed columns (PERA, GSIS, PH, PAG-IBIG, WTAX) in promotion table]
+        function togglePromotionDetails() {
+            const table = document.getElementById('tablePromotionBreakdown');
+            const btn = document.getElementById('btnTogglePromotionDetails');
+            if (table && btn) {
+                const isHidden = table.classList.toggle('hide-breakdown');
+                localStorage.setItem('le_promo_hide_breakdown', isHidden ? '1' : '0');
+                if (isHidden) {
+                    btn.innerHTML = '<i class="bi bi-eye"></i>';
+                } else {
+                    btn.innerHTML = '<i class="bi bi-eye-slash"></i>';
+                }
+            }
+        }
+
+        // [2026-07-12 New: Selects/deselects all individual CSB deductions checkboxes when the master checkbox changes]
+        function toggleAllCsbDeductions(masterCb) {
+            document.querySelectorAll('.csb-deduction-cb').forEach(cb => {
+                cb.checked = masterCb.checked;
+            });
+            runCalculations();
+        }
+
+        // [2026-07-12 New: Selects/deselects all individual OnQueue checkboxes when the master checkbox changes]
+        function toggleAllOnqDeductions(masterCb) {
+            document.querySelectorAll('.onq-checkbox').forEach(cb => {
+                cb.checked = masterCb.checked;
+            });
+            runCalculations();
         }
 
         // [2026-07-11 New: Retrieves the PLI slot count from localStorage, defaulting to 3 (shows PLI 1, 2, 3)]
