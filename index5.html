@@ -532,7 +532,13 @@
         }
 
         /* [2026-07-11 Fix: orange-node margin helpers preserved; -webkit-text-fill-color reset needed for icon SVG stroke] */
-        .orange-node.mb-1, .orange-node.mb-2, .orange-node.mb-3 {
+        .orange-node.mb-1 {
+            margin-bottom: 4px !important;
+        }
+        .orange-node.mb-2 {
+            margin-bottom: 6px !important;
+        }
+        .orange-node.mb-3 {
             margin-bottom: 10px !important;
         }
 
@@ -975,8 +981,16 @@
             min-height: 38px !important;
             padding: 6px 12px !important;
         }
+        #card-baseline-netpay .currency-input-wrapper .bank-input {
+            padding-left: 32px !important;
+        }
         #card-baseline-netpay .currency-prefix {
             font-size: 0.85rem !important;
+        }
+        #card-baseline-netpay .orange-node.mb-1 {
+            margin-bottom: 2px !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
         }
 
         #panel-baseline-inner .baseline-row {
@@ -1172,12 +1186,46 @@
             margin-top: 40px;
             border-top: 1px solid rgba(255, 255, 255, 0.08);
             padding-top: 30px;
+            margin-bottom: 80px !important;
+        }
+
+        .employee-summary-card {
+            background: rgba(255, 255, 255, 0.02) !important;
+            border: 1px solid rgba(255, 255, 255, 0.05) !important;
+            border-left: 3px solid var(--accent-orange) !important;
+            border-radius: var(--radius-sm) !important;
+            padding: 14px 16px !important;
+        }
+        .summary-icon-box {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.15);
+            font-size: 0.95rem;
+            flex-shrink: 0;
+        }
+        .summary-label {
+            font-size: 0.65rem;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 2px;
+        }
+        #empSummaryName, #empSummaryID, #empSummaryDiv {
+            font-size: 0.85rem;
+            letter-spacing: 0.02em;
+            line-height: 1.2;
         }
 
         .history-grid-header, .history-ledger-row {
             display: grid;
-            grid-template-columns: 110px 1.5fr 1.2fr 1.2fr 44px;
-            gap: 16px;
+            grid-template-columns: 85px 85px 1.5fr 1.2fr 1.1fr 1.1fr 44px;
+            gap: 12px;
             align-items: center;
         }
 
@@ -1875,31 +1923,7 @@
             ] */
             /* [2026-07-11 Fix: Retain regular table columns on mobile with horizontal scroll wrapper instead of display:block card lists] */
 
-            .history-grid-header {
-                display: none;
-            }
 
-            .history-ledger-row {
-                grid-template-columns: 1fr;
-                row-gap: 10px;
-                padding: 16px !important;
-            }
-
-            .history-cell {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                white-space: normal;
-            }
-
-            .history-cell-label {
-                display: inline-block;
-                font-size: 11px;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-                color: var(--text-muted);
-                font-weight: 700;
-            }
 
         /* Final Net Pay styling override */
         /* [2026-07-12 Fix: Adjusted size to 1.48rem as the main hero final value] */
@@ -2219,18 +2243,7 @@
                 padding-right: var(--container-padding) !important;
             }
 
-            /* Standardize history run ledger row padding on mobile viewports */
-            .history-ledger-row {
-                grid-template-columns: 1fr;
-                row-gap: 10px;
-                padding: 12px 14px !important;
-            }
-            .history-cell {
-                font-size: var(--font-size-label) !important;
-            }
-            .history-cell-label {
-                font-size: var(--font-size-table) !important;
-            }
+
         }
 
         @media (max-width: 575.98px) {
@@ -2238,12 +2251,12 @@
             #colPLISubtotal {
                 border-right: none !important;
                 border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-                padding-right: 0 !important;
-                padding-bottom: 14px !important;
-                margin-bottom: 14px !important;
+                padding-right: 6px !important;
+                padding-bottom: 12px !important;
+                margin-bottom: 12px !important;
             }
             #colNetPayPLITotal {
-                padding-left: 0 !important;
+                padding-left: 6px !important;
             }
 
             /* Ensure columns can be scrolled horizontally */
@@ -2314,23 +2327,29 @@
                     <h5 class="mb-lg-0 font-weight-bold credit-assessment-title" id="titleCreditAssessment"><i class="bi bi-shield-check"></i> Credit Assessment</h5>
                 </div>
                 <div class="col-lg-3 col-md-4 mb-2 mb-md-0">
-                    <select id="activeMonthSelect" class="form-control bank-select">
-                        <option value="jun26" selected>June 2026</option>
-                        <option value="may26">May 2026</option>
-                        <option value="apr26">April 2026</option>
-                        <option value="mar26">March 2026</option>
-                        <option value="feb26">February 2026</option>
-                        <option value="jan26">January 2026</option>
-                        <option value="nov25">November 2025</option>
-                        <option value="oct25">October 2025</option>
-                        <option value="sep25">September 2025</option>
-                        <option value="aug25">August 2025</option>
-                        <option value="jul25">July 2025</option>
-                        <option value="jun25">June 2025</option>
-                    </select>
+                    <div class="currency-input-wrapper">
+                        <span class="currency-prefix"><i class="bi bi-calendar3 text-warning"></i></span>
+                        <select id="activeMonthSelect" class="form-control bank-select" style="padding-left: 36px !important;">
+                            <option value="jun26" selected>June 2026</option>
+                            <option value="may26">May 2026</option>
+                            <option value="apr26">April 2026</option>
+                            <option value="mar26">March 2026</option>
+                            <option value="feb26">February 2026</option>
+                            <option value="jan26">January 2026</option>
+                            <option value="nov25">November 2025</option>
+                            <option value="oct25">October 2025</option>
+                            <option value="sep25">September 2025</option>
+                            <option value="aug25">August 2025</option>
+                            <option value="jul25">July 2025</option>
+                            <option value="jun25">June 2025</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="col-lg-4 col-md-5 mb-2 mb-md-0">
-                    <input type="text" id="employeeNumber" class="form-control bank-input" value="4694264" placeholder="Search Employee ID...">
+                    <div class="currency-input-wrapper">
+                        <span class="currency-prefix"><i class="bi bi-person-badge text-warning"></i></span>
+                        <input type="text" id="employeeNumber" class="form-control bank-input font-weight-bold" value="4694264" placeholder="Search Employee ID..." style="padding-left: 36px !important;">
+                    </div>
                 </div>
                 <div class="col-lg-2 col-md-3 mb-0">
                     <!-- Search Button (Polished: Inline background and color styles removed in favor of bank-btn-primary class styles) -->
@@ -2349,12 +2368,44 @@
             </div>
 
             <!-- Employee Details Summary Display Card -->
-            <!-- Employee Details Summary Display Card (Polished: Styled glassmorphic background using class instead of solid panel inline styles) -->
-            <div id="empSummaryCard" class="mt-3 p-3 employee-summary-card" data-label="Employee Details Summary Card">
-                <div class="row text-white-50">
-                    <div class="col-md-4">Client Name: <span id="empSummaryName" class="text-white font-weight-bold ml-1">-</span></div>
-                    <div class="col-md-4">Employee ID: <span id="empSummaryID" class="text-white font-weight-bold ml-1">-</span></div>
-                    <div class="col-md-4">Div / Station: <span id="empSummaryDiv" class="text-white font-weight-bold ml-1">-</span></div>
+            <div id="empSummaryCard" class="mt-3 employee-summary-card" data-label="Employee Details Summary Card">
+                <div class="row align-items-center text-white-50">
+                    <!-- Client Name -->
+                    <div class="col-md-4 mb-2 mb-md-0">
+                        <div class="d-flex align-items-center">
+                            <div class="summary-icon-box mr-2">
+                                <i class="bi bi-person-fill text-warning"></i>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <span class="summary-label text-uppercase">Client Name</span>
+                                <span id="empSummaryName" class="text-white font-weight-bold">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Employee ID -->
+                    <div class="col-md-4 mb-2 mb-md-0">
+                        <div class="d-flex align-items-center">
+                            <div class="summary-icon-box mr-2">
+                                <i class="bi bi-card-text text-warning"></i>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <span class="summary-label text-uppercase">Employee ID</span>
+                                <span id="empSummaryID" class="text-white font-weight-bold">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Div / Station -->
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-center">
+                            <div class="summary-icon-box mr-2">
+                                <i class="bi bi-building text-warning"></i>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <span class="summary-label text-uppercase">Div / Station</span>
+                                <span id="empSummaryDiv" class="text-white font-weight-bold">-</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2718,7 +2769,7 @@
                                       <!-- Card: Subtotals (below the 3 cards) -->
                             <div class="bank-card private-liabilities-card mt-3" id="card-pli-subtotals" data-label="Subtotals Card">
                                 <!-- [2026-07-11 Note: PAP label updates dynamically based on which toggles are active] -->
-                                <div class="baseline-row mt-0" id="panel-papsubtotal">
+                                <div class="baseline-row mt-0 d-none" id="panel-papsubtotal">
                                     <div class="orange-node font-weight-bold" id="node-papsubtotal">
                                         <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16v1a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v1"/><path d="M18 8h4a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-4"/><circle cx="8" cy="12" r="2"/></svg>
                                         <span id="lbl-papsubtotal-title">PLI + ANTICIPATED + PROMOTION SUBTOTAL</span>
@@ -2962,16 +3013,23 @@
                     <i class="bi bi-clock-history text-warning mr-2"></i> Session Runs Audit Trail
                 </h5>
                 <p class="text-white-50 small">Click on any run card below to restore its complete evaluation states and parameter overrides.</p>
-                <div class="history-grid-header">
-                    <span>Timestamp</span>
-                    <span>ID &amp; Term</span>
-                    <span>Loan Amount</span>
-                    <span>New NetPay</span>
-                    <span></span>
-                </div>
-                <div class="history-ledger-list" id="historyLogList">
-                    <!-- Loaded dynamically via JS -->
-                    <div class="text-white-50 text-center py-4 w-100">No historical assess runs recorded in this session.</div>
+                
+                <div class="table-responsive" style="margin-top: 18px; border-radius: var(--radius-sm); border: 1px solid rgba(255, 255, 255, 0.05); background: rgba(10, 14, 23, 0.2); overflow-x: auto;">
+                    <div style="min-width: 820px;">
+                        <div class="history-grid-header">
+                            <span>Date</span>
+                            <span>Timestamp</span>
+                            <span>Client Name</span>
+                            <span>ID &amp; Term</span>
+                            <span>Loan Amount</span>
+                            <span>New NetPay</span>
+                            <span></span>
+                        </div>
+                        <div class="history-ledger-list" id="historyLogList">
+                            <!-- Loaded dynamically via JS -->
+                            <div class="text-white-50 text-center py-4 w-100 font-italic">No historical assess runs recorded in this session.</div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -4079,9 +4137,9 @@
             const papRowEl = document.getElementById('panel-papsubtotal');
             if (papRowEl) {
                 if (useAnticipated || usePromotion) {
-                    papRowEl.style.display = 'flex';
+                    papRowEl.classList.remove('d-none');
                 } else {
-                    papRowEl.style.display = 'none';
+                    papRowEl.classList.add('d-none');
                 }
             }
 
@@ -4599,9 +4657,14 @@
                 if (cb.checked) onqSelections.push(idx);
             });
 
+            const fullNameEl = document.getElementById('empSummaryName');
+            const fullName = fullNameEl ? fullNameEl.textContent.trim() : 'Unknown';
+
             const stateRun = {
                 empNum: window.currentData.empNum,
                 month: window.currentData.month,
+                fullName: fullName,
+                searchDate: new Date().toLocaleDateString([], { month: '2-digit', day: '2-digit', year: 'numeric' }),
                 loanAmount: safeFloat(document.getElementById('loanAmount').value),
                 loanTerm: safeInt(document.getElementById('loanTerm').value),
                 interestRate: getInterestRateValue(),
@@ -4635,23 +4698,27 @@
             list.innerHTML = history.map((item, index) => {
                 const threshold = (item.interestRate === 9.66) ? 5000.00 : 5300.00;
                 const isSafe = item.newNetPay >= threshold;
+                const searchDate = item.searchDate || new Date().toLocaleDateString([], { month: '2-digit', day: '2-digit', year: 'numeric' });
+                const fullName = item.fullName || 'Unknown';
                 return `
                     <div class="history-ledger-row" onclick="restoreHistoryState(${index})" title="Click to restore this computational state">
+                        <div class="history-cell text-white-50">
+                            ${searchDate}
+                        </div>
                         <div class="history-cell">
-                            <span class="history-cell-label">Timestamp</span>
-                            <span>${item.timestamp}</span>
+                            ${item.timestamp}
+                        </div>
+                        <div class="history-cell text-white font-weight-bold">
+                            ${fullName}
                         </div>
                         <div class="history-cell" style="color: #E5A93C;">
-                            <span class="history-cell-label">ID &amp; Term</span>
-                            <span>#${item.empNum} <span class="muted">(${item.loanTerm}m @ ${item.interestRate}%)</span></span>
+                            #${item.empNum} <span class="text-white-50 font-weight-normal">(${item.loanTerm}m @ ${item.interestRate}%)</span>
                         </div>
                         <div class="history-cell">
-                            <span class="history-cell-label">Loan Amount</span>
-                            <span>${formatPHP(item.loanAmount)}</span>
+                            ${formatPHP(item.loanAmount)}
                         </div>
                         <div class="history-cell" style="color: ${isSafe ? '#10B981' : '#EF4444'};">
-                            <span class="history-cell-label">New NetPay</span>
-                            <span>${formatPHP(item.newNetPay)}</span>
+                            ${formatPHP(item.newNetPay)}
                         </div>
                         <button onclick="event.stopPropagation(); deleteHistoryState(${index})" class="history-delete-btn" title="Delete this run">
                             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>

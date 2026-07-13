@@ -33,24 +33,6 @@ CSS rules were updated in the style sheet in [index5.html](file:///c:/Users/Leno
 }
 ```
 
-### Media Query Tokens Override (max-width: 767.98px)
-```css
-@media (max-width: 767.98px) {
-    :root {
-        --font-size-hero: 1.35rem;
-        --font-size-subtotal: 1.1rem;
-        --font-size-value: 0.9rem;
-        --font-size-label: 0.8rem;
-        --font-size-table: 0.72rem;
-        
-        --card-padding: 14px 12px;
-        --panel-padding: 10px 10px;
-        --row-padding: 6px 10px;
-        --container-padding: 16px;
-    }
-}
-```
-
 ---
 
 ## 3. Card Separation & Modularity
@@ -59,34 +41,18 @@ The single large Private Liabilities card has been split into **three separate c
 2. **Anticipated Card (`#card-anticipated`)**: Wraps the Anticipated header, toggle switch, original SG/Step info, details toggler, and table breakdown.
 3. **Promotion Card (`#card-promotion`)**: Wraps the Promotion header, toggle switch, override selectors, New Salary text readout, details toggler, and table breakdown.
 
-### Setup & Capital Base Card Closing Fix
-- **Problem**: The Setup & Capital Base Card (`#card-baseline-netpay`) was missing its closing tags in the HTML. As a result, the Redemption, Anticipated, and Promotion cards were nested inside it in the DOM hierarchy.
-- **Fix**: Added closing div tags to `panel-baseline-inner` and `card-baseline-netpay` on line 2522, successfully moving the three toggle cards outside of it as clean, sibling elements.
+---
 
-### Promotion Card Closing Fix
-- **Problem**: The Promotion Card (`#card-promotion`) was missing its closing tags, causing the Save/Reset/Clear Cache buttons and the Session Runs Audit Trail section to wrap inside it.
-- **Fix**: Added three closing div tags right after `#val-promomargin` (line 2703), successfully excluding these elements from the promotion card container.
-
-### High-Density Compact Font Sizing
-- **Problem**: The font sizes and paddings inside the Loan Setup and NetPay Baseline Computation area were bulky and wrapped awkwardly.
-- **Fix**: Targeted `#card-baseline-netpay` specifically to apply a smaller, high-density look:
-  - Input fields and selectors font-size reduced to `0.82rem` with a compact `38px` min-height.
-  - Baseline list rows font-size reduced to `0.76rem` with `4px 8px` padding.
-  - Subtotal value readouts font-size reduced to `0.95rem` (down from `1.2rem`).
-  - Final New Net Pay hero number font-size scaled down to `1.45rem` (down from `2.35rem`) to fit beautifully on all viewports.
+## 4. Visual Spacing & Padding Alignments (Polished)
+- **Input Overlap Fix**: Fixed currency symbol overlap on `#loanAmount` by enforcing `.currency-input-wrapper .bank-input { padding-left: 32px !important; }` in custom CSS overrides.
+- **Select Dropdowns Gap**: Tightened the vertical gap between section header labels (`.orange-node`) and input/select controls. Set `#card-baseline-netpay .orange-node.mb-1` margin to `2px !important` and removed inner label paddings to minimize space.
+- **Card Subtotals Wrapping**: Fixed subtotal values wrapping or touching card borders on narrow mobile devices. Refactored `#colPLISubtotal` and `#colNetPayPLITotal` to include a secure `6px` internal padding on mobile devices, ensuring numbers remain separated from the frosted borders.
+- **Subtotal Hide/Show Clash Fix**: Corrected a layout bug where the combined subtotal row `#panel-papsubtotal` remained visible showing "NO PLI/COMPENSATION SUBTOTAL" when all overrides were off. This was caused by CSS `.baseline-row { display: flex !important; }` overriding JS `.style.display = 'none'`. Fixed by switching the JS hide/show toggles to use Bootstrap's `.d-none` utility class.
 
 ---
 
-## 4. Subtotals Panel Card & Flex Layout
-The subtotals block is wrapped inside a dedicated card container:
-- **Card**: `#card-pli-subtotals` (replaces floating `.section-panel-inner mt-3` panel, establishing clean outer margins and card-standard paddings).
-- **PAP Subtotal (`#panel-papsubtotal`)**: Combined subtotal of all active PLI and compensation adjustments.
-  - *Redundancy Fix*: The combined subtotal row `#panel-papsubtotal` is dynamically hidden (`style.display = 'none'`) when both `useAnticipated` and `usePromotion` toggles are false.
-- **PLI Totals (`#panel-pli-totals`)**: Contains columns for PLI Subtotal and NetPay + PLI Total.
-  - *Padding Fix*: Columns `#colPLISubtotal` and `#colNetPayPLITotal` are styled as clean, side-by-side flex rows. This prevents labels from wrapping onto multiple lines and limits layout vertical space.
-
----
-
-## 5. Visual Redundancies & Overflows
-- **Chart.js Donut Legend**: Disabled the redundant doughnut legend (`display: false`). The detailed legend list below the progress bar serves as the single source of truth.
-- **Stacked Progress Bar Overflow**: Sized segments relative to the *sum* of the categories instead of the baseline value, guaranteeing they sum to exactly 100% and never overflow the container. Removed percentage label text inside progress segments to avoid text-wrapping issues.
+## 5. Audit Trail Grid & Date/Name Integration
+The session run audit trail is refactored from card blocks to a responsive data table layout:
+- **Table Row Layout**: Removed the vertical card structure on tablet/mobile by wrapping the ledger grid inside an `.table-responsive` wrapper with a horizontal scroll capacity (`min-width: 820px`). Removed mobile media query grid overrides (`grid-template-columns: 1fr`) to prevent rows from collapsing into vertical stacked card lists on mobile screens.
+- **Additional Data Columns**: Added columns for **Date of Search** (e.g. `07/13/2026`) and **Client Full Name** (e.g. `Juan Dela Cruz`) to track historical session logs easily.
+- **JS State Capture**: Updated `logCurrentState()` and `renderHistoryLog()` to capture name details dynamically from the employee summary display and append them to the session history cache.
