@@ -77,6 +77,14 @@ Key computations are marked with the 🍊 emoji. Popovers are bound on hover (PC
   $$\text{New NetPay} = \text{SemiTotal} - \text{Amortization}$$
   *Safety Guard*: If New NetPay < ₱5,000.00, typography turns warning red and displays a statutory warning limit warning message.
 
+### Receipt List Accordion & Subtotal Visibility (Updated 2026-07-13)
+- **🍊 REDEMPTION/ADJUSTMENT ACCORDION**: Displays a dynamic, collapsable list (`#dynamic-pli-rows-container`) of all active redemptions and adjustments.
+  - Sourced from active selected PLIs if the master **REDEMPTION** toggle is enabled.
+  - Sourced from **Anticipated Step Pay** if the **ANTICIPATION** toggle is enabled and its delta value is positive.
+  - Sourced from **Promotion Override Delta** if the **PROMOTION** toggle is enabled and its delta value is non-zero.
+  - *Automatic Listing*: The accordion and respective rows display automatically if ANY of these items are active, without requiring the master REDEMPTION toggle to be turned on or a PLI to be selected first.
+- **🍊 SUBTOTAL AFTER REDEMPTION ROW**: The row displaying the revised baseline sum (`#row-subtotal-after-redemption`) is shown dynamically if there is at least one active, non-zero component (PLIs, Anticipated, or Promotion) enabled, regardless of the master REDEMPTION toggle state.
+
 ---
 
 ## 4. Bottom Session Runs Audit Trail

@@ -4154,11 +4154,14 @@
             }
 
             // [2026-07-11 New: Dynamic receipt lines for each selected active PLI in NETPAY COMPUTATION]
-            const dynamicPliContainer = document.getElementById('dynamic-pli-rows-container');
-            const receiptBody = document.getElementById('receiptAccordionBody');
+            // [2026-07-13 Fix: Modified dynamic receipt lines to render Anticipated and Promotion options outside of useMasterPli so they show up automatically when enabled]
+            const dynamicPliContainer = document.getElementById('dynamic-pli-rows-container'); // Container div for PLI/Redemption dynamic accordion list
+            const receiptBody = document.getElementById('receiptAccordionBody'); // Body div inside accordion where individual receipt rows are rendered
             if (dynamicPliContainer && receiptBody) {
                 receiptBody.innerHTML = '';
                 let hasItems = false;
+                
+                // Show selected PLIs only if master PLI/Redemption toggle is active
                 if (useMasterPli) {
                     selectedPlis.forEach(pli => {
                         const rowEl = document.createElement('div');
@@ -4170,30 +4173,30 @@
                         receiptBody.appendChild(rowEl);
                         hasItems = true;
                     });
-                    
-                    // Add Anticipated if active and selected
-                    if (useAnticipated && anticipatedVal > 0) {
-                        const rowEl = document.createElement('div');
-                        rowEl.className = 'receipt-row';
-                        rowEl.innerHTML = `
-                            <span>Anticipated Step Pay</span>
-                            <span class="tabular-nums font-weight-bold text-white">${formatPHP(anticipatedVal)}</span>
-                        `;
-                        receiptBody.appendChild(rowEl);
-                        hasItems = true;
-                    }
-                    
-                    // Add Promotion if active and selected
-                    if (usePromotion && promotionMargin !== 0) {
-                        const rowEl = document.createElement('div');
-                        rowEl.className = 'receipt-row';
-                        rowEl.innerHTML = `
-                            <span>Promotion Override Delta</span>
-                            <span class="tabular-nums font-weight-bold text-white">${formatPHP(promotionMargin)}</span>
-                        `;
-                        receiptBody.appendChild(rowEl);
-                        hasItems = true;
-                    }
+                }
+                
+                // Add Anticipated if active and selected (Rendered outside useMasterPli check)
+                if (useAnticipated && anticipatedVal > 0) {
+                    const rowEl = document.createElement('div');
+                    rowEl.className = 'receipt-row';
+                    rowEl.innerHTML = `
+                        <span>Anticipated Step Pay</span>
+                        <span class="tabular-nums font-weight-bold text-white">${formatPHP(anticipatedVal)}</span>
+                    `;
+                    receiptBody.appendChild(rowEl);
+                    hasItems = true;
+                }
+                
+                // Add Promotion if active and selected (Rendered outside useMasterPli check)
+                if (usePromotion && promotionMargin !== 0) {
+                    const rowEl = document.createElement('div');
+                    rowEl.className = 'receipt-row';
+                    rowEl.innerHTML = `
+                        <span>Promotion</span>
+                        <span class="tabular-nums font-weight-bold text-white">${formatPHP(promotionMargin)}</span>
+                    `;
+                    receiptBody.appendChild(rowEl);
+                    hasItems = true;
                 }
                 
                 if (hasItems) {
@@ -4243,17 +4246,17 @@
             }
 
             // [2026-07-12 New: Compute and update Subtotal after Redemption display value]
-            // [2026-07-12 Fix: Only show Subtotal after Redemption row if the Redemption toggle (useMasterPli) is ON AND at least one redemption gets toggled]
+            // [2026-07-13 Fix: Show "Subtotal after Redemption" if any redemptions or adjustments (PLI, Anticipated, or Promotion) are active, regardless of master PLI toggle state]
             const subtotalAfterRedemption = baselineSubVal + papSubtotal;
-            const valSubtotalAfterRedemptionEl = document.getElementById('val-subtotal-after-redemption');
+            const valSubtotalAfterRedemptionEl = document.getElementById('val-subtotal-after-redemption'); // Span element showing subtotal value after redemption/adjustments
             if (valSubtotalAfterRedemptionEl) {
                 valSubtotalAfterRedemptionEl.innerHTML = formatPHP(subtotalAfterRedemption);
             }
             
-            const hasActiveRedemptions = (selectedPlis.length > 0) || (useAnticipated && anticipatedVal > 0) || (usePromotion && promotionMargin !== 0);
-            const showSubtotalAfterRedemption = useMasterPli && hasActiveRedemptions;
+            const hasActiveRedemptions = (useMasterPli && selectedPlis.length > 0) || (useAnticipated && anticipatedVal > 0) || (usePromotion && promotionMargin !== 0);
+            const showSubtotalAfterRedemption = hasActiveRedemptions;
 
-            const rowSubtotalAfterRedemptionEl = document.getElementById('row-subtotal-after-redemption');
+            const rowSubtotalAfterRedemptionEl = document.getElementById('row-subtotal-after-redemption'); // Div row element for subtotal after redemption in receipt
             if (rowSubtotalAfterRedemptionEl) {
                 if (showSubtotalAfterRedemption) {
                     rowSubtotalAfterRedemptionEl.style.setProperty('display', 'flex', 'important');
