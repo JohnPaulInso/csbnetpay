@@ -87,9 +87,11 @@
             top: 0 !important;
             width: 100% !important;
             z-index: 1000 !important;
-            background-color: rgba(9, 9, 11, 0.75) !important;
-            backdrop-filter: blur(20px) !important;
-            -webkit-backdrop-filter: blur(20px) !important;
+            /* [2026-07-13 Fix: Increased opacity to 0.85 to match reduced blur] */
+            background-color: rgba(9, 9, 11, 0.85) !important;
+            /* [2026-07-13 Fix: Reduced nav blur from 20px to 10px normal glass blur for scroll performance] */
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
             border-bottom: 1px solid var(--border-hairline) !important;
             padding: 12px 0 !important;
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4) !important;
@@ -136,12 +138,13 @@
         /* ============ CARD SHELL — Liquid Glass (iPhone-style) [2026-07-11 Fix: Frosted glass with layered specular highlights, inner shine, soft reflection] ============ */
         /* [2026-07-11 Fix: overflow changed from hidden to visible so math-popover tooltips can escape card bounds without clipping] */
         .card, .bank-card, .phase-block {
-            /* Layered liquid glass background */
+            /* Layered liquid glass background - [2026-07-13 Fix: Made base background gradient slightly more solid to ensure contrast with reduced blur] */
             background:
                 linear-gradient(160deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 40%, rgba(0,0,0,0.08) 100%),
-                linear-gradient(135deg, rgba(14,18,38,0.72) 0%, rgba(6,8,20,0.82) 100%) !important;
-            backdrop-filter: blur(40px) saturate(180%) brightness(1.08) !important;
-            -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.08) !important;
+                linear-gradient(135deg, rgba(14,18,38,0.85) 0%, rgba(6,8,20,0.92) 100%) !important;
+            /* [2026-07-13 Fix: Reduced heavy liquid glassmorphism blur from 40px saturate/brightness to a performance-friendly 10px glass blur to eliminate rendering lag] */
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
             /* Glass edge borders: top-left brighter, bottom-right darker */
             border: 1px solid rgba(255,255,255,0.09) !important;
             border-top: 1px solid rgba(255,255,255,0.18) !important;
@@ -573,8 +576,9 @@
             z-index: 999999;
             display: none;
             background: rgba(8, 11, 22, 0.97);
-            backdrop-filter: blur(24px) saturate(160%);
-            -webkit-backdrop-filter: blur(24px) saturate(160%);
+            /* [2026-07-13 Fix: Reduced math popover blur from 24px saturate to 8px normal glass blur to optimize popup drawing] */
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             border: 1px solid rgba(245, 158, 11, 0.4);
             border-top: 2px solid rgba(245, 158, 11, 0.65);
             padding: 14px 18px;
@@ -628,11 +632,13 @@
 
         /* ============ ACCORDIONS (LESS ONQUEUE / PLI 1-5) ============ */
         .bank-accordion-btn {
+            /* [2026-07-13 Fix: Increased background opacity to 0.8 to preserve contrast against backdrop] */
             background:
                 linear-gradient(160deg, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0.06) 100%),
-                rgba(14, 18, 36, 0.55) !important;
-            backdrop-filter: blur(20px) !important;
-            -webkit-backdrop-filter: blur(20px) !important;
+                rgba(14, 18, 36, 0.8) !important;
+            /* [2026-07-13 Fix: Reduced glass blur from 20px to 8px to optimize button redraw/transition times] */
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
             border: 1px solid rgba(255, 255, 255, 0.07) !important;
             border-top-color: rgba(255,255,255,0.13) !important;
             /* [2026-07-12 Fix: border-radius set to var(--radius-sm) for a subtle rounded look] */
@@ -1669,11 +1675,13 @@
 
         /* [2026-07-11 Fix: overflow set to visible (not hidden) so math-popover children can escape this panel's border-radius boundary] */
         .section-panel-inner {
+            /* [2026-07-13 Fix: Increased opacity from 0.45 to 0.75 to maintain solid premium depth with reduced blur] */
             background:
                 linear-gradient(160deg, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0.08) 100%),
-                rgba(8, 12, 28, 0.45);
-            backdrop-filter: blur(24px) saturate(150%) !important;
-            -webkit-backdrop-filter: blur(24px) saturate(150%) !important;
+                rgba(8, 12, 28, 0.75);
+            /* [2026-07-13 Fix: Reduced blur from 24px saturate to 8px normal glass blur to prevent lag] */
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
             border: 1px solid rgba(255, 255, 255, 0.065);
             border-top-color: rgba(255,255,255,0.12);
             border-radius: var(--radius-md);
@@ -1705,11 +1713,13 @@
 
         /* [2026-07-11 Fix: Employee summary card — liquid glass] */
         .employee-summary-card {
+            /* [2026-07-13 Fix: Increased background opacity to 0.7 to preserve layout readability] */
             background:
                 linear-gradient(160deg, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0.08) 100%),
-                rgba(8, 12, 28, 0.4) !important;
-            backdrop-filter: blur(28px) saturate(160%) !important;
-            -webkit-backdrop-filter: blur(28px) saturate(160%) !important;
+                rgba(8, 12, 28, 0.7) !important;
+            /* [2026-07-13 Fix: Reduced glass blur from 28px saturate to a quick 8px normal glass blur to prevent mobile/desktop rendering lag] */
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
             border: 1px solid rgba(255, 255, 255, 0.065) !important;
             border-top-color: rgba(255,255,255,0.14) !important;
             border-radius: var(--radius-md) !important;
@@ -1743,11 +1753,13 @@
 
         /* ============ SUMMARY MINI-CARDS — Liquid glass [2026-07-11 Fix: iPhone liquid glass treatment, amber glow only on hover] ============ */
         .inner-summary-card {
+            /* [2026-07-13 Fix: Increased background opacity to 0.8 to maintain high contrast with lower blur value] */
             background:
                 linear-gradient(160deg, rgba(255,255,255,0.055) 0%, rgba(0,0,0,0.1) 100%),
-                rgba(8, 12, 28, 0.55) !important;
-            backdrop-filter: blur(32px) saturate(170%) !important;
-            -webkit-backdrop-filter: blur(32px) saturate(170%) !important;
+                rgba(8, 12, 28, 0.8) !important;
+            /* [2026-07-13 Fix: Reduced heavy blur from 32px to 8px normal glass blur to resolve layout paint lagging] */
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
             border: 1px solid rgba(255,255,255,0.075) !important;
             border-top-color: rgba(255,255,255,0.16) !important;
             border-radius: var(--radius-md) !important;
@@ -1825,9 +1837,11 @@
             bottom: 0 !important;
             left: 0 !important;
             right: 0 !important;
-            background: rgba(15, 23, 42, 0.85) !important;
-            backdrop-filter: blur(18px) !important;
-            -webkit-backdrop-filter: blur(18px) !important;
+            /* [2026-07-13 Fix: Increased background opacity to 0.93 to match the reduced blur value] */
+            background: rgba(15, 23, 42, 0.93) !important;
+            /* [2026-07-13 Fix: Reduced bottom nav blur from 18px to 10px normal glass blur to resolve mobile scrolling/render lag] */
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
             display: none !important; /* Hide on desktop */
             justify-content: space-around !important;
             padding: 10px 0 !important;

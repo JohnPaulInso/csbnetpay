@@ -9,7 +9,7 @@ This document outlines the revamp of the **Loan Evaluation (LE)** tool in [index
 - **Typography**: Refined Montserrat headers and body typography.
 - **Glassmorphic Layout**:
   - Deep blue slate gradient background (`#0F172A` to `#020617`).
-  - Translucent slate cards (`rgba(15, 23, 42, 0.45)`) backed by backdrop filter blur (`18px`).
+  - Translucent slate cards (`rgba(15, 23, 42, 0.85)` to `0.92` base opacity) backed by a performance-optimized standard backdrop filter blur (`10px`). (Updated 2026-07-13: Reduced from expensive 40px saturate liquid glass filters to a normal glass blur to prevent GPU/rendering lag).
   - Crisp hairline border frames (`1px solid rgba(255, 255, 255, 0.08)`) with glowing amber borders on hover (`rgba(245, 158, 11, 0.25)`).
   - High-contrast text layout (`#F8FAFC` for primary content, `#94A3B8` for secondary labels, `#64748B` for muted labels).
 - **Custom-Styled Controls**:
