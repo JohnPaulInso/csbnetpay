@@ -45,7 +45,8 @@
             --emerald-light: #34D399;
             --text-primary: #F0F4F8;
             --text-secondary: #8B9BB4;
-            --text-muted: #4E5F77;
+            /* [2026-07-13 Fix: Brightened text-muted color from #4E5F77 to #8294A7 for WCAG AA compliance (4.5:1 ratio)] */
+            --text-muted: #8294A7;
             --radius-lg: 20px;
             --radius-md: 14px;
             --radius-sm: 9px;
@@ -54,6 +55,18 @@
             --shadow-glass-hover: 0 16px 48px rgba(0,0,0,0.65), 0 4px 16px rgba(0,0,0,0.4), 0 0 0 1px rgba(245,158,11,0.15), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.25);
             --shadow-card: var(--shadow-glass);
             --shadow-card-hover: var(--shadow-glass-hover);
+
+            /* [2026-07-13 Design System Tokens: Standard layout and typography variables] */
+            --font-size-hero: 1.7rem;
+            --font-size-subtotal: 1.2rem;
+            --font-size-value: 0.95rem;
+            --font-size-label: 0.85rem;
+            --font-size-table: 0.8rem;
+            
+            --card-padding: 20px;
+            --panel-padding: 14px 16px;
+            --row-padding: 8px 12px;
+            --container-padding: 24px;
         }
 
         /* [2026-07-11 Fix: Deeper background — near-black space dark with indigo-violet radial glow; uniform Montserrat font] */
@@ -90,8 +103,8 @@
         .container, .container-xl {
             max-width: 1380px !important;
             width: 100% !important;
-            padding-left: 24px !important;
-            padding-right: 24px !important;
+            padding-left: var(--container-padding) !important;
+            padding-right: var(--container-padding) !important;
         }
 
         .navbar-nav {
@@ -136,7 +149,7 @@
             border-bottom: 1px solid rgba(0,0,0,0.3) !important;
             border-right: 1px solid rgba(0,0,0,0.2) !important;
             border-radius: var(--radius-lg) !important;
-            padding: 22px;
+            padding: var(--card-padding) !important;
             margin-bottom: 20px;
             box-shadow: var(--shadow-glass) !important;
             transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease;
@@ -956,22 +969,24 @@
           Fix: Refined font sizes based on visual importance (minor vs subtotal vs hero).
                Restricted amber gradient color clip ONLY to actual subtotal rows.
         */
-        #panel-baseline-inner .baseline-row {
-            font-size: 0.92rem !important;
-            padding: 10px 14px !important;
-            border-radius: var(--radius-sm) !important;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
-            margin-bottom: 2px !important;
+        #card-baseline-netpay .bank-input,
+        #card-baseline-netpay .bank-select {
+            font-size: 0.82rem !important;
+            min-height: 38px !important;
+            padding: 6px 12px !important;
         }
-        
-        #panel-baseline-inner .baseline-row:hover {
-            background: rgba(255, 255, 255, 0.025) !important;
-            transform: translateX(3px);
+        #card-baseline-netpay .currency-prefix {
+            font-size: 0.85rem !important;
+        }
+
+        #panel-baseline-inner .baseline-row {
+            font-size: 0.76rem !important;
+            padding: 4px 8px !important;
         }
 
         #panel-baseline-inner .netpay-label {
             color: rgba(255, 255, 255, 0.72) !important;
-            font-size: 0.88rem !important;
+            font-size: 0.76rem !important;
             font-weight: 600 !important;
             display: flex;
             align-items: center;
@@ -979,7 +994,7 @@
 
         #panel-baseline-inner .netpay-label-bold {
             color: rgba(255, 255, 255, 0.88) !important;
-            font-size: 0.88rem !important;
+            font-size: 0.76rem !important;
             font-weight: 700 !important;
             text-transform: uppercase !important;
             letter-spacing: 0.05em !important;
@@ -994,7 +1009,7 @@
         #val-less-onqueue,
         #val-less-incoming,
         #val-new-csb-amortization {
-            font-size: 0.98rem !important;
+            font-size: 0.8rem !important;
             font-weight: 700 !important;
             color: #FFFFFF !important;
             background: none !important;
@@ -1006,7 +1021,7 @@
         #val-baseline, 
         #val-subtotal-after-redemption, 
         #val-revised-baseline {
-            font-size: 1.25rem !important;
+            font-size: 0.95rem !important;
             font-weight: 800 !important;
             font-family: 'Montserrat', sans-serif !important;
             background: linear-gradient(110deg, #F59E0B 0%, #FBBF24 50%, #FCD34D 100%) !important;
@@ -1144,7 +1159,9 @@
             margin-bottom: 20px !important;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
         }
-        .private-liabilities-card.collapsed-state #wrapperMasterPliToggleHeader {
+        .private-liabilities-card.collapsed-state #wrapperMasterPliToggleHeader,
+        .private-liabilities-card.collapsed-state #wrapperAnticipatedToggleHeader,
+        .private-liabilities-card.collapsed-state #wrapperPromotionToggleHeader {
             border-bottom: 1px solid transparent !important;
             margin-bottom: 0 !important;
             padding-bottom: 0 !important;
@@ -1273,7 +1290,7 @@
 
         /* ============ FINANCIAL VALUE DISPLAY [2026-07-11 Fix: Changed numbers from Inter to Montserrat; thicker weights on major totals] ============ */
         .bank-value-display {
-            font-size: 1.1rem !important;
+            font-size: var(--font-size-value) !important;
             font-weight: 700 !important;
             font-family: 'Montserrat', sans-serif !important;
             background: linear-gradient(135deg, #F1F5F9 0%, #CBD5E1 100%);
@@ -1288,7 +1305,7 @@
         /* [2026-07-11 Fix: Baseline and secondary values Montserrat, baseline weight bumped to 800] */
         /* [2026-07-12 Fix: Excluded val-baseline to style it independently in the amber gradient list] */
         #val-anticipated, #val-promomargin {
-            font-size: 1.15rem !important;
+            font-size: var(--font-size-value) !important;
             font-weight: 800 !important;
             font-family: 'Montserrat', sans-serif !important;
             background: linear-gradient(135deg, #F1F5F9 0%, #CBD5E1 100%);
@@ -1301,7 +1318,7 @@
         }
 
         #val-plisubtotal {
-            font-size: 1.15rem !important;
+            font-size: var(--font-size-subtotal) !important;
             font-weight: 700 !important;
             font-family: 'Montserrat', sans-serif !important;
             background: linear-gradient(135deg, #F1F5F9 0%, #94A3B8 100%);
@@ -1315,7 +1332,7 @@
 
         /* [2026-07-11 Fix: PAP Subtotal — major total, Montserrat, thicker weight 900] */
         #val-papsubtotal {
-            font-size: 1.3rem !important;
+            font-size: var(--font-size-subtotal) !important;
             font-weight: 900 !important;
             font-family: 'Montserrat', sans-serif !important;
             background: linear-gradient(135deg, #FFFFFF 0%, #E2E8F0 50%, #CBD5E1 100%);
@@ -1329,7 +1346,7 @@
 
         /* [2026-07-11 Fix: SemiTotal — prominent mid-total, Montserrat, thicker weight 900] */
         #val-semitotal {
-            font-size: 1.45rem !important;
+            font-size: var(--font-size-hero) !important;
             font-weight: 900 !important;
             font-family: 'Montserrat', sans-serif !important;
             background: linear-gradient(135deg, #FFFFFF 0%, #E2E8F0 100%);
@@ -1346,7 +1363,7 @@
         }
 
         #val-amortization {
-            font-size: 1.25rem !important;
+            font-size: var(--font-size-hero) !important;
             font-weight: 900 !important;
             font-family: 'Montserrat', sans-serif !important;
             letter-spacing: -0.03em !important;
@@ -1363,7 +1380,7 @@
 
         /* [2026-07-11 Fix: NetPay+PLI total, Montserrat, thicker weight 900] */
         #val-netpayplitotal {
-            font-size: 1.4rem !important;
+            font-size: var(--font-size-subtotal) !important;
             font-weight: 900 !important;
             font-family: 'Montserrat', sans-serif !important;
             letter-spacing: -0.04em !important;
@@ -1391,22 +1408,37 @@
         /* ============ LAYOUT PRIMITIVES ============ */
         .baseline-row {
             display: flex !important;
-            align-items: baseline !important;
+            align-items: center !important; /* Center-align elements to prevent vertical offset */
             justify-content: space-between !important;
             width: 100%;
             gap: 12px;
+            padding: var(--row-padding) !important;
+            margin-bottom: 4px !important;
+            border-radius: var(--radius-sm) !important;
+            transition: all 0.2s ease !important;
+            box-sizing: border-box !important;
+            background: transparent;
+            border: none;
+            outline: none !important;
+        }
+
+        .baseline-row:hover {
+            background: rgba(255, 255, 255, 0.02) !important;
         }
 
         .baseline-row > span:first-child,
         .baseline-row > .orange-node {
             flex: 1 1 auto;
             min-width: 0;
+            display: flex;
+            align-items: center;
         }
 
         .baseline-row > span:last-child,
         .baseline-row > [id^="val-"] {
             flex: 0 0 auto;
             white-space: nowrap !important;
+            display: inline-block;
         }
 
         /* [2026-07-11 New: Receipt aesthetics for selected dynamic PLI items inside the baseline computational list] */
@@ -1597,7 +1629,7 @@
             border: 1px solid rgba(255, 255, 255, 0.065);
             border-top-color: rgba(255,255,255,0.12);
             border-radius: var(--radius-md);
-            padding: 14px 16px;
+            padding: var(--panel-padding) !important;
             overflow: visible; /* Must be visible — hidden would clip popover children and round-corner table */
         }
 
@@ -1872,7 +1904,7 @@
         /* Final Net Pay styling override */
         /* [2026-07-12 Fix: Adjusted size to 1.48rem as the main hero final value] */
         #val-final-new-netpay {
-            font-size: 2.35rem !important;
+            font-size: 1.45rem !important;
             font-weight: 900 !important;
             font-family: 'Montserrat', sans-serif !important;
             letter-spacing: -0.05em !important;
@@ -1982,7 +2014,7 @@
         #val-semitotal,
         #val-amortization,
         #val-newnetpay {
-            font-size: 1.75rem !important;
+            font-size: var(--font-size-hero) !important;
             font-weight: 900 !important;
             font-family: 'Montserrat', sans-serif !important;
             letter-spacing: -0.045em !important;
@@ -1991,13 +2023,9 @@
             margin-bottom: 0 !important;
         }
 
-        #val-amortization {
-            font-size: 2.1rem !important;
-        }
-
         /* Incoming input field: matches value display sizing */
         #incomingDeduction {
-            font-size: 1.75rem !important;
+            font-size: var(--font-size-hero) !important;
             font-weight: 900 !important;
             font-family: 'Montserrat', sans-serif !important;
             letter-spacing: -0.045em !important;
@@ -2093,6 +2121,152 @@
             font-family: 'Montserrat', sans-serif !important;
             font-weight: 800 !important;
         }
+
+        /* [2026-07-13 Fix: Mobile-First Responsive Layout & Visual Polish Enhancements] */
+        
+        /* Elevate table header contrast for better accessibility on dark background */
+        #tableAnticipatedBreakdown th, #tablePromotionBreakdown th {
+            color: rgba(255, 255, 255, 0.65) !important;
+        }
+
+        /* Spacing and border separations for PLI totals when stacked vs side-by-side */
+        #colPLISubtotal {
+            padding-right: 24px;
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        #colNetPayPLITotal {
+            padding-left: 24px;
+        }
+
+        /* Standardize table typography and styling metrics globally */
+        .bank-table {
+            font-size: var(--font-size-table) !important;
+            width: 100% !important;
+        }
+        .bank-table th {
+            font-size: var(--font-size-table) !important;
+            padding: 8px 10px !important;
+            color: rgba(255, 255, 255, 0.5) !important;
+        }
+        .bank-table td {
+            font-size: var(--font-size-table) !important;
+            padding: 8px 10px !important;
+        }
+
+        /* Prevent tables from squeezing columns on mobile viewports by enforcing scroll width */
+        .table-responsive table {
+            min-width: 480px !important;
+        }
+
+        /* Mobile Viewport Styling Overrides */
+        @media (max-width: 767.98px) {
+            :root {
+                --font-size-hero: 1.35rem;
+                --font-size-subtotal: 1.1rem;
+                --font-size-value: 0.9rem;
+                --font-size-label: 0.8rem;
+                --font-size-table: 0.72rem;
+                
+                --card-padding: 14px 12px;
+                --panel-padding: 10px 10px;
+                --row-padding: 6px 10px;
+                --container-padding: 16px;
+            }
+
+            /* Reset fixed heights on the 4 dashboard summary cards and 2 chart cards to prevent content clip/overflow */
+            #box-incoming-deduction,
+            #box-semitotal-summary,
+            #box-amortization-summary,
+            #box-new-netpay-summary,
+            #card-donut-chart,
+            #card-line-chart {
+                min-height: auto !important;
+                max-height: none !important;
+                height: auto !important;
+            }
+
+            /* Adjust visual margins on summary card grid items for vertical stacking flow */
+            .semitotal-summary-wrapper,
+            .incoming-adjustment-wrapper,
+            .amortization-summary-wrapper,
+            .newnetpay-summary-wrapper {
+                margin-bottom: 12px !important;
+            }
+
+            /* Spacing inside the employee summary details card on mobile */
+            .employee-summary-card .row > div {
+                margin-bottom: 8px;
+            }
+            .employee-summary-card .row > div:last-child {
+                margin-bottom: 0;
+            }
+
+            /* Prevent iOS Safari from zooming in on input field focus by enforcing 16px minimum font size */
+            select, input[type="text"], input[type="number"], .bank-input, .bank-select {
+                font-size: 1rem !important; /* 16px */
+            }
+
+            /* Tighten accordion header buttons */
+            .bank-accordion-btn {
+                padding: 10px 12px !important;
+                font-size: 0.8rem !important;
+                min-height: 44px !important;
+            }
+
+            /* Tighten container padding to give more screen space */
+            .container, .container-xl {
+                padding-left: var(--container-padding) !important;
+                padding-right: var(--container-padding) !important;
+            }
+
+            /* Standardize history run ledger row padding on mobile viewports */
+            .history-ledger-row {
+                grid-template-columns: 1fr;
+                row-gap: 10px;
+                padding: 12px 14px !important;
+            }
+            .history-cell {
+                font-size: var(--font-size-label) !important;
+            }
+            .history-cell-label {
+                font-size: var(--font-size-table) !important;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            /* Stack PLI subtotal and NetPay+PLI totals vertically */
+            #colPLISubtotal {
+                border-right: none !important;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+                padding-right: 0 !important;
+                padding-bottom: 14px !important;
+                margin-bottom: 14px !important;
+            }
+            #colNetPayPLITotal {
+                padding-left: 0 !important;
+            }
+
+            /* Ensure columns can be scrolled horizontally */
+            .table-responsive table {
+                min-width: 440px !important;
+            }
+
+            /* Scale down massive hero numbers on mobile to prevent wrapping of values */
+            #val-final-new-netpay {
+                font-size: var(--font-size-subtotal) !important; /* In baseline list, fit layout */
+            }
+
+            /* Full-width side-by-side action buttons on mobile */
+            .action-btn-row {
+                justify-content: space-between !important;
+                gap: 10px;
+                margin-top: 15px !important;
+            }
+            .action-btn-row button {
+                flex: 1 !important;
+                margin-right: 0 !important;
+            }
+        }
     </style>
 
 
@@ -2134,11 +2308,12 @@
         <!-- [2026-07-10 Fix: Added descriptive label class names, IDs, and data-labels per global rules] -->
         <!-- Search & Client Configuration Widget -->
         <div class="bank-card search-config-card" id="searchConfigurationCard" data-label="Search & Client Configuration Card">
+            <!-- [2026-07-13 Fix: Added responsive vertical margins mb-3/mb-2 on intermediate cols when grid stacks on mobile] -->
             <div class="row align-items-center">
-                <div class="col-lg-3 col-md-12">
+                <div class="col-lg-3 col-md-12 mb-3 mb-lg-0">
                     <h5 class="mb-lg-0 font-weight-bold credit-assessment-title" id="titleCreditAssessment"><i class="bi bi-shield-check"></i> Credit Assessment</h5>
                 </div>
-                <div class="col-lg-3 col-md-4">
+                <div class="col-lg-3 col-md-4 mb-2 mb-md-0">
                     <select id="activeMonthSelect" class="form-control bank-select">
                         <option value="jun26" selected>June 2026</option>
                         <option value="may26">May 2026</option>
@@ -2154,10 +2329,10 @@
                         <option value="jun25">June 2025</option>
                     </select>
                 </div>
-                <div class="col-lg-4 col-md-5">
+                <div class="col-lg-4 col-md-5 mb-2 mb-md-0">
                     <input type="text" id="employeeNumber" class="form-control bank-input" value="4694264" placeholder="Search Employee ID...">
                 </div>
-                <div class="col-lg-2 col-md-3">
+                <div class="col-lg-2 col-md-3 mb-0">
                     <!-- Search Button (Polished: Inline background and color styles removed in favor of bank-btn-primary class styles) -->
                     <button id="searchBtn" class="btn btn-warning bank-btn-primary w-100 font-weight-bold" onclick="performSearch()">
                         <i class="bi bi-search"></i> Search
@@ -2272,16 +2447,17 @@
                             
                             <!-- [2026-07-12 CSB Deductions Accordion Row - Labeled dynamic-csb-deductions-container. Toggleable accordion styled like a transparent baseline row that drops down to show a responsive table of CSB positive deductions] -->
                             <div id="dynamic-csb-deductions-container" class="mt-0 mb-2" style="background: transparent; border: none; overflow: hidden; width: 100%;">
-                                <button type="button" class="baseline-row netpay-row-csb-deductions-header w-100" id="btn-csb-accordion-header" onclick="toggleCsbAccordion();" style="background: transparent; border: none; outline: none !important; display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 10px 14px; border-radius: var(--radius-sm); transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);">
+                                <button type="button" class="baseline-row netpay-row-csb-deductions-header w-100" id="btn-csb-accordion-header" onclick="toggleCsbAccordion();" style="background: transparent; border: none; outline: none !important; width: 100%;">
                                     <span class="netpay-label"><i class="bi bi-plus-lg text-success mr-2"></i>CSB Deductions</span>
                                     <span class="d-flex align-items-center" style="gap: 8px;">
-                                        <span id="lbl-dedamt" class="tabular-nums font-weight-bold" style="font-size: 0.98rem; font-weight: 700; color: #FFFFFF;">₱0.00</span>
+                                        <span id="lbl-dedamt" class="tabular-nums font-weight-bold">₱0.00</span>
                                         <i class="bi bi-chevron-down text-white-50" id="csb-chevron" style="font-size: 0.75rem; transition: transform 0.2s ease;"></i>
                                     </span>
                                 </button>
                                 <div id="csbAccordionBody" class="receipt-accordion-body" style="display: none; padding: 2px 14px 6px 14px; border-top: 1px solid rgba(255, 255, 255, 0.04); background: rgba(0, 0, 0, 0.22); border-radius: 6px; margin-top: 2px;">
                                     <div class="table-responsive">
-                                        <table class="bank-table mb-0" style="width: 100%; min-width: 320px; border: none; background: transparent; font-size: 0.60rem !important;">
+                                        <!-- [2026-07-13 Fix: Replaced inline font-size and min-width with clean table styling] -->
+                                        <table class="bank-table mb-0" id="tableCsbDeductions" style="width: 100%; border: none; background: transparent;">
                                             <thead>
                                                 <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
                                                     <th style="width: 32px; text-align: center; vertical-align: middle; padding: 4px 0;"><input type="checkbox" id="csb-select-all" checked onchange="toggleAllCsbDeductions(this)"></th>
@@ -2307,10 +2483,10 @@
                             
                             <!-- [2026-07-12 Redemption Accordion Row - Labeled dynamic-pli-rows-container. Styled like a transparent baseline row that drops down to show dynamic PLIs] -->
                             <div id="dynamic-pli-rows-container" class="receipt-container-accordion mt-2 mb-2" style="background: transparent; border: none; overflow: hidden; width: 100%;">
-                                <button type="button" class="baseline-row netpay-row-redemption-header w-100" id="btn-redemption-accordion-header" onclick="toggleReceiptAccordion();" style="background: transparent; border: none; outline: none !important; display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 10px 14px; border-radius: var(--radius-sm); transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);">
+                                <button type="button" class="baseline-row netpay-row-redemption-header w-100" id="btn-redemption-accordion-header" onclick="toggleReceiptAccordion();" style="background: transparent; border: none; outline: none !important; width: 100%;">
                                     <span class="netpay-label"><i class="bi bi-plus-lg text-success mr-2"></i>Redemption</span>
                                     <span class="d-flex align-items-center" style="gap: 8px;">
-                                        <span id="val-baseline-papsubtotal" class="tabular-nums font-weight-bold" style="font-size: 0.98rem; font-weight: 700; color: #FFFFFF;">₱0.00</span>
+                                        <span id="val-baseline-papsubtotal" class="tabular-nums font-weight-bold">₱0.00</span>
                                         <i class="bi bi-chevron-down text-white-50" id="redemption-chevron" style="font-size: 0.75rem; transition: transform 0.2s ease;"></i>
                                     </span>
                                 </button>
@@ -2357,244 +2533,235 @@
                         </div>
                     </div>
 
-                    <!-- [2026-07-10 Fix: Added descriptive IDs, label classnames, and uniform numeric display classes per global rules] -->
-                    <!-- Card: Private Liabilities (PLI) -->
-                    <div class="bank-card private-liabilities-card" id="card-private-liabilities" data-label="Private Liabilities (PLI) Assessment Card">
-                        
-                        <!-- [2026-07-12 Fix: Premium header row with always-visible title and master toggle switch] -->
-                        <div class="d-flex align-items-center justify-content-between mb-3 pb-2" id="wrapperMasterPliToggleHeader" style="border-bottom: 1px solid rgba(255,255,255,0.06); gap: 16px;">
-                            <div class="d-flex flex-column" id="pli-header-title-block" data-desc="Title text block for Private Liabilities section header.">
-                                <div class="orange-node mb-1" id="node-private-liabilities-title" style="margin-bottom: 2px !important;">
-                                    <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
-                                    REDEMPTION
-                                    <span class="math-popover">
-                                        <strong>Private Liabilities Section</strong><br>
-                                        Toggle to include private lending institution (PLI) redemptions in calculations.
-                                    </span>
+                    <!-- [2026-07-13 Fix: Split single Private Liabilities card into three separate cards (Redemption, Anticipated, Promotion) and relocated subtotals block below them] -->
+
+                            <!-- Card: Private Liabilities (PLI) / Redemption -->
+                            <div class="bank-card private-liabilities-card mt-3" id="card-private-liabilities" data-label="Private Liabilities (PLI) Assessment Card">
+                                <!-- [2026-07-12 Fix: Premium header row with always-visible title and master toggle switch] -->
+                                <div class="d-flex align-items-center justify-content-between mb-3 pb-2" id="wrapperMasterPliToggleHeader" style="border-bottom: 1px solid rgba(255,255,255,0.06); gap: 16px;">
+                                    <div class="d-flex flex-column" id="pli-header-title-block" data-desc="Title text block for Private Liabilities section header.">
+                                        <div class="orange-node mb-1" id="node-private-liabilities-title" style="margin-bottom: 2px !important;">
+                                            <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
+                                            REDEMPTION
+                                            <span class="math-popover">
+                                                <strong>Private Liabilities Section</strong><br>
+                                                Toggle to include private lending institution (PLI) redemptions in calculations.
+                                            </span>
+                                        </div>
+                                        <span class="text-muted" style="font-size: 0.68rem; font-weight: 500; font-family: 'Montserrat', sans-serif;">Manage and incorporate private lending institution deductions</span>
+                                    </div>
+                                    <div class="toggle-switch-wrapper mb-0" id="wrapperMasterPliToggle" style="margin-bottom: 0 !important;">
+                                        <label class="toggle-switch m-0" id="labelMasterPliSwitch" title="Toggle entire Private Liabilities section (PLIs) in calculations">
+                                            <input type="checkbox" id="toggleMasterPli" onchange="onToggleMasterPli(); runCalculations();">
+                                            <span class="toggle-track toggle-track-master-pli"></span>
+                                        </label>
+                                        <span class="toggle-label-text ml-1" id="lblToggleMasterPliText">EXCLUDED</span>
+                                    </div>
                                 </div>
-                                <span class="text-muted" style="font-size: 0.68rem; font-weight: 500; font-family: 'Montserrat', sans-serif;">Manage and incorporate private lending institution deductions</span>
-                            </div>
-                            <div class="toggle-switch-wrapper mb-0" id="wrapperMasterPliToggle" style="margin-bottom: 0 !important;">
-                                <label class="toggle-switch m-0" id="labelMasterPliSwitch" title="Toggle entire Private Liabilities section (PLIs, Anticipated, Promotion) in calculations">
-                                    <input type="checkbox" id="toggleMasterPli" onchange="onToggleMasterPli(); runCalculations();">
-                                    <span class="toggle-track toggle-track-master-pli"></span>
-                                </label>
-                                <span class="toggle-label-text ml-1" id="lblToggleMasterPliText">EXCLUDED</span>
-                            </div>
-                        </div>
 
-                        <!-- [2026-07-11 Fix: Wrapped all PLI inner content blocks in a pli-card-collapse container to animate height expansion based on master toggle switch] -->
-                        <div id="pliCardCollapseBody" class="pli-card-collapse">
-
-                            <!-- [2026-07-11 Fix: Wrapped title and accordions in section-panel-inner container to match design guidelines] -->
-                            <div class="section-panel-inner" id="panel-pli-inner">
-                            
-                            <div id="pliAccordions" class="accordion">
-                                <!-- Populated dynamically -->
+                                <!-- [2026-07-11 Fix: Wrapped all PLI inner content blocks in a pli-card-collapse container to animate height expansion based on master toggle switch] -->
+                                <div id="pliCardCollapseBody" class="pli-card-collapse">
+                                    <!-- [2026-07-11 Fix: Wrapped title and accordions in section-panel-inner container to match design guidelines] -->
+                                    <div class="section-panel-inner" id="panel-pli-inner">
+                                        <div id="pliAccordions" class="accordion">
+                                            <!-- Populated dynamically -->
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
 
-                        <!-- [2026-07-11 Fix: Anticipated & Promotion integrated inside card-private-liabilities since they are part of liabilities/compensation calculations] -->
-                        <div class="section-panel-inner mt-3" id="panel-comp-adjustments">
-                            <div class="row" id="row-comp-adjustments" data-desc="Row wrapping Anticipated and Promotion adjustment columns.">
-                                <!-- ANTICIPATED Column — toggleable via switch; disabled state grays out the value -->
-                                <div class="col-12 anticipated-comp-col" id="colAnticipatedCompensation" data-desc="Anticipated compensation step details display column.">
-                                    <!-- [2026-07-11 Fix: Inline alignment wrapper to put the toggle on the right side of the node title] -->
-                                    <div class="d-flex align-items-center justify-content-between mb-3" style="min-height: 24px;">
-                                        <div class="orange-node mb-0" id="node-anticipated" style="margin-bottom: 0 !important;">
+                            <!-- Card: Anticipated Compensation Adjustments -->
+                            <div class="bank-card private-liabilities-card mt-3" id="card-anticipated" data-label="Anticipated Compensation Card">
+                                <!-- Premium header row with always-visible title and master toggle switch -->
+                                <div class="d-flex align-items-center justify-content-between mb-3 pb-2" id="wrapperAnticipatedToggleHeader" style="border-bottom: 1px solid rgba(255,255,255,0.06); gap: 16px;">
+                                    <div class="d-flex flex-column">
+                                        <div class="orange-node mb-1" id="node-anticipated" style="margin-bottom: 2px !important;">
                                             <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
                                             ANTICIPATED
                                             <span class="math-popover" id="popover-anticipated" data-desc="Math popover description for Anticipated.">
                                                 Anticipated salary standardization increase (Net Pay difference between 4th Tranche 2027 and 3rd Tranche 2026) for the original Grade and Step.<br>Toggle switch on the right to include/exclude from total.
                                             </span>
                                         </div>
-                                        <!-- [2026-07-11 New: Toggle switch on the right side of the header title] -->
-                                        <div class="toggle-switch-wrapper mb-0" id="wrapperAnticipatedToggle" style="margin-bottom: 0 !important; gap: 0;">
-                                            <label class="toggle-switch" id="labelAnticipatedSwitch" title="Toggle Anticipated in total">
-                                                <input type="checkbox" id="toggleAnticipated" onchange="onToggleAnticipated(); runCalculations();">
-                                                <span class="toggle-track toggle-track-anticipated"></span>
-                                            </label>
-                                            <!-- [2026-07-11 Fix: Redundant text is hidden using d-none, but element is kept in DOM for backward-compatibility with JS] -->
-                                            <span class="toggle-label-text d-none" id="lblToggleAnticipatedText">ANTICIPATED</span>
-                                        </div>
+                                        <span class="text-muted" style="font-size: 0.68rem; font-weight: 500; font-family: 'Montserrat', sans-serif;">Manage and incorporate anticipated salary standardization increases</span>
                                     </div>
-                                    <!-- [2026-07-11 Fix: Stacked label-then-value — displays original baseline grade/step and dropdown overrides] -->
-                                    <div class="mb-3 d-flex align-items-center justify-content-between" id="anticipated-sg-wrapper">
-                                        <div>
-                                            <div class="comp-field-label mb-1">Original SG / Step</div>
-                                            <div id="lbl-originalsg" class="font-weight-bold text-white-50 tabular-nums" style="font-size: 0.9rem;">-</div>
-                                        </div>
-                                        <!-- [2026-07-12 New: Subtle details toggle button inside anticipated card (icon only)] -->
-                                        <button type="button" id="btnToggleAnticipatedDetails" class="btn btn-sm btn-outline-secondary" style="font-size: 0.72rem; padding: 4px 6px; border-color: rgba(255,255,255,0.08); color: rgba(255,255,255,0.45); border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px;" title="Toggle breakdown details" onclick="toggleAnticipatedDetails()">
-                                            <i class="bi bi-eye"></i>
-                                        </button>
-                                    </div>
-                                    
-
-
-                                    <!-- [2026-07-12 New: Detailed comparison table showing breakdown of Basic, PERA, GSIS, PhilHealth, Pag-IBIG, WTAX, Net Pay for old vs new target] -->
-                                    <div class="mt-3" id="wrapperAnticipatedTable" style="width: 100%; overflow-x: hidden;" data-desc="Table breakdown wrapper for anticipated salary standardization details.">
-                                        <table class="table table-sm table-dark bank-table mb-0 hide-breakdown" id="tableAnticipatedBreakdown" style="font-size: 0.54rem; text-align: right; border: 1px solid rgba(255,255,255,0.06); width: 100%; table-layout: auto;">
-                                            <thead>
-                                                <tr style="color: rgba(255,255,255,0.45); font-weight: 600; text-transform: uppercase; font-size: 0.50rem; border-bottom: 2px solid rgba(255,255,255,0.1);">
-                                                    <th style="text-align: left; padding: 3px 2px;">YEAR</th>
-                                                    <th style="padding: 3px 2px;" title="Basic Salary from Tranche CSV based on Salary Grade and Step">BASIC</th>
-                                                    <th class="col-breakdown" style="padding: 3px 2px;" title="Personal Economic Relief Allowance (Constant ₱2,000.00)">PERA</th>
-                                                    <th class="col-breakdown" style="padding: 3px 2px;" title="GSIS Premium Deduction = Basic Pay × 9%">GSIS</th>
-                                                    <th class="col-breakdown" style="padding: 3px 2px;" title="PhilHealth Premium Deduction = Basic Pay × 2.5%">PHEALTH</th>
-                                                    <th class="col-breakdown" style="padding: 3px 2px;" title="Pag-IBIG Contribution = Constant ₱200.00">PAG-IBIG</th>
-                                                    <th class="col-breakdown" style="padding: 3px 2px;" title="Withholding Tax = (Annual Taxable Income - Bracket Threshold) × Rate / 12. Annual Taxable Income = (Basic Pay × 12 + 13th & 14th Month Bonus above 90k) - (GSIS + PH + Pag-IBIG) × 12">WTAX</th>
-                                                    <th style="padding: 3px 2px;" title="Net Pay = Basic Pay + PERA - GSIS - PhilHealth - Pag-IBIG - Withholding Tax">NET PAY</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="bodyAnticipatedBreakdown" class="tabular-nums">
-                                                <!-- Populated dynamically by runCalculations() -->
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    
-                                    <div id="anticipated-value-wrapper" class="mt-3">
-                                        <div class="comp-field-label mb-1" id="lbl-anticipated-value" data-desc="Label for anticipated salary standardization net increase.">Anticipated Net Increase</div>
-                                        <div id="val-anticipated" class="bank-value-display font-weight-bold" style="color: var(--accent-orange) !important;">₱0.00</div>
+                                    <div class="toggle-switch-wrapper mb-0" id="wrapperAnticipatedToggle" style="margin-bottom: 0 !important; gap: 0;">
+                                        <label class="toggle-switch" id="labelAnticipatedSwitch" title="Toggle Anticipated in total">
+                                            <input type="checkbox" id="toggleAnticipated" onchange="onToggleAnticipated(); runCalculations();">
+                                            <span class="toggle-track toggle-track-anticipated"></span>
+                                        </label>
+                                        <span class="toggle-label-text ml-1" id="lblToggleAnticipatedText">EXCLUDED</span>
                                     </div>
                                 </div>
 
-                                <!-- PROMOTION Column — toggleable via switch; disabled state grays out the value -->
-                                <div class="col-6 promotion-comp-col" id="colPromotionCompensation" data-desc="Promotional grade and step override selector column.">
-                                    <!-- [2026-07-11 Fix: Inline alignment wrapper to put the toggle on the right side of the node title] -->
-                                    <div class="d-flex align-items-center justify-content-between mb-3" style="min-height: 24px;">
-                                        <div class="orange-node mb-0" id="node-promotion" style="margin-bottom: 0 !important;">
+                                <!-- Collapse body wrapper for Anticipated card -->
+                                <div id="anticipatedCardCollapseBody" class="pli-card-collapse">
+                                    <div class="section-panel-inner" id="panel-anticipated-inner">
+                                        <!-- Stacked label-then-value — displays original baseline grade/step and dropdown overrides -->
+                                        <div class="mb-3 d-flex align-items-center justify-content-between" id="anticipated-sg-wrapper">
+                                            <div>
+                                                <div class="comp-field-label mb-1">Original SG / Step</div>
+                                                <div id="lbl-originalsg" class="font-weight-bold text-white-50 tabular-nums" style="font-size: 0.9rem;">-</div>
+                                            </div>
+                                            <button type="button" id="btnToggleAnticipatedDetails" class="btn btn-sm btn-outline-secondary" style="font-size: 0.72rem; padding: 4px 6px; border-color: rgba(255,255,255,0.08); color: rgba(255,255,255,0.45); border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px;" title="Toggle breakdown details" onclick="toggleAnticipatedDetails()">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="mt-3 table-responsive" id="wrapperAnticipatedTable" style="width: 100%; overflow-x: auto !important;" data-desc="Table breakdown wrapper for anticipated salary standardization details.">
+                                            <table class="table table-sm table-dark bank-table mb-0 hide-breakdown" id="tableAnticipatedBreakdown" style="text-align: right; border: 1px solid rgba(255,255,255,0.06); width: 100%; table-layout: auto;">
+                                                <thead>
+                                                    <tr style="color: rgba(255,255,255,0.45); font-weight: 600; text-transform: uppercase; font-size: 0.50rem; border-bottom: 2px solid rgba(255,255,255,0.1);">
+                                                        <th style="text-align: left; padding: 3px 2px;">YEAR</th>
+                                                        <th style="padding: 3px 2px;" title="Basic Salary from Tranche CSV based on Salary Grade and Step">BASIC</th>
+                                                        <th class="col-breakdown" style="padding: 3px 2px;" title="Personal Economic Relief Allowance (Constant ₱2,000.00)">PERA</th>
+                                                        <th class="col-breakdown" style="padding: 3px 2px;" title="GSIS Premium Deduction = Basic Pay × 9%">GSIS</th>
+                                                        <th class="col-breakdown" style="padding: 3px 2px;" title="PhilHealth Premium Deduction = Basic Pay × 2.5%">PHEALTH</th>
+                                                        <th class="col-breakdown" style="padding: 3px 2px;" title="Pag-IBIG Contribution = Constant ₱200.00">PAG-IBIG</th>
+                                                        <th class="col-breakdown" style="padding: 3px 2px;" title="Withholding Tax = (Annual Taxable Income - Bracket Threshold) × Rate / 12. Annual Taxable Income = (Basic Pay × 12 + 13th & 14th Month Bonus above 90k) - (GSIS + PH + Pag-IBIG) × 12">WTAX</th>
+                                                        <th style="padding: 3px 2px;" title="Net Pay = Basic Pay + PERA - GSIS - PhilHealth - Pag-IBIG - Withholding Tax">NET PAY</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="bodyAnticipatedBreakdown" class="tabular-nums">
+                                                    <!-- Populated dynamically by runCalculations() -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        
+                                        <div id="anticipated-value-wrapper" class="mt-3">
+                                            <div class="comp-field-label mb-1" id="lbl-anticipated-value" data-desc="Label for anticipated salary standardization net increase.">Anticipated Net Increase</div>
+                                            <div id="val-anticipated" class="bank-value-display font-weight-bold" style="color: var(--accent-orange) !important;">₱0.00</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card: Promotion Adjustments -->
+                            <div class="bank-card private-liabilities-card mt-3" id="card-promotion" data-label="Promotion Compensation Card">
+                                <!-- Premium header row with always-visible title and master toggle switch -->
+                                <div class="d-flex align-items-center justify-content-between mb-3 pb-2" id="wrapperPromotionToggleHeader" style="border-bottom: 1px solid rgba(255,255,255,0.06); gap: 16px;">
+                                    <div class="d-flex flex-column">
+                                        <div class="orange-node mb-1" id="node-promotion" style="margin-bottom: 2px !important;">
                                             <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
                                             PROMOTION
                                             <span class="math-popover">
                                                 Select promotional overrides inside tranch2026.csv.<br>Toggle switch on the right to include/exclude margin from total.
                                             </span>
                                         </div>
-                                        <!-- [2026-07-11 New: Toggle switch on the right side of the header title] -->
-                                        <div class="toggle-switch-wrapper mb-0" id="wrapperPromotionToggle" style="margin-bottom: 0 !important; gap: 0;">
-                                            <label class="toggle-switch" id="labelPromotionSwitch" title="Toggle Promotion in total">
-                                                <input type="checkbox" id="togglePromotion" onchange="onTogglePromotion(); runCalculations();">
-                                                <span class="toggle-track toggle-track-promotion"></span>
-                                            </label>
-                                            <!-- [2026-07-11 Fix: Redundant text is hidden using d-none, but element is kept in DOM for backward-compatibility with JS] -->
-                                            <span class="toggle-label-text d-none" id="lblTogglePromotionText">PROMOTION</span>
-                                        </div>
+                                        <span class="text-muted" style="font-size: 0.68rem; font-weight: 500; font-family: 'Montserrat', sans-serif;">Manage and select promotional salary grade and step overrides</span>
                                     </div>
-                                    <!-- [2026-07-12 New: Original SG / Step display for Promotion matching Anticipated card layout] -->
-                                    <div class="mb-3 d-flex align-items-center justify-content-between" id="promotion-sg-wrapper">
-                                        <div>
-                                            <div class="comp-field-label mb-1">Original SG / Step</div>
-                                            <div id="lbl-promo-originalsg" class="font-weight-bold text-white-50 tabular-nums" style="font-size: 0.9rem;">-</div>
-                                        </div>
-                                        <!-- [2026-07-12 New: Subtle details toggle button inside promotion card (icon only)] -->
-                                        <button type="button" id="btnTogglePromotionDetails" class="btn btn-sm btn-outline-secondary" style="font-size: 0.72rem; padding: 4px 6px; border-color: rgba(255,255,255,0.08); color: rgba(255,255,255,0.45); border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px;" title="Toggle breakdown details" onclick="togglePromotionDetails()">
-                                            <i class="bi bi-eye-slash"></i>
-                                        </button>
+                                    <div class="toggle-switch-wrapper mb-0" id="wrapperPromotionToggle" style="margin-bottom: 0 !important; gap: 0;">
+                                        <label class="toggle-switch" id="labelPromotionSwitch" title="Toggle Promotion in total">
+                                            <input type="checkbox" id="togglePromotion" onchange="onTogglePromotion(); runCalculations();">
+                                            <span class="toggle-track toggle-track-promotion"></span>
+                                        </label>
+                                        <span class="toggle-label-text ml-1" id="lblTogglePromotionText">EXCLUDED</span>
                                     </div>
+                                </div>
 
-                                    <!-- [2026-07-11 Fix: Label above dropdowns, New Salary readout BELOW dropdowns so nothing overlaps] -->
-                                    <div class="mb-3" id="promotion-controls-wrapper">
-                                        <div class="comp-field-label mb-2">COMPARE PROMOTION</div>
-                                        <div class="d-flex" style="gap: 8px;">
-                                            <select id="promoGrade" class="form-control bank-select select-sm tabular-nums" style="flex: 1; min-width: 0;" onchange="runCalculations()">
-                                            </select>
-                                            <select id="promoStep" class="form-control bank-select select-sm tabular-nums" style="flex: 1; min-width: 0;" onchange="runCalculations()">
-                                            </select>
+                                <!-- Collapse body wrapper for Promotion card -->
+                                <div id="promotionCardCollapseBody" class="pli-card-collapse">
+                                    <div class="section-panel-inner" id="panel-promotion-inner">
+                                        <!-- Original SG / Step display for Promotion matching Anticipated card layout -->
+                                        <div class="mb-3 d-flex align-items-center justify-content-between" id="promotion-sg-wrapper">
+                                            <div>
+                                                <div class="comp-field-label mb-1">Original SG / Step</div>
+                                                <div id="lbl-promo-originalsg" class="font-weight-bold text-white-50 tabular-nums" style="font-size: 0.9rem;">-</div>
+                                            </div>
+                                            <button type="button" id="btnTogglePromotionDetails" class="btn btn-sm btn-outline-secondary" style="font-size: 0.72rem; padding: 4px 6px; border-color: rgba(255,255,255,0.08); color: rgba(255,255,255,0.45); border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px;" title="Toggle breakdown details" onclick="togglePromotionDetails()">
+                                                <i class="bi bi-eye-slash"></i>
+                                            </button>
                                         </div>
-                                        <!-- New Salary display below dropdowns — no horizontal clash -->
-                                        <div id="lbl-promoted-salary" class="tabular-nums mt-2">
-                                            New Salary: ₱0.00
-                                        </div>
-                                    </div>
 
-                                    <!-- [2026-07-12 New: Detailed comparison table for Promotion showing breakdown of Basic, PERA, GSIS, PhilHealth, Pag-IBIG, WTAX, Net Pay for old vs promoted target] -->
-                                    <div class="mt-3" id="wrapperPromotionTable" style="width: 100%; overflow-x: hidden;" data-desc="Table breakdown wrapper for promotion details.">
-                                        <table class="table table-sm table-dark bank-table mb-0" id="tablePromotionBreakdown" style="font-size: 0.54rem; text-align: right; border: 1px solid rgba(255,255,255,0.06); width: 100%; table-layout: auto;">
-                                            <thead>
-                                                <tr style="color: rgba(255,255,255,0.45); font-weight: 600; text-transform: uppercase; font-size: 0.50rem; border-bottom: 2px solid rgba(255,255,255,0.1);">
-                                                    <!-- th-promo-year: Table header displaying target year of promotion -->
-                                                    <th id="th-promo-year" style="text-align: left; padding: 3px 2px;" title="Target Tranche Year (2026 for Promotion)">YEAR</th>
-                                                    <!-- th-promo-basic: Table header displaying promoted basic salary -->
-                                                    <th id="th-promo-basic" style="padding: 3px 2px;" title="Basic Salary from Tranche CSV based on Promotional Salary Grade and Step">BASIC</th>
-                                                    <!-- th-promo-pera: Table header displaying PERA allowance -->
-                                                    <th id="th-promo-pera" class="col-breakdown" style="padding: 3px 2px;" title="Personal Economic Relief Allowance (Constant ₱2,000.00)">PERA</th>
-                                                    <!-- th-promo-gsis: Table header displaying GSIS premium deduction -->
-                                                    <th id="th-promo-gsis" class="col-breakdown" style="padding: 3px 2px;" title="GSIS Premium Deduction = Basic Pay × 9%">GSIS</th>
-                                                    <!-- th-promo-philhealth: Table header displaying PhilHealth premium deduction -->
-                                                    <th id="th-promo-philhealth" class="col-breakdown" style="padding: 3px 2px;" title="PhilHealth Premium Deduction = Basic Pay × 2.5%">PHILHEALTH</th>
-                                                    <!-- th-promo-pagibig: Table header displaying Pag-IBIG premium contribution -->
-                                                    <th id="th-promo-pagibig" class="col-breakdown" style="padding: 3px 2px;" title="Pag-IBIG Contribution = Constant ₱200.00">PAG-IBIG</th>
-                                                    <!-- th-promo-wtax: Table header displaying Withholding Tax calculation based on TRAIN Law -->
-                                                    <th id="th-promo-wtax" class="col-breakdown" style="padding: 3px 2px;" title="Withholding Tax = (Annual Taxable Income - Bracket Threshold) × Rate / 12. Annual Taxable Income = (Basic Pay × 12 + Annual Taxable Bonus) - (GSIS + PH + Pag-IBIG) × 12 (Note: No 90,000 exemption is subtracted from bonus for Promotion WTAX)">WTAX</th>
-                                                    <!-- th-promo-netpay: Table header displaying Net Take Home Pay calculation -->
-                                                    <th id="th-promo-netpay" style="padding: 3px 2px;" title="Net Pay = Basic Pay + PERA - GSIS - PhilHealth - Pag-IBIG - Withholding Tax">NET PAY</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="bodyPromotionBreakdown" class="tabular-nums">
-                                                <!-- Populated dynamically by runCalculations() -->
-                                            </tbody>
-                                        </table>
+                                        <!-- Label above dropdowns, New Salary readout BELOW dropdowns so nothing overlaps -->
+                                        <div class="mb-3" id="promotion-controls-wrapper">
+                                            <div class="comp-field-label mb-2">COMPARE PROMOTION</div>
+                                            <div class="d-flex" style="gap: 8px;">
+                                                <select id="promoGrade" class="form-control bank-select select-sm tabular-nums" style="flex: 1; min-width: 0;" onchange="runCalculations()">
+                                                </select>
+                                                <select id="promoStep" class="form-control bank-select select-sm tabular-nums" style="flex: 1; min-width: 0;" onchange="runCalculations()">
+                                                </select>
+                                            </div>
+                                            <!-- New Salary display below dropdowns — no horizontal clash -->
+                                            <div id="lbl-promoted-salary" class="tabular-nums mt-2">
+                                                New Salary: ₱0.00
+                                            </div>
+                                        </div>
+
+                                        <!-- Table breakdown wrapper for promotion details -->
+                                        <div class="mt-3 table-responsive" id="wrapperPromotionTable" style="width: 100%; overflow-x: auto !important;" data-desc="Table breakdown wrapper for promotion details.">
+                                            <table class="table table-sm table-dark bank-table mb-0" id="tablePromotionBreakdown" style="text-align: right; border: 1px solid rgba(255,255,255,0.06); width: 100%; table-layout: auto;">
+                                                <thead>
+                                                    <tr style="color: rgba(255,255,255,0.45); font-weight: 600; text-transform: uppercase; font-size: 0.50rem; border-bottom: 2px solid rgba(255,255,255,0.1);">
+                                                        <th id="th-promo-year" style="text-align: left; padding: 3px 2px;" title="Target Tranche Year (2026 for Promotion)">YEAR</th>
+                                                        <th id="th-promo-basic" style="padding: 3px 2px;" title="Basic Salary from Tranche CSV based on Promotional Salary Grade and Step">BASIC</th>
+                                                        <th id="th-promo-pera" class="col-breakdown" style="padding: 3px 2px;" title="Personal Economic Relief Allowance (Constant ₱2,000.00)">PERA</th>
+                                                        <th id="th-promo-gsis" class="col-breakdown" style="padding: 3px 2px;" title="GSIS Premium Deduction = Basic Pay × 9%">GSIS</th>
+                                                        <th id="th-promo-philhealth" class="col-breakdown" style="padding: 3px 2px;" title="PhilHealth Premium Deduction = Basic Pay × 2.5%">PHILHEALTH</th>
+                                                        <th id="th-promo-pagibig" class="col-breakdown" style="padding: 3px 2px;" title="Pag-IBIG Contribution = Constant ₱200.00">PAG-IBIG</th>
+                                                        <th id="th-promo-wtax" class="col-breakdown" style="padding: 3px 2px;" title="Withholding Tax = (Annual Taxable Income - Bracket Threshold) × Rate / 12. Annual Taxable Income = (Basic Pay × 12 + Annual Taxable Bonus) - (GSIS + PH + Pag-IBIG) × 12 (Note: No 90,000 exemption is subtracted from bonus for Promotion WTAX)">WTAX</th>
+                                                        <th id="th-promo-netpay" style="padding: 3px 2px;" title="Net Pay = Basic Pay + PERA - GSIS - PhilHealth - Pag-IBIG - Withholding Tax">NET PAY</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="bodyPromotionBreakdown" class="tabular-nums">
+                                                    <!-- Populated dynamically by runCalculations() -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        
+                                        <div id="promotion-value-wrapper" class="mt-3">
+                                            <div class="comp-field-label mb-1">PROMOTION</div>
+                                            <div id="val-promomargin" class="bank-value-display">₱0.00</div>
+                                        </div>
                                     </div>
-                                    
-                                    <div id="promotion-value-wrapper" class="mt-3">
-                                        <div class="comp-field-label mb-1">PROMOTION</div>
-                                        <div id="val-promomargin" class="bank-value-display">₱0.00</div>
+                                </div>
+                            </div>
+                                      <!-- Card: Subtotals (below the 3 cards) -->
+                            <div class="bank-card private-liabilities-card mt-3" id="card-pli-subtotals" data-label="Subtotals Card">
+                                <!-- [2026-07-11 Note: PAP label updates dynamically based on which toggles are active] -->
+                                <div class="baseline-row mt-0" id="panel-papsubtotal">
+                                    <div class="orange-node font-weight-bold" id="node-papsubtotal">
+                                        <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16v1a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v1"/><path d="M18 8h4a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-4"/><circle cx="8" cy="12" r="2"/></svg>
+                                        <span id="lbl-papsubtotal-title">PLI + ANTICIPATED + PROMOTION SUBTOTAL</span>
+                                        <span class="math-popover">
+                                            <strong>Sum of active PLI deductions + toggled components (Anticipated / Promotion Margin)</strong>
+                                        </span>
+                                    </div>
+                                    <div id="val-papsubtotal" class="bank-value-display">₱0.00</div>
+                                </div>
+
+                                <!-- [2026-07-11 Fix: PLI Subtotal row — section-panel-inner + mt-3 layout] -->
+                                <div class="mt-3" id="panel-pli-totals" style="border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 14px;">
+                                    <div class="row">
+                                        <!-- PLI Subtotal Column -->
+                                        <div class="col-12 col-sm-6 pli-subtotal-col" id="colPLISubtotal" data-desc="Column displaying the computed PLI subtotal value.">
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <div class="orange-node font-weight-bold mb-0" id="node-plisubtotal" style="margin-bottom: 0 !important;">
+                                                    <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
+                                                    PLI SUBTOTAL
+                                                    <span class="math-popover">
+                                                        Sum of selected PLI deductions.
+                                                    </span>
+                                                </div>
+                                                <div id="val-plisubtotal" class="bank-value-display">₱0.00</div>
+                                            </div>
+                                        </div>
+                                        <!-- NetPay + PLI Total Column -->
+                                        <div class="col-12 col-sm-6 netpay-pli-col" id="colNetPayPLITotal" data-desc="Column displaying combined NetPay and PLI subtotal.">
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <div class="orange-node font-weight-bold mb-0" id="node-netpayplitotal" style="margin-bottom: 0 !important;">
+                                                    <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                                    NETPAY + PLI TOTAL
+                                                    <span class="math-popover">
+                                                        <strong>NetPay + PLI Total Margin</strong>
+                                                    </span>
+                                                </div>
+                                                <div id="val-netpayplitotal" class="bank-value-display">₱0.00</div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- [2026-07-11 Fix: PAP Subtotal uses section-panel-inner + mt-3 spacing] -->
-                        <!-- [2026-07-11 Note: PAP label updates dynamically based on which toggles are active] -->
-                        <div class="section-panel-inner mt-3" id="panel-papsubtotal">
-                            <div class="baseline-row">
-                                <div class="orange-node font-weight-bold" id="node-papsubtotal">
-                                    <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16v1a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v1"/><path d="M18 8h4a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-4"/><circle cx="8" cy="12" r="2"/></svg>
-                                    <span id="lbl-papsubtotal-title">PLI + ANTICIPATED + PROMOTION SUBTOTAL</span>
-                                    <span class="math-popover">
-                                        <strong>Sum of active PLI deductions + toggled components (Anticipated / Promotion Margin)</strong>
-                                    </span>
-                                </div>
-                                <div id="val-papsubtotal" class="bank-value-display">₱0.00</div>
-                            </div>
-                        </div>
-
-                        <!-- [2026-07-11 Fix: PLI Subtotal row — section-panel-inner + mt-3 layout] -->
-                        <div class="section-panel-inner mt-3" id="panel-pli-totals">
-                            <div class="row">
-                                <!-- PLI Subtotal Column (Polished: Added class name .pli-subtotal-col, ID and data-desc, with uniform 24px right padding and border separator) -->
-                                <div class="col-6 pli-subtotal-col" id="colPLISubtotal" style="padding-right: 24px; border-right: 1px solid rgba(255,255,255,0.08);" data-desc="Column displaying the computed PLI subtotal value.">
-                                    <div class="pli-total-col">
-                                        <div class="orange-node font-weight-bold" id="node-plisubtotal">
-                                            <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
-                                            PLI SUBTOTAL
-                                            <span class="math-popover">
-                                                Sum of selected PLI deductions.
-                                            </span>
-                                        </div>
-                                        <div id="val-plisubtotal" class="bank-value-display mt-2">₱0.00</div>
-                                    </div>
-                                </div>
-                                <!-- NetPay + PLI Total Column (Polished: Added class name .netpay-pli-col and data-desc, styled using CSS class with uniform 24px left padding) -->
-                                <div class="col-6 netpay-pli-col" id="colNetPayPLITotal" style="padding-left: 24px;" data-desc="Column displaying combined NetPay and PLI subtotal.">
-                                    <div class="pli-total-col">
-                                        <div class="orange-node font-weight-bold" id="node-netpayplitotal">
-                                            <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                                            NETPAY + PLI TOTAL
-                                            <span class="math-popover">
-                                                <strong>NetPay + PLI Total Margin</strong>
-                                            </span>
-                                        </div>
-                                        <div id="val-netpayplitotal" class="bank-value-display mt-2">₱0.00</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- [2026-07-11 Fix: Close pliCardCollapseBody wrapper] -->
-                        </div>
-                    </div>
-
-                </div>
 
                 <!-- Right Column (Compensation, Final Underwriting) -->
                 <div class="col-lg-6 col-md-12">
@@ -2779,6 +2946,13 @@
                 </button>
                 <button class="btn btn-secondary bank-btn-secondary font-weight-bold" onclick="clearInputsAndReload()">
                     <i class="bi bi-arrow-counterclockwise"></i> RESET
+                </button>
+            </div>
+
+            <!-- [2026-07-13 New: Clear Local Storage Cache and Reload Button with high-contrast warning design] -->
+            <div class="d-flex justify-content-center" style="margin-top: 60px; margin-bottom: 24px;">
+                <button type="button" class="btn btn-outline-danger font-weight-bold" id="btn-clear-cache" onclick="clearLocalStorageAndReload();" style="border-color: rgba(239, 68, 68, 0.4); color: #EF4444; background: rgba(239, 68, 68, 0.05); padding: 10px 20px; border-radius: var(--radius-sm); font-size: 0.8rem; letter-spacing: 0.06em; transition: all 0.25s ease;" onmouseover="this.style.background='rgba(239, 68, 68, 0.15)'; this.style.borderColor='#EF4444';" onmouseout="this.style.background='rgba(239, 68, 68, 0.05)'; this.style.borderColor='rgba(239, 68, 68, 0.4)';">
+                    <i class="bi bi-trash-fill mr-2"></i>CLEAR LOCAL STORAGE CACHE &amp; RELOAD
                 </button>
             </div>
 
@@ -3357,9 +3531,10 @@
                 const headingId = `pliHeading${i}`;
 
                 let tableHTML = '';
+                /* [2026-07-13 Fix: Removed inline style="font-size: 11px;" to use centralized CSS class typography rules] */
                 if (pliRows.length === 0) {
                     tableHTML = `
-                        <table class="bank-table text-white" style="font-size: 11px;">
+                        <table class="bank-table text-white">
                             <tbody>
                                 <tr>
                                     <td colspan="6" class="text-center text-muted">No active records found for PLI slot.</td>
@@ -3369,7 +3544,7 @@
                     `;
                 } else {
                     tableHTML = `
-                        <table class="bank-table text-white" style="font-size: 11px;">
+                        <table class="bank-table text-white">
                             <thead>
                                 <tr>
                                     <th>Select</th>
@@ -3479,9 +3654,11 @@
                 return;
             }
 
+            /* [2026-07-13 Fix: Added missing <tr> tag inside <thead> and removed inline font-size to use global CSS table styles] */
             let html = `
-                <table class="bank-table text-white" style="font-size: 11px;">
+                <table class="bank-table text-white">
                     <thead>
+                        <tr>
                             <th style="width: 32px; text-align: center; vertical-align: middle;"><input type="checkbox" id="onq-select-all" checked onchange="toggleAllOnqDeductions(this)"></th>
                             <th>PLI Code</th>
                             <th>EFF</th>
@@ -3828,8 +4005,8 @@
 
             // [2026-07-11 New: Read toggle states — only include in total if enabled]
             const useMasterPli   = document.getElementById('toggleMasterPli')   ? document.getElementById('toggleMasterPli').checked   : true;
-            const useAnticipated = useMasterPli && (document.getElementById('toggleAnticipated') ? document.getElementById('toggleAnticipated').checked : false);
-            const usePromotion   = useMasterPli && (document.getElementById('togglePromotion')   ? document.getElementById('togglePromotion').checked   : false);
+            const useAnticipated = document.getElementById('toggleAnticipated') ? document.getElementById('toggleAnticipated').checked : false;
+            const usePromotion   = document.getElementById('togglePromotion')   ? document.getElementById('togglePromotion').checked   : false;
 
             // Compute active components under master PLI toggle
             const activePliSubtotal = useMasterPli ? pliSubtotal : 0;
@@ -3842,7 +4019,7 @@
             const colAnticipated = document.getElementById('colAnticipatedCompensation');
             const colPromotion = document.getElementById('colPromotionCompensation');
             
-            const showAnticipated = useMasterPli && useAnticipated;
+            const showAnticipated = useAnticipated;
             if (colAnticipated) {
                 const childDivs = Array.from(colAnticipated.children).filter(el => !el.classList.contains('toggle-switch-wrapper'));
                 childDivs.forEach(el => {
@@ -3850,11 +4027,9 @@
                     el.style.filter = showAnticipated ? 'none' : 'grayscale(100%)';
                     el.style.transition = 'opacity 0.25s ease, filter 0.25s ease';
                 });
-                const antCb = document.getElementById('toggleAnticipated');
-                if (antCb) antCb.disabled = !useMasterPli;
             }
             
-            const showPromotion = useMasterPli && usePromotion;
+            const showPromotion = usePromotion;
             if (colPromotion) {
                 const childDivs = Array.from(colPromotion.children).filter(el => !el.classList.contains('toggle-switch-wrapper'));
                 childDivs.forEach(el => {
@@ -3867,9 +4042,6 @@
                 const stepSelect = document.getElementById('promoStep');
                 if (gradeSelect) gradeSelect.disabled = !showPromotion;
                 if (stepSelect) stepSelect.disabled = !showPromotion;
-
-                const proCb = document.getElementById('togglePromotion');
-                if (proCb) proCb.disabled = !useMasterPli;
             }
 
             // [2026-07-11 Fix: Dim entire PLI section panels and disable child interactives if master toggle is off]
@@ -3898,19 +4070,29 @@
             }
 
             // Compute PAP subtotal based on active toggles
-            const activeAnticipated = useMasterPli && useAnticipated ? anticipatedVal    : 0;
-            const activePromotion   = useMasterPli && usePromotion   ? promotionMargin   : 0;
+            const activeAnticipated = useAnticipated ? anticipatedVal    : 0;
+            const activePromotion   = usePromotion   ? promotionMargin   : 0;
             const papSubtotal = activePliSubtotal + activeAnticipated + activePromotion;
             document.getElementById('val-papsubtotal').innerHTML = formatPHP(papSubtotal);
+
+            // Dynamically show/hide PAP combined subtotal row based on toggles activity
+            const papRowEl = document.getElementById('panel-papsubtotal');
+            if (papRowEl) {
+                if (useAnticipated || usePromotion) {
+                    papRowEl.style.display = 'flex';
+                } else {
+                    papRowEl.style.display = 'none';
+                }
+            }
 
             // [2026-07-11 New: Update PAP subtotal label dynamically based on toggle state]
             const titleParts = [];
             if (useMasterPli) titleParts.push('PLI');
-            if (useMasterPli && useAnticipated) titleParts.push('ANTICIPATED');
-            if (useMasterPli && usePromotion)   titleParts.push('PROMOTION');
+            if (useAnticipated) titleParts.push('ANTICIPATED');
+            if (usePromotion)   titleParts.push('PROMOTION');
             const papTitleEl = document.getElementById('lbl-papsubtotal-title');
             if (papTitleEl) {
-                papTitleEl.textContent = titleParts.length > 0 ? (titleParts.join(' + ') + ' SUBTOTAL') : 'NO PLI/COMPENSATION SUBTOTAL';
+                papTitleEl.textContent = titleParts.length > 0 ? (titleParts.join(' + ') + ' COMBINED SUBTOTAL') : 'NO PLI/COMPENSATION SUBTOTAL';
             }
 
             // [2026-07-11 New: Dynamic receipt lines for each selected active PLI in NETPAY COMPUTATION]
@@ -4078,7 +4260,7 @@
             // Compute Total Interest Paid over the loan term
             const totalRepayment = amortization * loanTerm;
             const totalInterest = Math.max(0, totalRepayment - loanAmount);
-            document.getElementById('lbl-total-interest').innerHTML = `<i class="bi bi-percent text-warning mr-1"></i>Est. Interest: <strong class="text-white-50">${formatPHP(totalInterest)}</strong>`;
+            document.getElementById('lbl-total-interest').innerHTML = `<i class="bi bi-calculator text-warning mr-1"></i>Est. Interest: <strong class="text-white-50">${formatPHP(totalInterest)}</strong>`;
 
             // Determine final New NetPay
             // [2026-07-11 Fix: newNetPay is calculated from revisedBaseline (which is Subtotal - LESS ONQUEUE - LESS INCOMING) minus amortization]
@@ -4176,14 +4358,7 @@
                             maintainAspectRatio: false,
                             plugins: {
                                 legend: {
-                                    display: true,
-                                    position: 'right',
-                                    labels: {
-                                        color: 'rgba(255, 255, 255, 0.75)',
-                                        font: { family: 'Inter', size: 9, weight: '600' },
-                                        boxWidth: 8,
-                                        padding: 5
-                                    }
+                                    display: false,
                                 },
                                 tooltip: {
                                     callbacks: {
@@ -4221,23 +4396,30 @@
             if (barNewNetPay && barCsbAmort && barPliDeductions && barOnqueue) {
                 const totalBaseVal = baselineSubVal || 1; // prevent divide by zero
                 
-                // Calculate percentages (clamp to minimum 0)
+                // Calculate percentages relative to baseline for legends
                 const pctNetPay = Math.max(0, (newNetPay / totalBaseVal) * 100);
                 const pctCsb = Math.max(0, (amortization / totalBaseVal) * 100);
                 const pctPli = Math.max(0, (papSubtotal / totalBaseVal) * 100);
                 const pctOnq = Math.max(0, (activeOnqSum / totalBaseVal) * 100);
 
-                // Set widths
-                barNewNetPay.style.width = `${pctNetPay}%`;
-                barCsbAmort.style.width = `${pctCsb}%`;
-                barPliDeductions.style.width = `${pctPli}%`;
-                barOnqueue.style.width = `${pctOnq}%`;
+                // Compute sum of active parts to scale segments to exactly 100% container width
+                const sumOfParts = Math.max(0, newNetPay) + Math.max(0, amortization) + Math.max(0, papSubtotal) + Math.max(0, activeOnqSum) || 1;
+                const widthNetPay = (Math.max(0, newNetPay) / sumOfParts) * 100;
+                const widthCsb = (Math.max(0, amortization) / sumOfParts) * 100;
+                const widthPli = (Math.max(0, papSubtotal) / sumOfParts) * 100;
+                const widthOnq = (Math.max(0, activeOnqSum) / sumOfParts) * 100;
 
-                // Set labels inside progress bars if width is visible
-                barNewNetPay.textContent = pctNetPay > 10 ? `${pctNetPay.toFixed(0)}%` : '';
-                barCsbAmort.textContent = pctCsb > 10 ? `${pctCsb.toFixed(0)}%` : '';
-                barPliDeductions.textContent = pctPli > 10 ? `${pctPli.toFixed(0)}%` : '';
-                barOnqueue.textContent = pctOnq > 10 ? `${pctOnq.toFixed(0)}%` : '';
+                // Set widths
+                barNewNetPay.style.width = `${widthNetPay}%`;
+                barCsbAmort.style.width = `${widthCsb}%`;
+                barPliDeductions.style.width = `${widthPli}%`;
+                barOnqueue.style.width = `${widthOnq}%`;
+
+                // Omit inner text labels to avoid visual overlaps on narrow containers
+                barNewNetPay.textContent = '';
+                barCsbAmort.textContent = '';
+                barPliDeductions.textContent = '';
+                barOnqueue.textContent = '';
 
                 // Set detail legend labels text
                 if (lblBarNetPay) lblBarNetPay.textContent = `${pctNetPay.toFixed(1)}%`;
@@ -4256,6 +4438,25 @@
             const labelEl = document.getElementById('lblToggleAnticipatedText');
             if (labelEl) {
                 labelEl.classList.toggle('is-active', isOn);
+                labelEl.textContent = isOn ? 'INCLUDED' : 'EXCLUDED';
+            }
+
+            const cardEl = document.getElementById('card-anticipated');
+            if (cardEl) {
+                if (isOn) {
+                    cardEl.classList.remove('collapsed-state');
+                } else {
+                    cardEl.classList.add('collapsed-state');
+                }
+            }
+
+            const collapseBody = document.getElementById('anticipatedCardCollapseBody');
+            if (collapseBody) {
+                if (isOn) {
+                    collapseBody.classList.add('show');
+                } else {
+                    collapseBody.classList.remove('show');
+                }
             }
         }
 
@@ -4265,6 +4466,25 @@
             const labelEl = document.getElementById('lblTogglePromotionText');
             if (labelEl) {
                 labelEl.classList.toggle('is-active', isOn);
+                labelEl.textContent = isOn ? 'INCLUDED' : 'EXCLUDED';
+            }
+
+            const cardEl = document.getElementById('card-promotion');
+            if (cardEl) {
+                if (isOn) {
+                    cardEl.classList.remove('collapsed-state');
+                } else {
+                    cardEl.classList.add('collapsed-state');
+                }
+            }
+
+            const collapseBody = document.getElementById('promotionCardCollapseBody');
+            if (collapseBody) {
+                if (isOn) {
+                    collapseBody.classList.add('show');
+                } else {
+                    collapseBody.classList.remove('show');
+                }
             }
         }
 
@@ -4799,6 +5019,13 @@
                 document.getElementById('activeMonthSelect').value = 'jun26';
                 document.getElementById('evaluationWorkspace').classList.add('d-none');
                 document.getElementById('empSummaryCard').classList.add('d-none');
+            }
+        }
+
+        async function clearLocalStorageAndReload() {
+            if (await showCustomConfirm("Are you sure you want to clear all local storage cache and reload the application? This will reset all session data.")) {
+                localStorage.clear();
+                window.location.reload();
             }
         }
     </script>
