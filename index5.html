@@ -465,6 +465,29 @@
             padding-left: 32px !important;
         }
 
+        /* 2026-07-13: Add button input action style inside wrappers (was: no action buttons inside inputs) */
+        .btn-input-action {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            z-index: 10;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+        .btn-input-action:hover {
+            color: #F59E0B !important;
+            transform: translateY(-50%) scale(1.1);
+        }
+
         /* ============ DATA TABLES [2026-07-11 Fix: Near-transparent table headers, stronger blur glass rows] ============ */
         .bank-table {
             width: 100%;
@@ -940,12 +963,12 @@
         }
         #tableAnticipatedBreakdown.hide-breakdown th, #tablePromotionBreakdown.hide-breakdown th {
             font-size: 0.6rem !important;
-            padding: 4px 0 !important;
+            padding: 4px 12px !important;
             letter-spacing: 0.02em;
         }
         #tableAnticipatedBreakdown.hide-breakdown td, #tablePromotionBreakdown.hide-breakdown td {
             font-size: 0.72rem !important;
-            padding: 4px 0 !important;
+            padding: 4px 12px !important;
         }
         @media (min-width: 768px) {
             body #tableAnticipatedBreakdown.hide-breakdown, body #tablePromotionBreakdown.hide-breakdown {
@@ -956,56 +979,58 @@
 
             #tableAnticipatedBreakdown.hide-breakdown th, #tablePromotionBreakdown.hide-breakdown th {
                 font-size: 0.68rem !important;
-                padding: 6px 0 !important;
+                padding: 6px 12px !important;
             }
             #tableAnticipatedBreakdown.hide-breakdown td, #tablePromotionBreakdown.hide-breakdown td {
                 font-size: 0.8rem !important;
-                padding: 6px 0 !important;
+                padding: 6px 12px !important;
             }
         }
         body #tableAnticipatedBreakdown th, body #tableAnticipatedBreakdown td,
         body #tablePromotionBreakdown th, body #tablePromotionBreakdown td {
-            padding: 6px 0 !important;
+            padding: 6px 12px !important;
         }
         body #tableAnticipatedBreakdown th:first-child, body #tableAnticipatedBreakdown td:first-child,
         body #tablePromotionBreakdown th:first-child, body #tablePromotionBreakdown td:first-child {
-            padding-left: 8px !important;
+            padding-left: 12px !important;
         }
         body #tableAnticipatedBreakdown th:last-child, body #tableAnticipatedBreakdown td:last-child,
         body #tablePromotionBreakdown th:last-child, body #tablePromotionBreakdown td:last-child {
-            padding-right: 8px !important;
+            padding-right: 12px !important;
         }
         body #tableAnticipatedBreakdown.hide-breakdown th, body #tableAnticipatedBreakdown.hide-breakdown td,
         body #tablePromotionBreakdown.hide-breakdown th, body #tablePromotionBreakdown.hide-breakdown td {
-            padding: 6px 0 !important;
+            padding: 6px 12px !important;
         }
         body #tableAnticipatedBreakdown.hide-breakdown th:first-child, body #tableAnticipatedBreakdown.hide-breakdown td:first-child,
         body #tablePromotionBreakdown.hide-breakdown th:first-child, body #tablePromotionBreakdown.hide-breakdown td:first-child {
-            padding-left: 8px !important;
+            padding-left: 12px !important;
         }
         body #tableAnticipatedBreakdown.hide-breakdown th:last-child, body #tableAnticipatedBreakdown.hide-breakdown td:last-child,
         body #tablePromotionBreakdown.hide-breakdown th:last-child, body #tablePromotionBreakdown.hide-breakdown td:last-child {
-            padding-right: 8px !important;
+            padding-right: 12px !important;
         }
-        /* [2026-07-14 Fix: Set vertical padding to 4px with zero horizontal padding on mobile, adding side padding to outer columns] */
+        /* [2026-07-14 Fix: Set vertical padding to 4px with 8px horizontal padding on mobile, adding side padding to outer columns] */
         @media (max-width: 767px) {
             body #tableAnticipatedBreakdown th, body #tableAnticipatedBreakdown td,
             body #tablePromotionBreakdown th, body #tablePromotionBreakdown td {
-                padding: 4px 0 !important;
+                padding: 4px 8px !important;
             }
             body #tableAnticipatedBreakdown th:first-child, body #tableAnticipatedBreakdown td:first-child,
             body #tablePromotionBreakdown th:first-child, body #tablePromotionBreakdown td:first-child {
-                padding-left: 6px !important;
+                padding-left: 8px !important;
             }
             body #tableAnticipatedBreakdown th:last-child, body #tableAnticipatedBreakdown td:last-child,
             body #tablePromotionBreakdown th:last-child, body #tablePromotionBreakdown td:last-child {
-                padding-right: 6px !important;
+                padding-right: 8px !important;
             }
         }
 
         /* [2026-07-14 New: Align value wrappers to the right] */
+        /* 2026-07-13: Add cursor pointer to value wrappers (was: text-align right only) */
         #pli-value-wrapper, #anticipated-value-wrapper, #promotion-value-wrapper {
             text-align: right;
+            cursor: pointer;
         }
 
         #pliCardCollapseBody, #anticipatedCardCollapseBody, #promotionCardCollapseBody {
@@ -1131,12 +1156,14 @@
             flex: 1 1 0;
         }
 
-        #panel-baseline-inner .baseline-row {
+        #panel-baseline-inner .baseline-row,
+        #panel-netproc-inner .baseline-row {
             font-size: 0.76rem !important;
             padding: 4px 8px !important;
         }
 
-        #panel-baseline-inner .netpay-label {
+        #panel-baseline-inner .netpay-label,
+        #panel-netproc-inner .netpay-label {
             color: rgba(255, 255, 255, 0.72) !important;
             font-size: 0.76rem !important;
             font-weight: 600 !important;
@@ -1144,7 +1171,8 @@
             align-items: center;
         }
 
-        #panel-baseline-inner .netpay-label-bold {
+        #panel-baseline-inner .netpay-label-bold,
+        #panel-netproc-inner .netpay-label-bold {
             color: rgba(255, 255, 255, 0.88) !important;
             font-size: 0.76rem !important;
             font-weight: 700 !important;
@@ -1158,9 +1186,15 @@
         #lbl-netpay,
         #lbl-dedamt,
         #val-baseline-papsubtotal,
+        #val-anticipated-receipt,
+        #val-promotion-receipt,
         #val-less-onqueue,
         #val-less-incoming,
-        #val-new-csb-amortization {
+        #val-new-csb-amortization,
+        #val-netproc-loan-proceeds,
+        #val-netproc-redemption,
+        #val-netproc-advance-payment,
+        #lbl-netproc-old-dedamt {
             font-size: 0.8rem !important;
             font-weight: 700 !important;
             color: #FFFFFF !important;
@@ -1172,7 +1206,8 @@
            Styled with amber gradient colors and medium-large size. */
         #val-baseline, 
         #val-subtotal-after-redemption, 
-        #val-revised-baseline {
+        #val-revised-baseline,
+        #val-netproc-total {
             font-size: 0.95rem !important;
             font-weight: 800 !important;
             font-family: 'Montserrat', sans-serif !important;
@@ -1180,6 +1215,33 @@
             -webkit-background-clip: text !important;
             -webkit-text-fill-color: transparent !important;
             letter-spacing: -0.02em !important;
+        }
+        /* 2026-07-13: Make val-netproc-total clickable with copy hover effect (was: default cursor/hover) */
+        #val-netproc-total {
+            cursor: pointer !important;
+            transition: filter 0.2s ease !important;
+        }
+        #val-netproc-total:hover {
+            filter: brightness(1.2) drop-shadow(0 0 4px rgba(245, 158, 11, 0.4)) !important;
+        }
+
+        /* Compact inputs and dropdowns inside baseline receipt/computation rows */
+        .baseline-row input[type="number"],
+        .baseline-row select,
+        .baseline-row .bank-input,
+        .baseline-row .bank-select {
+            min-height: 26px !important;
+            height: 26px !important;
+            padding: 2px 8px !important;
+            font-size: 0.8rem !important;
+            line-height: 1.2 !important;
+            border-radius: 4px !important;
+        }
+
+        /* Adjust chevron positioning and padding on compact selects */
+        .baseline-row select.bank-select {
+            background-position: right 6px center !important;
+            padding-right: 20px !important;
         }
 
         /* [2026-07-11 Fix: PAP subtotal panel spacing improved] */
@@ -1355,78 +1417,6 @@
             line-height: 1.2;
             margin-bottom: 2px;
         }
-        /* [2026-07-14 New: DEPED/AUTONOMOUS mode select pill in empSummaryCard] */
-        .mode-select-pill {
-            appearance: none;
-            -webkit-appearance: none;
-            background: rgba(14, 18, 36, 0.85);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            border-radius: 20px;
-            color: var(--accent);
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.65rem;
-            font-weight: 700;
-            letter-spacing: 0.07em;
-            padding: 4px 24px 4px 10px;
-            cursor: pointer;
-            outline: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23F59E0B'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 8px center;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        .mode-select-pill:hover, .mode-select-pill:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.15);
-        }
-        .mode-select-pill option {
-            background: #0e1224;
-            color: #fff;
-        }
-        /* [2026-07-14 New: Autonomous mode input fields replacing static span values in NETPAY COMPUTATION] */
-        .netpay-auto-input {
-            display: none;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 6px;
-            color: #fff;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.78rem;
-            font-weight: 700;
-            text-align: right;
-            padding: 3px 8px;
-            width: 130px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        .netpay-auto-input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 2px rgba(245,158,11,0.12);
-        }
-        /* When panel is in autonomous mode: show inputs, hide static spans */
-        #panel-baseline-inner.auto-mode .netpay-auto-hide { display: none !important; }
-        #panel-baseline-inner.auto-mode .netpay-auto-input { display: inline-block !important; }
-        /* Autonomous mode: hide OnQueue and CSB accordion rows entirely */
-        #panel-baseline-inner.auto-mode #row-less-onqueue { display: none !important; }
-        #panel-baseline-inner.auto-mode #dynamic-csb-deductions-container { display: none !important; }
-        /* Autonomous mode: show manual CSB input row instead */
-        #panel-baseline-inner.auto-mode #row-auto-csb { display: flex !important; }
-        /* Autonomous mode label badge */
-        .auto-mode-badge {
-            display: none;
-            font-size: 0.58rem;
-            font-weight: 700;
-            letter-spacing: 0.06em;
-            color: var(--accent);
-            background: rgba(245,158,11,0.1);
-            border: 1px solid rgba(245,158,11,0.2);
-            border-radius: 10px;
-            padding: 1px 7px;
-            margin-left: 6px;
-            vertical-align: middle;
-        }
-        #panel-baseline-inner.auto-mode .auto-mode-badge { display: inline; }
-
         #empSummaryName, #empSummaryID, #empSummaryDiv {
             font-size: 0.85rem;
             letter-spacing: 0.02em;
@@ -1617,11 +1607,13 @@
         }
 
         /* [2026-07-11 Fix: Stronger pure emerald — #059669 base, richer green, NOT teal. Montserrat] */
+        /* 2026-07-13: Add cursor pointer to netpayplitotal and newnetpay (was: default cursor) */
         #val-netpayplitotal, #val-newnetpay {
             background: linear-gradient(135deg, #047857 0%, #059669 30%, #10B981 70%, #34D399 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             white-space: nowrap !important;
+            cursor: pointer;
         }
 
         /* [2026-07-11 Fix: NetPay+PLI total, Montserrat, thicker weight 900] */
@@ -1633,12 +1625,14 @@
         }
 
         /* [2026-07-11 Fix: New NetPay — hero value; Montserrat, weight 900] */
+        /* 2026-07-13: Add cursor pointer to new netpay value (was: no cursor pointer) */
         #val-newnetpay {
             font-size: 1.7rem !important;
             font-weight: 900 !important;
             font-family: 'Montserrat', sans-serif !important;
             letter-spacing: -0.05em !important;
             transition: filter 0.3s ease;
+            cursor: pointer;
         }
 
         /* Glow activates only when parent card is hovered and depending on status class */
@@ -1904,19 +1898,32 @@
         }
 
         /* [2026-07-11 Fix: Employee summary card — liquid glass] */
+        /* 2026-07-13: Enhance card padding and add desktop dividers (was: basic card layout, no column dividers) */
         .employee-summary-card {
-            /* [2026-07-13 Fix: Increased background opacity to 0.7 to preserve layout readability] */
             background:
                 linear-gradient(160deg, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0.08) 100%),
                 rgba(8, 12, 28, 0.7) !important;
-            /* [2026-07-13 Fix: Reduced glass blur from 28px saturate to a quick 8px normal glass blur to prevent mobile/desktop rendering lag] */
             backdrop-filter: blur(8px) !important;
             -webkit-backdrop-filter: blur(8px) !important;
             border: 1px solid rgba(255, 255, 255, 0.065) !important;
             border-top-color: rgba(255,255,255,0.14) !important;
             border-radius: var(--radius-md) !important;
-            padding: 14px 16px !important;
+            padding: 16px 20px !important;
             transition: all 0.3s ease;
+        }
+        @media (min-width: 768px) {
+            .employee-summary-card .row > div {
+                border-right: 1px solid rgba(255, 255, 255, 0.06);
+                padding-right: 20px;
+                padding-left: 20px;
+            }
+            .employee-summary-card .row > div:first-child {
+                padding-left: 0;
+            }
+            .employee-summary-card .row > div:last-child {
+                border-right: none;
+                padding-right: 0;
+            }
         }
 
         .pli-total-col {
@@ -2190,6 +2197,38 @@
             50% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.45); }
         }
 
+        /* 2026-07-14: Glow flash animation for val-netproc-total — text-only glow (was: box-shadow div glow) */
+        @keyframes netproc-copy-glow {
+            0%   { text-shadow: none; }
+            30%  { text-shadow: 0 0 8px rgba(245, 158, 11, 0.9), 0 0 20px rgba(245, 158, 11, 0.6), 0 0 40px rgba(245, 158, 11, 0.3); }
+            100% { text-shadow: none; }
+        }
+        #val-netproc-total {
+            cursor: pointer;
+            border-radius: 6px;
+        }
+        #val-netproc-total.copy-glow {
+            animation: netproc-copy-glow 0.7s ease-out forwards;
+        }
+        /* Tap-to-copy helper label beneath the value */
+        #lbl-netproc-tap-hint {
+            font-size: 0.55rem;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            /* 2026-07-14: Changed hint color from green to amber/yellow (was: rgba(16,185,129,0.5)) */
+            color: rgba(245, 158, 11, 0.55);
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            margin-top: 2px;
+            transition: opacity 0.2s ease;
+        }
+        #val-netproc-total.copy-glow + #lbl-netproc-tap-hint {
+            opacity: 0;
+        }
+
 
         /* ============================================================
            [2026-07-12 Uniform Dashboard Card Sizing Overhaul]
@@ -2259,35 +2298,7 @@
             margin-bottom: 0 !important;
         }
 
-        /* Incoming input field: matches value display sizing */
-        #incomingDeduction {
-            font-size: var(--font-size-hero) !important;
-            font-weight: 900 !important;
-            font-family: 'Montserrat', sans-serif !important;
-            letter-spacing: -0.045em !important;
-            color: #FFFFFF !important;
-            background: rgba(255, 255, 255, 0.025) !important;
-            border: 1px solid rgba(255, 255, 255, 0.08) !important;
-            border-radius: 6px !important;
-            height: 44px !important;
-            padding-left: 36px !important;
-            width: 100% !important;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        }
-
-        /* Currency prefix glyph sits properly beside larger input */
-        #box-incoming-deduction .currency-prefix {
-            font-size: 1.1rem !important;
-            top: 50% !important;
-            transform: translateY(-50%) !important;
-        }
-
-        /* Incoming currency wrapper: push to bottom of card like other values */
-        #box-incoming-deduction .currency-input-wrapper {
-            margin-top: auto !important;
-            margin-bottom: 0 !important;
-            width: 100% !important;
-        }
+        /* 2026-07-14: Removed per-card color overrides — all 4 summary cards now use uniform base inner-summary-card glass style (was: amber/blue/pink/green gradients per card) */
 
         /* Inner card value pushes to bottom */
         .inner-summary-card > .bank-value-display {
@@ -2296,14 +2307,30 @@
         }
 
         /* Status badge + threshold error: compact to prevent card overflow */
+        /* 2026-07-14: Status badge — accommodate vs cannot accommodate states (was: only CAN ACCOMMODATE style) */
         #underwriting-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            border-radius: 20px !important;
+            padding: 3px 10px !important;
+            font-size: 0.6rem !important;
+            font-weight: 800 !important;
+            letter-spacing: 0.07em !important;
+            text-transform: uppercase !important;
             margin-top: 6px !important;
-            font-size: 0.62rem !important;
-            padding: 2px 8px !important;
+            width: fit-content !important;
+            transition: all 0.25s ease;
         }
-        #lbl-threshold-error {
-            font-size: 0.72rem !important;
-            margin-top: 4px !important;
+        #underwriting-status-badge.badge-ok {
+            background: rgba(16, 185, 129, 0.1) !important;
+            border: 1.5px solid rgba(16, 185, 129, 0.3) !important;
+            color: #34D399 !important;
+        }
+        #underwriting-status-badge.badge-fail {
+            background: rgba(239, 68, 68, 0.1) !important;
+            border: 1.5px solid rgba(239, 68, 68, 0.3) !important;
+            color: #F87171 !important;
         }
 
         /* Progress bar legend cells: uniform height */
@@ -2421,6 +2448,43 @@
                 height: auto !important;
             }
 
+            /* 2026-07-13: Reduce font size and padding of the 4 summary cards for 2-column mobile view (was: standard font sizes and margins) */
+            #box-incoming-deduction,
+            #box-semitotal-summary,
+            #box-amortization-summary,
+            #box-new-netpay-summary {
+                padding: 10px 8px !important;
+                min-height: 90px !important;
+            }
+            #box-incoming-deduction .orange-node,
+            #box-semitotal-summary .orange-node,
+            #box-amortization-summary .orange-node,
+            #box-new-netpay-summary .orange-node {
+                font-size: 0.58rem !important;
+                letter-spacing: 0.03em !important;
+            }
+            #val-semitotal,
+            #val-amortization,
+            #val-newnetpay {
+                font-size: 1.15rem !important;
+                font-weight: 800 !important;
+                letter-spacing: -0.03em !important;
+            }
+            #incomingDeduction {
+                font-size: 1.15rem !important;
+                height: 36px !important;
+                padding-left: 28px !important;
+            }
+            #box-incoming-deduction .currency-prefix {
+                font-size: 0.95rem !important;
+                left: 10px !important;
+            }
+            #underwriting-status-badge {
+                font-size: 0.52rem !important;
+                padding: 2px 4px !important;
+                margin-top: 4px !important;
+            }
+
             /* Adjust visual margins on summary card grid items for vertical stacking flow */
             .semitotal-summary-wrapper,
             .incoming-adjustment-wrapper,
@@ -2429,12 +2493,19 @@
                 margin-bottom: 12px !important;
             }
 
-            /* Spacing inside the employee summary details card on mobile */
+            /* 2026-07-13: Style employee details with balanced vertical padding and dividers on mobile (was: unbalanced margin/padding stack) */
             .employee-summary-card .row > div {
-                margin-bottom: 8px;
+                padding: 10px 12px !important;
+                margin-bottom: 0 !important;
+                border-right: none !important;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+            }
+            .employee-summary-card .row > div:first-child {
+                padding-top: 0 !important;
             }
             .employee-summary-card .row > div:last-child {
-                margin-bottom: 0;
+                padding-bottom: 0 !important;
+                border-bottom: none !important;
             }
 
             /* Prevent iOS Safari from zooming in on input field focus by enforcing 16px minimum font size */
@@ -2735,10 +2806,12 @@
             </div>
 
             <!-- Employee Details Summary Display Card -->
+            <!-- [2026-07-14 Fix: Refactored employee summary card grid columns from 3 to 4, adding a Mode Selector dropdown on the right side; previous: 3 cols layout] -->
             <div id="empSummaryCard" class="mt-3 employee-summary-card" data-label="Employee Details Summary Card">
                 <div class="row align-items-center text-white-50">
                     <!-- Client Name -->
-                    <div class="col-md-4 mb-2 mb-md-0">
+                    <!-- 2026-07-13: Make employee columns 1 column stack on mobile (was: col-6 col-md-3) -->
+                    <div class="col-12 col-md-3 mb-2 mb-md-0">
                         <div class="d-flex align-items-center">
                             <div class="summary-icon-box mr-2">
                                 <i class="bi bi-person-fill text-warning"></i>
@@ -2750,7 +2823,8 @@
                         </div>
                     </div>
                     <!-- Employee ID -->
-                    <div class="col-md-4 mb-2 mb-md-0">
+                    <!-- 2026-07-13: Make employee columns 1 column stack on mobile (was: col-6 col-md-3) -->
+                    <div class="col-12 col-md-3 mb-2 mb-md-0">
                         <div class="d-flex align-items-center">
                             <div class="summary-icon-box mr-2">
                                 <i class="bi bi-card-text text-warning"></i>
@@ -2762,7 +2836,8 @@
                         </div>
                     </div>
                     <!-- Div / Station -->
-                    <div class="col-md-4">
+                    <!-- 2026-07-13: Make employee columns 1 column stack on mobile (was: col-6 col-md-3) -->
+                    <div class="col-12 col-md-3 mb-2 mb-md-0">
                         <div class="d-flex align-items-center">
                             <div class="summary-icon-box mr-2">
                                 <i class="bi bi-building text-warning"></i>
@@ -2773,20 +2848,25 @@
                             </div>
                         </div>
                     </div>
-                    <!-- [2026-07-14 New: DEPED/AUTONOMOUS mode selector on right side of summary card] -->
-                    <div class="col-md-auto ml-auto d-flex align-items-center" id="col-mode-select" style="gap: 8px;">
-                        <div class="d-flex flex-column align-items-end">
-                            <span class="summary-label text-uppercase mb-1">Mode</span>
-                            <select id="modeSelect" class="mode-select-pill" onchange="onModeSelectChange()" title="Switch between DepED data mode and manual autonomous input">
-                                <option value="deped" selected>DEPED</option>
-                                <option value="autonomous">AUTONOMOUS</option>
-                            </select>
+                    <!-- Mode Selector -->
+                    <!-- 2026-07-13: Make employee columns 1 column stack on mobile (was: col-6 col-md-3) -->
+                    <div class="col-12 col-md-3 mb-2 mb-md-0">
+                        <div class="d-flex align-items-center">
+                            <div class="summary-icon-box mr-2">
+                                <i class="bi bi-gear-fill text-warning"></i>
+                            </div>
+                            <div class="d-flex flex-column" style="width: 100%;">
+                                <span class="summary-label text-uppercase">Evaluation Mode</span>
+                                <select id="evaluationModeSelect" class="form-control bank-select select-sm text-white font-weight-bold" style="background: rgba(8,12,28,0.6); border: 1px solid rgba(255,255,255,0.1); height: 32px; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px;" onchange="onModeChange()">
+                                    <option value="DEPED" selected>DEPED</option>
+                                    <option value="AUTONOMOUS">AUTONOMOUS</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
-
-                </div><!-- /.row -->
-            </div><!-- /#empSummaryCard -->
-        </div><!-- /outer wrapper -->
+                </div>
+            </div>
+        </div>
 
         <!-- Main Evaluation Workspace -->
         <div id="evaluationWorkspace" class="d-none">
@@ -2810,10 +2890,17 @@
                                     <strong>Initial Loan = floor(Remaining Value / 20.01) * 1000</strong>
                                 </span>
                             </div>
-                            <!-- [2026-07-10 Fix: Integrated currency text prefix inside wrapper with text-white input styling] -->
-                            <div class="currency-input-wrapper mb-1">
+                            <!-- 2026-07-13: Add paste button icon inside input wrapper (was: default input wrapper, no action button) -->
+                            <!-- 2026-07-14: Added copy button to the left of the paste button (was: paste button only) -->
+                            <div class="currency-input-wrapper mb-1" style="position: relative;">
                                 <span class="currency-prefix">₱</span>
-                                <input type="text" id="loanAmount" class="form-control bank-input font-weight-bold text-white tabular-nums" oninput="formatLoanAmountField(); runCalculations();">
+                                <input type="text" id="loanAmount" class="form-control bank-input font-weight-bold text-white tabular-nums" style="padding-right: 68px !important;" oninput="formatLoanAmountField(); runCalculations();">
+                                <button type="button" id="btn-copy-loan" class="btn-input-action" title="Copy to clipboard" onclick="copyLoanAmount()" style="right: 38px;">
+                                    <i class="bi bi-clipboard text-warning"></i>
+                                </button>
+                                <button type="button" id="btn-paste-loan" class="btn-input-action" title="Paste from clipboard" onclick="pasteToLoanAmount()">
+                                    <i class="bi bi-clipboard-plus text-warning"></i>
+                                </button>
                             </div>
                             <div id="lbl-total-interest" class="text-white-50 tabular-nums mt-2" style="font-size: 0.75rem; font-weight: 500;">
                                 Total Interest: ₱0.00
@@ -2859,11 +2946,11 @@
                         </div>
 
                         <!-- [2026-07-11 Fix: section-panel-inner for NETPAY & DEDAMT BASELINE panel moved below the Loan Amount setup panel] -->
+                        <!-- [2026-07-14 Fix: Overhauled row layout inside netpay computation panel to include manual numeric input inputs toggled for AUTONOMOUS mode; removed receipt margins] -->
                         <div class="section-panel-inner" id="panel-baseline-inner">
                             <div class="orange-node mb-3" id="node-baseline">
                                 <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10"/></svg>
                                 NETPAY COMPUTATION
-                                <span class="auto-mode-badge" id="badge-auto-mode">AUTONOMOUS</span>
                                 <span class="math-popover">
                                     <strong>Baseline Subtotal = NetPay + DEDAMT</strong><br>
                                     Combines NetPay (from june26.csv) and DEDAMT components (from pos_june26.csv).
@@ -2872,8 +2959,8 @@
                             <!-- [2026-07-12 Current Net Pay Row - Starting baseline net pay. Labeled netpay-row-current] -->
                             <div class="baseline-row netpay-row-current mb-2" id="row-current-netpay">
                                 <span class="netpay-label"><i class="bi bi-wallet2 text-success mr-2"></i>Current Net Pay</span>
-                                <span id="lbl-netpay" class="netpay-value tabular-nums font-weight-bold netpay-auto-hide">₱0.00</span>
-                                <input id="inp-autonomous-netpay" class="netpay-auto-input tabular-nums" type="text" value="0" placeholder="0.00" oninput="runCalculations()">
+                                <span id="lbl-netpay" class="netpay-value tabular-nums font-weight-bold">₱0.00</span>
+                                <input type="number" step="0.01" id="input-netpay" class="form-control bank-input input-sm tabular-nums text-right font-weight-bold d-none" style="width: 110px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; height: 26px; padding: 2px 8px; font-size: 0.8rem; border-radius: 4px; display: none !important;" value="0.00" oninput="runCalculations()">
                             </div>
                             
                             <!-- [2026-07-12 CSB Deductions Accordion Row - Labeled dynamic-csb-deductions-container. Toggleable accordion styled like a transparent baseline row that drops down to show a responsive table of CSB positive deductions] -->
@@ -2905,44 +2992,58 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- [2026-07-14 New: CSB Deductions manual input row for Autonomous Mode] -->
+                            <div class="baseline-row netpay-row-cs-deductions-autonomous mb-2 d-none" id="row-cs-deductions-autonomous" style="display: none !important;">
+                                <span class="netpay-label"><i class="bi bi-plus-lg text-success mr-2"></i>CSB Deductions</span>
+                                <input type="number" step="0.01" id="input-cs-deductions" class="form-control bank-input input-sm tabular-nums text-right font-weight-bold" style="width: 110px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; height: 26px; padding: 2px 8px; font-size: 0.8rem; border-radius: 4px;" value="0.00" oninput="runCalculations()">
+                            </div>
                             
                             <!-- [2026-07-12 Subtotal Row - Starting subtotal before adjustments. Labeled netpay-row-subtotal] -->
-                            <!-- [2026-07-14 New: Manual CSB row shown only in autonomous mode] -->
-                            <div class="baseline-row netpay-row-auto-csb mb-2" id="row-auto-csb" style="display: none;">
-                                <span class="netpay-label"><i class="bi bi-plus-lg text-success mr-2"></i>CSB Deductions</span>
-                                <input id="inp-autonomous-csb" class="netpay-auto-input tabular-nums" type="text" value="0" placeholder="0.00" style="display: inline-block !important;" oninput="runCalculations()">
-                            </div>
-                            <div class="baseline-row netpay-row-subtotal font-weight-bold pt-2 mb-2" id="row-subtotal" style="border-top: 1px solid rgba(255,255,255,0.08);">
+                            <div class="baseline-row netpay-row-subtotal font-weight-bold pt-2 mb-0" id="row-subtotal" style="border-top: 1px solid rgba(255,255,255,0.08); margin-bottom: 0 !important;">
                                 <span class="netpay-label-bold"><i class="bi bi-calculator text-muted mr-2"></i>Subtotal</span>
                                 <span id="val-baseline" class="bank-value-display">₱0.00</span>
                             </div>
                             
                             <!-- [2026-07-12 Redemption Accordion Row - Labeled dynamic-pli-rows-container. Styled like a transparent baseline row that drops down to show dynamic PLIs] -->
-                            <div id="dynamic-pli-rows-container" class="receipt-container-accordion mt-2 mb-2" style="background: transparent; border: none; overflow: hidden; width: 100%;">
-                                <!-- [2026-07-14 Fix: Split accordion header so label-text click toggles REDEMPTION/DOUBLE DEDUCTION without opening accordion; previous: whole button was one onclick] -->
-                                <div class="baseline-row netpay-row-redemption-header w-100" id="btn-redemption-accordion-header" style="background: transparent; border: none; outline: none !important; width: 100%; cursor: default;">
+                            <div id="dynamic-pli-rows-container" class="receipt-container-accordion mt-0 mb-0" style="background: transparent; border: none; overflow: hidden; width: 100%;">
+                                <!-- [2026-07-14 Fix: Split accordion header so label-text click toggles REDEMPTION/Double Deduction without opening accordion; previous: whole button was one onclick] -->
+                                <div class="baseline-row netpay-row-redemption-header w-100" id="btn-redemption-accordion-header" style="background: transparent; border: none; outline: none !important; width: 100%; cursor: default; margin-bottom: 0 !important;">
                                     <span class="netpay-label" style="cursor: pointer; user-select: none;" id="lbl-redemption-toggle-text" onclick="toggleRedemptionLabel(event)" title="Click to toggle label"><i class="bi bi-plus-lg text-success mr-2"></i>Redemption</span>
-                                    <span class="d-flex align-items-center netpay-auto-hide" style="gap: 8px; cursor: pointer;" onclick="toggleReceiptAccordion()">
+                                    <span class="d-flex align-items-center" style="gap: 8px; cursor: pointer;" onclick="toggleReceiptAccordion()">
                                         <span id="val-baseline-papsubtotal" class="tabular-nums font-weight-bold">₱0.00</span>
                                         <i class="bi bi-chevron-down text-white-50" id="redemption-chevron" style="font-size: 0.75rem; transition: transform 0.2s ease;"></i>
                                     </span>
-                                    <input id="inp-autonomous-redemption" class="netpay-auto-input tabular-nums" type="text" value="0" placeholder="0.00" oninput="runCalculations()">
                                 </div>
                                 <div id="receiptAccordionBody" class="receipt-accordion-body" style="display: none; padding: 2px 14px 6px 14px; border-top: 1px solid rgba(255, 255, 255, 0.04); background: rgba(0, 0, 0, 0.22); border-radius: 6px; margin-top: 2px;">
                                     <!-- Dynamic receipt rows will be appended here -->
                                 </div>
                             </div>
 
-                            <!-- [2026-07-14 New: Separate plain receipt rows for Anticipated and Promotion (no dropdown)] -->
-                            <div class="baseline-row netpay-row-anticipated-receipt" id="row-anticipated-receipt" style="display: none;">
-                                <span class="netpay-label"><i class="bi bi-plus-lg text-success mr-2"></i>Anticipated</span>
-                                <span id="val-anticipated-receipt" class="tabular-nums font-weight-bold netpay-auto-hide">₱0.00</span>
-                                <input id="inp-autonomous-anticipated" class="netpay-auto-input tabular-nums" type="text" value="0" placeholder="0.00" oninput="runCalculations()">
+                            <!-- [2026-07-14 New: Redemption manual input row for Autonomous Mode] -->
+                            <div class="baseline-row netpay-row-redemption-autonomous mb-2 d-none" id="row-redemption-autonomous" style="display: none !important;">
+                                <span class="netpay-label" style="cursor: pointer; user-select: none;" id="lbl-redemption-toggle-text-autonomous" onclick="toggleRedemptionLabel(event)" title="Click to toggle label"><i class="bi bi-plus-lg text-success mr-2"></i>Redemption</span>
+                                <input type="number" step="0.01" id="input-redemption" class="form-control bank-input input-sm tabular-nums text-right font-weight-bold" style="width: 110px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; height: 26px; padding: 2px 8px; font-size: 0.8rem; border-radius: 4px;" value="0.00" oninput="runCalculations()">
                             </div>
-                            <div class="baseline-row netpay-row-promotion-receipt" id="row-promotion-receipt" style="display: none;">
+
+                            <!-- [2026-07-14 New: Separate plain receipt rows for Anticipated and Promotion (no dropdown)] -->
+                            <div class="baseline-row netpay-row-anticipated-receipt" id="row-anticipated-receipt" style="display: none; margin-bottom: 0 !important;">
+                                <span class="netpay-label"><i class="bi bi-plus-lg text-success mr-2"></i>Anticipated</span>
+                                <span id="val-anticipated-receipt" class="tabular-nums font-weight-bold" style="padding-right: 20px !important;">₱0.00</span>
+                            </div>
+                            <div class="baseline-row netpay-row-promotion-receipt" id="row-promotion-receipt" style="display: none; margin-bottom: 4px !important;">
                                 <span class="netpay-label"><i class="bi bi-plus-lg text-success mr-2"></i>Promotion</span>
-                                <span id="val-promotion-receipt" class="tabular-nums font-weight-bold netpay-auto-hide">₱0.00</span>
-                                <input id="inp-autonomous-promotion" class="netpay-auto-input tabular-nums" type="text" value="0" placeholder="0.00" oninput="runCalculations()">
+                                <span id="val-promotion-receipt" class="tabular-nums font-weight-bold" style="padding-right: 20px !important;">₱0.00</span>
+                            </div>
+
+                            <!-- [2026-07-14 New: Anticipated and Promotion manual input rows for Autonomous Mode] -->
+                            <div class="baseline-row netpay-row-anticipated-autonomous mb-2 d-none" id="row-anticipated-autonomous" style="display: none !important;">
+                                <span class="netpay-label"><i class="bi bi-plus-lg text-success mr-2"></i>Anticipated</span>
+                                <input type="number" step="0.01" id="input-anticipated" class="form-control bank-input input-sm tabular-nums text-right font-weight-bold" style="width: 110px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; height: 26px; padding: 2px 8px; font-size: 0.8rem; border-radius: 4px;" value="0.00" oninput="runCalculations()">
+                            </div>
+                            <div class="baseline-row netpay-row-promotion-autonomous mb-2 d-none" id="row-promotion-autonomous" style="display: none !important;">
+                                <span class="netpay-label"><i class="bi bi-plus-lg text-success mr-2"></i>Promotion</span>
+                                <input type="number" step="0.01" id="input-promotion" class="form-control bank-input input-sm tabular-nums text-right font-weight-bold" style="width: 110px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; height: 26px; padding: 2px 8px; font-size: 0.8rem; border-radius: 4px;" value="0.00" oninput="runCalculations()">
                             </div>
 
                             <!-- [2026-07-14 Fix: Add ID and update text of subtotal label; previous: static 'Subtotal' label without ID] -->
@@ -2956,12 +3057,23 @@
                                 <span class="netpay-label"><i class="bi bi-dash-lg text-warning mr-2"></i>Less OnQueue</span>
                                 <span id="val-less-onqueue" class="bank-value-display">₱0.00</span>
                             </div>
+
+                            <!-- [2026-07-14 New: Less OnQueue manual input row for Autonomous Mode] -->
+                            <div class="baseline-row netpay-row-less-onqueue-autonomous pt-2 mb-2 d-none" id="row-less-onqueue-autonomous" style="border-top: 1px dashed rgba(255,255,255,0.08); display: none !important;">
+                                <span class="netpay-label"><i class="bi bi-dash-lg text-warning mr-2"></i>Less OnQueue</span>
+                                <input type="number" step="0.01" id="input-less-onqueue" class="form-control bank-input input-sm tabular-nums text-right font-weight-bold" style="width: 110px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; height: 26px; padding: 2px 8px; font-size: 0.8rem; border-radius: 4px;" value="0.00" oninput="runCalculations()">
+                            </div>
                             
                             <!-- [2026-07-12 Less Incoming Row - Manual adjustments. Labeled netpay-row-less-incoming] -->
                             <div class="baseline-row netpay-row-less-incoming pt-2 mb-2" id="row-less-incoming" style="border-top: 1px dashed rgba(255,255,255,0.08);">
                                 <span class="netpay-label"><i class="bi bi-dash-lg text-warning mr-2"></i>Less Incoming</span>
-                                <span id="val-less-incoming" class="bank-value-display netpay-auto-hide">₱0.00</span>
-                                <input id="inp-autonomous-incoming" class="netpay-auto-input tabular-nums" type="text" value="0" placeholder="0.00" oninput="runCalculations()">
+                                <span id="val-less-incoming" class="bank-value-display">₱0.00</span>
+                            </div>
+
+                            <!-- [2026-07-14 New: Less Incoming manual input row for Autonomous Mode] -->
+                            <div class="baseline-row netpay-row-less-incoming-autonomous pt-2 mb-2 d-none" id="row-less-incoming-autonomous" style="border-top: 1px dashed rgba(255,255,255,0.08); display: none !important;">
+                                <span class="netpay-label"><i class="bi bi-dash-lg text-warning mr-2"></i>Less Incoming</span>
+                                <input type="number" step="0.01" id="input-less-incoming" class="form-control bank-input input-sm tabular-nums text-right font-weight-bold" style="width: 110px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; height: 26px; padding: 2px 8px; font-size: 0.8rem; border-radius: 4px;" value="0.00" oninput="runCalculations()">
                             </div>
                             
                             <!-- [2026-07-12 Total Subtotal Row - Subtotal after redemptions and queue checks. Labeled netpay-row-total-subtotal] -->
@@ -2984,6 +3096,112 @@
                         </div>
                     </div>
 
+                    <!-- Card: Net Proceeds -->
+                    <div class="bank-card mt-3" id="card-net-proceeds" data-label="Net Proceeds Calculation Card">
+                        <div class="d-flex align-items-center justify-content-between mb-3 pb-2" id="wrapperNetProceedsHeader" style="border-bottom: 1px solid rgba(255,255,255,0.06); gap: 16px;">
+                            <div class="d-flex flex-column">
+                                <div class="orange-node mb-1" id="node-net-proceeds" style="margin-bottom: 2px !important;">
+                                    <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/></svg>
+                                    NET PROCEEDS
+                                    <span class="math-popover">
+                                        <strong>Net Proceeds = Loan Proceeds - Old Balance - Redemption - Advance Payment</strong>
+                                    </span>
+                                </div>
+                                <span class="text-muted" style="font-size: 0.68rem; font-weight: 500; font-family: 'Montserrat', sans-serif;">Calculate loan proceeds, settlements, and advance payments</span>
+                            </div>
+                            <!-- 2026-07-13: Add dedicated Calculate button for Net Proceeds (was: auto-triggered by input changes) -->
+                            <button type="button" id="btn-calculate-netproc" onclick="calculateNetProceeds()" style="background: linear-gradient(135deg, #059669 0%, #10B981 100%); border: none; border-radius: 8px; color: #fff; font-family: 'Montserrat', sans-serif; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.08em; padding: 7px 14px; cursor: pointer; white-space: nowrap; flex-shrink: 0; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35); transition: all 0.2s ease; text-transform: uppercase;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 18px rgba(16,185,129,0.5)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 12px rgba(16,185,129,0.35)'">
+                                <i class="bi bi-calculator-fill mr-1"></i>CALCULATE
+                            </button>
+                        </div>
+
+                        <!-- Card Body (styled like Netpay Computation Card) -->
+                        <div class="section-panel-inner" id="panel-netproc-inner">
+                            <!-- 1. Loan Proceeds Row -->
+                            <div class="baseline-row mb-2" id="row-netproc-loan-proceeds">
+                                <span class="netpay-label"><i class="bi bi-wallet2 text-success mr-2"></i>Loan Proceeds</span>
+                                <span id="val-netproc-loan-proceeds" class="netpay-value tabular-nums font-weight-bold" style="padding-right: 0px !important; font-size: 0.8rem;">₱0.00</span>
+                            </div>
+
+                            <!-- 2. Old Balance Row (Manual Input) -->
+                            <div class="baseline-row mb-2" id="row-netproc-old-balance">
+                                <span class="netpay-label"><i class="bi bi-dash-lg text-warning mr-2"></i>Less Old Balance</span>
+                                <!-- 2026-07-13: Remove oninput runCalculations from old balance (was: oninput="runCalculations()") -->
+                                <input type="number" step="0.01" id="input-netproc-old-balance" class="form-control bank-input input-sm tabular-nums text-right font-weight-bold" style="width: 110px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; height: 26px; padding: 2px 8px; font-size: 0.8rem; border-radius: 4px;" value="0">
+                            </div>
+
+                            <!-- 3. Redemption Row (PLIs) -->
+                            <div class="baseline-row mb-2" id="row-netproc-redemption">
+                                <span class="netpay-label"><i class="bi bi-dash-lg text-warning mr-2"></i>Less Redemption</span>
+                                <span id="val-netproc-redemption" class="netpay-value tabular-nums font-weight-bold" style="padding-right: 0px !important; font-size: 0.8rem;">₱0.00</span>
+                            </div>
+
+                            <!-- 4. Old Deductions Accordion (Checkbox table for basis of advance payment deductions) -->
+                            <div id="dynamic-netproc-deductions-container" class="mt-0 mb-2" style="background: transparent; border: none; overflow: hidden; width: 100%;">
+                                <button type="button" class="baseline-row netpay-row-csb-deductions-header w-100" id="btn-netproc-accordion-header" onclick="toggleNetprocAccordion();" style="background: transparent; border: none; outline: none !important; width: 100%; margin-bottom: 0 !important;">
+                                    <span class="netpay-label"><i class="bi bi-receipt text-success mr-2"></i>Old Deductions</span>
+                                    <span class="d-flex align-items-center" style="gap: 8px;">
+                                        <span id="lbl-netproc-old-dedamt" class="tabular-nums font-weight-bold" style="padding-right: 0px !important; font-size: 0.8rem !important; color: white !important;">₱0.00</span>
+                                        <i class="bi bi-chevron-down text-white-50" id="netproc-chevron" style="font-size: 0.75rem; transition: transform 0.2s ease;"></i>
+                                    </span>
+                                </button>
+                                <div id="netprocAccordionBody" class="receipt-accordion-body" style="display: none; padding: 2px 14px 6px 14px; border-top: 1px solid rgba(255, 255, 255, 0.04); background: rgba(0, 0, 0, 0.22); border-radius: 6px; margin-top: 2px;">
+                                    <div class="table-responsive">
+                                        <table class="bank-table mb-0" id="tableNetprocOldDeductions" style="width: 100%; border: none; background: transparent;">
+                                            <thead>
+                                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+                                                    <!-- 2026-07-13: Remove onchange runCalculations from master deduction checkbox (was: onchange="toggleAllNetprocDeductions(this)") -->
+                                                    <th style="width: 32px; text-align: center; vertical-align: middle; padding: 4px 0;"><input type="checkbox" id="netproc-select-all" checked onchange="toggleAllNetprocCheckboxes(this)"></th>
+                                                    <th style="text-align: left; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.35) !important;">Code</th>
+                                                    <th style="text-align: left; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.35) !important;">Policy No</th>
+                                                    <th style="text-align: center; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.35) !important;">Date</th>
+                                                    <th style="text-align: right; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.35) !important;">Amount</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="netproc-old-deductions-tbody">
+                                                <!-- Dynamic CSB rows populated on employee search load -->
+                                                <tr><td colspan="5" class="text-white-50 text-center py-2">No positive CSB deductions found</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 5. Advance Payment Months Selector -->
+                            <div class="baseline-row mb-2" id="row-netproc-advance-months">
+                                <span class="netpay-label"><i class="bi bi-calendar-event text-success mr-2"></i>Advance Payment Months</span>
+                                <!-- 2026-07-13: Remove onchange runCalculations from advance months selector (was: onchange="runCalculations()") -->
+                                <select id="select-netproc-advance-months" class="form-control bank-select select-sm tabular-nums text-right font-weight-bold" style="width: 60px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; height: 26px; padding: 2px; font-size: 0.8rem; border-radius: 4px;">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3" selected>3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                </select>
+                            </div>
+
+                            <!-- 6. Advance Payment Row -->
+                            <div class="baseline-row mb-2" id="row-netproc-advance-payment">
+                                <span class="netpay-label"><i class="bi bi-dash-lg text-warning mr-2"></i>Less Advance Payment</span>
+                                <span id="val-netproc-advance-payment" class="netpay-value tabular-nums font-weight-bold" style="padding-right: 0px !important; font-size: 0.8rem;">₱0.00</span>
+                            </div>
+
+                            <!-- 7. Final Net Proceeds Row (Subtotal/Total) -->
+                            <div class="baseline-row netpay-row-new-netpay font-weight-bold pt-2 mb-0" id="row-netproc-total" style="border-top: 1px solid rgba(255,255,255,0.08); margin-bottom: 0 !important;">
+                                <span class="netpay-label-bold"><i class="bi bi-check-circle-fill text-success mr-2"></i>Net Proceeds</span>
+                                <!-- 2026-07-14: Wrapped val-netproc-total in flex column to stack value + tap hint (was: bare span) -->
+                                <div class="d-flex flex-column align-items-end">
+                                    <span id="val-netproc-total" class="bank-value-display">₱0.00</span>
+                                    <span id="lbl-netproc-tap-hint"><i class="bi bi-clipboard" style="font-size:0.55rem;"></i> tap to copy</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- [2026-07-13 Fix: Split single Private Liabilities card into three separate cards (Redemption, Anticipated, Promotion) and relocated subtotals block below them] -->
 
                             <!-- Card: Private Liabilities (PLI) / Redemption -->
@@ -2993,7 +3211,7 @@
                                     <div class="d-flex flex-column" id="pli-header-title-block" data-desc="Title text block for Private Liabilities section header.">
                                         <div class="orange-node mb-1" id="node-private-liabilities-title" style="margin-bottom: 2px !important;">
                                             <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
-                                            REDEMPTION
+                                            <span id="lbl-pli-card-title-text">REDEMPTION</span>
                                             <span class="math-popover">
                                                 <strong>Private Liabilities Section</strong><br>
                                                 Toggle to include private lending institution (PLI) redemptions in calculations.
@@ -3261,24 +3479,24 @@
                             </div>
                         </div>
 
-                        <!-- [2026-07-11 Fix: 2x2 inner summary card grid uses equal-height-row for uniform card height across all 4 boxes] -->
-                        <!-- manual inputs & calculations results grids (Polished: Added clean wrapper classnames and semantic ids for columns structure) -->
-                        <div class="row g-3 mb-3">
-                            <!-- Semitotal Computation Grid Wrapper (Displays baseline calculations minus deductions) -->
-                            <div class="col-md-6 d-flex semitotal-summary-wrapper" id="wrapperSemitotalSummary" data-desc="Wrapper layout for the semitotal computation display panel.">
+                        <!-- 2026-07-14: Reduced row gap from g-3 to g-2 (was: g-3) -->
+                        <div class="row g-2 mb-2">
+                            <!-- 2026-07-13: Change wrapper to col-6 for 2-column mobile layout (was: col-md-6 d-flex) -->
+                            <div class="col-6 col-md-6 d-flex semitotal-summary-wrapper" id="wrapperSemitotalSummary" data-desc="Wrapper layout for the semitotal computation display panel.">
                                 <div class="inner-summary-card semitotal-panel w-100" id="box-semitotal-summary" data-label="SemiTotal Summary Panel">
                                     <div class="orange-node mb-2" id="node-semitotal">
                                         <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="16" y1="18" x2="16" y2="18"/><line x1="12" y1="18" x2="12" y2="18"/><line x1="8" y1="18" x2="8" y2="18"/></svg>
                                         LESS ONQUEUE
                                         <span class="math-popover">
-                                            <strong>Less OnQueue = PAP Subtotal + Active OnQueue Total</strong>
+                                            <strong>Less OnQueue = Active OnQueue Total</strong>
                                         </span>
                                     </div>
                                     <div id="val-semitotal" class="bank-value-display">₱0.00</div>
                                 </div>
                             </div>
                             <!-- Incoming Deduction Grid Wrapper (Allows flexible layout wrapping) -->
-                            <div class="col-md-6 d-flex incoming-adjustment-wrapper" id="wrapperIncomingAdjustment" data-desc="Wrapper layout for the incoming deduction override panel.">
+                            <!-- 2026-07-13: Change wrapper to col-6 for 2-column mobile layout (was: col-md-6 d-flex) -->
+                            <div class="col-6 col-md-6 d-flex incoming-adjustment-wrapper" id="wrapperIncomingAdjustment" data-desc="Wrapper layout for the incoming deduction override panel.">
                                 <div class="inner-summary-card incoming-panel w-100" id="box-incoming-deduction" data-label="Incoming Deduction Override Panel">
                                     <div class="orange-node mb-2" id="node-incoming">
                                         <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17V3"/><path d="m6 11 6 6 6-6"/><path d="M19 21H5"/></svg>
@@ -3295,9 +3513,11 @@
                             </div>
                         </div>
 
-                        <div class="row g-3">
+                        <!-- 2026-07-14: Reduced row gap from g-3 to g-2 (was: g-3) -->
+                        <div class="row g-2">
                             <!-- Amortization Computation Grid Wrapper (Displays the calculated monthly loan installment) -->
-                            <div class="col-md-6 d-flex amortization-summary-wrapper" id="wrapperAmortizationSummary" data-desc="Wrapper layout for the amortization computation display panel.">
+                            <!-- 2026-07-13: Change wrapper to col-6 for 2-column mobile layout (was: col-md-6 d-flex) -->
+                            <div class="col-6 col-md-6 d-flex amortization-summary-wrapper" id="wrapperAmortizationSummary" data-desc="Wrapper layout for the amortization computation display panel.">
                                 <div class="inner-summary-card amortization-panel w-100" id="box-amortization-summary" data-label="CSB Amortization Summary Panel">
                                     <div class="orange-node mb-2" id="node-amortization">
                                         <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -3310,7 +3530,8 @@
                                 </div>
                             </div>
                             <!-- New NetPay Grid Wrapper (Displays the final net pay after all adjustments) -->
-                            <div class="col-md-6 d-flex newnetpay-summary-wrapper" id="wrapperNewNetPaySummary" data-desc="Wrapper layout for the final New NetPay display panel.">
+                            <!-- 2026-07-13: Change wrapper to col-6 for 2-column mobile layout (was: col-md-6 d-flex) -->
+                            <div class="col-6 col-md-6 d-flex newnetpay-summary-wrapper" id="wrapperNewNetPaySummary" data-desc="Wrapper layout for the final New NetPay display panel.">
                                 <div class="inner-summary-card new-netpay-panel w-100" id="box-new-netpay-summary" data-label="New NetPay Final Settlement Panel">
                                     <div class="orange-node mb-2" id="node-newnetpay">
                                         <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -3321,11 +3542,8 @@
                                         </span>
                                     </div>
                                     <div id="val-newnetpay" class="bank-value-display">₱0.00</div>
-                                    <!-- [2026-07-12 Status Badge (NEW) - Labeled underwriting-status-badge] -->
-                                    <div id="underwriting-status-badge" class="status-badge status-badge-accommodated">CAN ACCOMMODATE</div>
-                                    <div id="lbl-threshold-error" class="text-danger small font-weight-bold mt-2 d-none">
-                                        <i class="bi bi-exclamation-triangle-fill"></i> statutory limit warning (Below ₱5,300.00)!
-                                    </div>
+                                    <!-- 2026-07-14: Unified status badge replaces dual badge+error label (was: separate CAN ACCOMMODATE badge + lbl-threshold-error text) -->
+                                    <div id="underwriting-status-badge" class="badge-ok" style="display:none;">CAN ACCOMMODATE</div>
                                 </div>
                             </div>
                         </div>
@@ -3548,7 +3766,143 @@
                     await performSearch(true);
                 }
             }
+
+            // 2026-07-13: Scroll to node-baseline on value wrapper click with custom smooth scrolling logic (was: scrollIntoView on mapped card elements)
+            function smoothScrollTo(element) {
+                if (!element) return;
+                const targetPosition = element.getBoundingClientRect().top + window.scrollY;
+                const startPosition = window.scrollY;
+                const distance = targetPosition - startPosition;
+                const duration = 600; // Duration in milliseconds
+                let start = null;
+
+                function step(timestamp) {
+                    if (!start) start = timestamp;
+                    const progress = timestamp - start;
+                    const time = Math.min(1, progress / duration);
+                    // Easing: easeInOutCubic
+                    const ease = time < 0.5 ? 4 * time * time * time : 1 - Math.pow(-2 * time + 2, 3) / 2;
+                    window.scrollTo(0, startPosition + distance * ease);
+                    if (progress < duration) {
+                        window.requestAnimationFrame(step);
+                    }
+                }
+                window.requestAnimationFrame(step);
+            }
+
+            const idsToScroll = ['pli-value-wrapper', 'anticipated-value-wrapper', 'promotion-value-wrapper', 'val-netpayplitotal', 'val-newnetpay'];
+            idsToScroll.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('click', () => {
+                        const target = document.getElementById('node-baseline');
+                        if (target) {
+                            smoothScrollTo(target);
+                        }
+                    });
+                }
+            });
+
+            // 2026-07-13: Set up click-to-copy handler on val-netproc-total (was: no action)
+            const netprocTotalEl = document.getElementById('val-netproc-total');
+            if (netprocTotalEl) {
+                netprocTotalEl.addEventListener('click', async () => {
+                    const text = netprocTotalEl.textContent || "";
+                    // 2026-07-13: Preserve minus sign for negative values when copying (was: stripped all non-numeric)
+                    const isNegative = text.trim().startsWith('-') || text.includes('-');
+                    const cleanNum = (isNegative ? '-' : '') + text.replace(/[^0-9.]/g, '');
+                    if (cleanNum && cleanNum !== '-') {
+                        try {
+                            await navigator.clipboard.writeText(cleanNum);
+                            showToast("Copied to Clipboard");
+                        } catch (err) {
+                            showToast("Failed to copy to clipboard");
+                        }
+                    }
+                    // 2026-07-14: Trigger glow flash on tap (was: no visual feedback on the element itself)
+                    netprocTotalEl.classList.remove('copy-glow');
+                    void netprocTotalEl.offsetWidth; // force reflow to restart animation
+                    netprocTotalEl.classList.add('copy-glow');
+                    setTimeout(() => netprocTotalEl.classList.remove('copy-glow'), 750);
+                });
+            }
         });
+
+        // 2026-07-13: Helper functions for copy toast and paste action (was: no functions)
+        function showToast(message) {
+            let toast = document.getElementById('custom-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'custom-toast';
+                toast.style.cssText = `
+                    position: fixed;
+                    bottom: 80px;
+                    left: 50%;
+                    transform: translateX(-50%) translateY(20px);
+                    background: rgba(15, 23, 42, 0.95);
+                    border: 1px solid rgba(245, 158, 11, 0.4);
+                    color: #FCD34D;
+                    padding: 8px 16px;
+                    border-radius: 20px;
+                    font-size: 0.8rem;
+                    font-weight: 600;
+                    letter-spacing: 0.05em;
+                    z-index: 9999;
+                    opacity: 0;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+                    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                    pointer-events: none;
+                `;
+                document.body.appendChild(toast);
+            }
+            toast.textContent = message;
+            toast.offsetHeight; // Force reflow
+            toast.style.transform = 'translateX(-50%) translateY(0)';
+            toast.style.opacity = '1';
+            
+            setTimeout(() => {
+                toast.style.transform = 'translateX(-50%) translateY(20px)';
+                toast.style.opacity = '0';
+            }, 2000);
+        }
+
+        async function pasteToLoanAmount() {
+            try {
+                const text = await navigator.clipboard.readText();
+                let clean = text.replace(/[^0-9.]/g, '');
+                if (clean) {
+                    const floatVal = parseFloat(clean);
+                    if (!isNaN(floatVal)) {
+                        const formatted = floatVal.toLocaleString('en-US', { maximumFractionDigits: 2 });
+                        const loanInput = document.getElementById('loanAmount');
+                        if (loanInput) {
+                            loanInput.value = formatted;
+                            formatLoanAmountField();
+                            runCalculations();
+                            showToast("Pasted value: ₱" + formatted);
+                        }
+                    }
+                } else {
+                    showToast("No numeric value found in clipboard");
+                }
+            } catch (err) {
+                showToast("Clipboard access denied. Copy value first.");
+            }
+        }
+
+        // 2026-07-14: Copy current loanAmount field value to clipboard (was: no copy button on loan amount input)
+        async function copyLoanAmount() {
+            const loanInput = document.getElementById('loanAmount');
+            if (!loanInput) return;
+            const raw = loanInput.value.replace(/[^0-9.]/g, '');
+            if (!raw) { showToast("Nothing to copy"); return; }
+            try {
+                await navigator.clipboard.writeText(raw);
+                showToast("Copied: ₱" + loanInput.value);
+            } catch (err) {
+                showToast("Clipboard access denied.");
+            }
+        }
 
         // Dropdowns build helpers
         /* [2026-07-11 Fix: buildLoanTermOptions extends select list up to 84 months, defaulting to 60 months selected] */
@@ -3851,11 +4205,49 @@
             }
 
             if (!empRow) {
-                // [2026-07-14 New: If employee not found, activate autonomous mode instead of blocking with alert]
-                await showCustomAlert("Employee ID " + empNum + " not found in records. Switching to AUTONOMOUS mode for manual entry.");
-                activateAutonomousMode(empNum);
+                // [2026-07-14 Fix: Auto-switch to Autonomous mode when searched employee is not found in records; previous: simply showed alert and exited]
+                await showCustomAlert("Employee ID " + empNum + " not found in baseline records. Switching to Autonomous Mode.");
+                
+                window.searchFailedNoOnQueue = true;
+                window.activeSession = {
+                    netPay: 0,
+                    origGrade: 1,
+                    origStep: 1,
+                    posSum: 0,
+                    onqSum: 0,
+                    pliSum: 0
+                };
+                
+                document.getElementById('empSummaryName').textContent = "Manual / Autonomous Entry";
+                document.getElementById('empSummaryID').textContent = empNum;
+                document.getElementById('empSummaryDiv').textContent = "N/A";
+                
+                document.getElementById('evaluationModeSelect').value = 'AUTONOMOUS';
+                document.getElementById('empSummaryCard').classList.remove('d-none');
+                document.getElementById('evaluationWorkspace').classList.remove('d-none');
+                
+                // Clear the manual input values to 0 by default so they can type
+                document.getElementById('input-netpay').value = "0.00";
+                document.getElementById('input-cs-deductions').value = "0.00";
+                document.getElementById('input-redemption').value = "0.00";
+                document.getElementById('input-anticipated').value = "0.00";
+                document.getElementById('input-promotion').value = "0.00";
+                document.getElementById('input-less-onqueue').value = "0.00";
+                document.getElementById('input-less-incoming').value = "0.00";
+                
+                const netprocTbody = document.getElementById('netproc-old-deductions-tbody');
+                if (netprocTbody) {
+                    netprocTbody.innerHTML = `<tr><td colspan="5" class="text-white-50 text-center py-2">No positive CSB deductions found</td></tr>`;
+                }
+
+                onModeChange();
                 return;
             }
+
+            // [2026-07-14 Fix: Reset Mode to DEPED and searchFailedNoOnQueue to false on successful lookup; previous: did not reset since no mode existed]
+            window.searchFailedNoOnQueue = false;
+            document.getElementById('evaluationModeSelect').value = 'DEPED';
+            onModeChange();
 
             // [2026-07-14 Fix: Save successfully searched employee ID in localStorage to sync across other pages; previous: did not save]
             localStorage.setItem("employeeNumber", empNum);
@@ -3920,6 +4312,37 @@
                     if (masterSelectAll) masterSelectAll.checked = true;
                 } else {
                     csbTbody.innerHTML = `<tr><td colspan="5" class="text-white-50 text-center py-2">No positive CSB deductions found</td></tr>`;
+                }
+            }
+
+            // Populate Net Proceeds Old Deductions table breakdown dynamically
+            const netprocTbody = document.getElementById('netproc-old-deductions-tbody');
+            if (netprocTbody) {
+                if (matchingPos.length > 0) {
+                    netprocTbody.innerHTML = matchingPos.map((row, idx) => {
+                        const code = row[7] || '-';
+                        const policy = row[15] || '-';
+                        const dateVal = row[16] || '-';
+                        const amount = safeFloat(row[13]);
+                        
+                        return `
+                            <tr>
+                                <td style="text-align: center; vertical-align: middle; padding: 4px 0;">
+                                    <!-- 2026-07-13: Remove onchange runCalculations from individual deduction checkboxes (was: onchange="runCalculations()") -->
+                                    <input type="checkbox" class="netproc-deduction-cb" data-amount="${amount}" checked>
+                                </td>
+                                <td style="text-align: left; vertical-align: middle; font-family: var(--font-mono); padding: 4px 2px; color: rgba(255, 255, 255, 0.45) !important;">${code}</td>
+                                <td style="text-align: left; vertical-align: middle; font-family: var(--font-mono); padding: 4px 2px; color: rgba(255, 255, 255, 0.45) !important;">${policy}</td>
+                                <td style="text-align: center; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.45) !important;">${dateVal}</td>
+                                <td style="text-align: right; vertical-align: middle; font-weight: 600; color: rgba(255, 255, 255, 0.55) !important; padding: 4px 2px;">${formatPHP(amount)}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                    
+                    const masterSelectAllNetproc = document.getElementById('netproc-select-all');
+                    if (masterSelectAllNetproc) masterSelectAllNetproc.checked = true;
+                } else {
+                    netprocTbody.innerHTML = `<tr><td colspan="5" class="text-white-50 text-center py-2">No positive CSB deductions found</td></tr>`;
                 }
             }
 
@@ -4057,7 +4480,7 @@
                                     <td data-label="Select" onclick="event.stopPropagation()">
                                         <input type="radio" name="pli_radio_${i}" class="pli-radio" data-dedpli="0" data-row-index="none" data-plicode="None" checked onchange="updatePLIHeaderValue(${i}); runCalculations();">
                                     </td>
-                                    <td data-label="PLI Code" class="text-muted">None</td>
+                                    <td data-label="Code" class="text-muted">None</td>
                                     <td data-label="EFF" class="text-muted">-</td>
                                     <td data-label="TERM" class="text-muted">-</td>
                                     <td data-label="DEDPLI" class="text-muted">₱0.00</td>
@@ -4300,17 +4723,7 @@
                 node.addEventListener('mouseenter', () => showTooltip(node));
                 node.addEventListener('mouseleave', () => hideTooltip(node));
 
-                // Click toggle for touch / keyboard
-                node.addEventListener('click', (e) => {
-                    if (node.classList.contains('show-popover')) {
-                        hideTooltip(node);
-                    } else {
-                        document.querySelectorAll('.orange-node').forEach(o => {
-                            if (o !== node) hideTooltip(o);
-                        });
-                        showTooltip(node);
-                    }
-                });
+                // 2026-07-14: Removed click-toggle for popover on tap — caused unintended popup on Redemption header tap (was: click toggled show-popover)
             });
         }
 
@@ -4335,49 +4748,62 @@
             return pmt;
         }
 
-        // Phase calculations trigger logic
-        // [2026-07-11 Fix: Anticipated and Promotion are now conditionally included based on toggle state]
         function runCalculations() {
-            // [2026-07-14 New: In autonomous mode, bypass CSV-dependent checks and use manual inputs]
-            const isAutoMode = document.getElementById('panel-baseline-inner') &&
-                               document.getElementById('panel-baseline-inner').classList.contains('auto-mode');
+            if (!window.activeSession) return;
 
-            if (!window.currentData || !window.activeSession) {
-                if (isAutoMode) {
-                    runAutonomousCalculations();
-                }
-                return;
-            }
-
-            // In autonomous mode with a session, run autonomous path only
-            if (isAutoMode) {
-                runAutonomousCalculations();
-                return;
-            }
+            const modeSelect = document.getElementById('evaluationModeSelect');
+            const mode = modeSelect ? modeSelect.value : 'DEPED';
+            const isAutonomous = (mode === 'AUTONOMOUS');
 
             // Ingest variables safely
             const loanAmount = safeFloat(document.getElementById('loanAmount').value);
             const loanTerm = safeInt(document.getElementById('loanTerm').value);
             const interestRate = getInterestRateValue();
 
+            // Toggle autonomous input wrapper visibility
+            const rowRedAuto = document.getElementById('row-redemption-autonomous');
+            const rowAntAuto = document.getElementById('row-anticipated-autonomous');
+            const rowProAuto = document.getElementById('row-promotion-autonomous');
+            
+            const useMasterPli   = document.getElementById('toggleMasterPli')   ? document.getElementById('toggleMasterPli').checked   : true;
+            const useAnticipated = document.getElementById('toggleAnticipated') ? document.getElementById('toggleAnticipated').checked : false;
+            const usePromotion   = document.getElementById('togglePromotion')   ? document.getElementById('togglePromotion').checked   : false;
+
+            if (rowRedAuto) {
+                rowRedAuto.style.setProperty('display', (isAutonomous && useMasterPli) ? 'flex' : 'none', 'important');
+            }
+            if (rowAntAuto) {
+                rowAntAuto.style.setProperty('display', (isAutonomous && useAnticipated) ? 'flex' : 'none', 'important');
+            }
+            if (rowProAuto) {
+                rowProAuto.style.setProperty('display', (isAutonomous && usePromotion) ? 'flex' : 'none', 'important');
+            }
+
             // Phase B deductions calculations
             let pliSubtotal = 0;
             const selectedPlis = [];
-            const slotCount = getPliSlotCount();
-            for (let i = 1; i <= slotCount; i++) {
-                const checkedRadio = document.querySelector(`input[name="pli_radio_${i}"]:checked`);
-                if (checkedRadio) {
-                    const val = safeFloat(checkedRadio.getAttribute('data-dedpli'));
-                    const code = checkedRadio.getAttribute('data-plicode');
-                    if (val > 0 && code && code !== 'None') {
-                        selectedPlis.push({
-                            label: `PLI ${i} (CODE ${code})`,
-                            value: val
-                        });
+
+            if (isAutonomous) {
+                pliSubtotal = safeFloat(document.getElementById('input-redemption').value);
+            } else {
+                const slotCount = getPliSlotCount();
+                for (let i = 1; i <= slotCount; i++) {
+                    const checkedRadio = document.querySelector(`input[name="pli_radio_${i}"]:checked`);
+                    if (checkedRadio) {
+                        const val = safeFloat(checkedRadio.getAttribute('data-dedpli'));
+                        const code = checkedRadio.getAttribute('data-plicode');
+                        if (val > 0 && code && code !== 'None') {
+                            selectedPlis.push({
+                                label: `PLI ${i} (CODE ${code})`,
+                                value: val
+                            });
+                        }
+                        pliSubtotal += val;
                     }
-                    pliSubtotal += val;
                 }
             }
+            pliSubtotal = Math.round(pliSubtotal * 100) / 100;
+
             /* [2026-07-10 Fix: Changed all calculation result assignments from textContent to innerHTML to render muted currency span HTML cleanly] */
             document.getElementById('val-plisubtotal').innerHTML = formatPHP(pliSubtotal);
 
@@ -4387,175 +4813,183 @@
                 valPliTotalEl.innerHTML = formatPHP(pliSubtotal);
             }
 
-            const netPayPliTotal = window.activeSession.netPay + pliSubtotal;
+            const netPayPliTotal = (isAutonomous ? safeFloat(document.getElementById('input-netpay').value) : window.activeSession.netPay) + pliSubtotal;
             document.getElementById('val-netpayplitotal').innerHTML = formatPHP(netPayPliTotal);
 
             // Phase C Salary Adjustments & overrides query matrix
-            // [2026-07-12 Fix: Dynamic anticipated calculation and comparison table population]
-            const originalGrade = window.activeSession.origGrade;
-            const originalStep = window.activeSession.origStep;
+            let anticipatedVal = 0;
+            let promotionMargin = 0;
 
-            const tranchRowsOld = window.currentData.tranch;
-            const tranchRowsNew = window.currentData.tranch2027;
+            if (window.currentData) {
+                // [2026-07-12 Fix: Dynamic anticipated calculation and comparison table population]
+                const originalGrade = window.activeSession.origGrade;
+                const originalStep = window.activeSession.origStep;
 
-            let basicOld = 0;
-            for (let i = 1; i < tranchRowsOld.length; i++) {
-                if (safeInt(tranchRowsOld[i][0]) === originalGrade) {
-                    basicOld = safeFloat(tranchRowsOld[i][originalStep]);
-                    break;
+                const tranchRowsOld = window.currentData.tranch;
+                const tranchRowsNew = window.currentData.tranch2027;
+
+                let basicOld = 0;
+                for (let i = 1; i < tranchRowsOld.length; i++) {
+                    if (safeInt(tranchRowsOld[i][0]) === originalGrade) {
+                        basicOld = safeFloat(tranchRowsOld[i][originalStep]);
+                        break;
+                    }
                 }
-            }
 
-            let basicNew = 0;
-            for (let i = 1; i < tranchRowsNew.length; i++) {
-                if (safeInt(tranchRowsNew[i][0]) === originalGrade) {
-                    basicNew = safeFloat(tranchRowsNew[i][originalStep]);
-                    break;
+                let basicNew = 0;
+                for (let i = 1; i < tranchRowsNew.length; i++) {
+                    if (safeInt(tranchRowsNew[i][0]) === originalGrade) {
+                        basicNew = safeFloat(tranchRowsNew[i][originalStep]);
+                        break;
+                    }
                 }
-            }
 
-            // Compute breakdowns and diffs
-            const breakdownOld = getNetPayBreakdown(basicOld);
-            const breakdownNew = getNetPayBreakdown(basicNew);
-            const breakdownDiff = {
-                basic: breakdownNew.basic - breakdownOld.basic,
-                pera: breakdownNew.pera - breakdownOld.pera,
-                gsis: breakdownNew.gsis - breakdownOld.gsis,
-                philhealth: breakdownNew.philhealth - breakdownOld.philhealth,
-                pagibig: breakdownNew.pagibig - breakdownOld.pagibig,
-                wtax: breakdownNew.wtax - breakdownOld.wtax,
-                netPay: breakdownNew.netPay - breakdownOld.netPay
-            };
+                // Compute breakdowns and diffs
+                const breakdownOld = getNetPayBreakdown(basicOld);
+                const breakdownNew = getNetPayBreakdown(basicNew);
+                const breakdownDiff = {
+                    basic: breakdownNew.basic - breakdownOld.basic,
+                    pera: breakdownNew.pera - breakdownOld.pera,
+                    gsis: breakdownNew.gsis - breakdownOld.gsis,
+                    philhealth: breakdownNew.philhealth - breakdownOld.philhealth,
+                    pagibig: breakdownNew.pagibig - breakdownOld.pagibig,
+                    wtax: breakdownNew.wtax - breakdownOld.wtax,
+                    netPay: breakdownNew.netPay - breakdownOld.netPay
+                };
 
-            // Render comparison table body
-            const tbody = document.getElementById('bodyAnticipatedBreakdown');
-            if (tbody) {
-                // [2026-07-14 Fix: Improve item row labels in comparison table to show Tranche years; previous: static 'FROM' and 'TO']
-                tbody.innerHTML = `
-                    <tr>
-                        <td class="font-weight-bold text-white-50 text-left">2026 (T3)</td>
-                        <td>${breakdownOld.basic.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                        <td class="col-breakdown">${breakdownOld.pera.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                        <td class="col-breakdown">${breakdownOld.gsis.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                        <td class="col-breakdown">${breakdownOld.philhealth.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                        <td class="col-breakdown">${breakdownOld.pagibig.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                        <td class="col-breakdown">${breakdownOld.wtax.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                        <td>${breakdownOld.netPay.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                    </tr>
-                    <tr>
-                        <td class="font-weight-bold text-white-50 text-left">2027 (T4)</td>
-                        <td>${breakdownNew.basic.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                        <td class="col-breakdown">${breakdownNew.pera.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                        <td class="col-breakdown">${breakdownNew.gsis.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                        <td class="col-breakdown">${breakdownNew.philhealth.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                        <td class="col-breakdown">${breakdownNew.pagibig.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                        <td class="col-breakdown">${breakdownNew.wtax.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                        <td>${breakdownNew.netPay.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                    </tr>
-                    <tr class="diff-row">
-                        <td class="font-weight-bold text-left">DIFF</td>
-                        <td>-</td>
-                        <td class="col-breakdown">-</td>
-                        <td class="col-breakdown">-</td>
-                        <td class="col-breakdown">-</td>
-                        <td class="col-breakdown">-</td>
-                        <td class="col-breakdown">-</td>
-                        <td>+${breakdownDiff.netPay.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                    </tr>
-                `;
-            }
-
-            const anticipatedVal = breakdownDiff.netPay;
-            document.getElementById('val-anticipated').innerHTML = formatPHP(anticipatedVal);
-            window.activeSession.anticipatedVal = anticipatedVal;
-
-            // [2026-07-12 Fix: Compute promotional override salary standard increase using tranch2026.csv and compare net pay deltas]
-            const selectedGrade = safeInt(document.getElementById('promoGrade').value);
-            const selectedStep = safeInt(document.getElementById('promoStep').value);
-
-            let promoBasicNew = 0; // promoted basic pay under 3rd Tranche (2026)
-            for (let i = 1; i < tranchRowsOld.length; i++) {
-                if (safeInt(tranchRowsOld[i][0]) === selectedGrade) {
-                    promoBasicNew = safeFloat(tranchRowsOld[i][selectedStep]);
-                    break;
+                // Render comparison table body
+                const tbody = document.getElementById('bodyAnticipatedBreakdown');
+                if (tbody) {
+                    // [2026-07-14 Fix: Improve item row labels in comparison table to show Tranche years; previous: static 'FROM' and 'TO']
+                    tbody.innerHTML = `
+                        <tr>
+                            <td class="font-weight-bold text-white-50 text-left">2026 (T3)</td>
+                            <td>${breakdownOld.basic.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                            <td class="col-breakdown">${breakdownOld.pera.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                            <td class="col-breakdown">${breakdownOld.gsis.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                            <td class="col-breakdown">${breakdownOld.philhealth.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                            <td class="col-breakdown">${breakdownOld.pagibig.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                            <td class="col-breakdown">${breakdownOld.wtax.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                            <td>${breakdownOld.netPay.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                        </tr>
+                        <tr>
+                            <td class="font-weight-bold text-white-50 text-left">2027 (T4)</td>
+                            <td>${breakdownNew.basic.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                            <td class="col-breakdown">${breakdownNew.pera.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                            <td class="col-breakdown">${breakdownNew.gsis.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                            <td class="col-breakdown">${breakdownNew.philhealth.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                            <td class="col-breakdown">${breakdownNew.pagibig.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                            <td class="col-breakdown">${breakdownNew.wtax.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                            <td>${breakdownNew.netPay.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                        </tr>
+                        <tr class="diff-row">
+                            <td class="font-weight-bold text-left">DIFF</td>
+                            <td>-</td>
+                            <td class="col-breakdown">-</td>
+                            <td class="col-breakdown">-</td>
+                            <td class="col-breakdown">-</td>
+                            <td class="col-breakdown">-</td>
+                            <td class="col-breakdown">-</td>
+                            <td>+${breakdownDiff.netPay.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                        </tr>
+                    `;
                 }
+
+                anticipatedVal = Math.round(breakdownDiff.netPay * 100) / 100;
+                document.getElementById('val-anticipated').innerHTML = formatPHP(anticipatedVal);
+                window.activeSession.anticipatedVal = anticipatedVal;
+
+                // [2026-07-12 Fix: Compute promotional override salary standard increase using tranch2026.csv and compare net pay deltas]
+                const selectedGrade = safeInt(document.getElementById('promoGrade').value);
+                const selectedStep = safeInt(document.getElementById('promoStep').value);
+
+                let promoBasicNew = 0; // promoted basic pay under 3rd Tranche (2026)
+                for (let i = 1; i < tranchRowsOld.length; i++) {
+                    if (safeInt(tranchRowsOld[i][0]) === selectedGrade) {
+                        promoBasicNew = safeFloat(tranchRowsOld[i][selectedStep]);
+                        break;
+                    }
+                }
+
+                // Update New Basic Pay label in gray text
+                document.getElementById('lbl-promoted-salary').innerHTML = `New Salary: ${formatPHP(promoBasicNew)}`;
+
+                // Calculate breakdowns and diffs for promotion (both FROM and TO queried from tranch2026.csv)
+                const breakdownPromoOld = getNetPayBreakdown(basicOld, true);
+                const breakdownPromoNew = getNetPayBreakdown(promoBasicNew, true);
+                const breakdownPromoDiff = {
+                    basic: breakdownPromoNew.basic - breakdownPromoOld.basic,
+                    pera: breakdownPromoNew.pera - breakdownPromoOld.pera,
+                    gsis: breakdownPromoNew.gsis - breakdownPromoOld.gsis,
+                    philhealth: breakdownPromoNew.philhealth - breakdownPromoOld.philhealth,
+                    pagibig: breakdownPromoNew.pagibig - breakdownPromoOld.pagibig,
+                    wtax: breakdownPromoNew.wtax - breakdownPromoOld.wtax,
+                    netPay: breakdownPromoNew.netPay - breakdownPromoOld.netPay
+                };
+
+                // Helper for formatting diff cell text with sign prefixes
+                const formatDiffCell = (val) => {
+                    if (val === 0) return '0.00';
+                    const formatted = val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                    return val > 0 ? `+${formatted}` : formatted;
+                };
+
+                // Render Promotion comparison table body dynamically
+                const tbodyPromo = document.getElementById('bodyPromotionBreakdown');
+                if (tbodyPromo) {
+                    tbodyPromo.innerHTML = `
+                        <tr>
+                            <td class="font-weight-bold text-white-50 text-left">Current</td>
+                            <td>${breakdownPromoOld.basic.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                            <td class="col-breakdown">${breakdownPromoOld.pera.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                            <td class="col-breakdown">${breakdownPromoOld.gsis.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                            <td class="col-breakdown">${breakdownPromoOld.philhealth.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                            <td class="col-breakdown">${breakdownPromoOld.pagibig.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                            <td class="col-breakdown">${breakdownPromoOld.wtax.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                            <td>${breakdownPromoOld.netPay.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                        </tr>
+                        <tr>
+                            <td class="font-weight-bold text-white-50 text-left">Promoted</td>
+                            <td>${breakdownPromoNew.basic.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                            <td class="col-breakdown">${breakdownPromoNew.pera.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                            <td class="col-breakdown">${breakdownPromoNew.gsis.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                            <td class="col-breakdown">${breakdownPromoNew.philhealth.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                            <td class="col-breakdown">${breakdownPromoNew.pagibig.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                            <td class="col-breakdown">${breakdownPromoNew.wtax.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                            <td>${breakdownPromoNew.netPay.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                        </tr>
+                        <tr class="diff-row">
+                            <td class="font-weight-bold text-left">DIFF</td>
+                            <td>${formatDiffCell(breakdownPromoDiff.basic)}</td>
+                            <td class="col-breakdown">${formatDiffCell(breakdownPromoDiff.pera)}</td>
+                            <td class="col-breakdown">${formatDiffCell(breakdownPromoDiff.gsis)}</td>
+                            <td class="col-breakdown">${formatDiffCell(breakdownPromoDiff.philhealth)}</td>
+                            <td class="col-breakdown">${formatDiffCell(breakdownPromoDiff.pagibig)}</td>
+                            <td class="col-breakdown">${formatDiffCell(breakdownPromoDiff.wtax)}</td>
+                            <td>${formatDiffCell(breakdownPromoDiff.netPay)}</td>
+                        </tr>
+                    `;
+                }
+
+                promotionMargin = Math.round(breakdownPromoDiff.netPay * 100) / 100;
+                document.getElementById('val-promomargin').innerHTML = formatPHP(promotionMargin);
+            } else {
+                // Read from manual input fields directly when there is no currentData (search failed)
+                anticipatedVal = isAutonomous ? safeFloat(document.getElementById('input-anticipated').value) : 0;
+                promotionMargin = isAutonomous ? safeFloat(document.getElementById('input-promotion').value) : 0;
             }
 
-            // Update New Basic Pay label in gray text
-            document.getElementById('lbl-promoted-salary').innerHTML = `New Salary: ${formatPHP(promoBasicNew)}`;
-
-            // Calculate breakdowns and diffs for promotion (both FROM and TO queried from tranch2026.csv)
-            // [2026-07-12 Fix: Set isPromotion=true in getNetPayBreakdown to match Dad's spreadsheet WTAX calculations]
-            const breakdownPromoOld = getNetPayBreakdown(basicOld, true);
-            const breakdownPromoNew = getNetPayBreakdown(promoBasicNew, true);
-            const breakdownPromoDiff = {
-                basic: breakdownPromoNew.basic - breakdownPromoOld.basic,
-                pera: breakdownPromoNew.pera - breakdownPromoOld.pera,
-                gsis: breakdownPromoNew.gsis - breakdownPromoOld.gsis,
-                philhealth: breakdownPromoNew.philhealth - breakdownPromoOld.philhealth,
-                pagibig: breakdownPromoNew.pagibig - breakdownPromoOld.pagibig,
-                wtax: breakdownPromoNew.wtax - breakdownPromoOld.wtax,
-                netPay: breakdownPromoNew.netPay - breakdownPromoOld.netPay
-            };
-
-            // Helper for formatting diff cell text with sign prefixes
-            const formatDiffCell = (val) => {
-                if (val === 0) return '0.00';
-                const formatted = val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                return val > 0 ? `+${formatted}` : formatted;
-            };
-
-            // Render Promotion comparison table body dynamically
-            const tbodyPromo = document.getElementById('bodyPromotionBreakdown');
-            if (tbodyPromo) {
-                // [2026-07-14 Fix: Improve item row labels in comparison table to show Current/Promoted SG & Step details; previous: static 'FROM' and 'TO']
-                tbodyPromo.innerHTML = `
-                    <tr>
-                        <td class="font-weight-bold text-white-50 text-left">Current</td>
-                        <td>${breakdownPromoOld.basic.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                        <td class="col-breakdown">${breakdownPromoOld.pera.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                        <td class="col-breakdown">${breakdownPromoOld.gsis.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                        <td class="col-breakdown">${breakdownPromoOld.philhealth.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                        <td class="col-breakdown">${breakdownPromoOld.pagibig.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                        <td class="col-breakdown">${breakdownPromoOld.wtax.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                        <td>${breakdownPromoOld.netPay.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                    </tr>
-                    <tr>
-                        <td class="font-weight-bold text-white-50 text-left">Promoted</td>
-                        <td>${breakdownPromoNew.basic.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                        <td class="col-breakdown">${breakdownPromoNew.pera.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                        <td class="col-breakdown">${breakdownPromoNew.gsis.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                        <td class="col-breakdown">${breakdownPromoNew.philhealth.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                        <td class="col-breakdown">${breakdownPromoNew.pagibig.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                        <td class="col-breakdown">${breakdownPromoNew.wtax.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                        <td>${breakdownPromoNew.netPay.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                    </tr>
-                    <tr class="diff-row">
-                        <td class="font-weight-bold text-left">DIFF</td>
-                        <td>${formatDiffCell(breakdownPromoDiff.basic)}</td>
-                        <td class="col-breakdown">${formatDiffCell(breakdownPromoDiff.pera)}</td>
-                        <td class="col-breakdown">${formatDiffCell(breakdownPromoDiff.gsis)}</td>
-                        <td class="col-breakdown">${formatDiffCell(breakdownPromoDiff.philhealth)}</td>
-                        <td class="col-breakdown">${formatDiffCell(breakdownPromoDiff.pagibig)}</td>
-                        <td class="col-breakdown">${formatDiffCell(breakdownPromoDiff.wtax)}</td>
-                        <td>${formatDiffCell(breakdownPromoDiff.netPay)}</td>
-                    </tr>
-                `;
+            if (isAutonomous) {
+                // If in manual mode, override anticipated and promotion margins from manual fields
+                anticipatedVal = Math.round(safeFloat(document.getElementById('input-anticipated').value) * 100) / 100;
+                promotionMargin = Math.round(safeFloat(document.getElementById('input-promotion').value) * 100) / 100;
             }
-
-            const promotionMargin = breakdownPromoDiff.netPay;
-            document.getElementById('val-promomargin').innerHTML = formatPHP(promotionMargin);
-
-            // [2026-07-11 New: Read toggle states — only include in total if enabled]
-            const useMasterPli   = document.getElementById('toggleMasterPli')   ? document.getElementById('toggleMasterPli').checked   : true;
-            const useAnticipated = document.getElementById('toggleAnticipated') ? document.getElementById('toggleAnticipated').checked : false;
-            const usePromotion   = document.getElementById('togglePromotion')   ? document.getElementById('togglePromotion').checked   : false;
 
             // Compute active components under master PLI toggle
             const activePliSubtotal = useMasterPli ? pliSubtotal : 0;
             document.getElementById('val-plisubtotal').innerHTML = formatPHP(activePliSubtotal);
 
-            const activeNetPayPliTotal = window.activeSession.netPay + activePliSubtotal;
+            const activeNetPayPliTotal = (isAutonomous ? safeFloat(document.getElementById('input-netpay').value) : window.activeSession.netPay) + activePliSubtotal;
             document.getElementById('val-netpayplitotal').innerHTML = formatPHP(activeNetPayPliTotal);
 
             // [2026-07-11 Fix: Overhauled visual dimming to gray out the entire column contents (nodes, labels, and inputs) except the toggle switch, and disable select elements]
@@ -4672,38 +5106,44 @@
             const rowAnticipatedReceipt = document.getElementById('row-anticipated-receipt');
             const valAnticipatedReceipt = document.getElementById('val-anticipated-receipt');
             if (rowAnticipatedReceipt && valAnticipatedReceipt) {
-                if (useAnticipated && anticipatedVal > 0) {
-                    rowAnticipatedReceipt.style.display = 'flex';
-                    valAnticipatedReceipt.textContent = formatPHP(anticipatedVal);
+                if (!isAutonomous && useAnticipated && anticipatedVal > 0) {
+                    rowAnticipatedReceipt.style.setProperty('display', 'flex', 'important');
+                    valAnticipatedReceipt.innerHTML = formatPHP(anticipatedVal);
                 } else {
-                    rowAnticipatedReceipt.style.display = 'none';
+                    rowAnticipatedReceipt.style.setProperty('display', 'none', 'important');
                 }
             }
 
             // [2026-07-14 New: Update separate Promotion receipt row]
+            // 2026-07-13: Make promotion receipt row visible if usePromotion is toggled, even if promotionMargin is zero (was: hidden if promotionMargin was 0)
             const rowPromotionReceipt = document.getElementById('row-promotion-receipt');
             const valPromotionReceipt = document.getElementById('val-promotion-receipt');
             if (rowPromotionReceipt && valPromotionReceipt) {
-                if (usePromotion && promotionMargin !== 0) {
-                    rowPromotionReceipt.style.display = 'flex';
-                    valPromotionReceipt.textContent = formatPHP(promotionMargin);
+                if (!isAutonomous && usePromotion) {
+                    rowPromotionReceipt.style.setProperty('display', 'flex', 'important');
+                    valPromotionReceipt.innerHTML = formatPHP(promotionMargin);
                 } else {
-                    rowPromotionReceipt.style.display = 'none';
+                    rowPromotionReceipt.style.setProperty('display', 'none', 'important');
                 }
             }
 
 
             // [2026-07-12 New: Calculate CSB Deductions sum dynamically from table checkboxes]
+            // [2026-07-14 Fix: Read posSum from input-cs-deductions if isAutonomous; previous: only from table checkboxes]
             let posSum = 0;
-            const csbCbs = document.querySelectorAll('.csb-deduction-cb');
-            if (csbCbs.length > 0) {
-                csbCbs.forEach(cb => {
-                    if (cb.checked) {
-                        posSum += parseFloat(cb.getAttribute('data-amount')) || 0;
-                    }
-                });
+            if (isAutonomous) {
+                posSum = safeFloat(document.getElementById('input-cs-deductions').value);
             } else {
-                posSum = window.activeSession.posSum || 0;
+                const csbCbs = document.querySelectorAll('.csb-deduction-cb');
+                if (csbCbs.length > 0) {
+                    csbCbs.forEach(cb => {
+                        if (cb.checked) {
+                            posSum += parseFloat(cb.getAttribute('data-amount')) || 0;
+                        }
+                    });
+                } else {
+                    posSum = window.activeSession.posSum || 0;
+                }
             }
             
             const lblDedAmt = document.getElementById('lbl-dedamt');
@@ -4711,7 +5151,8 @@
                 lblDedAmt.innerHTML = formatPHP(posSum);
             }
 
-            const netPayVal = window.activeSession.netPay || 0;
+            // [2026-07-14 Fix: Read netPayVal from input-netpay if isAutonomous; previous: only from activeSession]
+            const netPayVal = isAutonomous ? safeFloat(document.getElementById('input-netpay').value) : (window.activeSession.netPay || 0);
             const baselineSubVal = netPayVal + posSum;
             
             const valBaselineEl = document.getElementById('val-baseline');
@@ -4725,7 +5166,8 @@
             
             const valBaselinePapEl = document.getElementById('val-baseline-papsubtotal');
             if (valBaselinePapEl) {
-                valBaselinePapEl.innerHTML = formatPHP(papSubtotal);
+                // [2026-07-14 Fix: Show only activePliSubtotal in redemption accordion header value; previous: papSubtotal]
+                valBaselinePapEl.innerHTML = formatPHP(activePliSubtotal);
             }
             const rowBaselinePapEl = document.getElementById('row-baseline-papsubtotal');
             if (rowBaselinePapEl) {
@@ -4742,7 +5184,7 @@
 
             // [2026-07-14 Fix: Removed dynamic header rename — Redemption/Anticipated/Promotion are now separate rows; previous: single accordion renamed based on active toggles]
             
-            const hasActiveRedemptions = (useMasterPli && selectedPlis.length > 0) || (useAnticipated && anticipatedVal > 0) || (usePromotion && promotionMargin !== 0);
+            const hasActiveRedemptions = (useMasterPli && (isAutonomous || selectedPlis.length > 0)) || (useAnticipated && anticipatedVal > 0) || (usePromotion && promotionMargin !== 0);
             const showSubtotalAfterRedemption = hasActiveRedemptions;
 
             const rowSubtotalAfterRedemptionEl = document.getElementById('row-subtotal-after-redemption'); // Div row element for subtotal after redemption in receipt
@@ -4754,22 +5196,30 @@
                 }
             }
 
-
-
             // Phase D Deductions totals
+            // [2026-07-14 Fix: Read activeOnqSum from input-less-onqueue if isAutonomous (or set to 0 if searchFailedNoOnQueue); previous: only from checkboxes]
             let activeOnqSum = 0;
-            document.querySelectorAll('.onq-checkbox').forEach(cb => {
-                if (cb.checked) {
-                    activeOnqSum += safeFloat(cb.getAttribute('data-dedamt'));
+            if (isAutonomous) {
+                if (window.searchFailedNoOnQueue) {
+                    activeOnqSum = 0;
+                } else {
+                    activeOnqSum = safeFloat(document.getElementById('input-less-onqueue').value);
                 }
-            });
+            } else {
+                document.querySelectorAll('.onq-checkbox').forEach(cb => {
+                    if (cb.checked) {
+                        activeOnqSum += safeFloat(cb.getAttribute('data-dedamt'));
+                    }
+                });
+            }
             document.getElementById('lbl-onqueuetotal').innerHTML = formatPHP(activeOnqSum);
 
-            const incoming = safeFloat(document.getElementById('incomingDeduction').value);
+            // [2026-07-14 Fix: Read incoming from input-less-incoming if isAutonomous; previous: only from incomingDeduction]
+            const incoming = isAutonomous ? safeFloat(document.getElementById('input-less-incoming').value) : safeFloat(document.getElementById('incomingDeduction').value);
             
             // [2026-07-11 Fix: semiTotal now represents PLI + OnQueue total deductions, excluding incoming deduction]
             const semiTotal = papSubtotal + activeOnqSum;
-            document.getElementById('val-semitotal').innerHTML = formatPHP(semiTotal);
+            document.getElementById('val-semitotal').innerHTML = formatPHP(activeOnqSum);
 
             // [2026-07-11 New: Update LESS ONQUEUE display value in NetPay Computation block with OnQueue deductions only]
             const valLessOnqueueEl = document.getElementById('val-less-onqueue');
@@ -4875,15 +5325,16 @@
                 if (thresholdErr) thresholdErr.classList.add('d-none');
             }
 
-            // [2026-07-12 New: Update Underwriting Status Badge dynamically]
+            // 2026-07-14: Unified badge logic — mutually exclusive CAN/CANNOT ACCOMMODATE (was: two separate elements that could both show)
             const statusBadge = document.getElementById('underwriting-status-badge');
             if (statusBadge) {
+                statusBadge.style.display = 'inline-flex';
                 if (roundedNetPay >= thresholdLimit) {
-                    statusBadge.textContent = "ACCOMMODATED";
-                    statusBadge.className = "status-badge status-badge-accommodated";
-                    statusBadge.style.display = "inline-flex";
+                    statusBadge.textContent = "CAN ACCOMMODATE";
+                    statusBadge.className = "badge-ok";
                 } else {
-                    statusBadge.style.display = "none"; // REMOVE DECLINED WORD entirely
+                    statusBadge.textContent = "CANNOT ACCOMMODATE";
+                    statusBadge.className = "badge-fail";
                 }
             }
 
@@ -4979,8 +5430,117 @@
                 if (lblBarOnq) lblBarOnq.textContent = `${pctOnq.toFixed(1)}%`;
             }
 
+            // [2026-07-14 New: Calculate Net Proceeds values moved to dedicated calculateNetProceeds() function]
+            // 2026-07-13: Net Proceeds now only calculated when user presses the Calculate button (was: auto-triggered via runCalculations)
+
             // Save currently active state values to local storage for restore after reload
             saveActiveEvaluationState();
+        }
+
+        // 2026-07-13: Standalone net proceeds calculation function triggered only by Calculate button (was: embedded in runCalculations)
+        function calculateNetProceeds() {
+            if (!window.activeSession) return;
+
+            const modeSelect = document.getElementById('evaluationModeSelect');
+            const mode = modeSelect ? modeSelect.value : 'DEPED';
+            const isAutonomous = (mode === 'AUTONOMOUS');
+
+            const loanAmount = safeFloat(document.getElementById('loanAmount').value);
+            const loanProceeds = Math.round((loanAmount - (loanAmount * 0.06)) * 100) / 100;
+            const oldBalance = Math.round(safeFloat(document.getElementById('input-netproc-old-balance').value) * 100) / 100;
+            const advanceMonths = parseInt(document.getElementById('select-netproc-advance-months').value, 10) || 0;
+
+            const useAnticipated = document.getElementById('toggleAnticipated') ? document.getElementById('toggleAnticipated').checked : false;
+            const usePromotion   = document.getElementById('togglePromotion')   ? document.getElementById('togglePromotion').checked   : false;
+            const useMasterPli   = document.getElementById('toggleMasterPli')   ? document.getElementById('toggleMasterPli').checked   : true;
+
+            // Redemption (PLI subtotal)
+            let pliSubtotal = 0;
+            if (isAutonomous) {
+                pliSubtotal = safeFloat(document.getElementById('input-redemption').value);
+            } else {
+                const slotCount = getPliSlotCount();
+                for (let i = 1; i <= slotCount; i++) {
+                    const checkedRadio = document.querySelector(`input[name="pli_radio_${i}"]:checked`);
+                    if (checkedRadio) {
+                        const val = safeFloat(checkedRadio.getAttribute('data-dedpli'));
+                        const code = checkedRadio.getAttribute('data-plicode');
+                        if (val > 0 && code && code !== 'None') {
+                            pliSubtotal += val;
+                        }
+                    }
+                }
+            }
+            const activePliSubtotal = useMasterPli ? Math.round(pliSubtotal * 100) / 100 : 0;
+
+            // Old CSB deduction basis
+            let oldDeduction = 0;
+            if (isAutonomous) {
+                oldDeduction = Math.round(safeFloat(document.getElementById('input-cs-deductions').value) * 100) / 100;
+            } else {
+                document.querySelectorAll('.netproc-deduction-cb').forEach(cb => {
+                    if (cb.checked) oldDeduction += safeFloat(cb.getAttribute('data-amount'));
+                });
+                oldDeduction = Math.round(oldDeduction * 100) / 100;
+            }
+
+            // Old deduction label update
+            const lblNetprocOldDedamt = document.getElementById('lbl-netproc-old-dedamt');
+            if (lblNetprocOldDedamt) lblNetprocOldDedamt.innerHTML = formatPHP(oldDeduction);
+
+            // Amortization from current calculation
+            const loanTerm = safeInt(document.getElementById('loanTerm').value);
+            const interestRate = getInterestRateValue();
+            let amortization = 0;
+            if (loanAmount > 0 && loanTerm > 0 && interestRate > 0) {
+                const rawPmt = calculatePMT(interestRate / 12, loanTerm, loanAmount);
+                amortization = Math.ceil(rawPmt * 100) / 100;
+            }
+
+            // Advance payment
+            let advancePayment = 0;
+            if (useAnticipated || usePromotion) {
+                const basis = Math.max(0, amortization - oldDeduction);
+                advancePayment = Math.round(basis * advanceMonths * 100) / 100;
+            }
+
+            // Final net proceeds
+            const netProceeds = Math.round((loanProceeds - oldBalance - activePliSubtotal - advancePayment) * 100) / 100;
+
+            // Update all display elements
+            const valLP = document.getElementById('val-netproc-loan-proceeds');
+            if (valLP) valLP.innerHTML = formatPHP(loanProceeds);
+
+            const valRed = document.getElementById('val-netproc-redemption');
+            if (valRed) valRed.innerHTML = formatPHP(activePliSubtotal);
+
+            const valAdv = document.getElementById('val-netproc-advance-payment');
+            if (valAdv) valAdv.innerHTML = formatPHP(advancePayment);
+
+            const valTotal = document.getElementById('val-netproc-total');
+            // 2026-07-14: Display net proceeds as absolute positive value (was: could display negative)
+            if (valTotal) valTotal.innerHTML = formatPHP(Math.abs(netProceeds));
+
+            // Animate button to give feedback
+            const btn = document.getElementById('btn-calculate-netproc');
+            if (btn) {
+                const orig = btn.innerHTML;
+                btn.innerHTML = '<i class="bi bi-check-lg mr-1"></i>DONE';
+                btn.style.background = 'linear-gradient(135deg, #047857 0%, #059669 100%)';
+                setTimeout(() => {
+                    btn.innerHTML = orig;
+                    btn.style.background = 'linear-gradient(135deg, #059669 0%, #10B981 100%)';
+                }, 1400);
+            }
+
+            saveActiveEvaluationState();
+        }
+
+        // 2026-07-13: Only toggle checkboxes without auto-calculating (was: called runCalculations)
+        function toggleAllNetprocCheckboxes(master) {
+            document.querySelectorAll('.netproc-deduction-cb').forEach(cb => {
+                cb.checked = master.checked;
+            });
         }
 
         // [2026-07-11 New: Toggle handler for Anticipated — updates label color when toggled]
@@ -5095,8 +5655,11 @@
         }
 
         function saveActiveEvaluationState() {
-            if (!window.currentData || !window.activeSession) return;
+            if (!window.activeSession) return;
             
+            const empNumVal = window.currentData ? window.currentData.empNum : (window.activeSession.empNum || document.getElementById('employeeNumber').value.trim());
+            const monthVal = window.currentData ? window.currentData.month : document.getElementById('activeMonthSelect').value;
+
             const pliSelections = [];
             const slotCount = getPliSlotCount();
             for (let i = 1; i <= slotCount; i++) {
@@ -5110,8 +5673,8 @@
             });
 
             const activeState = {
-                empNum: window.currentData.empNum,
-                month: window.currentData.month,
+                empNum: empNumVal,
+                month: monthVal,
                 loanAmount: safeFloat(document.getElementById('loanAmount').value),
                 loanTerm: safeInt(document.getElementById('loanTerm').value),
                 interestRate: getInterestRateValue(),
@@ -5124,7 +5687,31 @@
                 /* [2026-07-11 Fix: Added saving toggle check states to localStorage activeState object] */
                 toggleMasterPli: document.getElementById('toggleMasterPli') ? document.getElementById('toggleMasterPli').checked : false,
                 toggleAnticipated: document.getElementById('toggleAnticipated') ? document.getElementById('toggleAnticipated').checked : false,
-                togglePromotion: document.getElementById('togglePromotion') ? document.getElementById('togglePromotion').checked : false
+                togglePromotion: document.getElementById('togglePromotion') ? document.getElementById('togglePromotion').checked : false,
+                // [2026-07-14 New: Save evaluationModeSelect state]
+                evaluationMode: document.getElementById('evaluationModeSelect') ? document.getElementById('evaluationModeSelect').value : 'DEPED',
+                // [2026-07-14 New: Save searchFailedNoOnQueue state]
+                searchFailedNoOnQueue: window.searchFailedNoOnQueue ? true : false,
+                // [2026-07-14 New: Save redemption label doubled state]
+                redemptionDoubled: (document.getElementById('lbl-redemption-toggle-text') ? (document.getElementById('lbl-redemption-toggle-text').dataset.doubled === '1') : false),
+                // [2026-07-14 New: Save autonomous input values]
+                inputNetpayVal: document.getElementById('input-netpay') ? document.getElementById('input-netpay').value : "0.00",
+                inputCsDeductionsVal: document.getElementById('input-cs-deductions') ? document.getElementById('input-cs-deductions').value : "0.00",
+                inputRedemptionVal: document.getElementById('input-redemption') ? document.getElementById('input-redemption').value : "0.00",
+                inputAnticipatedVal: document.getElementById('input-anticipated') ? document.getElementById('input-anticipated').value : "0.00",
+                inputPromotionVal: document.getElementById('input-promotion') ? document.getElementById('input-promotion').value : "0.00",
+                inputLessOnqueueVal: document.getElementById('input-less-onqueue') ? document.getElementById('input-less-onqueue').value : "0.00",
+                inputLessIncomingVal: document.getElementById('input-less-incoming') ? document.getElementById('input-less-incoming').value : "0.00",
+                // 2026-07-13: Change default old balance value to "0" (was: "0.00")
+                netprocOldBalance: document.getElementById('input-netproc-old-balance') ? document.getElementById('input-netproc-old-balance').value : "0",
+                netprocAdvanceMonths: document.getElementById('select-netproc-advance-months') ? document.getElementById('select-netproc-advance-months').value : "3",
+                netprocSelections: (() => {
+                    const selections = [];
+                    document.querySelectorAll('.netproc-deduction-cb').forEach((cb, idx) => {
+                        if (cb.checked) selections.push(idx);
+                    });
+                    return selections;
+                })()
             };
 
             localStorage.setItem('le_active_state', JSON.stringify(activeState));
@@ -5133,10 +5720,13 @@
         // State history logger card controls
         // State history logger card controls
         async function logCurrentState() {
-            if (!window.currentData || !window.activeSession) {
-                await showCustomAlert("Please run a successful employee lookup session first.");
+            if (!window.activeSession) {
+                await showCustomAlert("Please run a successful employee lookup or enter Autonomous Mode first.");
                 return;
             }
+
+            const empNumVal = window.currentData ? window.currentData.empNum : (window.activeSession.empNum || document.getElementById('employeeNumber').value.trim());
+            const monthVal = window.currentData ? window.currentData.month : document.getElementById('activeMonthSelect').value;
 
             // Capture selections indices
             const pliSelections = [];
@@ -5158,8 +5748,8 @@
             const amortVal = safeFloat(document.getElementById('val-new-csb-amortization').textContent) || safeFloat(document.getElementById('val-amortization').textContent);
 
             const stateRun = {
-                empNum: window.currentData.empNum,
-                month: window.currentData.month,
+                empNum: empNumVal,
+                month: monthVal,
                 fullName: fullName,
                 // [2026-07-14 Fix: Format date as 'Jan 01, 2026' on save]
                 searchDate: (() => {
@@ -5363,6 +5953,48 @@
                 onTogglePromotion();
             }
 
+            // [2026-07-14 New: Restore Evaluation Mode, searchFailedNoOnQueue flag, and autonomous inputs]
+            if (state.evaluationMode !== undefined) {
+                document.getElementById('evaluationModeSelect').value = state.evaluationMode;
+            }
+            if (state.searchFailedNoOnQueue !== undefined) {
+                window.searchFailedNoOnQueue = state.searchFailedNoOnQueue;
+            }
+            // Restore redemption label doubled state
+            if (state.redemptionDoubled !== undefined) {
+                const isDoubled = state.redemptionDoubled;
+                const lbl = document.getElementById('lbl-redemption-toggle-text');
+                const lblAuto = document.getElementById('lbl-redemption-toggle-text-autonomous');
+                const cardTitleEl = document.getElementById('lbl-pli-card-title-text');
+                if (lbl) {
+                    lbl.dataset.doubled = isDoubled ? '1' : '0';
+                    lbl.innerHTML = isDoubled ? '<i class="bi bi-plus-lg text-success mr-2"></i>Double Deduction' : '<i class="bi bi-plus-lg text-success mr-2"></i>Redemption';
+                }
+                if (lblAuto) {
+                    lblAuto.dataset.doubled = isDoubled ? '1' : '0';
+                    lblAuto.innerHTML = isDoubled ? '<i class="bi bi-plus-lg text-success mr-2"></i>Double Deduction' : '<i class="bi bi-plus-lg text-success mr-2"></i>Redemption';
+                }
+                if (cardTitleEl) {
+                    cardTitleEl.textContent = isDoubled ? 'Double Deduction' : 'REDEMPTION';
+                }
+            }
+            if (state.inputNetpayVal !== undefined) document.getElementById('input-netpay').value = state.inputNetpayVal;
+            if (state.inputCsDeductionsVal !== undefined) document.getElementById('input-cs-deductions').value = state.inputCsDeductionsVal;
+            if (state.inputRedemptionVal !== undefined) document.getElementById('input-redemption').value = state.inputRedemptionVal;
+            if (state.inputAnticipatedVal !== undefined) document.getElementById('input-anticipated').value = state.inputAnticipatedVal;
+            if (state.inputPromotionVal !== undefined) document.getElementById('input-promotion').value = state.inputPromotionVal;
+            if (state.inputLessOnqueueVal !== undefined) document.getElementById('input-less-onqueue').value = state.inputLessOnqueueVal;
+            if (state.inputLessIncomingVal !== undefined) document.getElementById('input-less-incoming').value = state.inputLessIncomingVal;
+            if (state.netprocOldBalance !== undefined) document.getElementById('input-netproc-old-balance').value = state.netprocOldBalance;
+            if (state.netprocAdvanceMonths !== undefined) document.getElementById('select-netproc-advance-months').value = state.netprocAdvanceMonths;
+            if (state.netprocSelections !== undefined) {
+                const netprocCbs = document.querySelectorAll('.netproc-deduction-cb');
+                netprocCbs.forEach((cb, idx) => {
+                    cb.checked = state.netprocSelections.includes(idx);
+                });
+            }
+
+            onModeChange();
             // Re-run calculations matrix
             runCalculations();
         }
@@ -5381,173 +6013,164 @@
             }
         }
 
-        // [2026-07-14 New: Toggle Redemption label text between REDEMPTION and DOUBLE DEDUCTION on click; does not open accordion]
-        // [2026-07-14 New: Switch between DEPED (auto-filled) and AUTONOMOUS (manual input) modes]
-        function onModeSelectChange() {
-            const mode = document.getElementById('modeSelect').value;
-            const panel = document.getElementById('panel-baseline-inner');
-            if (!panel) return;
-            if (mode === 'autonomous') {
-                panel.classList.add('auto-mode');
-                // Pre-fill inputs from current activeSession values if available
-                if (window.activeSession) {
-                    const inpNetpay = document.getElementById('inp-autonomous-netpay');
-                    const inpCsb    = document.getElementById('inp-autonomous-csb');
-                    const inpIncoming = document.getElementById('inp-autonomous-incoming');
-                    const inpRedemption = document.getElementById('inp-autonomous-redemption');
-                    if (inpNetpay)    inpNetpay.value    = (window.activeSession.netPay    || 0).toFixed(2);
-                    if (inpCsb)       inpCsb.value       = (window.activeSession.posSum    || 0).toFixed(2);
-                    if (inpIncoming) {
-                        const incoming = parseFloat(document.getElementById('incomingDeduction')?.value) || 0;
-                        inpIncoming.value = incoming.toFixed(2);
-                    }
-                    if (inpRedemption) inpRedemption.value = (window.activeSession.papSubtotalLast || 0).toFixed(2);
+        // [2026-07-14 New: Toggles expand/collapse states of the Old Deductions table inside Net Proceeds card]
+        function toggleNetprocAccordion() {
+            const body = document.getElementById('netprocAccordionBody');
+            const chevron = document.getElementById('netproc-chevron');
+            if (body) {
+                const isHidden = body.style.display === 'none';
+                body.style.display = isHidden ? 'block' : 'none';
+                if (chevron) {
+                    chevron.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
                 }
-                runAutonomousCalculations();
-            } else {
-                panel.classList.remove('auto-mode');
-                // Restore from activeSession if available
-                if (window.activeSession) {
-                    const lnp = document.getElementById('lbl-netpay');
-                    const ldm = document.getElementById('lbl-dedamt');
-                    if (lnp) lnp.innerHTML = formatPHP(window.activeSession.netPay || 0);
-                    if (ldm) ldm.innerHTML = formatPHP(window.activeSession.posSum || 0);
-                }
-                runCalculations();
             }
         }
 
-        // [2026-07-14 New: Autonomous calculation path — reads from manual input fields instead of CSV session data]
-        function runAutonomousCalculations() {
-            const safeInp = (id) => {
-                const el = document.getElementById(id);
-                if (!el) return 0;
-                return parseFloat(el.value.replace(/,/g, '')) || 0;
-            };
-
-            const netPay   = safeInp('inp-autonomous-netpay');
-            const csbDed   = safeInp('inp-autonomous-csb');
-            const incoming = safeInp('inp-autonomous-incoming');
-
-            // Subtotal = Net Pay + CSB Deductions
-            const subtotal = netPay + csbDed;
-            const valBaselineEl = document.getElementById('val-baseline');
-            if (valBaselineEl) valBaselineEl.innerHTML = formatPHP(subtotal);
-
-            // Redemption (manual, shown only if PLI/Redemption row visible)
-            const redemption  = safeInp('inp-autonomous-redemption');
-            const antVal      = safeInp('inp-autonomous-anticipated');
-            const promoVal    = safeInp('inp-autonomous-promotion');
-
-            // Update receipt row values (autonomous: inputs are already live, just update spans for subtotal display)
-            const valPapEl = document.getElementById('val-baseline-papsubtotal');
-            if (valPapEl) valPapEl.innerHTML = formatPHP(redemption);
-
-            const rowAnticipatedReceipt = document.getElementById('row-anticipated-receipt');
-            const rowPromotionReceipt   = document.getElementById('row-promotion-receipt');
-            const useAnticipated = document.getElementById('toggleAnticipated')?.checked || false;
-            const usePromotion   = document.getElementById('togglePromotion')?.checked   || false;
-            if (rowAnticipatedReceipt) rowAnticipatedReceipt.style.display = useAnticipated ? 'flex' : 'none';
-            if (rowPromotionReceipt)   rowPromotionReceipt.style.display   = usePromotion   ? 'flex' : 'none';
-
-            // Subtotal after redemption
-            const papSubtotal = redemption + (useAnticipated ? antVal : 0) + (usePromotion ? promoVal : 0);
-            const subtotalAfterRedemption = subtotal + papSubtotal;
-            const valSubtotalAfterEl = document.getElementById('val-subtotal-after-redemption');
-            if (valSubtotalAfterEl) valSubtotalAfterEl.innerHTML = formatPHP(subtotalAfterRedemption);
-            const rowSAR = document.getElementById('row-subtotal-after-redemption');
-            if (rowSAR) rowSAR.style.setProperty('display', papSubtotal !== 0 ? 'flex' : 'none', 'important');
-
-            // Updated display in val-less-incoming span (for audit trail / display)
-            const valLessIncomingEl = document.getElementById('val-less-incoming');
-            if (valLessIncomingEl) valLessIncomingEl.innerHTML = formatPHP(incoming);
-
-            // Revised baseline
-            const revisedBaseline = subtotalAfterRedemption - incoming;
-            const valRevisedEl = document.getElementById('val-revised-baseline');
-            if (valRevisedEl) valRevisedEl.innerHTML = formatPHP(revisedBaseline);
-            const panelRevisedEl = document.getElementById('row-revised-baseline');
-            if (panelRevisedEl) panelRevisedEl.style.setProperty('display', 'flex', 'important');
-
-            // val-less-onqueue: force 0 in autonomous (no onqueue)
-            const valLessOnqueueEl = document.getElementById('val-less-onqueue');
-            if (valLessOnqueueEl) valLessOnqueueEl.innerHTML = formatPHP(0);
-
-            // Loan & amortization
-            const loanAmount   = safeFloat(document.getElementById('loanAmount')?.value);
-            const loanTerm     = safeInt(document.getElementById('loanTerm')?.value);
-            const interestRate = getInterestRateValue();
-            const monthlyRate  = interestRate / 100 / 12;
-            const pmtResult    = calculatePMT(monthlyRate, loanTerm, loanAmount);
-            const amortization = Math.ceil(parseFloat(pmtResult.toFixed(6)) * 100) / 100;
-
-            const valAmoEl = document.getElementById('val-amortization');
-            if (valAmoEl) valAmoEl.innerHTML = formatPHP(amortization);
-            const totalRepayment = amortization * loanTerm;
-            const totalInterest = Math.max(0, totalRepayment - loanAmount);
-            const lblTotalInterest = document.getElementById('lbl-total-interest');
-            if (lblTotalInterest) lblTotalInterest.innerHTML = `<i class="bi bi-calculator text-muted mr-1"></i>Est. Interest: <strong class="text-white-50">${formatPHP(totalInterest)}</strong>`;
-
-            const newNetPay = revisedBaseline - amortization;
-            const roundedNetPay = Math.round(newNetPay * 100) / 100;
-            const valCsbAmoEl = document.getElementById('val-new-csb-amortization');
-            if (valCsbAmoEl) valCsbAmoEl.innerHTML = formatPHP(amortization);
-            const valFinalEl = document.getElementById('val-final-new-netpay');
-            if (valFinalEl) valFinalEl.innerHTML = formatPHP(roundedNetPay);
-            const netPayEl = document.getElementById('val-newnetpay');
-            if (netPayEl) {
-                netPayEl.innerHTML = formatPHP(roundedNetPay);
-                netPayEl.classList.remove('glow-green', 'glow-red');
-                netPayEl.classList.add(roundedNetPay >= 0 ? 'glow-green' : 'glow-red');
-            }
-            // Save for audit/print
-            if (!window.activeSession) window.activeSession = {};
-            window.activeSession.papSubtotalLast = papSubtotal;
-        }
-
-        // [2026-07-14 New: Activates autonomous mode when employee not found in records]
-        function activateAutonomousMode(empNum) {
-            // Minimal session so runCalculations guard passes
-            window.activeSession = { netPay: 0, origGrade: 1, origStep: 1, posSum: 0, baselineSub: 0 };
-            window.currentData = window.currentData || { tranch: [[]], tranch2027: [[]], pli: [[]], onq: [[]], pos: [[]], netpay: [[]] };
-
-            // Show empSummaryCard with placeholder info
-            document.getElementById('empSummaryName').textContent = 'UNKNOWN';
-            document.getElementById('empSummaryID').textContent   = empNum || '-';
-            document.getElementById('empSummaryDiv').textContent  = 'AUTONOMOUS MODE';
-            document.getElementById('empSummaryCard').classList.remove('d-none');
-
-            // Show workspace
-            document.getElementById('evaluationWorkspace').classList.remove('d-none');
-            document.getElementById('loadingIndicator').classList.add('d-none');
-
-            // Switch dropdown to autonomous and apply mode
-            const modeSelect = document.getElementById('modeSelect');
-            if (modeSelect) modeSelect.value = 'autonomous';
-            const panel = document.getElementById('panel-baseline-inner');
-            if (panel) panel.classList.add('auto-mode');
-
-            // Reset autonomous inputs
-            ['inp-autonomous-netpay','inp-autonomous-csb','inp-autonomous-incoming',
-             'inp-autonomous-redemption','inp-autonomous-anticipated','inp-autonomous-promotion'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.value = '0';
+        // [2026-07-14 New: Selects/deselects all old deductions checkboxes inside Net Proceeds card]
+        function toggleAllNetprocDeductions(master) {
+            document.querySelectorAll('.netproc-deduction-cb').forEach(cb => {
+                cb.checked = master.checked;
             });
-            runAutonomousCalculations();
+            runCalculations();
         }
 
+        // [2026-07-14 New: Toggle Redemption label text between REDEMPTION and Double Deduction on click; does not open accordion]
         function toggleRedemptionLabel(event) {
             event.stopPropagation(); // Prevent accordion from opening
             const lbl = document.getElementById('lbl-redemption-toggle-text');
-            if (!lbl) return;
-            const isDouble = lbl.dataset.doubled === '1';
-            if (isDouble) {
-                lbl.innerHTML = '<i class="bi bi-plus-lg text-success mr-2"></i>Redemption';
-                lbl.dataset.doubled = '0';
-            } else {
-                lbl.innerHTML = '<i class="bi bi-plus-lg text-success mr-2"></i>DOUBLE DEDUCTION';
-                lbl.dataset.doubled = '1';
+            const lblAuto = document.getElementById('lbl-redemption-toggle-text-autonomous');
+            const cardTitleEl = document.getElementById('lbl-pli-card-title-text');
+            
+            let isDouble = false;
+            if (lbl) {
+                isDouble = lbl.dataset.doubled === '1';
+                if (isDouble) {
+                    lbl.innerHTML = '<i class="bi bi-plus-lg text-success mr-2"></i>Redemption';
+                    lbl.dataset.doubled = '0';
+                } else {
+                    lbl.innerHTML = '<i class="bi bi-plus-lg text-success mr-2"></i>Double Deduction';
+                    lbl.dataset.doubled = '1';
+                }
             }
+            if (lblAuto) {
+                isDouble = lblAuto.dataset.doubled === '1';
+                if (isDouble) {
+                    lblAuto.innerHTML = '<i class="bi bi-plus-lg text-success mr-2"></i>Redemption';
+                    lblAuto.dataset.doubled = '0';
+                } else {
+                    lblAuto.innerHTML = '<i class="bi bi-plus-lg text-success mr-2"></i>Double Deduction';
+                    lblAuto.dataset.doubled = '1';
+                }
+            }
+
+            if (cardTitleEl) {
+                // If previous was Double Deduction, it is toggled back to REDEMPTION
+                cardTitleEl.textContent = isDouble ? 'REDEMPTION' : 'Double Deduction';
+            }
+        }
+
+        // [2026-07-14 New: Mode Selector change handler to toggle display-only elements vs manual numeric inputs in NETPAY COMPUTATION]
+        function onModeChange() {
+            const modeSelect = document.getElementById('evaluationModeSelect');
+            const mode = modeSelect ? modeSelect.value : 'DEPED';
+            const isAutonomous = (mode === 'AUTONOMOUS');
+            
+            // Toggle visibility of standard elements vs manual inputs
+            // 1. Current Net Pay
+            const lblNetPay = document.getElementById('lbl-netpay');
+            const inputNetPay = document.getElementById('input-netpay');
+            if (lblNetPay && inputNetPay) {
+                if (isAutonomous) {
+                    lblNetPay.style.setProperty('display', 'none', 'important');
+                    inputNetPay.style.setProperty('display', 'inline-block', 'important');
+                } else {
+                    lblNetPay.style.removeProperty('display');
+                    inputNetPay.style.setProperty('display', 'none', 'important');
+                }
+            }
+            
+            // 2. CSB Deductions
+            const csbContainer = document.getElementById('dynamic-csb-deductions-container');
+            const csbAutoRow = document.getElementById('row-cs-deductions-autonomous');
+            if (csbContainer && csbAutoRow) {
+                if (isAutonomous) {
+                    csbContainer.style.setProperty('display', 'none', 'important');
+                    csbAutoRow.style.setProperty('display', 'flex', 'important');
+                } else {
+                    csbContainer.style.removeProperty('display');
+                    csbAutoRow.style.setProperty('display', 'none', 'important');
+                }
+            }
+            
+            // 3. Redemption
+            const pliContainer = document.getElementById('dynamic-pli-rows-container');
+            const redemptionAutoRow = document.getElementById('row-redemption-autonomous');
+            if (pliContainer && redemptionAutoRow) {
+                if (isAutonomous) {
+                    pliContainer.style.setProperty('display', 'none', 'important');
+                    redemptionAutoRow.style.setProperty('display', 'flex', 'important');
+                } else {
+                    pliContainer.style.removeProperty('display');
+                    redemptionAutoRow.style.setProperty('display', 'none', 'important');
+                }
+            }
+            
+            // 4. Anticipated
+            const anticipatedReceiptRow = document.getElementById('row-anticipated-receipt');
+            const anticipatedAutoRow = document.getElementById('row-anticipated-autonomous');
+            if (anticipatedReceiptRow && anticipatedAutoRow) {
+                if (isAutonomous) {
+                    anticipatedReceiptRow.style.setProperty('display', 'none', 'important');
+                    // will show/hide in runCalculations based on toggle state
+                } else {
+                    anticipatedAutoRow.style.setProperty('display', 'none', 'important');
+                }
+            }
+            
+            // 5. Promotion
+            const promotionReceiptRow = document.getElementById('row-promotion-receipt');
+            const promotionAutoRow = document.getElementById('row-promotion-autonomous');
+            if (promotionReceiptRow && promotionAutoRow) {
+                if (isAutonomous) {
+                    promotionReceiptRow.style.setProperty('display', 'none', 'important');
+                    // will show/hide in runCalculations based on toggle state
+                } else {
+                    promotionAutoRow.style.setProperty('display', 'none', 'important');
+                }
+            }
+            
+            // 6. Less OnQueue
+            const onqRow = document.getElementById('row-less-onqueue');
+            const onqAutoRow = document.getElementById('row-less-onqueue-autonomous');
+            if (onqRow && onqAutoRow) {
+                if (isAutonomous) {
+                    onqRow.style.setProperty('display', 'none', 'important');
+                    if (window.searchFailedNoOnQueue) {
+                        onqAutoRow.style.setProperty('display', 'none', 'important');
+                    } else {
+                        onqAutoRow.style.setProperty('display', 'flex', 'important');
+                    }
+                } else {
+                    onqRow.style.removeProperty('display');
+                    onqAutoRow.style.setProperty('display', 'none', 'important');
+                }
+            }
+            
+            // 7. Less Incoming
+            const incomingRow = document.getElementById('row-less-incoming');
+            const incomingAutoRow = document.getElementById('row-less-incoming-autonomous');
+            if (incomingRow && incomingAutoRow) {
+                if (isAutonomous) {
+                    incomingRow.style.setProperty('display', 'none', 'important');
+                    incomingAutoRow.style.setProperty('display', 'flex', 'important');
+                } else {
+                    incomingRow.style.removeProperty('display');
+                    incomingAutoRow.style.setProperty('display', 'none', 'important');
+                }
+            }
+            
+            // Re-run calculations to update the subtotal and netpay outputs
+            runCalculations();
         }
 
         // [2026-07-12 New: Toggles expand/collapse states of the CSB Deductions receipt container accordion]
