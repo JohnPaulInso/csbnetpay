@@ -1114,6 +1114,23 @@
             padding-bottom: 0 !important;
         }
 
+        /* [2026-07-14 Fix: Increased panel padding so content has breathing room from border; previous: inherited 14px 16px was cramped] */
+        #panel-loanamt-inner {
+            padding: 16px 18px 18px 18px !important;
+        }
+        /* [2026-07-14 Fix: Remove Bootstrap px-2 gutter collision on term/rate columns; use explicit gap instead] */
+        #panel-loanamt-inner .row {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            gap: 10px;
+            flex-wrap: nowrap;
+        }
+        #panel-loanamt-inner .row > [class*="col-"] {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            flex: 1 1 0;
+        }
+
         #panel-baseline-inner .baseline-row {
             font-size: 0.76rem !important;
             padding: 4px 8px !important;
@@ -1338,6 +1355,78 @@
             line-height: 1.2;
             margin-bottom: 2px;
         }
+        /* [2026-07-14 New: DEPED/AUTONOMOUS mode select pill in empSummaryCard] */
+        .mode-select-pill {
+            appearance: none;
+            -webkit-appearance: none;
+            background: rgba(14, 18, 36, 0.85);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 20px;
+            color: var(--accent);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.07em;
+            padding: 4px 24px 4px 10px;
+            cursor: pointer;
+            outline: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23F59E0B'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .mode-select-pill:hover, .mode-select-pill:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.15);
+        }
+        .mode-select-pill option {
+            background: #0e1224;
+            color: #fff;
+        }
+        /* [2026-07-14 New: Autonomous mode input fields replacing static span values in NETPAY COMPUTATION] */
+        .netpay-auto-input {
+            display: none;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-align: right;
+            padding: 3px 8px;
+            width: 130px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .netpay-auto-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(245,158,11,0.12);
+        }
+        /* When panel is in autonomous mode: show inputs, hide static spans */
+        #panel-baseline-inner.auto-mode .netpay-auto-hide { display: none !important; }
+        #panel-baseline-inner.auto-mode .netpay-auto-input { display: inline-block !important; }
+        /* Autonomous mode: hide OnQueue and CSB accordion rows entirely */
+        #panel-baseline-inner.auto-mode #row-less-onqueue { display: none !important; }
+        #panel-baseline-inner.auto-mode #dynamic-csb-deductions-container { display: none !important; }
+        /* Autonomous mode: show manual CSB input row instead */
+        #panel-baseline-inner.auto-mode #row-auto-csb { display: flex !important; }
+        /* Autonomous mode label badge */
+        .auto-mode-badge {
+            display: none;
+            font-size: 0.58rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            color: var(--accent);
+            background: rgba(245,158,11,0.1);
+            border: 1px solid rgba(245,158,11,0.2);
+            border-radius: 10px;
+            padding: 1px 7px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+        #panel-baseline-inner.auto-mode .auto-mode-badge { display: inline; }
+
         #empSummaryName, #empSummaryID, #empSummaryDiv {
             font-size: 0.85rem;
             letter-spacing: 0.02em;
@@ -2684,9 +2773,20 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
+                    <!-- [2026-07-14 New: DEPED/AUTONOMOUS mode selector on right side of summary card] -->
+                    <div class="col-md-auto ml-auto d-flex align-items-center" id="col-mode-select" style="gap: 8px;">
+                        <div class="d-flex flex-column align-items-end">
+                            <span class="summary-label text-uppercase mb-1">Mode</span>
+                            <select id="modeSelect" class="mode-select-pill" onchange="onModeSelectChange()" title="Switch between DepED data mode and manual autonomous input">
+                                <option value="deped" selected>DEPED</option>
+                                <option value="autonomous">AUTONOMOUS</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div><!-- /.row -->
+            </div><!-- /#empSummaryCard -->
+        </div><!-- /outer wrapper -->
 
         <!-- Main Evaluation Workspace -->
         <div id="evaluationWorkspace" class="d-none">
@@ -2715,7 +2815,7 @@
                                 <span class="currency-prefix">₱</span>
                                 <input type="text" id="loanAmount" class="form-control bank-input font-weight-bold text-white tabular-nums" oninput="formatLoanAmountField(); runCalculations();">
                             </div>
-                            <div id="lbl-total-interest" class="text-white-50 small tabular-nums" style="font-size: 0.8rem; font-weight: 500;">
+                            <div id="lbl-total-interest" class="text-white-50 tabular-nums mt-2" style="font-size: 0.75rem; font-weight: 500;">
                                 Total Interest: ₱0.00
                             </div>
 
@@ -2763,6 +2863,7 @@
                             <div class="orange-node mb-3" id="node-baseline">
                                 <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10"/></svg>
                                 NETPAY COMPUTATION
+                                <span class="auto-mode-badge" id="badge-auto-mode">AUTONOMOUS</span>
                                 <span class="math-popover">
                                     <strong>Baseline Subtotal = NetPay + DEDAMT</strong><br>
                                     Combines NetPay (from june26.csv) and DEDAMT components (from pos_june26.csv).
@@ -2771,7 +2872,8 @@
                             <!-- [2026-07-12 Current Net Pay Row - Starting baseline net pay. Labeled netpay-row-current] -->
                             <div class="baseline-row netpay-row-current mb-2" id="row-current-netpay">
                                 <span class="netpay-label"><i class="bi bi-wallet2 text-success mr-2"></i>Current Net Pay</span>
-                                <span id="lbl-netpay" class="netpay-value tabular-nums font-weight-bold">₱0.00</span>
+                                <span id="lbl-netpay" class="netpay-value tabular-nums font-weight-bold netpay-auto-hide">₱0.00</span>
+                                <input id="inp-autonomous-netpay" class="netpay-auto-input tabular-nums" type="text" value="0" placeholder="0.00" oninput="runCalculations()">
                             </div>
                             
                             <!-- [2026-07-12 CSB Deductions Accordion Row - Labeled dynamic-csb-deductions-container. Toggleable accordion styled like a transparent baseline row that drops down to show a responsive table of CSB positive deductions] -->
@@ -2805,6 +2907,11 @@
                             </div>
                             
                             <!-- [2026-07-12 Subtotal Row - Starting subtotal before adjustments. Labeled netpay-row-subtotal] -->
+                            <!-- [2026-07-14 New: Manual CSB row shown only in autonomous mode] -->
+                            <div class="baseline-row netpay-row-auto-csb mb-2" id="row-auto-csb" style="display: none;">
+                                <span class="netpay-label"><i class="bi bi-plus-lg text-success mr-2"></i>CSB Deductions</span>
+                                <input id="inp-autonomous-csb" class="netpay-auto-input tabular-nums" type="text" value="0" placeholder="0.00" style="display: inline-block !important;" oninput="runCalculations()">
+                            </div>
                             <div class="baseline-row netpay-row-subtotal font-weight-bold pt-2 mb-2" id="row-subtotal" style="border-top: 1px solid rgba(255,255,255,0.08);">
                                 <span class="netpay-label-bold"><i class="bi bi-calculator text-muted mr-2"></i>Subtotal</span>
                                 <span id="val-baseline" class="bank-value-display">₱0.00</span>
@@ -2812,16 +2919,30 @@
                             
                             <!-- [2026-07-12 Redemption Accordion Row - Labeled dynamic-pli-rows-container. Styled like a transparent baseline row that drops down to show dynamic PLIs] -->
                             <div id="dynamic-pli-rows-container" class="receipt-container-accordion mt-2 mb-2" style="background: transparent; border: none; overflow: hidden; width: 100%;">
-                                <button type="button" class="baseline-row netpay-row-redemption-header w-100" id="btn-redemption-accordion-header" onclick="toggleReceiptAccordion();" style="background: transparent; border: none; outline: none !important; width: 100%;">
-                                    <span class="netpay-label"><i class="bi bi-plus-lg text-success mr-2"></i>Redemption</span>
-                                    <span class="d-flex align-items-center" style="gap: 8px;">
+                                <!-- [2026-07-14 Fix: Split accordion header so label-text click toggles REDEMPTION/DOUBLE DEDUCTION without opening accordion; previous: whole button was one onclick] -->
+                                <div class="baseline-row netpay-row-redemption-header w-100" id="btn-redemption-accordion-header" style="background: transparent; border: none; outline: none !important; width: 100%; cursor: default;">
+                                    <span class="netpay-label" style="cursor: pointer; user-select: none;" id="lbl-redemption-toggle-text" onclick="toggleRedemptionLabel(event)" title="Click to toggle label"><i class="bi bi-plus-lg text-success mr-2"></i>Redemption</span>
+                                    <span class="d-flex align-items-center netpay-auto-hide" style="gap: 8px; cursor: pointer;" onclick="toggleReceiptAccordion()">
                                         <span id="val-baseline-papsubtotal" class="tabular-nums font-weight-bold">₱0.00</span>
                                         <i class="bi bi-chevron-down text-white-50" id="redemption-chevron" style="font-size: 0.75rem; transition: transform 0.2s ease;"></i>
                                     </span>
-                                </button>
+                                    <input id="inp-autonomous-redemption" class="netpay-auto-input tabular-nums" type="text" value="0" placeholder="0.00" oninput="runCalculations()">
+                                </div>
                                 <div id="receiptAccordionBody" class="receipt-accordion-body" style="display: none; padding: 2px 14px 6px 14px; border-top: 1px solid rgba(255, 255, 255, 0.04); background: rgba(0, 0, 0, 0.22); border-radius: 6px; margin-top: 2px;">
                                     <!-- Dynamic receipt rows will be appended here -->
                                 </div>
+                            </div>
+
+                            <!-- [2026-07-14 New: Separate plain receipt rows for Anticipated and Promotion (no dropdown)] -->
+                            <div class="baseline-row netpay-row-anticipated-receipt" id="row-anticipated-receipt" style="display: none;">
+                                <span class="netpay-label"><i class="bi bi-plus-lg text-success mr-2"></i>Anticipated</span>
+                                <span id="val-anticipated-receipt" class="tabular-nums font-weight-bold netpay-auto-hide">₱0.00</span>
+                                <input id="inp-autonomous-anticipated" class="netpay-auto-input tabular-nums" type="text" value="0" placeholder="0.00" oninput="runCalculations()">
+                            </div>
+                            <div class="baseline-row netpay-row-promotion-receipt" id="row-promotion-receipt" style="display: none;">
+                                <span class="netpay-label"><i class="bi bi-plus-lg text-success mr-2"></i>Promotion</span>
+                                <span id="val-promotion-receipt" class="tabular-nums font-weight-bold netpay-auto-hide">₱0.00</span>
+                                <input id="inp-autonomous-promotion" class="netpay-auto-input tabular-nums" type="text" value="0" placeholder="0.00" oninput="runCalculations()">
                             </div>
 
                             <!-- [2026-07-14 Fix: Add ID and update text of subtotal label; previous: static 'Subtotal' label without ID] -->
@@ -2839,7 +2960,8 @@
                             <!-- [2026-07-12 Less Incoming Row - Manual adjustments. Labeled netpay-row-less-incoming] -->
                             <div class="baseline-row netpay-row-less-incoming pt-2 mb-2" id="row-less-incoming" style="border-top: 1px dashed rgba(255,255,255,0.08);">
                                 <span class="netpay-label"><i class="bi bi-dash-lg text-warning mr-2"></i>Less Incoming</span>
-                                <span id="val-less-incoming" class="bank-value-display">₱0.00</span>
+                                <span id="val-less-incoming" class="bank-value-display netpay-auto-hide">₱0.00</span>
+                                <input id="inp-autonomous-incoming" class="netpay-auto-input tabular-nums" type="text" value="0" placeholder="0.00" oninput="runCalculations()">
                             </div>
                             
                             <!-- [2026-07-12 Total Subtotal Row - Subtotal after redemptions and queue checks. Labeled netpay-row-total-subtotal] -->
@@ -3651,6 +3773,9 @@
                 return;
             }
 
+            // [2026-07-14 Fix: Disable searchBtn while searching; previous: button stayed enabled during async fetch]
+            const searchBtnEl = document.getElementById('searchBtn');
+            if (searchBtnEl) { searchBtnEl.disabled = true; searchBtnEl.style.opacity = '0.55'; }
             document.getElementById('loadingIndicator').classList.remove('d-none');
             document.getElementById('empSummaryCard').classList.add('d-none');
             document.getElementById('evaluationWorkspace').classList.add('d-none');
@@ -3707,6 +3832,8 @@
                 await showCustomAlert("Lookup failed. Ensure CSV data records are available for month: " + month);
             } finally {
                 document.getElementById('loadingIndicator').classList.add('d-none');
+                // [2026-07-14 Fix: Re-enable searchBtn after search completes; previous: not disabled so no re-enable needed]
+                if (searchBtnEl) { searchBtnEl.disabled = false; searchBtnEl.style.opacity = ''; }
             }
         }
 
@@ -3724,7 +3851,9 @@
             }
 
             if (!empRow) {
-                await showCustomAlert("Employee ID " + empNum + " not found in baseline " + window.currentData.month + ".csv records.");
+                // [2026-07-14 New: If employee not found, activate autonomous mode instead of blocking with alert]
+                await showCustomAlert("Employee ID " + empNum + " not found in records. Switching to AUTONOMOUS mode for manual entry.");
+                activateAutonomousMode(empNum);
                 return;
             }
 
@@ -4209,7 +4338,22 @@
         // Phase calculations trigger logic
         // [2026-07-11 Fix: Anticipated and Promotion are now conditionally included based on toggle state]
         function runCalculations() {
-            if (!window.currentData || !window.activeSession) return;
+            // [2026-07-14 New: In autonomous mode, bypass CSV-dependent checks and use manual inputs]
+            const isAutoMode = document.getElementById('panel-baseline-inner') &&
+                               document.getElementById('panel-baseline-inner').classList.contains('auto-mode');
+
+            if (!window.currentData || !window.activeSession) {
+                if (isAutoMode) {
+                    runAutonomousCalculations();
+                }
+                return;
+            }
+
+            // In autonomous mode with a session, run autonomous path only
+            if (isAutoMode) {
+                runAutonomousCalculations();
+                return;
+            }
 
             // Ingest variables safely
             const loanAmount = safeFloat(document.getElementById('loanAmount').value);
@@ -4516,36 +4660,38 @@
                     });
                 }
                 
-                // Add Anticipated if active and selected (Rendered outside useMasterPli check)
-                if (useAnticipated && anticipatedVal > 0) {
-                    const rowEl = document.createElement('div');
-                    rowEl.className = 'receipt-row';
-                    rowEl.innerHTML = `
-                        <span>Anticipated Step Pay</span>
-                        <span class="tabular-nums font-weight-bold text-white">${formatPHP(anticipatedVal)}</span>
-                    `;
-                    receiptBody.appendChild(rowEl);
-                    hasItems = true;
-                }
-                
-                // Add Promotion if active and selected (Rendered outside useMasterPli check)
-                if (usePromotion && promotionMargin !== 0) {
-                    const rowEl = document.createElement('div');
-                    rowEl.className = 'receipt-row';
-                    rowEl.innerHTML = `
-                        <span>Promotion</span>
-                        <span class="tabular-nums font-weight-bold text-white">${formatPHP(promotionMargin)}</span>
-                    `;
-                    receiptBody.appendChild(rowEl);
-                    hasItems = true;
-                }
-                
+                // [2026-07-14 Fix: Anticipated and Promotion now rendered as separate plain rows, not inside accordion body; previous: appended into receiptBody]
                 if (hasItems) {
                     dynamicPliContainer.classList.add('show');
                 } else {
                     dynamicPliContainer.classList.remove('show');
                 }
             }
+
+            // [2026-07-14 New: Update separate Anticipated receipt row]
+            const rowAnticipatedReceipt = document.getElementById('row-anticipated-receipt');
+            const valAnticipatedReceipt = document.getElementById('val-anticipated-receipt');
+            if (rowAnticipatedReceipt && valAnticipatedReceipt) {
+                if (useAnticipated && anticipatedVal > 0) {
+                    rowAnticipatedReceipt.style.display = 'flex';
+                    valAnticipatedReceipt.textContent = formatPHP(anticipatedVal);
+                } else {
+                    rowAnticipatedReceipt.style.display = 'none';
+                }
+            }
+
+            // [2026-07-14 New: Update separate Promotion receipt row]
+            const rowPromotionReceipt = document.getElementById('row-promotion-receipt');
+            const valPromotionReceipt = document.getElementById('val-promotion-receipt');
+            if (rowPromotionReceipt && valPromotionReceipt) {
+                if (usePromotion && promotionMargin !== 0) {
+                    rowPromotionReceipt.style.display = 'flex';
+                    valPromotionReceipt.textContent = formatPHP(promotionMargin);
+                } else {
+                    rowPromotionReceipt.style.display = 'none';
+                }
+            }
+
 
             // [2026-07-12 New: Calculate CSB Deductions sum dynamically from table checkboxes]
             let posSum = 0;
@@ -4594,22 +4740,7 @@
                 valSubtotalAfterRedemptionEl.innerHTML = formatPHP(subtotalAfterRedemption);
             }
 
-            // [2026-07-14 Fix: Rename Redemption accordion label dynamically, and always display Subtotal label simply as 'Subtotal']
-            const lblRedemptionHeader = document.querySelector('#btn-redemption-accordion-header .netpay-label');
-            const lblSubtotalAfterRedemptionText = document.getElementById('lbl-subtotal-after-redemption-text');
-            let headerText = "Redemption";
-            let subtotalLabelText = "Subtotal";
-            if (useAnticipated && !useMasterPli && !usePromotion) {
-                headerText = "Anticipated";
-            } else if (usePromotion && !useMasterPli && !useAnticipated) {
-                headerText = "Promotion";
-            }
-            if (lblRedemptionHeader) {
-                lblRedemptionHeader.innerHTML = `<i class="bi bi-plus-lg text-success mr-2"></i>${headerText}`;
-            }
-            if (lblSubtotalAfterRedemptionText) {
-                lblSubtotalAfterRedemptionText.innerHTML = `<i class="bi bi-calculator-fill text-muted mr-2"></i>${subtotalLabelText}`;
-            }
+            // [2026-07-14 Fix: Removed dynamic header rename — Redemption/Anticipated/Promotion are now separate rows; previous: single accordion renamed based on active toggles]
             
             const hasActiveRedemptions = (useMasterPli && selectedPlis.length > 0) || (useAnticipated && anticipatedVal > 0) || (usePromotion && promotionMargin !== 0);
             const showSubtotalAfterRedemption = hasActiveRedemptions;
@@ -4679,7 +4810,8 @@
             // Compute Total Interest Paid over the loan term
             const totalRepayment = amortization * loanTerm;
             const totalInterest = Math.max(0, totalRepayment - loanAmount);
-            document.getElementById('lbl-total-interest').innerHTML = `<i class="bi bi-calculator text-warning mr-1"></i>Est. Interest: <strong class="text-white-50">${formatPHP(totalInterest)}</strong>`;
+            // [2026-07-14 Fix: Calculator icon changed from text-warning (amber) to text-muted (gray); previous: text-warning]
+            document.getElementById('lbl-total-interest').innerHTML = `<i class="bi bi-calculator text-muted mr-1"></i>Est. Interest: <strong class="text-white-50">${formatPHP(totalInterest)}</strong>`;
 
             // Determine final New NetPay
             // [2026-07-11 Fix: newNetPay is calculated from revisedBaseline (which is Subtotal - LESS ONQUEUE - LESS INCOMING) minus amortization]
@@ -5246,6 +5378,175 @@
                 if (chevron) {
                     chevron.style.transform = isExpanded ? 'rotate(180deg)' : 'rotate(0deg)';
                 }
+            }
+        }
+
+        // [2026-07-14 New: Toggle Redemption label text between REDEMPTION and DOUBLE DEDUCTION on click; does not open accordion]
+        // [2026-07-14 New: Switch between DEPED (auto-filled) and AUTONOMOUS (manual input) modes]
+        function onModeSelectChange() {
+            const mode = document.getElementById('modeSelect').value;
+            const panel = document.getElementById('panel-baseline-inner');
+            if (!panel) return;
+            if (mode === 'autonomous') {
+                panel.classList.add('auto-mode');
+                // Pre-fill inputs from current activeSession values if available
+                if (window.activeSession) {
+                    const inpNetpay = document.getElementById('inp-autonomous-netpay');
+                    const inpCsb    = document.getElementById('inp-autonomous-csb');
+                    const inpIncoming = document.getElementById('inp-autonomous-incoming');
+                    const inpRedemption = document.getElementById('inp-autonomous-redemption');
+                    if (inpNetpay)    inpNetpay.value    = (window.activeSession.netPay    || 0).toFixed(2);
+                    if (inpCsb)       inpCsb.value       = (window.activeSession.posSum    || 0).toFixed(2);
+                    if (inpIncoming) {
+                        const incoming = parseFloat(document.getElementById('incomingDeduction')?.value) || 0;
+                        inpIncoming.value = incoming.toFixed(2);
+                    }
+                    if (inpRedemption) inpRedemption.value = (window.activeSession.papSubtotalLast || 0).toFixed(2);
+                }
+                runAutonomousCalculations();
+            } else {
+                panel.classList.remove('auto-mode');
+                // Restore from activeSession if available
+                if (window.activeSession) {
+                    const lnp = document.getElementById('lbl-netpay');
+                    const ldm = document.getElementById('lbl-dedamt');
+                    if (lnp) lnp.innerHTML = formatPHP(window.activeSession.netPay || 0);
+                    if (ldm) ldm.innerHTML = formatPHP(window.activeSession.posSum || 0);
+                }
+                runCalculations();
+            }
+        }
+
+        // [2026-07-14 New: Autonomous calculation path — reads from manual input fields instead of CSV session data]
+        function runAutonomousCalculations() {
+            const safeInp = (id) => {
+                const el = document.getElementById(id);
+                if (!el) return 0;
+                return parseFloat(el.value.replace(/,/g, '')) || 0;
+            };
+
+            const netPay   = safeInp('inp-autonomous-netpay');
+            const csbDed   = safeInp('inp-autonomous-csb');
+            const incoming = safeInp('inp-autonomous-incoming');
+
+            // Subtotal = Net Pay + CSB Deductions
+            const subtotal = netPay + csbDed;
+            const valBaselineEl = document.getElementById('val-baseline');
+            if (valBaselineEl) valBaselineEl.innerHTML = formatPHP(subtotal);
+
+            // Redemption (manual, shown only if PLI/Redemption row visible)
+            const redemption  = safeInp('inp-autonomous-redemption');
+            const antVal      = safeInp('inp-autonomous-anticipated');
+            const promoVal    = safeInp('inp-autonomous-promotion');
+
+            // Update receipt row values (autonomous: inputs are already live, just update spans for subtotal display)
+            const valPapEl = document.getElementById('val-baseline-papsubtotal');
+            if (valPapEl) valPapEl.innerHTML = formatPHP(redemption);
+
+            const rowAnticipatedReceipt = document.getElementById('row-anticipated-receipt');
+            const rowPromotionReceipt   = document.getElementById('row-promotion-receipt');
+            const useAnticipated = document.getElementById('toggleAnticipated')?.checked || false;
+            const usePromotion   = document.getElementById('togglePromotion')?.checked   || false;
+            if (rowAnticipatedReceipt) rowAnticipatedReceipt.style.display = useAnticipated ? 'flex' : 'none';
+            if (rowPromotionReceipt)   rowPromotionReceipt.style.display   = usePromotion   ? 'flex' : 'none';
+
+            // Subtotal after redemption
+            const papSubtotal = redemption + (useAnticipated ? antVal : 0) + (usePromotion ? promoVal : 0);
+            const subtotalAfterRedemption = subtotal + papSubtotal;
+            const valSubtotalAfterEl = document.getElementById('val-subtotal-after-redemption');
+            if (valSubtotalAfterEl) valSubtotalAfterEl.innerHTML = formatPHP(subtotalAfterRedemption);
+            const rowSAR = document.getElementById('row-subtotal-after-redemption');
+            if (rowSAR) rowSAR.style.setProperty('display', papSubtotal !== 0 ? 'flex' : 'none', 'important');
+
+            // Updated display in val-less-incoming span (for audit trail / display)
+            const valLessIncomingEl = document.getElementById('val-less-incoming');
+            if (valLessIncomingEl) valLessIncomingEl.innerHTML = formatPHP(incoming);
+
+            // Revised baseline
+            const revisedBaseline = subtotalAfterRedemption - incoming;
+            const valRevisedEl = document.getElementById('val-revised-baseline');
+            if (valRevisedEl) valRevisedEl.innerHTML = formatPHP(revisedBaseline);
+            const panelRevisedEl = document.getElementById('row-revised-baseline');
+            if (panelRevisedEl) panelRevisedEl.style.setProperty('display', 'flex', 'important');
+
+            // val-less-onqueue: force 0 in autonomous (no onqueue)
+            const valLessOnqueueEl = document.getElementById('val-less-onqueue');
+            if (valLessOnqueueEl) valLessOnqueueEl.innerHTML = formatPHP(0);
+
+            // Loan & amortization
+            const loanAmount   = safeFloat(document.getElementById('loanAmount')?.value);
+            const loanTerm     = safeInt(document.getElementById('loanTerm')?.value);
+            const interestRate = getInterestRateValue();
+            const monthlyRate  = interestRate / 100 / 12;
+            const pmtResult    = calculatePMT(monthlyRate, loanTerm, loanAmount);
+            const amortization = Math.ceil(parseFloat(pmtResult.toFixed(6)) * 100) / 100;
+
+            const valAmoEl = document.getElementById('val-amortization');
+            if (valAmoEl) valAmoEl.innerHTML = formatPHP(amortization);
+            const totalRepayment = amortization * loanTerm;
+            const totalInterest = Math.max(0, totalRepayment - loanAmount);
+            const lblTotalInterest = document.getElementById('lbl-total-interest');
+            if (lblTotalInterest) lblTotalInterest.innerHTML = `<i class="bi bi-calculator text-muted mr-1"></i>Est. Interest: <strong class="text-white-50">${formatPHP(totalInterest)}</strong>`;
+
+            const newNetPay = revisedBaseline - amortization;
+            const roundedNetPay = Math.round(newNetPay * 100) / 100;
+            const valCsbAmoEl = document.getElementById('val-new-csb-amortization');
+            if (valCsbAmoEl) valCsbAmoEl.innerHTML = formatPHP(amortization);
+            const valFinalEl = document.getElementById('val-final-new-netpay');
+            if (valFinalEl) valFinalEl.innerHTML = formatPHP(roundedNetPay);
+            const netPayEl = document.getElementById('val-newnetpay');
+            if (netPayEl) {
+                netPayEl.innerHTML = formatPHP(roundedNetPay);
+                netPayEl.classList.remove('glow-green', 'glow-red');
+                netPayEl.classList.add(roundedNetPay >= 0 ? 'glow-green' : 'glow-red');
+            }
+            // Save for audit/print
+            if (!window.activeSession) window.activeSession = {};
+            window.activeSession.papSubtotalLast = papSubtotal;
+        }
+
+        // [2026-07-14 New: Activates autonomous mode when employee not found in records]
+        function activateAutonomousMode(empNum) {
+            // Minimal session so runCalculations guard passes
+            window.activeSession = { netPay: 0, origGrade: 1, origStep: 1, posSum: 0, baselineSub: 0 };
+            window.currentData = window.currentData || { tranch: [[]], tranch2027: [[]], pli: [[]], onq: [[]], pos: [[]], netpay: [[]] };
+
+            // Show empSummaryCard with placeholder info
+            document.getElementById('empSummaryName').textContent = 'UNKNOWN';
+            document.getElementById('empSummaryID').textContent   = empNum || '-';
+            document.getElementById('empSummaryDiv').textContent  = 'AUTONOMOUS MODE';
+            document.getElementById('empSummaryCard').classList.remove('d-none');
+
+            // Show workspace
+            document.getElementById('evaluationWorkspace').classList.remove('d-none');
+            document.getElementById('loadingIndicator').classList.add('d-none');
+
+            // Switch dropdown to autonomous and apply mode
+            const modeSelect = document.getElementById('modeSelect');
+            if (modeSelect) modeSelect.value = 'autonomous';
+            const panel = document.getElementById('panel-baseline-inner');
+            if (panel) panel.classList.add('auto-mode');
+
+            // Reset autonomous inputs
+            ['inp-autonomous-netpay','inp-autonomous-csb','inp-autonomous-incoming',
+             'inp-autonomous-redemption','inp-autonomous-anticipated','inp-autonomous-promotion'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '0';
+            });
+            runAutonomousCalculations();
+        }
+
+        function toggleRedemptionLabel(event) {
+            event.stopPropagation(); // Prevent accordion from opening
+            const lbl = document.getElementById('lbl-redemption-toggle-text');
+            if (!lbl) return;
+            const isDouble = lbl.dataset.doubled === '1';
+            if (isDouble) {
+                lbl.innerHTML = '<i class="bi bi-plus-lg text-success mr-2"></i>Redemption';
+                lbl.dataset.doubled = '0';
+            } else {
+                lbl.innerHTML = '<i class="bi bi-plus-lg text-success mr-2"></i>DOUBLE DEDUCTION';
+                lbl.dataset.doubled = '1';
             }
         }
 
