@@ -1489,8 +1489,9 @@
     <script>
         // Check for login session constraints
         document.addEventListener("DOMContentLoaded", async function () {
+            // [2026-07-14 Fix: Login must not expire anymore; check only if loginTime exists, previous: redirected if older than 3 hours]
             const loginTime = localStorage.getItem("loginTime");
-            if (!loginTime || (new Date().getTime() - loginTime) > 3 * 60 * 60 * 1000) {
+            if (!loginTime) {
                 window.location.href = "login/index.html";
             }
             
