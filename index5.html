@@ -137,51 +137,30 @@
 
         /* ============ CARD SHELL — Liquid Glass (iPhone-style) [2026-07-11 Fix: Frosted glass with layered specular highlights, inner shine, soft reflection] ============ */
         /* [2026-07-11 Fix: overflow changed from hidden to visible so math-popover tooltips can escape card bounds without clipping] */
+        /* (2026-07-13) Set enterprise styled cards; prev: glassmorphism style */
         .card, .bank-card, .phase-block {
-            /* Layered liquid glass background - [2026-07-13 Fix: Made base background gradient slightly more solid to ensure contrast with reduced blur] */
-            background:
-                linear-gradient(160deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 40%, rgba(0,0,0,0.08) 100%),
-                linear-gradient(135deg, rgba(14,18,38,0.85) 0%, rgba(6,8,20,0.92) 100%) !important;
-            /* [2026-07-13 Fix: Reduced heavy liquid glassmorphism blur from 40px saturate/brightness to a performance-friendly 10px glass blur to eliminate rendering lag] */
-            backdrop-filter: blur(10px) !important;
-            -webkit-backdrop-filter: blur(10px) !important;
-            /* Glass edge borders: top-left brighter, bottom-right darker */
-            border: 1px solid rgba(255,255,255,0.09) !important;
-            border-top: 1px solid rgba(255,255,255,0.18) !important;
-            border-left: 1px solid rgba(255,255,255,0.11) !important;
-            border-bottom: 1px solid rgba(0,0,0,0.3) !important;
-            border-right: 1px solid rgba(0,0,0,0.2) !important;
+            background: rgba(14, 18, 38, 0.95) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
             border-radius: var(--radius-lg) !important;
             padding: var(--card-padding) !important;
             margin-bottom: 20px;
-            box-shadow: var(--shadow-glass) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
             transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease;
             position: relative;
             overflow: visible; /* Changed: was 'hidden' — allows popover tooltips to escape card boundary */
         }
 
-        /* Liquid glass specular sheen line at top of card */
+        /* (2026-07-13) Hide specular sheen; prev: visible sheen line */
         .bank-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 12px;
-            right: 12px;
-            height: 1px;
-            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.22) 30%, rgba(255,255,255,0.35) 50%, rgba(255,255,255,0.22) 70%, transparent 100%);
-            border-radius: 1px;
-            pointer-events: none;
-            z-index: 1;
+            display: none !important;
         }
 
+        /* (2026-07-13) Make hover static; prev: color/border highlight on hover */
         .bank-card:hover {
-            background:
-                linear-gradient(160deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.02) 40%, rgba(0,0,0,0.06) 100%),
-                linear-gradient(135deg, rgba(18,22,48,0.75) 0%, rgba(8,10,26,0.85) 100%) !important;
-            border-top-color: rgba(255,255,255,0.28) !important;
-            border-color: rgba(245,158,11,0.18) !important;
-            box-shadow: var(--shadow-glass-hover) !important;
-            transform: translateY(-3px);
+            background: rgba(14, 18, 38, 0.95) !important;
+            border-color: rgba(255, 255, 255, 0.08) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+            transform: none !important;
         }
 
         .search-config-card {
@@ -240,15 +219,9 @@
             background: rgba(10, 14, 23, 0.8) !important;
         }
 
-        .bank-select {
-            appearance: none !important;
-            -webkit-appearance: none !important;
-            -moz-appearance: none !important;
-            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>") !important;
-            background-repeat: no-repeat !important;
-            background-position: right 14px center !important;
-            background-size: 12px !important;
-            padding-right: 36px !important;
+        /* (2026-07-13) Hide native select elements; prev: custom background styles */
+        select.bank-select {
+            display: none !important;
         }
 
         .bank-select.select-sm {
@@ -654,17 +627,10 @@
         }
 
         /* ============ ACCORDIONS (LESS ONQUEUE / PLI 1-5) ============ */
+        /* (2026-07-13) Enterprise accordion; prev: border-top reflection */
         .bank-accordion-btn {
-            /* [2026-07-13 Fix: Increased background opacity to 0.8 to preserve contrast against backdrop] */
-            background:
-                linear-gradient(160deg, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0.06) 100%),
-                rgba(14, 18, 36, 0.8) !important;
-            /* [2026-07-13 Fix: Reduced glass blur from 20px to 8px to optimize button redraw/transition times] */
-            backdrop-filter: blur(8px) !important;
-            -webkit-backdrop-filter: blur(8px) !important;
-            border: 1px solid rgba(255, 255, 255, 0.07) !important;
-            border-top-color: rgba(255,255,255,0.13) !important;
-            /* [2026-07-12 Fix: border-radius set to var(--radius-sm) for a subtle rounded look] */
+            background: rgba(14, 18, 36, 0.85) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
             border-radius: var(--radius-sm) !important;
             text-align: left;
             padding: 14px 18px !important;
@@ -687,22 +653,16 @@
         }
 
         .bank-accordion-btn:hover {
-            background:
-                linear-gradient(160deg, rgba(255,255,255,0.07) 0%, rgba(0,0,0,0.04) 100%),
-                rgba(20, 26, 52, 0.72) !important;
-            border-color: rgba(245, 158, 11, 0.28) !important;
-            border-top-color: rgba(245, 158, 11, 0.45) !important;
-            box-shadow: 0 0 16px rgba(245, 158, 11, 0.08), inset 0 1px 0 rgba(255,255,255,0.1) !important;
+            background: rgba(20, 26, 52, 0.92) !important;
+            border-color: rgba(245, 158, 11, 0.25) !important;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
         }
 
         /* Opened accordion button selected glow styling */
         .bank-accordion-btn[aria-expanded="true"] {
-            background:
-                linear-gradient(160deg, rgba(245, 158, 11, 0.12) 0%, rgba(20, 26, 52, 0.75) 100%),
-                rgba(20, 26, 52, 0.9) !important;
+            background: rgba(20, 26, 52, 0.98) !important;
             border-color: var(--accent-strong) !important;
-            border-top-color: rgba(255, 200, 80, 0.6) !important;
-            box-shadow: 0 0 20px rgba(245, 158, 11, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.1) !important;
             color: #FFFFFF !important;
         }
 
@@ -738,6 +698,11 @@
             max-height: 1800px;
             opacity: 1;
             overflow: visible;
+        }
+
+        /* (2026-07-13) Add top margin on card collapse open; prev: no margin */
+        .pli-card-collapse.show > :first-child {
+            margin-top: 12px !important;
         }
 
         .bank-accordion-btn > span.orange-node {
@@ -837,7 +802,7 @@
             margin-bottom: 24px !important;
         }
         /* [2026-07-13 Fix: Ultra-premium frosted glass table design with header gradients, column highlights, and soft diff glow] */
-        #tableAnticipatedBreakdown, #tablePromotionBreakdown {
+        #tableAnticipatedBreakdown, #tablePromotionBreakdown, #tableNetprocRedemption {
             font-size: 0.52rem !important;
             table-layout: auto !important;
             width: 100%;
@@ -853,9 +818,10 @@
             backdrop-filter: blur(4px) !important;
             -webkit-backdrop-filter: blur(4px) !important;
         }
-        #tableAnticipatedBreakdown th, #tablePromotionBreakdown th {
+        #tableAnticipatedBreakdown th, #tablePromotionBreakdown th, #tableNetprocRedemption th {
+            /* (2026-07-13) Compact table cell padding; prev: 5px 6px */
             font-size: 0.48rem !important;
-            padding: 5px 6px !important;
+            padding: 2px 4px !important;
             letter-spacing: 0.04em !important;
             text-align: right !important;
             border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
@@ -867,12 +833,13 @@
             font-weight: 600 !important;
             text-transform: uppercase !important;
         }
-        #tableAnticipatedBreakdown th:first-child, #tablePromotionBreakdown th:first-child {
+        #tableAnticipatedBreakdown th:first-child, #tablePromotionBreakdown th:first-child, #tableNetprocRedemption th:first-child {
             text-align: left !important;
         }
-        #tableAnticipatedBreakdown td, #tablePromotionBreakdown td {
-            font-size: 0.52rem !important;
-            padding: 5px 6px !important;
+        #tableAnticipatedBreakdown td, #tablePromotionBreakdown td, #tableNetprocRedemption td {
+            /* (2026-07-13) Tight table padding and font size; prev: 0.52rem size, 5px padding */
+            font-size: 0.50rem !important;
+            padding: 2px 4px !important;
             text-align: right !important;
             border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
             border-top: none !important;
@@ -881,14 +848,26 @@
             color: rgba(255, 255, 255, 0.75) !important;
             transition: background-color 0.15s ease;
         }
-        #tableAnticipatedBreakdown td:first-child, #tablePromotionBreakdown td:first-child {
+        #tableAnticipatedBreakdown td:first-child, #tablePromotionBreakdown td:first-child, #tableNetprocRedemption td:first-child {
             text-align: left !important;
         }
-        #tableAnticipatedBreakdown tr:last-child td, #tablePromotionBreakdown tr:last-child td {
+        #tableAnticipatedBreakdown tr:last-child td, #tablePromotionBreakdown tr:last-child td, #tableNetprocRedemption tr:last-child td {
             border-bottom: none !important;
         }
-        #tableAnticipatedBreakdown tbody tr:hover td, #tablePromotionBreakdown tbody tr:hover td {
+        #tableAnticipatedBreakdown tbody tr:hover td, #tablePromotionBreakdown tbody tr:hover td, #tableNetprocRedemption tbody tr:hover td {
             background: rgba(255, 255, 255, 0.03) !important;
+        }
+        /* (2026-07-13) Center redemption checkbox cells; prev: left-aligned */
+        #tableNetprocRedemption th:first-child, #tableNetprocRedemption td:first-child {
+            text-align: center !important;
+            width: 32px !important;
+        }
+        #tableNetprocRedemption th:nth-child(2), #tableNetprocRedemption td:nth-child(2) {
+            text-align: left !important;
+        }
+        #tableNetprocRedemption th:nth-child(3), #tableNetprocRedemption td:nth-child(3),
+        #tableNetprocRedemption th:nth-child(4), #tableNetprocRedemption td:nth-child(4) {
+            text-align: center !important;
         }
         /* Highlight the NET PAY column */
         #tableAnticipatedBreakdown th:last-child, #tablePromotionBreakdown th:last-child {
@@ -1026,15 +1005,30 @@
             }
         }
 
-        /* [2026-07-14 New: Align value wrappers to the right] */
-        /* 2026-07-13: Add cursor pointer to value wrappers (was: text-align right only) */
+        /* (2026-07-13) Right-align card totals; prev: side-by-side flex */
         #pli-value-wrapper, #anticipated-value-wrapper, #promotion-value-wrapper {
             text-align: right;
             cursor: pointer;
         }
 
+        /* (2026-07-13) Kill collapse bottom padding; prev: padding-bottom 8px */
         #pliCardCollapseBody, #anticipatedCardCollapseBody, #promotionCardCollapseBody {
-            padding-bottom: 8px;
+            padding-bottom: 0 !important;
+        }
+
+        /* (2026-07-13) Style tight dropdowns and PLI buttons; prev: standard sizes */
+        #promoGrade, #promoStep {
+            font-size: 0.72rem !important;
+            min-height: 28px !important;
+            height: 28px !important;
+            padding: 2px 8px !important;
+            padding-right: 24px !important;
+            background-position: right 8px center !important;
+        }
+        #pliAccordions .bank-accordion-btn {
+            padding: 8px 14px !important;
+            min-height: 38px !important;
+            font-size: 0.8rem !important;
         }
         /* [2026-07-14 New: Default to visible overflow-x to avoid horizontal scrollbar when collapsed] */
         #wrapperAnticipatedTable, #wrapperPromotionTable {
@@ -1072,22 +1066,21 @@
             display: block;
         }
 
-        /* [2026-07-11 Fix: SG/Step value — prominent display value] */
-        #lbl-originalsg {
-            font-size: 1.28rem !important;
+        /* (2026-07-13) Set both SG labels to identical size; prev: lbl-originalsg only */
+        #lbl-originalsg, #lbl-promo-originalsg {
+            font-size: 0.95rem !important;
             font-weight: 700 !important;
             color: #FFFFFF !important;
             letter-spacing: -0.01em !important;
-            /* [2026-07-11 Old: font-family: 'Inter', sans-serif !important;] */
             font-family: 'Montserrat', sans-serif !important;
             line-height: 1.3 !important;
         }
 
-        /* [2026-07-14 Fix: Make val-anticipated, val-promomargin, and val-pli-total larger and more visible with an amber gradient; previous: smaller size and overridden styling] */
+        /* (2026-07-13) Reduce font size of card totals; prev: 1.65rem size */
         #val-anticipated,
         #val-promomargin,
         #val-pli-total {
-            font-size: 1.65rem !important;
+            font-size: 1.15rem !important;
             font-weight: 850 !important;
             font-family: 'Montserrat', sans-serif !important;
             background: linear-gradient(110deg, #F59E0B 0%, #FBBF24 50%, #FCD34D 100%) !important;
@@ -1299,15 +1292,12 @@
             position: absolute;
         }
 
-        /* Liquid glass pill track */
+        /* (2026-07-13) Set enterprise toggle pill track; prev: border-top highlight */
         .toggle-track {
             position: absolute;
             inset: 0;
-            background:
-                linear-gradient(160deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.1) 100%),
-                rgba(30, 40, 60, 0.6);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-top-color: rgba(255,255,255,0.18);
+            background: rgba(30, 40, 60, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 20px;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -1326,16 +1316,13 @@
             left: 3px;
             transform: translateY(-50%);
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.2);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.5);
         }
 
         /* Active/checked state — amber pill */
         .toggle-switch input:checked + .toggle-track {
-            background:
-                linear-gradient(160deg, rgba(255,200,50,0.12) 0%, rgba(245,158,11,0.06) 100%),
-                rgba(30, 22, 5, 0.5);
-            border-color: rgba(245, 158, 11, 0.4);
-            border-top-color: rgba(255,200,80,0.55);
+            background: rgba(30, 22, 5, 0.7);
+            border-color: rgba(245, 158, 11, 0.5);
         }
 
         .toggle-switch input:checked + .toggle-track::after {
@@ -1824,15 +1811,15 @@
             display: flex;
             animation: bankModalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
+        /* (2026-07-13) Set enterprise bank modal; prev: border-top highlight */
         .custom-bank-modal-content {
-            background: linear-gradient(160deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%);
+            background: rgba(15, 23, 42, 0.98);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-top-color: rgba(255, 255, 255, 0.15);
             border-radius: var(--radius-md);
             width: 90%;
             max-width: 400px;
             padding: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(245, 158, 11, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
         }
         .custom-bank-modal-overlay.show .custom-bank-modal-content {
             animation: bankModalScaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
@@ -1860,16 +1847,10 @@
         }
 
         /* [2026-07-11 Fix: overflow set to visible (not hidden) so math-popover children can escape this panel's border-radius boundary] */
+        /* (2026-07-13) Set enterprise panel inner; prev: border-top highlight */
         .section-panel-inner {
-            /* [2026-07-13 Fix: Increased opacity from 0.45 to 0.75 to maintain solid premium depth with reduced blur] */
-            background:
-                linear-gradient(160deg, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0.08) 100%),
-                rgba(8, 12, 28, 0.75);
-            /* [2026-07-13 Fix: Reduced blur from 24px saturate to 8px normal glass blur to prevent lag] */
-            backdrop-filter: blur(8px) !important;
-            -webkit-backdrop-filter: blur(8px) !important;
-            border: 1px solid rgba(255, 255, 255, 0.065);
-            border-top-color: rgba(255,255,255,0.12);
+            background: rgba(8, 12, 28, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: var(--radius-md);
             padding: var(--panel-padding) !important;
             overflow: visible; /* Must be visible — hidden would clip popover children and round-corner table */
@@ -1899,14 +1880,10 @@
 
         /* [2026-07-11 Fix: Employee summary card — liquid glass] */
         /* 2026-07-13: Enhance card padding and add desktop dividers (was: basic card layout, no column dividers) */
+        /* (2026-07-13) Enterprise employee card; prev: border-top highlight */
         .employee-summary-card {
-            background:
-                linear-gradient(160deg, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0.08) 100%),
-                rgba(8, 12, 28, 0.7) !important;
-            backdrop-filter: blur(8px) !important;
-            -webkit-backdrop-filter: blur(8px) !important;
-            border: 1px solid rgba(255, 255, 255, 0.065) !important;
-            border-top-color: rgba(255,255,255,0.14) !important;
+            background: rgba(14, 18, 38, 0.95) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
             border-radius: var(--radius-md) !important;
             padding: 16px 20px !important;
             transition: all 0.3s ease;
@@ -1951,34 +1928,52 @@
         }
 
         /* ============ SUMMARY MINI-CARDS — Liquid glass [2026-07-11 Fix: iPhone liquid glass treatment, amber glow only on hover] ============ */
+        /* (2026-07-13) Set enterprise summary subcard; prev: border-top highlight */
         .inner-summary-card {
-            /* [2026-07-13 Fix: Increased background opacity to 0.8 to maintain high contrast with lower blur value] */
-            background:
-                linear-gradient(160deg, rgba(255,255,255,0.055) 0%, rgba(0,0,0,0.1) 100%),
-                rgba(8, 12, 28, 0.8) !important;
-            /* [2026-07-13 Fix: Reduced heavy blur from 32px to 8px normal glass blur to resolve layout paint lagging] */
-            backdrop-filter: blur(8px) !important;
-            -webkit-backdrop-filter: blur(8px) !important;
-            border: 1px solid rgba(255,255,255,0.075) !important;
-            border-top-color: rgba(255,255,255,0.16) !important;
+            background: rgba(14, 18, 38, 0.95) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
             border-radius: var(--radius-md) !important;
-            padding: 16px !important;
+            padding: 10px 14px !important;
             height: 100% !important;
-            min-height: 105px !important;
+            min-height: 85px !important;
             display: flex !important;
             flex-direction: column !important;
-            box-shadow: 0 8px 28px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.07) !important;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.3) !important;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
         }
-        /* [2026-07-11 Fix: Glow ONLY on hover — amber top highlight appears on mouse-enter only] */
+        /* (2026-07-13) Enterprise summary subcard hover; prev: color change */
         .inner-summary-card:hover {
-            border-top-color: rgba(245, 158, 11, 0.5) !important;
-            border-color: rgba(245, 158, 11, 0.18) !important;
-            background:
-                linear-gradient(160deg, rgba(255,200,50,0.06) 0%, rgba(0,0,0,0.08) 100%),
-                rgba(10, 14, 32, 0.62) !important;
-            box-shadow: 0 12px 36px rgba(0,0,0,0.5), 0 0 20px rgba(245,158,11,0.07), inset 0 1px 0 rgba(255,255,255,0.1) !important;
-            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.08) !important;
+            background: rgba(14, 18, 38, 0.95) !important;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.3) !important;
+            transform: none !important;
+        }
+
+        /* (2026-07-13) Compact nested inputs; prev: larger default form inputs */
+        .inner-summary-card .bank-input {
+            min-height: 32px !important;
+            height: 32px !important;
+            padding: 4px 10px !important;
+            padding-left: 28px !important;
+            font-size: 0.82rem !important;
+        }
+        .inner-summary-card .currency-prefix {
+            font-size: 0.82rem !important;
+            left: 10px !important;
+        }
+
+        /* (2026-07-13) Set compact row spacing; prev: default bootstrap spacing */
+        .compact-grid-row {
+            margin-left: -4px !important;
+            margin-right: -4px !important;
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 8px !important;
+        }
+        .compact-grid-row > [class*="col-"] {
+            padding-left: 4px !important;
+            padding-right: 4px !important;
+            margin-bottom: 8px !important;
         }
 
         .inner-summary-card > .bank-value-display,
@@ -2430,7 +2425,8 @@
                 --font-size-label: 0.8rem;
                 --font-size-table: 0.72rem;
                 
-                --card-padding: 14px 12px;
+                /* (2026-07-13) Set tight card padding on mobile; prev: 14px 12px */
+                --card-padding: 10px 8px;
                 --panel-padding: 10px 10px;
                 --row-padding: 6px 10px;
                 --container-padding: 16px;
@@ -2526,17 +2522,59 @@
                 padding-right: var(--container-padding) !important;
             }
 
+            /* (2026-07-13) Tighten mobile elements to save vertical space; prev: loose */
+            .card, .bank-card, .phase-block {
+                margin-bottom: 12px !important;
+            }
+            .bank-table th, .bank-table td {
+                padding: 2px 4px !important;
+                font-size: 0.60rem !important;
+                line-height: 1.2 !important;
+            }
+            .private-liabilities-card {
+                padding: 10px 10px !important;
+            }
+            .private-liabilities-card .orange-node {
+                font-size: 0.72rem !important;
+            }
+            .private-liabilities-card .comp-field-label {
+                font-size: 0.6rem !important;
+            }
+            .private-liabilities-card .bank-value-display {
+                font-size: 1.1rem !important;
+            }
+            #promotion-controls-wrapper,
+            #promotion-sg-wrapper,
+            #anticipated-sg-wrapper {
+                padding: 8px !important;
+                margin-bottom: 8px !important;
+            }
+            #promotion-controls-wrapper .comp-field-label {
+                margin-bottom: 6px !important;
+            }
+            .bank-select, .bank-input {
+                height: 28px !important;
+                padding-top: 2px !important;
+                padding-bottom: 2px !important;
+            }
+            #card-pli-subtotals .orange-node {
+                font-size: 0.65rem !important;
+            }
+            #card-pli-subtotals .bank-value-display {
+                font-size: 0.90rem !important;
+            }
+
 
         }
 
         @media (max-width: 575.98px) {
-            /* Stack PLI subtotal and NetPay+PLI totals vertically */
+            /* (2026-07-13) Set compact subtotals on mobile; prev: larger fonts/margins */
             #colPLISubtotal {
                 border-right: none !important;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+                border-bottom: none !important;
                 padding-right: 6px !important;
-                padding-bottom: 12px !important;
-                margin-bottom: 12px !important;
+                padding-bottom: 4px !important;
+                margin-bottom: 4px !important;
             }
             #colNetPayPLITotal {
                 padding-left: 6px !important;
@@ -2617,6 +2655,101 @@
             box-shadow: 0 0 10px rgba(239, 68, 68, 0.15);
         }
 
+        /* (2026-07-13) Custom select overlay dropdown styling; prev: native select */
+        .custom-select-wrapper {
+            position: relative;
+            user-select: none;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .custom-select-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(8, 12, 28, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 4px 8px;
+            font-size: 0.72rem;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            height: 28px;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease;
+        }
+
+        /* (2026-07-13) Shift trigger content for absolute overlays; prev: none */
+        .currency-input-wrapper .custom-select-trigger {
+            padding-left: 36px !important;
+        }
+
+        .custom-select-trigger:after {
+            content: '';
+            width: 0;
+            height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 4px solid #fff;
+            margin-left: 8px;
+            opacity: 0.65;
+            transition: transform 0.2s ease;
+        }
+
+        .custom-select-wrapper.open .custom-select-trigger:after {
+            transform: rotate(180deg);
+        }
+
+        .custom-select-wrapper.open .custom-select-trigger {
+            border-color: rgba(245, 158, 11, 0.35);
+        }
+
+        .custom-select-options {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            background: rgba(14, 18, 38, 0.98);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 6px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            max-height: 200px;
+            overflow-y: auto;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .custom-select-wrapper.open .custom-select-options {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .custom-option {
+            padding: 6px 10px;
+            font-size: 0.72rem;
+            color: rgba(255, 255, 255, 0.75);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-align: left;
+        }
+
+        .custom-option:hover {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fff;
+        }
+
+        .custom-option.selected {
+            background: rgba(245, 158, 11, 0.25);
+            color: #fff;
+            font-weight: 700;
+        }
+
         /* [2026-07-14 Fix: Responsive card-style display overrides for Session Runs Audit Trail on mobile viewports; previous: required horizontal scrolling] */
         @media (max-width: 768px) {
             #historyTableResponsive {
@@ -2633,15 +2766,20 @@
             .history-ledger-list {
                 gap: 12px !important;
             }
+            /* (2026-07-13) Compact mobile history cards; prev: larger cards */
             .history-ledger-row {
-                display: block !important;
-                padding: 12px 14px !important;
-                padding-top: 36px !important;
-                border-radius: 8px !important;
-                background: rgba(30, 41, 59, 0.4) !important;
+                display: grid !important;
+                grid-template-columns: 1.35fr 1fr !important;
+                grid-template-rows: auto auto auto !important;
+                gap: 5px 12px !important;
+                padding: 10px 12px !important;
+                padding-right: 48px !important;
+                border-radius: var(--radius-md) !important;
+                background: rgba(14, 18, 38, 0.95) !important;
                 border: 1px solid rgba(255, 255, 255, 0.08) !important;
                 position: relative !important;
-                margin-bottom: 4px !important;
+                margin-bottom: 8px !important;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
             }
             .history-ledger-row:hover {
                 transform: none !important;
@@ -2649,64 +2787,133 @@
             .history-cell {
                 display: block !important;
                 width: 100% !important;
-                text-align: left !important;
-                white-space: normal !important;
-                font-size: 0.76rem !important;
-                margin-bottom: 4px !important;
-                text-overflow: clip !important;
-                overflow: visible !important;
-            }
-            /* Date & Time combined row style */
-            .history-ledger-row .history-cell:nth-child(1) {
-                display: block !important;
+                white-space: nowrap !important;
                 font-size: 0.7rem !important;
-                color: rgba(255, 255, 255, 0.4) !important;
-                margin-bottom: 2px !important;
+                margin-bottom: 0 !important;
+                text-overflow: ellipsis !important;
+                overflow: hidden !important;
+            }
+            /* Date & Time style */
+            .history-cell.cell-date {
+                grid-column: 2 !important;
+                grid-row: 1 !important;
+                font-size: 0.62rem !important;
+                color: rgba(255, 255, 255, 0.35) !important;
+                text-align: right !important;
+                border-bottom: none !important;
+                padding-bottom: 0 !important;
+                margin-bottom: 0 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: flex-end !important;
+                justify-content: center !important;
+                line-height: 1.15 !important;
+            }
+            .history-cell.cell-date div {
+                font-size: inherit !important;
+                color: inherit !important;
             }
             /* Client Name and ID style */
-            .history-ledger-row .history-cell:nth-child(2) {
-                display: block !important;
-                font-size: 0.85rem !important;
-                font-weight: 800 !important;
-                color: #FFFFFF !important;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-                padding-bottom: 6px;
-                margin-bottom: 8px !important;
-            }
-            /* Value fields layout on mobile: 2-column flex */
-            .history-ledger-row .history-cell:nth-child(3),
-            .history-ledger-row .history-cell:nth-child(4),
-            .history-ledger-row .history-cell:nth-child(5),
-            .history-ledger-row .history-cell:nth-child(6) {
-                display: inline-block !important;
-                width: 48% !important;
-                margin-bottom: 6px !important;
+            .history-cell.cell-client {
+                grid-column: 1 !important;
+                grid-row: 1 !important;
                 font-size: 0.74rem !important;
-                vertical-align: top !important;
+                font-weight: 700 !important;
+                color: #FFFFFF !important;
+                margin-bottom: 0 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                justify-content: center !important;
+                line-height: 1.15 !important;
             }
-            .history-ledger-row .history-cell:nth-child(3)::before { content: "Loan: "; color: rgba(255, 255, 255, 0.4); font-weight: 500; }
-            .history-ledger-row .history-cell:nth-child(4)::before { content: "Term: "; color: rgba(255, 255, 255, 0.4); font-weight: 500; }
-            .history-ledger-row .history-cell:nth-child(5)::before { content: "Amort: "; color: rgba(255, 255, 255, 0.4); font-weight: 500; }
-            .history-ledger-row .history-cell:nth-child(6)::before { content: "NetPay: "; color: rgba(255, 255, 255, 0.4); font-weight: 500; }
+            .history-cell.cell-client div {
+                font-size: inherit !important;
+                font-weight: inherit !important;
+                color: inherit !important;
+            }
+            /* Left column details */
+            .history-cell.cell-loan {
+                grid-column: 1 !important;
+                grid-row: 2 !important;
+                text-align: left !important;
+            }
+            .history-cell.cell-term {
+                grid-column: 1 !important;
+                grid-row: 3 !important;
+                text-align: left !important;
+            }
+            /* Right column details */
+            .history-cell.cell-amort {
+                grid-column: 2 !important;
+                grid-row: 2 !important;
+                text-align: right !important;
+            }
+            .history-cell.cell-netpay {
+                grid-column: 2 !important;
+                grid-row: 3 !important;
+                text-align: right !important;
+            }
+            .history-cell.cell-loan::before { content: "Loan: "; color: rgba(255, 255, 255, 0.45); font-weight: 500; }
+            .history-cell.cell-term::before { content: "Term: "; color: rgba(255, 255, 255, 0.45); font-weight: 500; }
+            .history-cell.cell-amort::before { content: "Amort: "; color: rgba(255, 255, 255, 0.45); font-weight: 500; }
+            .history-cell.cell-netpay::before { content: "NetPay: "; color: rgba(255, 255, 255, 0.45); font-weight: 500; }
             
             .history-delete-btn-wrapper {
                 display: none !important;
             }
+            /* (2026-07-13) Center delete button; prev: top-aligned */
             .history-delete-btn {
                 position: absolute !important;
-                top: 8px !important;
-                right: 8px !important;
+                top: 50% !important;
+                transform: translateY(-50%) !important;
+                right: 12px !important;
                 background: rgba(239, 68, 68, 0.1) !important;
                 border: 1px solid rgba(239, 68, 68, 0.2) !important;
-                padding: 4px 6px !important;
-                border-radius: 4px !important;
-                font-size: 0.7rem !important;
+                padding: 6px !important;
+                height: 28px !important;
+                width: 28px !important;
+                border-radius: 6px !important;
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
                 width: 26px !important;
                 height: 26px !important;
             }
+        }
+
+        /* (2026-07-13) Custom checkboxes; prev: system default checkboxes */
+        input[type="checkbox"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px;
+            border-radius: 4px;
+            display: inline-block;
+            position: relative;
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+            vertical-align: middle;
+            transition: all 0.2s ease;
+        }
+        input[type="checkbox"]:checked {
+            background-color: #F59E0B;
+            border-color: #F59E0B;
+        }
+        input[type="checkbox"]:checked::after {
+            content: '\2713'; /* Unicode check mark symbol */
+            font-size: 11px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #080c1c;
+            font-weight: 900;
+        }
+        input[type="radio"] {
+            accent-color: #F59E0B !important;
         }
     </style>
 
@@ -3110,7 +3317,7 @@
                                 <span class="text-muted" style="font-size: 0.68rem; font-weight: 500; font-family: 'Montserrat', sans-serif;">Calculate loan proceeds, settlements, and advance payments</span>
                             </div>
                             <!-- 2026-07-13: Add dedicated Calculate button for Net Proceeds (was: auto-triggered by input changes) -->
-                            <button type="button" id="btn-calculate-netproc" onclick="calculateNetProceeds()" style="background: linear-gradient(135deg, #059669 0%, #10B981 100%); border: none; border-radius: 8px; color: #fff; font-family: 'Montserrat', sans-serif; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.08em; padding: 7px 14px; cursor: pointer; white-space: nowrap; flex-shrink: 0; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35); transition: all 0.2s ease; text-transform: uppercase;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 18px rgba(16,185,129,0.5)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 12px rgba(16,185,129,0.35)'">
+                            <button type="button" id="btn-calculate-netproc" onclick="calculateNetProceeds(true)" style="background: linear-gradient(135deg, #059669 0%, #10B981 100%); border: none; border-radius: 8px; color: #fff; font-family: 'Montserrat', sans-serif; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.08em; padding: 7px 14px; cursor: pointer; white-space: nowrap; flex-shrink: 0; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35); transition: all 0.2s ease; text-transform: uppercase;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 18px rgba(16,185,129,0.5)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 12px rgba(16,185,129,0.35)'">
                                 <i class="bi bi-calculator-fill mr-1"></i>CALCULATE
                             </button>
                         </div>
@@ -3130,51 +3337,46 @@
                                 <input type="number" step="0.01" id="input-netproc-old-balance" class="form-control bank-input input-sm tabular-nums text-right font-weight-bold" style="width: 110px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; height: 26px; padding: 2px 8px; font-size: 0.8rem; border-radius: 4px;" value="0">
                             </div>
 
-                            <!-- 3. Redemption Row (PLIs) -->
-                            <div class="baseline-row mb-2" id="row-netproc-redemption">
-                                <span class="netpay-label"><i class="bi bi-dash-lg text-warning mr-2"></i>Less Redemption</span>
-                                <span id="val-netproc-redemption" class="netpay-value tabular-nums font-weight-bold" style="padding-right: 0px !important; font-size: 0.8rem;">₱0.00</span>
-                            </div>
-
-                            <!-- 4. Old Deductions Accordion (Checkbox table for basis of advance payment deductions) -->
-                            <div id="dynamic-netproc-deductions-container" class="mt-0 mb-2" style="background: transparent; border: none; overflow: hidden; width: 100%;">
-                                <button type="button" class="baseline-row netpay-row-csb-deductions-header w-100" id="btn-netproc-accordion-header" onclick="toggleNetprocAccordion();" style="background: transparent; border: none; outline: none !important; width: 100%; margin-bottom: 0 !important;">
-                                    <span class="netpay-label"><i class="bi bi-receipt text-success mr-2"></i>Old Deductions</span>
+                            <!-- (2026-07-13) Less Redemption as accordion checklist; prev: plain row -->
+                            <div id="dynamic-netproc-redemption-container" class="mt-0 mb-2" style="background: transparent; border: none; overflow: hidden; width: 100%;">
+                                <button type="button" class="baseline-row netpay-row-redemption-header w-100" id="btn-netproc-redemption-header" onclick="toggleNetprocRedemptionAccordion();" style="background: transparent; border: none; outline: none !important; width: 100%; margin-bottom: 0 !important;">
+                                    <span class="netpay-label"><i class="bi bi-dash-lg text-warning mr-2"></i>Less Redemption</span>
                                     <span class="d-flex align-items-center" style="gap: 8px;">
-                                        <span id="lbl-netproc-old-dedamt" class="tabular-nums font-weight-bold" style="padding-right: 0px !important; font-size: 0.8rem !important; color: white !important;">₱0.00</span>
-                                        <i class="bi bi-chevron-down text-white-50" id="netproc-chevron" style="font-size: 0.75rem; transition: transform 0.2s ease;"></i>
+                                        <span id="val-netproc-redemption" class="tabular-nums font-weight-bold" style="padding-right: 0px !important; font-size: 0.8rem !important; color: white !important;">₱0.00</span>
+                                        <i class="bi bi-chevron-down text-white-50" id="netproc-redemption-chevron" style="font-size: 0.75rem; transition: transform 0.2s ease;"></i>
                                     </span>
                                 </button>
-                                <div id="netprocAccordionBody" class="receipt-accordion-body" style="display: none; padding: 2px 14px 6px 14px; border-top: 1px solid rgba(255, 255, 255, 0.04); background: rgba(0, 0, 0, 0.22); border-radius: 6px; margin-top: 2px;">
-                                    <div class="table-responsive">
-                                        <table class="bank-table mb-0" id="tableNetprocOldDeductions" style="width: 100%; border: none; background: transparent;">
-                                            <thead>
-                                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-                                                    <!-- 2026-07-13: Remove onchange runCalculations from master deduction checkbox (was: onchange="toggleAllNetprocDeductions(this)") -->
-                                                    <th style="width: 32px; text-align: center; vertical-align: middle; padding: 4px 0;"><input type="checkbox" id="netproc-select-all" checked onchange="toggleAllNetprocCheckboxes(this)"></th>
-                                                    <th style="text-align: left; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.35) !important;">Code</th>
-                                                    <th style="text-align: left; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.35) !important;">Policy No</th>
-                                                    <th style="text-align: center; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.35) !important;">Date</th>
-                                                    <th style="text-align: right; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.35) !important;">Amount</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="netproc-old-deductions-tbody">
-                                                <!-- Dynamic CSB rows populated on employee search load -->
-                                                <tr><td colspan="5" class="text-white-50 text-center py-2">No positive CSB deductions found</td></tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                <div id="netprocRedemptionAccordionBody" class="receipt-accordion-body" style="display: none; padding: 6px 14px 8px 14px; border-top: 1px solid rgba(255, 255, 255, 0.04); background: rgba(0, 0, 0, 0.22); border-radius: 6px; margin-top: 2px;">
+                                    <table class="bank-table mb-0" id="tableNetprocRedemption" style="width: 100%; border: none; background: transparent; margin-top: 4px;">
+                                        <thead>
+                                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+                                                <th style="width: 32px; text-align: center; vertical-align: middle; padding: 4px 0;"><input type="checkbox" id="redemption-select-all" checked onchange="toggleAllRedemptionCheckboxes(this); calculateNetProceeds();"></th>
+                                                <th style="text-align: left; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.35) !important;">CODE</th>
+                                                <th style="text-align: center; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.35) !important;">EFF</th>
+                                                <th style="text-align: center; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.35) !important;">TERM</th>
+                                                <th style="text-align: right; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.35) !important;">DEDPLI</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="netproc-redemption-tbody">
+                                            <!-- Dynamic PLI rows populated on employee search load -->
+                                            <tr><td colspan="5" class="text-white-50 text-center py-2">No redemption records found</td></tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
+
+                            <!-- (2026-07-13) Remove Old Deductions accordion; prev: duplicate CSB list -->
 
                             <!-- 5. Advance Payment Months Selector -->
                             <div class="baseline-row mb-2" id="row-netproc-advance-months">
                                 <span class="netpay-label"><i class="bi bi-calendar-event text-success mr-2"></i>Advance Payment Months</span>
                                 <!-- 2026-07-13: Remove onchange runCalculations from advance months selector (was: onchange="runCalculations()") -->
+                                <!-- (2026-07-13) Add 0 option to advance months; prev: 1-9 options -->
                                 <select id="select-netproc-advance-months" class="form-control bank-select select-sm tabular-nums text-right font-weight-bold" style="width: 60px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; height: 26px; padding: 2px; font-size: 0.8rem; border-radius: 4px;">
+                                    <option value="0" selected>0</option>
                                     <option value="1">1</option>
                                     <option value="2">2</option>
-                                    <option value="3" selected>3</option>
+                                    <option value="3">3</option>
                                     <option value="4">4</option>
                                     <option value="5">5</option>
                                     <option value="6">6</option>
@@ -3206,10 +3408,11 @@
 
                             <!-- Card: Private Liabilities (PLI) / Redemption -->
                             <div class="bank-card private-liabilities-card mt-3" id="card-private-liabilities" data-label="Private Liabilities (PLI) Assessment Card">
-                                <!-- [2026-07-12 Fix: Premium header row with always-visible title and master toggle switch] -->
-                                <div class="d-flex align-items-center justify-content-between mb-3 pb-2" id="wrapperMasterPliToggleHeader" style="border-bottom: 1px solid rgba(255,255,255,0.06); gap: 16px;">
+                                <!-- (2026-07-13) Set header margin to mb-0; prev: mb-2 pb-0 -->
+                                <div class="d-flex align-items-center justify-content-between mb-0 pb-0" id="wrapperMasterPliToggleHeader" onclick="if(!event.target.closest('.toggle-switch-wrapper')){ document.getElementById('toggleMasterPli').click(); }" style="gap: 16px; cursor: pointer;">
                                     <div class="d-flex flex-column" id="pli-header-title-block" data-desc="Title text block for Private Liabilities section header.">
-                                        <div class="orange-node mb-1" id="node-private-liabilities-title" style="margin-bottom: 2px !important;">
+                                        <!-- (2026-07-13) Remove title description; prev: span description -->
+                                        <div class="orange-node mb-0" id="node-private-liabilities-title" style="margin-bottom: 0 !important;">
                                             <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
                                             <span id="lbl-pli-card-title-text">REDEMPTION</span>
                                             <span class="math-popover">
@@ -3217,10 +3420,9 @@
                                                 Toggle to include private lending institution (PLI) redemptions in calculations.
                                             </span>
                                         </div>
-                                        <span class="text-muted" style="font-size: 0.68rem; font-weight: 500; font-family: 'Montserrat', sans-serif;">Manage and incorporate private lending institution deductions</span>
                                     </div>
-                                    <div class="toggle-switch-wrapper mb-0" id="wrapperMasterPliToggle" style="margin-bottom: 0 !important;">
-                                        <label class="toggle-switch m-0" id="labelMasterPliSwitch" title="Toggle entire Private Liabilities section (PLIs) in calculations">
+                                    <div class="toggle-switch-wrapper mb-0" id="wrapperMasterPliToggle" style="margin-bottom: 0 !important; gap: 0;">
+                                        <label class="toggle-switch mb-0" id="labelMasterPliSwitch" title="Toggle entire Private Liabilities section (PLIs) in calculations">
                                             <input type="checkbox" id="toggleMasterPli" onchange="onToggleMasterPli(); runCalculations();">
                                             <span class="toggle-track toggle-track-master-pli"></span>
                                         </label>
@@ -3234,30 +3436,29 @@
                                         <!-- Populated dynamically -->
                                     </div>
 
-                                    <!-- [2026-07-14 Fix: Total Redemption/PLI amount display below section-panel-inner, styled like the Anticipated card total] -->
-                                    <div id="pli-value-wrapper" class="mt-1 px-3 pb-1" style="border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 12px;">
+                                    <!-- (2026-07-13) Remove top divider; prev: border-top present -->
+                                    <div id="pli-value-wrapper" class="mt-1 px-3 pb-1" style="padding-top: 4px;">
                                         <div class="comp-field-label mb-1" id="lbl-pli-total-value">Redemption Total Amount</div>
                                         <div id="val-pli-total" class="bank-value-display font-weight-bold">₱0.00</div>
                                     </div>
                                 </div>
                             </div>
-
                             <!-- Card: Anticipated Compensation Adjustments -->
                             <div class="bank-card private-liabilities-card mt-3" id="card-anticipated" data-label="Anticipated Compensation Card">
-                                <!-- Premium header row with always-visible title and master toggle switch -->
-                                <div class="d-flex align-items-center justify-content-between mb-3 pb-2" id="wrapperAnticipatedToggleHeader" style="border-bottom: 1px solid rgba(255,255,255,0.06); gap: 16px;">
+                                <!-- (2026-07-13) Set header margin to mb-0; prev: mb-2 pb-0 -->
+                                <div class="d-flex align-items-center justify-content-between mb-0 pb-0" id="wrapperAnticipatedToggleHeader" onclick="if(!event.target.closest('.toggle-switch-wrapper')){ document.getElementById('toggleAnticipated').click(); }" style="gap: 16px; cursor: pointer;">
                                     <div class="d-flex flex-column">
-                                        <div class="orange-node mb-1" id="node-anticipated" style="margin-bottom: 2px !important;">
+                                        <!-- (2026-07-13) Remove title description; prev: span description -->
+                                        <div class="orange-node mb-0" id="node-anticipated" style="margin-bottom: 0 !important;">
                                             <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
-                                            ANTICIPATED
+                                            <span>ANTICIPATED</span>
                                             <span class="math-popover" id="popover-anticipated" data-desc="Math popover description for Anticipated.">
                                                 Anticipated salary standardization increase (Net Pay difference between 4th Tranche 2027 and 3rd Tranche 2026) for the original Grade and Step.<br>Toggle switch on the right to include/exclude from total.
                                             </span>
                                         </div>
-                                        <span class="text-muted" style="font-size: 0.68rem; font-weight: 500; font-family: 'Montserrat', sans-serif;">Manage and incorporate anticipated salary standardization increases</span>
                                     </div>
                                     <div class="toggle-switch-wrapper mb-0" id="wrapperAnticipatedToggle" style="margin-bottom: 0 !important; gap: 0;">
-                                        <label class="toggle-switch" id="labelAnticipatedSwitch" title="Toggle Anticipated in total">
+                                        <label class="toggle-switch mb-0" id="labelAnticipatedSwitch" title="Toggle Anticipated in total">
                                             <input type="checkbox" id="toggleAnticipated" onchange="onToggleAnticipated(); runCalculations();">
                                             <span class="toggle-track toggle-track-anticipated"></span>
                                         </label>
@@ -3308,20 +3509,20 @@
 
                             <!-- Card: Promotion Adjustments -->
                             <div class="bank-card private-liabilities-card mt-3" id="card-promotion" data-label="Promotion Compensation Card">
-                                <!-- Premium header row with always-visible title and master toggle switch -->
-                                <div class="d-flex align-items-center justify-content-between mb-3 pb-2" id="wrapperPromotionToggleHeader" style="border-bottom: 1px solid rgba(255,255,255,0.06); gap: 16px;">
+                                <!-- (2026-07-13) Set header margin to mb-0; prev: mb-2 pb-0 -->
+                                <div class="d-flex align-items-center justify-content-between mb-0 pb-0" id="wrapperPromotionToggleHeader" onclick="if(!event.target.closest('.toggle-switch-wrapper')){ document.getElementById('togglePromotion').click(); }" style="gap: 16px; cursor: pointer;">
                                     <div class="d-flex flex-column">
-                                        <div class="orange-node mb-1" id="node-promotion" style="margin-bottom: 2px !important;">
+                                        <!-- (2026-07-13) Remove title description; prev: span description -->
+                                        <div class="orange-node mb-0" id="node-promotion" style="margin-bottom: 0 !important;">
                                             <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
-                                            PROMOTION
+                                            <span>PROMOTION</span>
                                             <span class="math-popover">
                                                 Select promotional overrides inside tranch2026.csv.<br>Toggle switch on the right to include/exclude margin from total.
                                             </span>
                                         </div>
-                                        <span class="text-muted" style="font-size: 0.68rem; font-weight: 500; font-family: 'Montserrat', sans-serif;">Manage and select promotional salary grade and step overrides</span>
                                     </div>
                                     <div class="toggle-switch-wrapper mb-0" id="wrapperPromotionToggle" style="margin-bottom: 0 !important; gap: 0;">
-                                        <label class="toggle-switch" id="labelPromotionSwitch" title="Toggle Promotion in total">
+                                        <label class="toggle-switch mb-0" id="labelPromotionSwitch" title="Toggle Promotion in total">
                                             <input type="checkbox" id="togglePromotion" onchange="onTogglePromotion(); runCalculations();">
                                             <span class="toggle-track toggle-track-promotion"></span>
                                         </label>
@@ -3358,8 +3559,8 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <!-- New Salary display below dropdowns — no horizontal clash -->
-                                            <div id="lbl-promoted-salary" class="tabular-nums mt-2" style="font-size: 0.8rem; font-weight: 600; color: rgba(255,255,255,0.55); border-top: 1px dashed rgba(255, 255, 255, 0.06); padding-top: 8px; margin-top: 8px !important;">
+                                            <!-- (2026-07-13) Hide promoted salary display; prev: visible div -->
+                                            <div id="lbl-promoted-salary" class="tabular-nums mt-2" style="display: none;">
                                                 New Salary: ₱0.00
                                             </div>
                                         </div>
@@ -3405,35 +3606,29 @@
                                     <div id="val-papsubtotal" class="bank-value-display">₱0.00</div>
                                 </div>
 
-                                <!-- [2026-07-11 Fix: PLI Subtotal row — section-panel-inner + mt-3 layout] -->
-                                <div class="mt-3" id="panel-pli-totals" style="border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 14px;">
-                                    <div class="row mx-0">
-                                        <!-- PLI Subtotal Column -->
-                                        <div class="col-12 col-sm-6 pli-subtotal-col px-0" id="colPLISubtotal" data-desc="Column displaying the computed PLI subtotal value.">
-                                            <div class="d-flex align-items-center justify-content-between">
-                                                <div class="orange-node font-weight-bold mb-0" id="node-plisubtotal" style="margin-bottom: 0 !important;">
-                                                    <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
-                                                    PLI SUBTOTAL
-                                                    <span class="math-popover">
-                                                        Sum of selected PLI deductions.
-                                                    </span>
-                                                </div>
-                                                <div id="val-plisubtotal" class="bank-value-display">₱0.00</div>
-                                            </div>
+                                <!-- (2026-07-13) Set compact aligned rows; prev: bootstrap columns layout -->
+                                <div class="mt-1" id="panel-pli-totals" style="padding-top: 0;">
+                                    <!-- PLI Subtotal Row -->
+                                    <div class="baseline-row mt-1" id="row-plisubtotal">
+                                        <div class="orange-node font-weight-bold" id="node-plisubtotal">
+                                            <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
+                                            <span id="lbl-plisubtotal-title">PLI SUBTOTAL</span>
+                                            <span class="math-popover">
+                                                Sum of selected PLI deductions.
+                                            </span>
                                         </div>
-                                        <!-- NetPay + PLI Total Column -->
-                                        <div class="col-12 col-sm-6 netpay-pli-col px-0" id="colNetPayPLITotal" data-desc="Column displaying combined NetPay and PLI subtotal.">
-                                            <div class="d-flex align-items-center justify-content-between">
-                                                <div class="orange-node font-weight-bold mb-0" id="node-netpayplitotal" style="margin-bottom: 0 !important;">
-                                                    <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                                                    NETPAY + PLI TOTAL
-                                                    <span class="math-popover">
-                                                        <strong>NetPay + PLI Total Margin</strong>
-                                                     </span>
-                                                </div>
-                                                <div id="val-netpayplitotal" class="bank-value-display">₱0.00</div>
-                                            </div>
+                                        <div id="val-plisubtotal" class="bank-value-display">₱0.00</div>
+                                    </div>
+                                    <!-- NetPay + PLI Total Row -->
+                                    <div class="baseline-row mt-1" id="row-netpayplitotal">
+                                        <div class="orange-node font-weight-bold" id="node-netpayplitotal">
+                                            <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                            <span id="lbl-netpayplitotal-title">NETPAY + PLI TOTAL</span>
+                                            <span class="math-popover">
+                                                <strong>NetPay + PLI Total Margin</strong>
+                                            </span>
                                         </div>
+                                        <div id="val-netpayplitotal" class="bank-value-display">₱0.00</div>
                                     </div>
                                 </div>
                             </div>
@@ -3480,7 +3675,8 @@
                         </div>
 
                         <!-- 2026-07-14: Reduced row gap from g-3 to g-2 (was: g-3) -->
-                        <div class="row g-2 mb-2">
+                        <!-- (2026-07-13) Unified row for summary cards; prev: separate bootstrap rows -->
+                        <div class="row compact-grid-row">
                             <!-- 2026-07-13: Change wrapper to col-6 for 2-column mobile layout (was: col-md-6 d-flex) -->
                             <div class="col-6 col-md-6 d-flex semitotal-summary-wrapper" id="wrapperSemitotalSummary" data-desc="Wrapper layout for the semitotal computation display panel.">
                                 <div class="inner-summary-card semitotal-panel w-100" id="box-semitotal-summary" data-label="SemiTotal Summary Panel">
@@ -3511,10 +3707,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- 2026-07-14: Reduced row gap from g-3 to g-2 (was: g-3) -->
-                        <div class="row g-2">
                             <!-- Amortization Computation Grid Wrapper (Displays the calculated monthly loan installment) -->
                             <!-- 2026-07-13: Change wrapper to col-6 for 2-column mobile layout (was: col-md-6 d-flex) -->
                             <div class="col-6 col-md-6 d-flex amortization-summary-wrapper" id="wrapperAmortizationSummary" data-desc="Wrapper layout for the amortization computation display panel.">
@@ -4129,10 +4321,49 @@
 
             // [2026-07-14 Fix: Disable searchBtn while searching; previous: button stayed enabled during async fetch]
             const searchBtnEl = document.getElementById('searchBtn');
-            if (searchBtnEl) { searchBtnEl.disabled = true; searchBtnEl.style.opacity = '0.55'; }
+            if (searchBtnEl) {
+                searchBtnEl.disabled = true;
+                searchBtnEl.style.opacity = '0.55';
+                searchBtnEl.innerHTML = '<span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>Searching...';
+            }
             document.getElementById('loadingIndicator').classList.remove('d-none');
             document.getElementById('empSummaryCard').classList.add('d-none');
             document.getElementById('evaluationWorkspace').classList.add('d-none');
+
+            // (2026-07-13) Set skeleton rows for items during search; prev: none
+            const csbTbody = document.getElementById('csb-deductions-tbody');
+            const redemptionTbody = document.getElementById('netproc-redemption-tbody');
+            const receiptBody = document.getElementById('receiptAccordionBody');
+            const skeletonRowsHtml = `
+                <tr>
+                    <td style="text-align: center; vertical-align: middle; padding: 4px 0;"><div class="skeleton-line" style="width: 16px; height: 16px; margin: auto;"></div></td>
+                    <td style="text-align: left; vertical-align: middle; padding: 4px 2px;"><div class="skeleton-line" style="width: 50px; height: 10px;"></div></td>
+                    <td style="text-align: center; vertical-align: middle; padding: 4px 2px;"><div class="skeleton-line" style="width: 40px; height: 10px; margin: auto;"></div></td>
+                    <td style="text-align: center; vertical-align: middle; padding: 4px 2px;"><div class="skeleton-line" style="width: 40px; height: 10px; margin: auto;"></div></td>
+                    <td style="text-align: right; vertical-align: middle; padding: 4px 2px;"><div class="skeleton-line" style="width: 60px; height: 10px; margin-left: auto;"></div></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; vertical-align: middle; padding: 4px 0;"><div class="skeleton-line" style="width: 16px; height: 16px; margin: auto;"></div></td>
+                    <td style="text-align: left; vertical-align: middle; padding: 4px 2px;"><div class="skeleton-line" style="width: 60px; height: 10px;"></div></td>
+                    <td style="text-align: center; vertical-align: middle; padding: 4px 2px;"><div class="skeleton-line" style="width: 40px; height: 10px; margin: auto;"></div></td>
+                    <td style="text-align: center; vertical-align: middle; padding: 4px 2px;"><div class="skeleton-line" style="width: 40px; height: 10px; margin: auto;"></div></td>
+                    <td style="text-align: right; vertical-align: middle; padding: 4px 2px;"><div class="skeleton-line" style="width: 55px; height: 10px; margin-left: auto;"></div></td>
+                </tr>
+            `;
+            if (csbTbody) csbTbody.innerHTML = skeletonRowsHtml;
+            if (redemptionTbody) redemptionTbody.innerHTML = skeletonRowsHtml;
+            if (receiptBody) {
+                receiptBody.innerHTML = `
+                    <div class="baseline-row py-2" style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+                        <div class="skeleton-line" style="width: 120px; height: 12px;"></div>
+                        <div class="skeleton-line" style="width: 80px; height: 12px; margin-left: auto;"></div>
+                    </div>
+                    <div class="baseline-row py-2">
+                        <div class="skeleton-line" style="width: 100px; height: 12px;"></div>
+                        <div class="skeleton-line" style="width: 70px; height: 12px; margin-left: auto;"></div>
+                    </div>
+                `;
+            }
 
             const month = document.getElementById('activeMonthSelect').value;
 
@@ -4187,7 +4418,11 @@
             } finally {
                 document.getElementById('loadingIndicator').classList.add('d-none');
                 // [2026-07-14 Fix: Re-enable searchBtn after search completes; previous: not disabled so no re-enable needed]
-                if (searchBtnEl) { searchBtnEl.disabled = false; searchBtnEl.style.opacity = ''; }
+                if (searchBtnEl) {
+                    searchBtnEl.disabled = false;
+                    searchBtnEl.style.opacity = '';
+                    searchBtnEl.innerHTML = '<i class="bi bi-search"></i> Search';
+                }
             }
         }
 
@@ -4235,9 +4470,10 @@
                 document.getElementById('input-less-onqueue').value = "0.00";
                 document.getElementById('input-less-incoming').value = "0.00";
                 
-                const netprocTbody = document.getElementById('netproc-old-deductions-tbody');
-                if (netprocTbody) {
-                    netprocTbody.innerHTML = `<tr><td colspan="5" class="text-white-50 text-center py-2">No positive CSB deductions found</td></tr>`;
+                // (2026-07-13) Set redemption table to default empty in autonomous mode; prev: none
+                const redemptionTbody = document.getElementById('netproc-redemption-tbody');
+                if (redemptionTbody) {
+                    redemptionTbody.innerHTML = `<tr><td colspan="5" class="text-white-50 text-center py-2">No redemption records found</td></tr>`;
                 }
 
                 onModeChange();
@@ -4315,36 +4551,7 @@
                 }
             }
 
-            // Populate Net Proceeds Old Deductions table breakdown dynamically
-            const netprocTbody = document.getElementById('netproc-old-deductions-tbody');
-            if (netprocTbody) {
-                if (matchingPos.length > 0) {
-                    netprocTbody.innerHTML = matchingPos.map((row, idx) => {
-                        const code = row[7] || '-';
-                        const policy = row[15] || '-';
-                        const dateVal = row[16] || '-';
-                        const amount = safeFloat(row[13]);
-                        
-                        return `
-                            <tr>
-                                <td style="text-align: center; vertical-align: middle; padding: 4px 0;">
-                                    <!-- 2026-07-13: Remove onchange runCalculations from individual deduction checkboxes (was: onchange="runCalculations()") -->
-                                    <input type="checkbox" class="netproc-deduction-cb" data-amount="${amount}" checked>
-                                </td>
-                                <td style="text-align: left; vertical-align: middle; font-family: var(--font-mono); padding: 4px 2px; color: rgba(255, 255, 255, 0.45) !important;">${code}</td>
-                                <td style="text-align: left; vertical-align: middle; font-family: var(--font-mono); padding: 4px 2px; color: rgba(255, 255, 255, 0.45) !important;">${policy}</td>
-                                <td style="text-align: center; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.45) !important;">${dateVal}</td>
-                                <td style="text-align: right; vertical-align: middle; font-weight: 600; color: rgba(255, 255, 255, 0.55) !important; padding: 4px 2px;">${formatPHP(amount)}</td>
-                            </tr>
-                        `;
-                    }).join('');
-                    
-                    const masterSelectAllNetproc = document.getElementById('netproc-select-all');
-                    if (masterSelectAllNetproc) masterSelectAllNetproc.checked = true;
-                } else {
-                    netprocTbody.innerHTML = `<tr><td colspan="5" class="text-white-50 text-center py-2">No positive CSB deductions found</td></tr>`;
-                }
-            }
+            // (2026-07-13) Remove Old Deductions accordion; prev: duplicate CSB list
 
             /* [2026-07-10 Fix: Changed textContent to innerHTML to render muted currency span correctly] */
             document.getElementById('lbl-netpay').innerHTML = formatPHP(netPayVal);
@@ -4375,6 +4582,36 @@
                 }
             }
             renderPLIAccordions(matchingPli);
+
+            // (2026-07-13) Populate redemption-tbody checkbox table; prev: none
+            const redemptionTbody = document.getElementById('netproc-redemption-tbody');
+            if (redemptionTbody) {
+                if (matchingPli.length > 0) {
+                    redemptionTbody.innerHTML = matchingPli.map((row, idx) => {
+                        const code = row[9] || '-';
+                        const eff = `${row[12] || ''}/${row[11] || ''}`;
+                        const term = `${row[14] || ''}/${row[13] || ''}`;
+                        const dedpli = safeFloat(row[15]);
+                        
+                        return `
+                            <tr>
+                                <td style="text-align: center; vertical-align: middle; padding: 4px 0;">
+                                    <input type="checkbox" class="netproc-redemption-cb" data-amount="${dedpli}" checked onchange="onRedemptionCheckboxChange()">
+                                </td>
+                                <td style="text-align: left; vertical-align: middle; font-family: var(--font-mono); padding: 4px 2px; color: rgba(255, 255, 255, 0.45) !important;">${code}</td>
+                                <td style="text-align: center; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.45) !important;">${eff}</td>
+                                <td style="text-align: center; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.45) !important;">${term}</td>
+                                <td style="text-align: right; vertical-align: middle; font-weight: 600; color: rgba(255, 255, 255, 0.55) !important; padding: 4px 2px;">${formatPHP(dedpli)}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                    
+                    const masterSelectAllRedemption = document.getElementById('redemption-select-all');
+                    if (masterSelectAllRedemption) masterSelectAllRedemption.checked = true;
+                } else {
+                    redemptionTbody.innerHTML = `<tr><td colspan="5" class="text-white-50 text-center py-2">No redemption records found</td></tr>`;
+                }
+            }
 
             // Determine Initial Loan Amount capacity
             // Formula: Capacity = NETPAY + CSB Deductions + PLI INCLUDED - ONQUEUE - 5300 (where 5300 is constant)
@@ -4432,6 +4669,7 @@
 
             // Trigger matrix run computations
             runCalculations();
+            calculateNetProceeds();
 
             // Log the initial state if requested
             if (!skipHistoryLog) {
@@ -4497,7 +4735,7 @@
                                             <td data-label="Select" onclick="event.stopPropagation()">
                                                 <input type="radio" name="pli_radio_${i}" class="pli-radio" data-dedpli="${dedpli}" data-row-index="${idx}" data-plicode="${pliCode}" onchange="updatePLIHeaderValue(${i}); runCalculations();">
                                             </td>
-                                            <td data-label="PLI Code">${pliCode}</td>
+                                            <td data-label="Code">${pliCode}</td>
                                             <td data-label="EFF">${eff}</td>
                                             <td data-label="TERM">${term}</td>
                                             <td data-label="DEDPLI" class="font-weight-bold text-white">${formatPHP(dedpli)}</td>
@@ -4579,8 +4817,8 @@
                 <table class="bank-table text-white">
                     <thead>
                         <tr>
-                            <th style="width: 32px; text-align: center; vertical-align: middle;"><input type="checkbox" id="onq-select-all" checked onchange="toggleAllOnqDeductions(this)"></th>
-                            <th>PLI Code</th>
+                            <th style="width: 32px; text-align: center; vertical-align: middle;"><input type="checkbox" id="onq-select-all" onchange="toggleAllOnqDeductions(this)"></th>
+                            <th>Code</th>
                             <th>EFF</th>
                             <th>TERM</th>
                             <th>DEDAMT</th>
@@ -4597,9 +4835,9 @@
                             return `
                                 <tr onclick="toggleOnqRow(event, this)" style="cursor: pointer;">
                                     <td data-label="Select" onclick="event.stopPropagation()">
-                                        <input type="checkbox" class="onq-checkbox" data-dedamt="${dedamt}" checked onchange="runCalculations()">
+                                        <input type="checkbox" class="onq-checkbox" data-dedamt="${dedamt}" onchange="runCalculations()">
                                     </td>
-                                    <td data-label="PLI Code">${pliCode}</td>
+                                    <td data-label="CODE">${pliCode}</td>
                                     <td data-label="EFF">${eff}</td>
                                     <td data-label="TERM">${term}</td>
                                     <td data-label="DEDAMT" class="font-weight-bold text-white">${formatPHP(dedamt)}</td>
@@ -4749,6 +4987,9 @@
         }
 
         function runCalculations() {
+            // (2026-07-13) Sync custom dropdown values; prev: no custom select sync
+            syncAllCustomDropdowns();
+
             if (!window.activeSession) return;
 
             const modeSelect = document.getElementById('evaluationModeSelect');
@@ -5206,7 +5447,14 @@
                     activeOnqSum = safeFloat(document.getElementById('input-less-onqueue').value);
                 }
             } else {
-                document.querySelectorAll('.onq-checkbox').forEach(cb => {
+                // (2026-07-13) Sync master checkbox state; prev: no sync
+                const masterOnqCb = document.getElementById('onq-select-all');
+                const checkboxes = document.querySelectorAll('.onq-checkbox');
+                if (masterOnqCb && checkboxes.length > 0) {
+                    masterOnqCb.checked = Array.from(checkboxes).every(cb => cb.checked);
+                }
+
+                checkboxes.forEach(cb => {
                     if (cb.checked) {
                         activeOnqSum += safeFloat(cb.getAttribute('data-dedamt'));
                     }
@@ -5438,7 +5686,7 @@
         }
 
         // 2026-07-13: Standalone net proceeds calculation function triggered only by Calculate button (was: embedded in runCalculations)
-        function calculateNetProceeds() {
+        function calculateNetProceeds(isManual = false) {
             if (!window.activeSession) return;
 
             const modeSelect = document.getElementById('evaluationModeSelect');
@@ -5454,39 +5702,27 @@
             const usePromotion   = document.getElementById('togglePromotion')   ? document.getElementById('togglePromotion').checked   : false;
             const useMasterPli   = document.getElementById('toggleMasterPli')   ? document.getElementById('toggleMasterPli').checked   : true;
 
-            // Redemption (PLI subtotal)
+            // (2026-07-13) Less Redemption as accordion checklist; prev: plain row
             let pliSubtotal = 0;
             if (isAutonomous) {
                 pliSubtotal = safeFloat(document.getElementById('input-redemption').value);
             } else {
-                const slotCount = getPliSlotCount();
-                for (let i = 1; i <= slotCount; i++) {
-                    const checkedRadio = document.querySelector(`input[name="pli_radio_${i}"]:checked`);
-                    if (checkedRadio) {
-                        const val = safeFloat(checkedRadio.getAttribute('data-dedpli'));
-                        const code = checkedRadio.getAttribute('data-plicode');
-                        if (val > 0 && code && code !== 'None') {
-                            pliSubtotal += val;
-                        }
-                    }
-                }
+                document.querySelectorAll('.netproc-redemption-cb').forEach(cb => {
+                    if (cb.checked) pliSubtotal += safeFloat(cb.getAttribute('data-amount'));
+                });
             }
             const activePliSubtotal = useMasterPli ? Math.round(pliSubtotal * 100) / 100 : 0;
 
-            // Old CSB deduction basis
+            // (2026-07-13) Sum csb-deduction-cb for basis; prev: netproc-deduction-cb
             let oldDeduction = 0;
             if (isAutonomous) {
                 oldDeduction = Math.round(safeFloat(document.getElementById('input-cs-deductions').value) * 100) / 100;
             } else {
-                document.querySelectorAll('.netproc-deduction-cb').forEach(cb => {
+                document.querySelectorAll('.csb-deduction-cb').forEach(cb => {
                     if (cb.checked) oldDeduction += safeFloat(cb.getAttribute('data-amount'));
                 });
                 oldDeduction = Math.round(oldDeduction * 100) / 100;
             }
-
-            // Old deduction label update
-            const lblNetprocOldDedamt = document.getElementById('lbl-netproc-old-dedamt');
-            if (lblNetprocOldDedamt) lblNetprocOldDedamt.innerHTML = formatPHP(oldDeduction);
 
             // Amortization from current calculation
             const loanTerm = safeInt(document.getElementById('loanTerm').value);
@@ -5497,10 +5733,10 @@
                 amortization = Math.ceil(rawPmt * 100) / 100;
             }
 
-            // Advance payment
+            // (2026-07-13) Subtract redemption from basis; prev: only oldDeduction
             let advancePayment = 0;
             if (useAnticipated || usePromotion) {
-                const basis = Math.max(0, amortization - oldDeduction);
+                const basis = Math.max(0, amortization - oldDeduction - activePliSubtotal);
                 advancePayment = Math.round(basis * advanceMonths * 100) / 100;
             }
 
@@ -5521,26 +5757,24 @@
             // 2026-07-14: Display net proceeds as absolute positive value (was: could display negative)
             if (valTotal) valTotal.innerHTML = formatPHP(Math.abs(netProceeds));
 
-            // Animate button to give feedback
-            const btn = document.getElementById('btn-calculate-netproc');
-            if (btn) {
-                const orig = btn.innerHTML;
-                btn.innerHTML = '<i class="bi bi-check-lg mr-1"></i>DONE';
-                btn.style.background = 'linear-gradient(135deg, #047857 0%, #059669 100%)';
-                setTimeout(() => {
-                    btn.innerHTML = orig;
-                    btn.style.background = 'linear-gradient(135deg, #059669 0%, #10B981 100%)';
-                }, 1400);
+            // (2026-07-13) Animate button on manual click; prev: animated on all updates
+            if (isManual) {
+                const btn = document.getElementById('btn-calculate-netproc');
+                if (btn && !btn.classList.contains('animating')) {
+                    btn.classList.add('animating');
+                    const orig = btn.innerHTML;
+                    btn.innerHTML = '<i class="bi bi-check-lg mr-1"></i>DONE';
+                    const origBg = btn.style.background;
+                    btn.style.background = 'linear-gradient(135deg, #047857 0%, #059669 100%)';
+                    setTimeout(() => {
+                        btn.innerHTML = orig;
+                        btn.style.background = origBg;
+                        btn.classList.remove('animating');
+                    }, 1400);
+                }
             }
 
             saveActiveEvaluationState();
-        }
-
-        // 2026-07-13: Only toggle checkboxes without auto-calculating (was: called runCalculations)
-        function toggleAllNetprocCheckboxes(master) {
-            document.querySelectorAll('.netproc-deduction-cb').forEach(cb => {
-                cb.checked = master.checked;
-            });
         }
 
         // [2026-07-11 New: Toggle handler for Anticipated — updates label color when toggled]
@@ -5704,10 +5938,12 @@
                 inputLessIncomingVal: document.getElementById('input-less-incoming') ? document.getElementById('input-less-incoming').value : "0.00",
                 // 2026-07-13: Change default old balance value to "0" (was: "0.00")
                 netprocOldBalance: document.getElementById('input-netproc-old-balance') ? document.getElementById('input-netproc-old-balance').value : "0",
-                netprocAdvanceMonths: document.getElementById('select-netproc-advance-months') ? document.getElementById('select-netproc-advance-months').value : "3",
-                netprocSelections: (() => {
+                // (2026-07-13) Set advance months default value to "0"; prev: "3"
+                netprocAdvanceMonths: document.getElementById('select-netproc-advance-months') ? document.getElementById('select-netproc-advance-months').value : "0",
+                // (2026-07-13) Save netproc-redemption-cb checked state; prev: netproc-deduction-cb
+                netprocRedemptionSelections: (() => {
                     const selections = [];
-                    document.querySelectorAll('.netproc-deduction-cb').forEach((cb, idx) => {
+                    document.querySelectorAll('.netproc-redemption-cb').forEach((cb, idx) => {
                         if (cb.checked) selections.push(idx);
                     });
                     return selections;
@@ -5843,24 +6079,24 @@
                         <button onclick="event.stopPropagation(); deleteHistoryState(${index})" class="history-delete-btn" title="Delete this run" style="position:absolute;top:8px;right:8px;">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                         </button>
-                        <div class="history-cell text-white-50" style="display:flex;justify-content:space-between;align-items:center;">
+                        <div class="history-cell cell-date text-white-50" style="display:flex;justify-content:space-between;align-items:center;">
                             <div>${formattedDate}</div>
                             <div style="font-size: 0.72rem; color: rgba(255,255,255,0.35);">${formattedTime}</div>
                         </div>
-                        <div class="history-cell" style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <div class="history-cell cell-client" style="display:flex;justify-content:space-between;align-items:baseline;">
                             <div class="text-white font-weight-bold">${fullName}</div>
                             <div style="font-size: 0.72rem; color: rgba(255,255,255,0.35);">#${item.empNum}</div>
                         </div>
-                        <div class="history-cell text-white">
+                        <div class="history-cell cell-loan text-white">
                             ${formatPHP(item.loanAmount)}
                         </div>
-                        <div class="history-cell text-white-50">
+                        <div class="history-cell cell-term text-white-50">
                             ${item.loanTerm}m @ ${item.interestRate}%
                         </div>
-                        <div class="history-cell" style="color: #E5A93C;">
+                        <div class="history-cell cell-amort" style="color: #E5A93C;">
                             ${formatPHP(amortVal)}
                         </div>
-                        <div class="history-cell" style="color: ${isSafe ? '#10B981' : '#EF4444'}; font-weight: 800;">
+                        <div class="history-cell cell-netpay" style="color: ${isSafe ? '#10B981' : '#EF4444'}; font-weight: 800;">
                             ${formatPHP(item.newNetPay)}
                         </div>
                     </div>
@@ -5987,16 +6223,18 @@
             if (state.inputLessIncomingVal !== undefined) document.getElementById('input-less-incoming').value = state.inputLessIncomingVal;
             if (state.netprocOldBalance !== undefined) document.getElementById('input-netproc-old-balance').value = state.netprocOldBalance;
             if (state.netprocAdvanceMonths !== undefined) document.getElementById('select-netproc-advance-months').value = state.netprocAdvanceMonths;
-            if (state.netprocSelections !== undefined) {
-                const netprocCbs = document.querySelectorAll('.netproc-deduction-cb');
-                netprocCbs.forEach((cb, idx) => {
-                    cb.checked = state.netprocSelections.includes(idx);
+            // (2026-07-13) Restore netproc-redemption-cb selections; prev: netproc-deduction-cb
+            if (state.netprocRedemptionSelections !== undefined) {
+                const redemptionCbs = document.querySelectorAll('.netproc-redemption-cb');
+                redemptionCbs.forEach((cb, idx) => {
+                    cb.checked = state.netprocRedemptionSelections.includes(idx);
                 });
             }
 
             onModeChange();
             // Re-run calculations matrix
             runCalculations();
+            calculateNetProceeds();
         }
 
         // [2026-07-11 New: Toggles expand/collapse states of the PLI INCLUDED receipt container accordion]
@@ -6013,10 +6251,10 @@
             }
         }
 
-        // [2026-07-14 New: Toggles expand/collapse states of the Old Deductions table inside Net Proceeds card]
-        function toggleNetprocAccordion() {
-            const body = document.getElementById('netprocAccordionBody');
-            const chevron = document.getElementById('netproc-chevron');
+        // (2026-07-13) Less Redemption as accordion checklist; prev: plain row
+        function toggleNetprocRedemptionAccordion() {
+            const body = document.getElementById('netprocRedemptionAccordionBody');
+            const chevron = document.getElementById('netproc-redemption-chevron');
             if (body) {
                 const isHidden = body.style.display === 'none';
                 body.style.display = isHidden ? 'block' : 'none';
@@ -6026,12 +6264,28 @@
             }
         }
 
-        // [2026-07-14 New: Selects/deselects all old deductions checkboxes inside Net Proceeds card]
-        function toggleAllNetprocDeductions(master) {
-            document.querySelectorAll('.netproc-deduction-cb').forEach(cb => {
+        // (2026-07-13) Toggle all redemption checkboxes; prev: old deductions
+        function toggleAllRedemptionCheckboxes(master) {
+            document.querySelectorAll('.netproc-redemption-cb').forEach(cb => {
                 cb.checked = master.checked;
             });
-            runCalculations();
+            const masterToggle = document.getElementById('toggleMasterPli');
+            if (masterToggle) {
+                masterToggle.checked = master.checked;
+                onToggleMasterPli();
+            }
+            calculateNetProceeds();
+        }
+
+        // (2026-07-13) Handles checkbox selections inside redemption table; prev: none
+        function onRedemptionCheckboxChange() {
+            const anyChecked = Array.from(document.querySelectorAll('.netproc-redemption-cb')).some(cb => cb.checked);
+            const masterToggle = document.getElementById('toggleMasterPli');
+            if (masterToggle) {
+                masterToggle.checked = anyChecked;
+                onToggleMasterPli();
+            }
+            calculateNetProceeds();
         }
 
         // [2026-07-14 New: Toggle Redemption label text between REDEMPTION and Double Deduction on click; does not open accordion]
@@ -6414,7 +6668,89 @@
                     }
                 });
             }
+            // (2026-07-13) Init custom dropdown selectors; prev: standard HTML selects
+            initCustomDropdowns();
         });
+
+        // (2026-07-13) Helpers for custom select UI overlays; prev: none
+        function initCustomDropdowns() {
+            const selects = document.querySelectorAll('select.bank-select');
+            selects.forEach(select => {
+                if (select.nextElementSibling && select.nextElementSibling.classList.contains('custom-select-wrapper')) {
+                    return;
+                }
+                select.style.setProperty('display', 'none', 'important');
+                const wrapper = document.createElement('div');
+                wrapper.className = 'custom-select-wrapper';
+                if (select.id) wrapper.id = `wrapper-custom-${select.id}`;
+                wrapper.style.width = select.style.width || '';
+                wrapper.style.display = select.classList.contains('d-none') ? 'none' : 'inline-block';
+
+                const trigger = document.createElement('div');
+                trigger.className = 'custom-select-trigger';
+
+                const optionsContainer = document.createElement('div');
+                optionsContainer.className = 'custom-select-options';
+
+                wrapper.appendChild(trigger);
+                wrapper.appendChild(optionsContainer);
+                select.parentNode.insertBefore(wrapper, select.nextSibling);
+
+                syncSelectOptions(select, wrapper);
+
+                trigger.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    document.querySelectorAll('.custom-select-wrapper').forEach(w => {
+                        if (w !== wrapper) w.classList.remove('open');
+                    });
+                    wrapper.classList.toggle('open');
+                });
+            });
+
+            document.addEventListener('click', function() {
+                document.querySelectorAll('.custom-select-wrapper').forEach(w => {
+                    w.classList.remove('open');
+                });
+            });
+        }
+
+        function syncSelectOptions(select, wrapper) {
+            if (!wrapper) {
+                wrapper = document.getElementById(`wrapper-custom-${select.id}`);
+            }
+            if (!wrapper) return;
+            const trigger = wrapper.querySelector('.custom-select-trigger');
+            const optionsContainer = wrapper.querySelector('.custom-select-options');
+            optionsContainer.innerHTML = '';
+            const selectedOpt = select.options[select.selectedIndex];
+            trigger.textContent = selectedOpt ? selectedOpt.textContent : '';
+            Array.from(select.options).forEach(opt => {
+                const optDiv = document.createElement('div');
+                optDiv.className = 'custom-option';
+                if (opt.selected) optDiv.classList.add('selected');
+                optDiv.textContent = opt.textContent;
+                optDiv.setAttribute('data-value', opt.value);
+                optDiv.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    select.value = opt.value;
+                    select.dispatchEvent(new Event('change'));
+                    wrapper.classList.remove('open');
+                    syncSelectOptions(select, wrapper);
+                });
+                optionsContainer.appendChild(optDiv);
+            });
+        }
+
+        function syncAllCustomDropdowns() {
+            document.querySelectorAll('select.bank-select').forEach(select => {
+                const wrapper = select.nextElementSibling;
+                if (wrapper && wrapper.classList.contains('custom-select-wrapper')) {
+                    syncSelectOptions(select, wrapper);
+                    const isHidden = select.classList.contains('d-none');
+                    wrapper.style.display = isHidden ? 'none' : 'inline-block';
+                }
+            });
+        }
 
         function logout() {
             // [2026-07-14 Fix: Clear employeeNumber on logout; previous: only cleared loginTime]
