@@ -28,6 +28,8 @@
            - Hover Transitions: Lift translateY(-4px) and soft ambient glows.
     <!-- Chart.js for premium dynamic dashboard data rendering -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- (2026-07-13) Add SheetJS CDN import; prev: no excel parsing library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         /* [2026-07-11 Fix: CSS vars updated — deeper shadow, wider emerald green added, liquid glass vars] */
         :root {
@@ -804,7 +806,7 @@
             margin-bottom: 24px !important;
         }
         /* [2026-07-13 Fix: Ultra-premium frosted glass table design with header gradients, column highlights, and soft diff glow] */
-        #tableAnticipatedBreakdown, #tablePromotionBreakdown, #tableNetprocRedemption, #tableNetprocRedemptionManual {
+        #tableAnticipatedBreakdown, #tablePromotionBreakdown, #tableNetprocRedemption, #tableNetprocRedemptionManual, #tableCsbDeductions {
             font-size: 0.52rem !important;
             table-layout: auto !important;
             width: 100%;
@@ -820,7 +822,7 @@
             backdrop-filter: blur(4px) !important;
             -webkit-backdrop-filter: blur(4px) !important;
         }
-        #tableAnticipatedBreakdown th, #tablePromotionBreakdown th, #tableNetprocRedemption th, #tableNetprocRedemptionManual th {
+        #tableAnticipatedBreakdown th, #tablePromotionBreakdown th, #tableNetprocRedemption th, #tableNetprocRedemptionManual th, #tableCsbDeductions th {
             /* (2026-07-13) Compact table cell padding; prev: 5px 6px */
             font-size: 0.48rem !important;
             padding: 2px 4px !important;
@@ -835,10 +837,10 @@
             font-weight: 600 !important;
             text-transform: uppercase !important;
         }
-        #tableAnticipatedBreakdown th:first-child, #tablePromotionBreakdown th:first-child, #tableNetprocRedemption th:first-child, #tableNetprocRedemptionManual th:first-child {
+        #tableAnticipatedBreakdown th:first-child, #tablePromotionBreakdown th:first-child, #tableNetprocRedemption th:first-child, #tableNetprocRedemptionManual th:first-child, #tableCsbDeductions th:first-child {
             text-align: left !important;
         }
-        #tableAnticipatedBreakdown td, #tablePromotionBreakdown td, #tableNetprocRedemption td, #tableNetprocRedemptionManual td {
+        #tableAnticipatedBreakdown td, #tablePromotionBreakdown td, #tableNetprocRedemption td, #tableNetprocRedemptionManual td, #tableCsbDeductions td {
             /* (2026-07-13) Tight table padding and font size; prev: 0.52rem size, 5px padding */
             font-size: 0.50rem !important;
             padding: 2px 4px !important;
@@ -850,13 +852,13 @@
             color: rgba(255, 255, 255, 0.75) !important;
             transition: background-color 0.15s ease;
         }
-        #tableAnticipatedBreakdown td:first-child, #tablePromotionBreakdown td:first-child, #tableNetprocRedemption td:first-child, #tableNetprocRedemptionManual td:first-child {
+        #tableAnticipatedBreakdown td:first-child, #tablePromotionBreakdown td:first-child, #tableNetprocRedemption td:first-child, #tableNetprocRedemptionManual td:first-child, #tableCsbDeductions td:first-child {
             text-align: left !important;
         }
-        #tableAnticipatedBreakdown tr:last-child td, #tablePromotionBreakdown tr:last-child td, #tableNetprocRedemption tr:last-child td, #tableNetprocRedemptionManual tr:last-child td {
+        #tableAnticipatedBreakdown tr:last-child td, #tablePromotionBreakdown tr:last-child td, #tableNetprocRedemption tr:last-child td, #tableNetprocRedemptionManual tr:last-child td, #tableCsbDeductions tr:last-child td {
             border-bottom: none !important;
         }
-        #tableAnticipatedBreakdown tbody tr:hover td, #tablePromotionBreakdown tbody tr:hover td, #tableNetprocRedemption tbody tr:hover td, #tableNetprocRedemptionManual tbody tr:hover td {
+        #tableAnticipatedBreakdown tbody tr:hover td, #tablePromotionBreakdown tbody tr:hover td, #tableNetprocRedemption tbody tr:hover td, #tableNetprocRedemptionManual tbody tr:hover td, #tableCsbDeductions tbody tr:hover td {
             background: rgba(255, 255, 255, 0.03) !important;
         }
         /* (2026-07-13) Center redemption checkbox cells; prev: left-aligned */
@@ -870,6 +872,23 @@
         #tableNetprocRedemption th:nth-child(3), #tableNetprocRedemption td:nth-child(3),
         #tableNetprocRedemption th:nth-child(4), #tableNetprocRedemption td:nth-child(4) {
             text-align: center !important;
+        }
+        /* (2026-07-13) CSB table layout and alignments; prev: none */
+        #tableCsbDeductions th:first-child, #tableCsbDeductions td:first-child {
+            text-align: center !important;
+            width: 32px !important;
+        }
+        #tableCsbDeductions th:nth-child(2), #tableCsbDeductions td:nth-child(2) {
+            text-align: left !important;
+        }
+        #tableCsbDeductions th:nth-child(3), #tableCsbDeductions td:nth-child(3) {
+            text-align: left !important;
+        }
+        #tableCsbDeductions th:nth-child(4), #tableCsbDeductions td:nth-child(4) {
+            text-align: center !important;
+        }
+        #tableCsbDeductions th:nth-child(5), #tableCsbDeductions td:nth-child(5) {
+            text-align: right !important;
         }
         /* (2026-07-13) Manual redemption table column alignments; prev: none */
         #tableNetprocRedemptionManual th:first-child, #tableNetprocRedemptionManual td:first-child {
@@ -2371,9 +2390,10 @@
         }
         #dynamic-csb-deductions-container .bank-table th,
         #dynamic-csb-deductions-container .bank-table td {
-            font-size: 0.54rem !important;
-            padding: 4px 2px !important;
+            font-size: 0.72rem !important;
+            padding: 2px 2px !important;
         }
+        /* (2026-07-13) Remove CSB width overrides; prev: percentage widths */
 
         #incomingDeduction:focus {
             background: rgba(255, 255, 255, 0.055) !important;
@@ -2926,6 +2946,115 @@
         input[type="radio"] {
             accent-color: #F59E0B !important;
         }
+
+        /* (2026-07-13) CSS styles for profile card layout; prev: standard columns */
+        .profile-card {
+            background: rgba(14, 20, 44, 0.45);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            margin-top: 15px;
+            margin-bottom: 20px;
+        }
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .profile-avatar {
+            width: 42px;
+            height: 42px;
+            background: rgba(229, 169, 60, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #E5A93C;
+            border: 1px solid rgba(229, 169, 60, 0.3);
+            flex-shrink: 0;
+        }
+        .profile-title h3 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 750;
+            color: #F0F4F8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .profile-title span {
+            font-size: 11px;
+            color: #8B9BB4;
+            display: block;
+            margin-top: 2px;
+        }
+        .profile-list {
+            padding: 8px 16px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+        }
+        .profile-item {
+            display: flex;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            gap: 10px;
+        }
+        .profile-item:last-child {
+            border-bottom: none;
+        }
+        .profile-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #E5A93C;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .profile-details {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .profile-details .label {
+            font-size: 9px;
+            color: #8B9BB4;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 1px;
+        }
+        .profile-details .value {
+            font-size: 12px;
+            color: #F0F4F8;
+            font-weight: 600;
+        }
+        .profile-action {
+            color: #8B9BB4;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 50%;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .profile-action:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #F0F4F8;
+        }
     </style>
 
 
@@ -3084,6 +3213,8 @@
                     </div>
                 </div>
             </div>
+            <!-- (2026-07-13) Add container for ledger profile card; prev: none -->
+            <div id="lcsProfileCard" class="mt-3" style="display: none;"></div>
         </div>
 
         <!-- Main Evaluation Workspace -->
@@ -3191,17 +3322,16 @@
                                         <i class="bi bi-chevron-down text-white-50" id="csb-chevron" style="font-size: 0.75rem; transition: transform 0.2s ease;"></i>
                                     </span>
                                 </button>
-                                <div id="csbAccordionBody" class="receipt-accordion-body" style="display: none; padding: 2px 14px 6px 14px; border-top: 1px solid rgba(255, 255, 255, 0.04); background: rgba(0, 0, 0, 0.22); border-radius: 6px; margin-top: 2px;">
-                                    <div class="table-responsive">
-                                        <!-- [2026-07-13 Fix: Replaced inline font-size and min-width with clean table styling] -->
-                                        <table class="bank-table mb-0" id="tableCsbDeductions" style="width: 100%; border: none; background: transparent;">
+                                <div id="csbAccordionBody" class="receipt-accordion-body" style="display: none; padding: 2px 6px 6px 6px; border-top: 1px solid rgba(255, 255, 255, 0.04); background: rgba(0, 0, 0, 0.22); border-radius: 6px; margin-top: 2px;">
+                                    <div style="width: 100%; overflow: visible;">
+                                        <table class="table table-sm table-dark bank-table mb-0" id="tableCsbDeductions" style="text-align: right; border: 1px solid rgba(255,255,255,0.06); width: 100%;">
                                             <thead>
-                                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+                                                <tr style="color: rgba(255,255,255,0.45); font-weight: 600; text-transform: uppercase; font-size: 0.50rem; border-bottom: 2px solid rgba(255,255,255,0.1);">
                                                     <th style="width: 32px; text-align: center; vertical-align: middle; padding: 4px 0;"><input type="checkbox" id="csb-select-all" checked onchange="toggleAllCsbDeductions(this)"></th>
                                                     <th style="text-align: left; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.35) !important;">Code</th>
-                                                    <th style="text-align: left; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.35) !important;">Policy No</th>
-                                                    <th style="text-align: center; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.35) !important;">Date</th>
-                                                    <th style="text-align: right; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.35) !important;">Amount</th>
+                                                    <th style="text-align: left; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.35) !important;">EFF</th>
+                                                    <th style="text-align: center; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.35) !important;">TERM</th>
+                                                    <th style="text-align: right; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.35) !important;">DEDAMT</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="csb-deductions-tbody">
@@ -3332,9 +3462,9 @@
                                 <span class="text-muted" style="font-size: 0.68rem; font-weight: 500; font-family: 'Montserrat', sans-serif;">Calculate loan proceeds, settlements, and advance payments</span>
                             </div>
                             <!-- 2026-07-13: Add dedicated Calculate button for Net Proceeds (was: auto-triggered by input changes) -->
-                            <button type="button" id="btn-calculate-netproc" onclick="calculateNetProceeds(true)" style="background: linear-gradient(135deg, #059669 0%, #10B981 100%); border: none; border-radius: 8px; color: #fff; font-family: 'Montserrat', sans-serif; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.08em; padding: 7px 14px; cursor: pointer; white-space: nowrap; flex-shrink: 0; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35); transition: all 0.2s ease; text-transform: uppercase;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 18px rgba(16,185,129,0.5)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 12px rgba(16,185,129,0.35)'">
-                                <i class="bi bi-calculator-fill mr-1"></i>CALCULATE
-                            </button>
+                           
+
+                            
                         </div>
 
                         <!-- Card Body (styled like Netpay Computation Card) -->
@@ -3349,42 +3479,39 @@
                             <div class="baseline-row mb-2" id="row-netproc-old-balance">
                                 <span class="netpay-label"><i class="bi bi-dash-lg text-warning mr-2"></i>Less Old Balance</span>
                                 <!-- 2026-07-13: Remove oninput runCalculations from old balance (was: oninput="runCalculations()") -->
-                                <input type="number" step="0.01" id="input-netproc-old-balance" class="form-control bank-input input-sm tabular-nums text-right font-weight-bold" style="width: 110px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; height: 26px; padding: 2px 8px; font-size: 0.8rem; border-radius: 4px;" value="0">
+                                <input type="number" step="0.01" id="input-netproc-old-balance" class="form-control bank-input input-sm tabular-nums text-right font-weight-bold" style="width: 110px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; height: 26px; padding: 2px 8px; font-size: 0.8rem; border-radius: 4px;" value="0" oninput="calculateNetProceeds()">
                             </div>
 
                             <!-- (2026-07-13) Less Redemption accordion; prev: display default -->
                             <div id="dynamic-netproc-redemption-container" class="mt-0 mb-2" style="background: transparent; border: none; overflow: hidden; width: 100%; display: none;">
                                 <button type="button" class="baseline-row netpay-row-redemption-header w-100" id="btn-netproc-redemption-header" onclick="toggleNetprocRedemptionAccordion();" style="background: transparent; border: none; outline: none !important; width: 100%; margin-bottom: 0 !important;">
-                                    <span class="netpay-label"><i class="bi bi-dash-lg text-warning mr-2"></i>Less Redemption</span>
+                                    <span class="netpay-label">
+                                        <!-- (2026-07-13) Add toggle checkbox for search mode redemption; prev: no checkbox -->
+                                        <input type="checkbox" id="toggleLessOldRedemption" checked style="margin-right: 8px; transform: scale(1.1); cursor: pointer;" onclick="event.stopPropagation();" onchange="calculateNetProceeds();">
+                                        Less Old Redemption
+                                    </span>
                                     <span class="d-flex align-items-center" style="gap: 8px;">
                                         <span id="val-netproc-redemption" class="tabular-nums font-weight-bold" style="padding-right: 0px !important; font-size: 0.8rem !important; color: white !important;">₱0.00</span>
                                         <i class="bi bi-chevron-down text-white-50" id="netproc-redemption-chevron" style="font-size: 0.75rem; transition: transform 0.2s ease;"></i>
                                     </span>
                                 </button>
-                                <div id="netprocRedemptionAccordionBody" class="receipt-accordion-body" style="display: none; padding: 6px 14px 8px 14px; border-top: 1px solid rgba(255, 255, 255, 0.04); background: rgba(0, 0, 0, 0.22); border-radius: 6px; margin-top: 2px;">
-                                    <table class="bank-table mb-0" id="tableNetprocRedemption" style="width: 100%; border: none; background: transparent; margin-top: 4px;">
-                                        <thead>
-                                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-                                                <th style="width: 32px; text-align: center; vertical-align: middle; padding: 4px 0;"><input type="checkbox" id="redemption-select-all" checked onchange="toggleAllRedemptionCheckboxes(this); calculateNetProceeds();"></th>
-                                                <th style="text-align: left; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.35) !important;">CODE</th>
-                                                <th style="text-align: center; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.35) !important;">EFF</th>
-                                                <th style="text-align: center; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.35) !important;">TERM</th>
-                                                <th style="text-align: right; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.35) !important;">DEDPLI</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="netproc-redemption-tbody">
-                                            <!-- Dynamic PLI rows populated on employee search load -->
-                                            <tr><td colspan="5" class="text-white-50 text-center py-2">No redemption records found</td></tr>
-                                        </tbody>
-                                    </table>
+                                <div id="netprocRedemptionAccordionBody" class="receipt-accordion-body" style="display: none; padding: 6px 14px; border-top: 1px solid rgba(255, 255, 255, 0.04); background: rgba(0, 0, 0, 0.22); border-radius: 6px; margin-top: 2px;">
+                                    <!-- (2026-07-13) Remove select all header; prev: select all included -->
+                                    <div id="netproc-redemption-tbody" style="display: flex; flex-direction: column; gap: 4px;">
+                                        <!-- Dynamic PLI list rows populated dynamically -->
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- (2026-07-13) Manual redemption static card; prev: accordion -->
                             <div id="dynamic-netproc-redemption-manual-container" class="mt-0 mb-2" style="background: transparent; border: none; overflow: hidden; width: 100%; display: flex; flex-direction: column;">
                                 <div class="baseline-row netpay-row-redemption-header w-100" id="btn-netproc-redemption-manual-header" style="background: transparent; border: none; outline: none !important; width: 100%; margin-bottom: 0 !important;">
-                                    <span class="netpay-label"><i class="bi bi-dash-lg text-warning mr-2"></i>Less Redemption</span>
-                                    <input type="number" step="0.01" id="val-netproc-redemption-manual-total" class="form-control bank-input input-sm tabular-nums text-right font-weight-bold" style="width: 110px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; height: 26px; padding: 2px 8px; font-size: 0.8rem; border-radius: 4px;" value="0">
+                                    <span class="netpay-label">
+                                        <!-- (2026-07-13) Add toggle checkbox for manual mode redemption; prev: no checkbox -->
+                                        <input type="checkbox" id="toggleLessOldRedemptionManual" checked style="margin-right: 8px; transform: scale(1.1); cursor: pointer;" onclick="event.stopPropagation();" onchange="calculateNetProceeds();">
+                                        Less Old Redemption
+                                    </span>
+                                    <input type="number" step="0.01" id="val-netproc-redemption-manual-total" class="form-control bank-input input-sm tabular-nums text-right font-weight-bold" style="width: 110px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; height: 26px; padding: 2px 8px; font-size: 0.8rem; border-radius: 4px;" value="0" oninput="calculateNetProceeds()">
                                 </div>
                                 <div id="netprocRedemptionManualAccordionBody" class="receipt-accordion-body" style="display: none !important; padding: 6px 14px 8px 14px; border-top: 1px solid rgba(255, 255, 255, 0.04); background: rgba(0, 0, 0, 0.22); border-radius: 6px; margin-top: 2px;">
                                     <table class="bank-table mb-0" id="tableNetprocRedemptionManual" style="width: 100%; border: none; background: transparent; margin-top: 4px;">
@@ -3411,7 +3538,7 @@
                                 <span class="netpay-label"><i class="bi bi-calendar-event text-success mr-2"></i>Advance Payment Months</span>
                                 <!-- 2026-07-13: Remove onchange runCalculations from advance months selector (was: onchange="runCalculations()") -->
                                 <!-- (2026-07-13) Add 0 option to advance months; prev: 1-9 options -->
-                                <select id="select-netproc-advance-months" class="form-control bank-select select-sm tabular-nums text-right font-weight-bold" style="width: 60px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; height: 26px; padding: 2px; font-size: 0.8rem; border-radius: 4px;">
+                                <select id="select-netproc-advance-months" class="form-control bank-select select-sm tabular-nums text-right font-weight-bold" style="width: 60px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; height: 26px; padding: 2px; font-size: 0.8rem; border-radius: 4px;" onchange="calculateNetProceeds()">
                                     <option value="0" selected>0</option>
                                     <option value="1">1</option>
                                     <option value="2">2</option>
@@ -3923,6 +4050,345 @@
     <!-- JavaScript logical matrix code -->
     <script>
         // (2026-07-13) Initialize global pagination state; prev: none
+        // (2026-07-13) Ingest SUNLINE LCS spreadsheet database; prev: no spreadsheet 
+        const lcsEmpMap = new Map();
+        let lcsDbReady = false;
+        let lcsDbReadyCallbacks = []; // (2026-07-13) Queue callbacks until CSV fully loaded; prev: none
+
+        function formatPHP(val) {
+            const v = parseFloat(val);
+            if (isNaN(v)) return '₱0.00';
+            return '₱' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        // (2026-07-13) Parse CSV in non-blocking chunks; prev: synchronous XLSX read
+        async function loadLcsDatabase() {
+            try {
+                console.log("Fetching SUNLINE LCS.csv...");
+                const response = await fetch('SUNLINE LCS.csv');
+                if (!response.ok) throw new Error("SUNLINE LCS.csv not found");
+                const text = await response.text();
+                console.log("SUNLINE LCS.csv fetched, parsing in chunks...");
+                
+                const lines = text.split('\n');
+                lcsEmpMap.clear();
+                
+                const chunkSize = 10000;
+                for (let i = 1; i < lines.length; i += chunkSize) {
+                    const end = Math.min(i + chunkSize, lines.length);
+                    for (let j = i; j < end; j++) {
+                        const line = lines[j].trim();
+                        if (!line) continue;
+                        
+                        // Parse CSV line using slice scan
+                        const row = [];
+                        let start = 0;
+                        let inQuotes = false;
+                        for (let k = 0; k < line.length; k++) {
+                            const c = line[k];
+                            if (c === '"') {
+                                inQuotes = !inQuotes;
+                            } else if (c === ',' && !inQuotes) {
+                                row.push(line.slice(start, k));
+                                start = k + 1;
+                            }
+                        }
+                        row.push(line.slice(start));
+                        const cleanedRow = row.map(cell => cell.replace(/^"|"$/g, '').trim());
+                        
+                        const empNum = cleanedRow[61]; // BJ
+                        if (!empNum) continue;
+                        
+                        const empNumStr = String(empNum).trim().replace(/^0+/, '');
+                        if (!empNumStr) continue;
+                        
+                        const accountNum = cleanedRow[9]; // J
+                        const branchName = cleanedRow[1]; // B
+                        const accountName = cleanedRow[17]; // R
+                        const loanDate = cleanedRow[18]; // S (2026-07-13: Add loan date; prev: none)
+                        const outstandingBalance = safeFloat(cleanedRow[25]); // Z
+                        const amortization = safeFloat(cleanedRow[34]); // AI
+                        const contactNum = cleanedRow[60]; // BI
+                        const groupName = cleanedRow[65]; // BN
+                        
+                        const accountObj = {
+                            accountNum: accountNum ? String(accountNum).trim() : 'N/A',
+                            branchName: branchName ? String(branchName).trim() : 'N/A',
+                            accountName: accountName ? String(accountName).trim() : 'N/A',
+                            loanDate: loanDate ? String(loanDate).trim() : 'N/A',
+                            outstandingBalance: outstandingBalance,
+                            amortization: amortization,
+                            contactNum: contactNum ? String(contactNum).trim() : 'N/A',
+                            groupName: groupName ? String(groupName).trim() : 'N/A'
+                        };
+                        
+                        if (!lcsEmpMap.has(empNumStr)) {
+                            lcsEmpMap.set(empNumStr, []);
+                        }
+                        lcsEmpMap.get(empNumStr).push(accountObj);
+                    }
+                    // Yield control to browser thread to keep UI responsive
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                }
+                console.log(`SUNLINE LCS.csv parsed successfully: ${lcsEmpMap.size} unique employees loaded.`);
+                // (2026-07-13) Mark DB ready and flush pending callbacks; prev: no flag
+                lcsDbReady = true;
+                lcsDbReadyCallbacks.forEach(cb => cb());
+                lcsDbReadyCallbacks = [];
+            } catch (err) {
+                console.error("Failed to load/parse SUNLINE LCS.csv: ", err);
+                lcsDbReady = true; // still mark ready so callbacks flush on failure
+                lcsDbReadyCallbacks.forEach(cb => cb());
+                lcsDbReadyCallbacks = [];
+            }
+        }
+
+        // (2026-07-13) Profile card builders and clipboard copy; prev: none
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showCustomAlert("Copied to clipboard: " + text, "Copied");
+            }).catch(err => {
+                console.error("Could not copy text: ", err);
+            });
+        }
+
+        function onLcsAccountChange(accountNum) {
+            if (!window.activeSession || !window.activeSession.lcsAccounts) return;
+            const account = window.activeSession.lcsAccounts.find(acc => acc.accountNum === accountNum);
+            if (!account) return;
+            
+            // Save selected account number inside state context
+            window.activeSession.selectedLcsAccount = accountNum;
+            
+            // Update displayed values in the card
+            const branchEl = document.getElementById('lbl-profile-branch');
+            const balanceEl = document.getElementById('lbl-profile-balance');
+            const amortEl = document.getElementById('lbl-profile-amortization');
+            const schoolEl = document.getElementById('lbl-profile-school');
+            const contactEl = document.getElementById('lbl-profile-contact');
+            const loanDateEl = document.getElementById('lbl-profile-loandate'); // (2026-07-13) Set loan date; prev: none
+            
+            if (branchEl) branchEl.textContent = account.branchName;
+            if (balanceEl) balanceEl.textContent = formatPHP(account.outstandingBalance);
+            if (amortEl) amortEl.textContent = formatPHP(account.amortization);
+            if (schoolEl) schoolEl.textContent = account.groupName;
+            if (contactEl) contactEl.textContent = account.contactNum;
+            if (loanDateEl) loanDateEl.textContent = account.loanDate;
+            
+            // Pre-populate Less Old Balance input field
+            const oldBalanceInput = document.getElementById('input-netproc-old-balance');
+            if (oldBalanceInput) {
+                oldBalanceInput.value = account.outstandingBalance;
+            }
+            
+            calculateNetProceeds();
+        }
+
+        function getFallbackCardHtml(empNum) {
+            return `
+                <div class="row align-items-center text-white-50">
+                    <div class="col-12 col-md-3 mb-2 mb-md-0">
+                        <div class="d-flex align-items-center">
+                            <div class="summary-icon-box mr-2">
+                                <i class="bi bi-person-fill text-warning"></i>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <span class="summary-label text-uppercase">Client Name</span>
+                                <span id="empSummaryName" class="text-white font-weight-bold">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3 mb-2 mb-md-0">
+                        <div class="d-flex align-items-center">
+                            <div class="summary-icon-box mr-2">
+                                <i class="bi bi-card-text text-warning"></i>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <span class="summary-label text-uppercase">Employee ID</span>
+                                <span id="empSummaryID" class="text-white font-weight-bold">${empNum}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3 mb-2 mb-md-0">
+                        <div class="d-flex align-items-center">
+                            <div class="summary-icon-box mr-2">
+                                <i class="bi bi-building text-warning"></i>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <span class="summary-label text-uppercase">Div / Station</span>
+                                <span id="empSummaryDiv" class="text-white font-weight-bold">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3 mb-2 mb-md-0">
+                        <div class="d-flex align-items-center">
+                            <div class="summary-icon-box mr-2">
+                                <i class="bi bi-gear-fill text-warning"></i>
+                            </div>
+                            <div class="d-flex flex-column" style="width: 100%;">
+                                <span class="summary-label text-uppercase">Evaluation Mode</span>
+                                <select id="evaluationModeSelect" class="form-control bank-select select-sm text-white font-weight-bold" style="background: rgba(8,12,28,0.6); border: 1px solid rgba(255,255,255,0.1); height: 32px; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px;" onchange="onModeChange()">
+                                    <option value="DEPED" selected>DEPED</option>
+                                    <option value="AUTONOMOUS">AUTONOMOUS</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateEmployeeDetailsCard(empNum, fname, mi, lname, div, sta) {
+            const summaryCard = document.getElementById('empSummaryCard');
+            if (!summaryCard) return;
+            
+            // Always update the original details summary card fields
+            const nameEl = document.getElementById('empSummaryName');
+            const idEl = document.getElementById('empSummaryID');
+            const divEl = document.getElementById('empSummaryDiv');
+            
+            const empNumStr = empNum.replace(/^0+/, '');
+            const lcsRows = lcsEmpMap.get(empNumStr);
+            
+            let clientName = "-";
+            if (fname && lname) {
+                clientName = `${fname} ${mi} ${lname}`;
+            } else if (lcsRows && lcsRows.length > 0 && lcsRows[0].accountName) {
+                clientName = lcsRows[0].accountName;
+            } else {
+                clientName = "Manual / Autonomous Entry";
+            }
+            
+            // (2026-07-13) Set textContent for static details summary fields; prev: summaryCard innerHTML rewrite
+            if (nameEl) nameEl.textContent = clientName;
+            if (idEl) idEl.textContent = empNum || "-";
+            if (divEl) divEl.textContent = div && sta ? `${div} / ${sta}` : "N/A";
+            
+            const profileCardContainer = document.getElementById('lcsProfileCard');
+            if (profileCardContainer) {
+                // (2026-07-13) If CSV still loading, defer render to DB ready callback; prev: none
+                if (!lcsDbReady && !lcsRows) {
+                    profileCardContainer.style.display = 'block';
+                    profileCardContainer.innerHTML = `
+                        <div class="profile-card d-flex align-items-center justify-content-center" style="min-height: 90px; background: rgba(14, 18, 38, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px;">
+                            <div class="text-center text-white-50">
+                                <div class="spinner-border spinner-border-sm text-warning mb-2" role="status" aria-hidden="true" style="width: 1.2rem; height: 1.2rem;"></div>
+                                <div style="font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Loading Ledger Database...</div>
+                            </div>
+                        </div>
+                    `;
+                    lcsDbReadyCallbacks.push(() => updateEmployeeDetailsCard(empNum, fname, mi, lname, div, sta));
+                    return;
+                }
+                const lcsRowsNow = lcsEmpMap.get(empNumStr);
+                if (lcsRowsNow && lcsRowsNow.length > 0) {
+                    if (!window.activeSession) window.activeSession = {};
+                    window.activeSession.lcsAccounts = lcsRowsNow;
+                    
+                    const firstAccount = lcsRowsNow[0];
+                    const optionsHtml = lcsRowsNow.map(acc => {
+                        return `<option value="${acc.accountNum}">${acc.accountNum}</option>`;
+                    }).join('');
+                    
+                    profileCardContainer.innerHTML = `
+                        <div class="profile-card">
+                            <div class="profile-header">
+                                <div class="profile-avatar">
+                                    <i class="bi bi-person-fill"></i>
+                                </div>
+                                <div class="profile-title" style="flex-grow: 1;">
+                                    <h3 id="lbl-profile-name">${firstAccount.accountName}</h3>
+                                    <span id="lbl-profile-school">${firstAccount.groupName}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="profile-list">
+                                <div class="profile-item">
+                                    <div class="profile-icon"><i class="bi bi-person-badge-fill"></i></div>
+                                    <div class="profile-details">
+                                        <span class="label">EMPLOYEE NUMBER</span>
+                                        <span class="value">${empNum}</span>
+                                    </div>
+                                    <div class="profile-action" onclick="copyToClipboard('${empNum}')" title="Copy">
+                                        <i class="bi bi-copy"></i>
+                                    </div>
+                                </div>
+                                
+                                <div class="profile-item">
+                                    <div class="profile-icon"><i class="bi bi-buildings-fill"></i></div>
+                                    <div class="profile-details">
+                                        <span class="label">BRANCH</span>
+                                        <span id="lbl-profile-branch" class="value">${firstAccount.branchName}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="profile-item">
+                                    <div class="profile-icon"><i class="bi bi-wallet-fill"></i></div>
+                                    <div class="profile-details">
+                                        <span class="label">ACCOUNT NUMBER</span>
+                                        <select id="empSummaryAccountSelect" class="form-control bank-select select-sm text-white font-weight-bold" style="background: rgba(8,12,28,0.6); border: 1px solid rgba(255,255,255,0.1); height: 24px; font-size: 0.75rem; padding: 0px 6px; border-radius: 4px; width: 140px; margin-top: 2px;" onchange="onLcsAccountChange(this.value)">
+                                            ${optionsHtml}
+                                        </select>
+                                    </div>
+                                    <div class="profile-action" onclick="copyToClipboard(document.getElementById('empSummaryAccountSelect').value)" title="Copy">
+                                        <i class="bi bi-copy"></i>
+                                    </div>
+                                </div>
+                                
+                                <div class="profile-item">
+                                    <div class="profile-icon"><i class="bi bi-calendar-event-fill"></i></div>
+                                    <div class="profile-details">
+                                        <span class="label">DATE OF LOAN</span>
+                                        <span id="lbl-profile-loandate" class="value">${firstAccount.loanDate}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="profile-item">
+                                    <div class="profile-icon"><i class="bi bi-cash-coin"></i></div>
+                                    <div class="profile-details">
+                                        <span class="label">OUTSTANDING BALANCE</span>
+                                        <span id="lbl-profile-balance" class="value text-warning">${formatPHP(firstAccount.outstandingBalance)}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="profile-item">
+                                    <div class="profile-icon"><i class="bi bi-calculator"></i></div>
+                                    <div class="profile-details">
+                                        <span class="label">AMORTIZATION</span>
+                                        <span id="lbl-profile-amortization" class="value text-warning">${formatPHP(firstAccount.amortization)}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="profile-item">
+                                    <div class="profile-icon"><i class="bi bi-telephone-fill"></i></div>
+                                    <div class="profile-details">
+                                        <span class="label">PHONE NUMBER</span>
+                                        <span id="lbl-profile-contact" class="value">${firstAccount.contactNum}</span>
+                                    </div>
+                                    <div class="profile-action" onclick="window.open('tel:${firstAccount.contactNum}')" title="Call">
+                                        <i class="bi bi-telephone-outbound"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    profileCardContainer.style.display = 'block';
+                    
+                    // (2026-07-13) Run initCustomDropdowns to render select; prev: hidden by CSS
+                    initCustomDropdowns();
+                    
+                    const oldBalanceInput = document.getElementById('input-netproc-old-balance');
+                    if (oldBalanceInput) {
+                        oldBalanceInput.value = firstAccount.outstandingBalance;
+                    }
+                } else {
+                    profileCardContainer.style.display = 'none';
+                    profileCardContainer.innerHTML = '';
+                }
+            }
+        }
+
         window.historyCurrentPage = 1;
 
         // Check for login session constraints
@@ -3941,6 +4407,9 @@
             
             // Initial load of logs
             renderHistoryLog();
+
+            // Load Excel Database
+            loadLcsDatabase();
 
             // [2026-07-12 New: Initialize Details button state based on localStorage preference, default hidden]
             const antiHide = localStorage.getItem('le_anti_hide_breakdown');
@@ -4374,6 +4843,20 @@
             document.getElementById('empSummaryCard').classList.add('d-none');
             document.getElementById('evaluationWorkspace').classList.add('d-none');
 
+            // (2026-07-13) Show premium spinner loader inside the profile card during active search; prev: hidden
+            const profileCardContainer = document.getElementById('lcsProfileCard');
+            if (profileCardContainer) {
+                profileCardContainer.style.display = 'block';
+                profileCardContainer.innerHTML = `
+                    <div class="profile-card d-flex align-items-center justify-content-center" style="min-height: 120px; background: rgba(14, 18, 38, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px;">
+                        <div class="text-center text-white-50">
+                            <div class="spinner-border spinner-border-sm text-warning mb-2" role="status" aria-hidden="true" style="width: 1.5rem; height: 1.5rem;"></div>
+                            <div style="font-size: 0.70rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255,255,255,0.6);">Loading Profile Ledger...</div>
+                        </div>
+                    </div>
+                `;
+            }
+
             // (2026-07-13) Set skeleton rows for items during search; prev: none
             const csbTbody = document.getElementById('csb-deductions-tbody');
             const redemptionTbody = document.getElementById('netproc-redemption-tbody');
@@ -4497,11 +4980,18 @@
                     pliSum: 0
                 };
                 
-                document.getElementById('empSummaryName').textContent = "Manual / Autonomous Entry";
-                document.getElementById('empSummaryID').textContent = empNum;
-                document.getElementById('empSummaryDiv').textContent = "N/A";
+                // (2026-07-13) Replace details card updates with updateEmployeeDetailsCard
+                updateEmployeeDetailsCard(empNum, '', '', '', '', '');
                 
-                document.getElementById('evaluationModeSelect').value = 'AUTONOMOUS';
+                if (document.getElementById('empSummaryName')) {
+                    document.getElementById('empSummaryName').textContent = "Manual / Autonomous Entry";
+                }
+                if (document.getElementById('empSummaryDiv')) {
+                    document.getElementById('empSummaryDiv').textContent = "N/A";
+                }
+                if (document.getElementById('evaluationModeSelect')) {
+                    document.getElementById('evaluationModeSelect').value = 'AUTONOMOUS';
+                }
                 document.getElementById('empSummaryCard').classList.remove('d-none');
                 document.getElementById('evaluationWorkspace').classList.remove('d-none');
                 
@@ -4530,8 +5020,6 @@
 
             // [2026-07-14 Fix: Reset Mode to DEPED and searchFailedNoOnQueue to false on successful lookup; previous: did not reset since no mode existed]
             window.searchFailedNoOnQueue = false;
-            document.getElementById('evaluationModeSelect').value = 'DEPED';
-            onModeChange();
 
             // [2026-07-14 Fix: Save successfully searched employee ID in localStorage to sync across other pages; previous: did not save]
             localStorage.setItem("employeeNumber", empNum);
@@ -4545,10 +5033,13 @@
             const originalStep = safeInt(empRow[10]);
 
             // Update Summary Card UI elements
-            document.getElementById('empSummaryName').textContent = `${fname} ${mi} ${lname}`;
-            document.getElementById('empSummaryID').textContent = empRow[3] || empNum;
-            document.getElementById('empSummaryDiv').textContent = `${empRow[1] || '-'} / ${empRow[2] || '-'}`;
+            updateEmployeeDetailsCard(empNum, fname, mi, lname, empRow[1], empRow[2]);
             document.getElementById('empSummaryCard').classList.remove('d-none');
+            
+            if (document.getElementById('evaluationModeSelect')) {
+                document.getElementById('evaluationModeSelect').value = 'DEPED';
+            }
+            onModeChange();
 
             // Save details to active session context
             window.activeSession = {
@@ -4573,10 +5064,17 @@
             const csbTbody = document.getElementById('csb-deductions-tbody');
             if (csbTbody) {
                 if (matchingPos.length > 0) {
+                    // (2026-07-13) Format CSB rows with combined EFFMM/EFFYY & TERMM/TERYY; prev: Policy/Date
                     csbTbody.innerHTML = matchingPos.map((row, idx) => {
                         const code = row[7] || '-';
-                        const policy = row[15] || '-';
-                        const dateVal = row[16] || '-';
+                        const padM = (v) => String(v || '').trim().padStart(2, '0');
+                        const effM = padM(row[10]);
+                        const effY = String(row[9] || '').trim();
+                        const eff = (effM && effY && effM !== '00') ? `${effM}/${effY}` : (effM !== '00' ? effM : '') || effY || '-';
+                        
+                        const termM = padM(row[12]);
+                        const termY = String(row[11] || '').trim();
+                        const term = (termM && termY && termM !== '00') ? `${termM}/${termY}` : (termM !== '00' ? termM : '') || termY || '-';
                         const amount = safeFloat(row[13]);
                         
                         return `
@@ -4585,8 +5083,8 @@
                                     <input type="checkbox" class="csb-deduction-cb" data-amount="${amount}" checked onchange="runCalculations()">
                                 </td>
                                 <td style="text-align: left; vertical-align: middle; font-family: var(--font-mono); padding: 4px 2px; color: rgba(255, 255, 255, 0.45) !important;">${code}</td>
-                                <td style="text-align: left; vertical-align: middle; font-family: var(--font-mono); padding: 4px 2px; color: rgba(255, 255, 255, 0.45) !important;">${policy}</td>
-                                <td style="text-align: center; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.45) !important;">${dateVal}</td>
+                                <td style="text-align: left; vertical-align: middle; font-family: var(--font-mono); padding: 4px 2px; color: rgba(255, 255, 255, 0.45) !important;">${eff}</td>
+                                <td style="text-align: center; vertical-align: middle; font-family: var(--font-mono); padding: 4px 2px; color: rgba(255, 255, 255, 0.45) !important;">${term}</td>
                                 <td style="text-align: right; vertical-align: middle; font-weight: 600; color: rgba(255, 255, 255, 0.55) !important; padding: 4px 2px;">${formatPHP(amount)}</td>
                             </tr>
                         `;
@@ -4631,59 +5129,13 @@
             }
             renderPLIAccordions(matchingPli);
 
-            // (2026-07-13) Populate redemption-tbody checkbox table; prev: none
-            const redemptionTbody = document.getElementById('netproc-redemption-tbody');
-            if (redemptionTbody) {
-                if (matchingPli.length > 0) {
-                    redemptionTbody.innerHTML = matchingPli.map((row, idx) => {
-                        const code = row[9] || '-';
-                        const eff = `${row[12] || ''}/${row[11] || ''}`;
-                        const term = `${row[14] || ''}/${row[13] || ''}`;
-                        const dedpli = safeFloat(row[15]);
-                        
-                        return `
-                            <tr>
-                                <td style="text-align: center; vertical-align: middle; padding: 4px 0;">
-                                    <input type="checkbox" class="netproc-redemption-cb" data-amount="${dedpli}" checked onchange="onRedemptionCheckboxChange()">
-                                </td>
-                                <td style="text-align: left; vertical-align: middle; font-family: var(--font-mono); padding: 4px 2px; color: rgba(255, 255, 255, 0.45) !important;">${code}</td>
-                                <td style="text-align: center; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.45) !important;">${eff}</td>
-                                <td style="text-align: center; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.45) !important;">${term}</td>
-                                <td style="text-align: right; vertical-align: middle; font-weight: 600; color: rgba(255, 255, 255, 0.55) !important; padding: 4px 2px;">${formatPHP(dedpli)}</td>
-                            </tr>
-                        `;
-                    }).join('');
-                    
-                    const masterSelectAllRedemption = document.getElementById('redemption-select-all');
-                    if (masterSelectAllRedemption) masterSelectAllRedemption.checked = true;
-                } else {
-                    redemptionTbody.innerHTML = `<tr><td colspan="5" class="text-white-50 text-center py-2">No redemption records found</td></tr>`;
-                }
-            }
+            window.activeSession.matchingPli = matchingPli;
+            renderPLIAccordions(matchingPli);
 
-            // (2026-07-13) Populate manual redemption table rows; prev: none
-            const redemptionManualTbody = document.getElementById('netproc-redemption-manual-tbody');
-            if (redemptionManualTbody) {
-                if (matchingPli.length > 0) {
-                    redemptionManualTbody.innerHTML = matchingPli.map((row, idx) => {
-                        const code = row[9] || '-';
-                        const eff = `${row[12] || ''}/${row[11] || ''}`;
-                        const term = `${row[14] || ''}/${row[13] || ''}`;
-                        return `
-                            <tr>
-                                <td style="text-align: left; vertical-align: middle; font-family: var(--font-mono); padding: 4px 2px; color: rgba(255, 255, 255, 0.45) !important;">${code}</td>
-                                <td style="text-align: center; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.45) !important;">${eff}</td>
-                                <td style="text-align: center; vertical-align: middle; padding: 4px 2px; color: rgba(255, 255, 255, 0.45) !important;">${term}</td>
-                                <td style="text-align: right; vertical-align: middle; padding: 2px 4px;">
-                                    <input type="number" step="0.01" class="netproc-redemption-manual-input form-control bank-input input-sm tabular-nums text-right font-weight-bold" style="width: 80px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; height: 20px; padding: 2px 6px; font-size: 0.7rem; border-radius: 4px; margin-left: auto;" value="0" oninput="calculateNetProceeds()">
-                                </td>
-                            </tr>
-                        `;
-                    }).join('');
-                } else {
-                    redemptionManualTbody.innerHTML = `<tr><td colspan="4" class="text-white-50 text-center py-2">No redemption records found</td></tr>`;
-                }
-            }
+            // (2026-07-13) Init added redemptions state; prev: inputs and checkedState only
+            window.activeSession.netprocRedemptionInputs = {};
+            window.activeSession.netprocRedemptionCheckedState = {};
+            window.activeSession.addedNetprocRedemptions = {};
 
             // Determine Initial Loan Amount capacity
             // Formula: Capacity = NETPAY + CSB Deductions + PLI INCLUDED - ONQUEUE - 5300 (where 5300 is constant)
@@ -5092,7 +5544,7 @@
                 rowProAuto.style.setProperty('display', 'none', 'important');
             }
 
-            // Phase B deductions calculations
+            // (2026-07-13) Revert redemption inputs; prev: custom input fields
             let pliSubtotal = 0;
             const selectedPlis = [];
 
@@ -5104,11 +5556,12 @@
                     const code = checkedRadio.getAttribute('data-plicode');
                     if (val > 0 && code && code !== 'None') {
                         selectedPlis.push({
+                            slot: i,
                             label: `PLI ${i} (CODE ${code})`,
                             value: val
                         });
+                        pliSubtotal += val;
                     }
-                    pliSubtotal += val;
                 }
             }
             pliSubtotal = Math.round(pliSubtotal * 100) / 100;
@@ -5374,21 +5827,30 @@
                 papTitleEl.textContent = titleParts.length > 0 ? (titleParts.join(' + ') + ' COMBINED SUBTOTAL') : 'NO PLI/COMPENSATION SUBTOTAL';
             }
 
-            // [2026-07-11 New: Dynamic receipt lines for each selected active PLI in NETPAY COMPUTATION]
-            // [2026-07-13 Fix: Modified dynamic receipt lines to render Anticipated and Promotion options outside of useMasterPli so they show up automatically when enabled]
+            // (2026-07-13) Render static redemption values; prev: input fields
             const dynamicPliContainer = document.getElementById('dynamic-pli-rows-container'); // Container div for PLI/Redemption dynamic accordion list
             const receiptBody = document.getElementById('receiptAccordionBody'); // Body div inside accordion where individual receipt rows are rendered
             if (dynamicPliContainer && receiptBody) {
                 receiptBody.innerHTML = '';
                 let hasItems = false;
                 
-                // Show selected PLIs only if master PLI/Redemption toggle is active
+                // (2026-07-13) Make PLI rows clickable with plus icon; prev: plain rows
                 if (useMasterPli) {
                     selectedPlis.forEach(pli => {
                         const rowEl = document.createElement('div');
                         rowEl.className = 'receipt-row';
+                        rowEl.style.cursor = 'pointer';
+                        rowEl.style.display = 'flex';
+                        rowEl.style.alignItems = 'center';
+                        rowEl.style.justifyContent = 'space-between';
+                        rowEl.onmouseover = () => { rowEl.style.background = 'rgba(255, 255, 255, 0.05)'; };
+                        rowEl.onmouseout = () => { rowEl.style.background = 'transparent'; };
+                        rowEl.onclick = () => { addPliToLessOldRedemption(pli.slot); };
                         rowEl.innerHTML = `
-                            <span>${pli.label}</span>
+                            <span style="display: flex; align-items: center; gap: 4px;">
+                                <i class="bi bi-plus-circle text-success" style="font-size: 0.85rem;"></i>
+                                ${pli.label}
+                            </span>
                             <span class="tabular-nums font-weight-bold text-white">${formatPHP(pli.value)}</span>
                         `;
                         receiptBody.appendChild(rowEl);
@@ -5401,6 +5863,51 @@
                     dynamicPliContainer.classList.add('show');
                 } else {
                     dynamicPliContainer.classList.remove('show');
+                }
+            }
+
+            // (2026-07-13) Filter and render added PLIs with default 0; prev: all selected
+            const redemptionTbody = document.getElementById('netproc-redemption-tbody');
+            if (redemptionTbody) {
+                if (!window.activeSession.netprocRedemptionInputs) window.activeSession.netprocRedemptionInputs = {};
+                if (!window.activeSession.addedNetprocRedemptions) window.activeSession.addedNetprocRedemptions = {};
+                
+                const addedPlis = selectedPlis.filter(pli => window.activeSession.addedNetprocRedemptions[pli.slot]);
+                
+                if (addedPlis.length > 0) {
+                    const selectedKeys = addedPlis.map(p => p.slot + '-' + p.label).join(',');
+                    if (redemptionTbody.getAttribute('data-rendered-keys') !== selectedKeys) {
+                        redemptionTbody.setAttribute('data-rendered-keys', selectedKeys);
+                        
+                        redemptionTbody.innerHTML = addedPlis.map(pli => {
+                            const savedVal = window.activeSession.netprocRedemptionInputs[pli.slot];
+                            const inputVal = savedVal !== undefined ? savedVal : 0;
+                            
+                            return `
+                                <div class="receipt-row align-items-center" style="display: flex; justify-content: space-between; width: 100%;">
+                                    <!-- (2026-07-13) Add trash icon to delete PLI row; prev: plain span label -->
+                                    <div style="display: flex; align-items: center;">
+                                        <i class="bi bi-trash3 text-danger mr-2" style="cursor: pointer; font-size: 0.65rem;" onclick="removePliFromLessOldRedemption(${pli.slot})"></i>
+                                        <span style="font-size: 0.58rem; font-weight: 500;">${pli.label}</span>
+                                    </div>
+                                    <!-- (2026-07-13) Make input thicker; prev: height 16px, font 0.58 -->
+                                    <input type="number" step="0.01" id="input-netproc-redemption-amount-${pli.slot}" class="form-control bank-input input-sm tabular-nums text-right font-weight-bold" style="width: 100px !important; background: rgba(0,0,0,0.3) !important; border: 1px solid rgba(255,255,255,0.1) !important; color: white !important; height: 22px !important; min-height: 22px !important; padding: 2px 6px !important; font-size: 0.75rem !important; border-radius: 4px !important; margin-left: auto !important;" value="${inputVal}" oninput="if(!window.activeSession.netprocRedemptionInputs)window.activeSession.netprocRedemptionInputs={};window.activeSession.netprocRedemptionInputs[${pli.slot}]=safeFloat(this.value);calculateNetProceeds()">
+                                </div>
+                            `;
+                        }).join('');
+                    } else {
+                        addedPlis.forEach(pli => {
+                            const inputEl = document.getElementById('input-netproc-redemption-amount-' + pli.slot);
+                            if (inputEl && document.activeElement !== inputEl) {
+                                const savedVal = window.activeSession.netprocRedemptionInputs[pli.slot];
+                                const inputVal = savedVal !== undefined ? savedVal : 0;
+                                inputEl.value = inputVal;
+                            }
+                        });
+                    }
+                } else {
+                    redemptionTbody.removeAttribute('data-rendered-keys');
+                    redemptionTbody.innerHTML = `<div class="text-white-50 text-center py-2">No redemption records found</div>`;
                 }
             }
 
@@ -5742,8 +6249,9 @@
             // [2026-07-14 New: Calculate Net Proceeds values moved to dedicated calculateNetProceeds() function]
             // 2026-07-13: Net Proceeds now only calculated when user presses the Calculate button (was: auto-triggered via runCalculations)
 
-            // Save currently active state values to local storage for restore after reload
+            // (2026-07-13) Auto-calculate net proceeds on value change; prev: manual only
             saveActiveEvaluationState();
+            calculateNetProceeds();
         }
 
         // 2026-07-13: Standalone net proceeds calculation function triggered only by Calculate button (was: embedded in runCalculations)
@@ -5763,18 +6271,102 @@
             const usePromotion   = document.getElementById('togglePromotion')   ? document.getElementById('togglePromotion').checked   : false;
             const useMasterPli   = document.getElementById('toggleMasterPli')   ? document.getElementById('toggleMasterPli').checked   : true;
 
-            // (2026-07-13) Less Redemption checklist vs manual input; prev: checklist only
-            let activePliSubtotal = 0;
-            if (useMasterPli) {
-                let pliSubtotal = 0;
-                document.querySelectorAll('.netproc-redemption-cb').forEach(cb => {
-                    if (cb.checked) pliSubtotal += safeFloat(cb.getAttribute('data-amount'));
+            // (2026-07-13) Show Less Old Redemption row only if selected; prev: always
+            let pliIsSelected = false;
+            const slotCount = getPliSlotCount();
+            for (let i = 1; i <= slotCount; i++) {
+                const checkedRadio = document.querySelector(`input[name="pli_radio_${i}"]:checked`);
+                if (checkedRadio) {
+                    const code = checkedRadio.getAttribute('data-plicode');
+                    if (code && code !== 'None') {
+                        pliIsSelected = true;
+                        break;
+                    }
+                }
+            }
+            const showNetprocRedemption = useMasterPli && pliIsSelected;
+
+            const netprocAccordion = document.getElementById('dynamic-netproc-redemption-container');
+            const netprocManualRow = document.getElementById('dynamic-netproc-redemption-manual-container');
+            if (netprocAccordion) {
+                netprocAccordion.style.setProperty('display', (!isAutonomous && showNetprocRedemption) ? 'block' : 'none', 'important');
+            }
+            if (netprocManualRow) {
+                netprocManualRow.style.setProperty('display', isAutonomous ? 'flex' : 'none', 'important');
+            }
+
+            // Check if Less Old Redemption is toggled ON
+            const toggleEl = isAutonomous ? document.getElementById('toggleLessOldRedemptionManual') : document.getElementById('toggleLessOldRedemption');
+            const useRedemption = toggleEl ? toggleEl.checked : true;
+
+            // Style update for dynamic redemption checklist
+            const redemptionTbody = document.getElementById('netproc-redemption-tbody');
+            if (redemptionTbody) {
+                redemptionTbody.style.opacity = useRedemption ? '1' : '0.4';
+                redemptionTbody.style.pointerEvents = useRedemption ? 'auto' : 'none';
+                redemptionTbody.querySelectorAll('input').forEach(input => {
+                    input.disabled = !useRedemption;
                 });
-                activePliSubtotal = Math.round(pliSubtotal * 100) / 100;
+            }
+            
+            // Enable/disable manual input field
+            const valRedManual = document.getElementById('val-netproc-redemption-manual-total');
+            if (valRedManual) {
+                valRedManual.disabled = !useRedemption;
+            }
+
+            // (2026-07-13) Sum added PLIs locally; prev: summed all selected PLIs
+            let activePliSubtotal = 0;
+            if (useRedemption) {
+                if (isAutonomous) {
+                    activePliSubtotal = valRedManual ? safeFloat(valRedManual.value) : 0;
+                } else {
+                    if (showNetprocRedemption) {
+                        const selectedPlis = [];
+                        const slotCount = getPliSlotCount();
+                        for (let i = 1; i <= slotCount; i++) {
+                            const checkedRadio = document.querySelector(`input[name="pli_radio_${i}"]:checked`);
+                            if (checkedRadio) {
+                                const val = safeFloat(checkedRadio.getAttribute('data-dedpli'));
+                                const code = checkedRadio.getAttribute('data-plicode');
+                                if (val > 0 && code && code !== 'None') {
+                                    selectedPlis.push({
+                                        slot: i,
+                                        label: `PLI ${i} (CODE ${code})`,
+                                        value: val
+                                    });
+                                }
+                            }
+                        }
+                        const addedPlis = selectedPlis.filter(pli => {
+                            return window.activeSession.addedNetprocRedemptions && window.activeSession.addedNetprocRedemptions[pli.slot];
+                        });
+                        let pliSubtotal = 0;
+                        addedPlis.forEach(pli => {
+                            const inputEl = document.getElementById('input-netproc-redemption-amount-' + pli.slot);
+                            const val = inputEl ? safeFloat(inputEl.value) : (window.activeSession.netprocRedemptionInputs && window.activeSession.netprocRedemptionInputs[pli.slot] !== undefined ? window.activeSession.netprocRedemptionInputs[pli.slot] : 0);
+                            pliSubtotal += val;
+                        });
+                        activePliSubtotal = Math.round(pliSubtotal * 100) / 100;
+                    }
+                }
+            }
+
+            // Calculate baselinePliSum (redemption amount shown in val-baseline-papsubtotal) for advance payment subtraction
+            let baselinePliSum = 0;
+            if (isAutonomous) {
+                baselinePliSum = safeFloat(document.getElementById('input-redemption').value);
             } else {
-                const manualInputEl = document.getElementById('val-netproc-redemption-manual-total');
-                const manualVal = manualInputEl ? safeFloat(manualInputEl.value) : 0;
-                activePliSubtotal = Math.round(manualVal * 100) / 100;
+                const slotCount = getPliSlotCount();
+                for (let i = 1; i <= slotCount; i++) {
+                    const checkedRadio = document.querySelector(`input[name="pli_radio_${i}"]:checked`);
+                    if (checkedRadio) {
+                        const code = checkedRadio.getAttribute('data-plicode');
+                        if (code && code !== 'None') {
+                            baselinePliSum += safeFloat(checkedRadio.getAttribute('data-dedpli'));
+                        }
+                    }
+                }
             }
 
             // (2026-07-13) Sum csb-deduction-cb for basis; prev: netproc-deduction-cb
@@ -5793,12 +6385,13 @@
             const interestRate = getInterestRateValue();
             let amortization = 0;
             if (loanAmount > 0 && loanTerm > 0 && interestRate > 0) {
-                const rawPmt = calculatePMT(interestRate / 12, loanTerm, loanAmount);
-                amortization = Math.ceil(rawPmt * 100) / 100;
+                // (2026-07-13) Fix advance payment amortization rate and basis formula; prev: rate/12
+                const rawPmt = calculatePMT(interestRate / 100 / 12, loanTerm, loanAmount);
+                amortization = Math.ceil(parseFloat(rawPmt.toFixed(6)) * 100) / 100;
             }
 
-            // (2026-07-13) Advance payment formula update; prev: conditional on toggles
-            const basis = Math.max(0, amortization - (oldDeduction + activePliSubtotal));
+            // (2026-07-13) Subtract baseline PLI subtotal from basis; prev: redemptionSub
+            const basis = Math.max(0, amortization - oldDeduction - baselinePliSum);
             const advancePayment = Math.round(basis * advanceMonths * 100) / 100;
 
             // Final net proceeds
@@ -5811,7 +6404,7 @@
             const valRed = document.getElementById('val-netproc-redemption');
             if (valRed) valRed.innerHTML = formatPHP(activePliSubtotal);
 
-            const valRedManual = document.getElementById('val-netproc-redemption-manual-total');
+            // (2026-07-13) Reuse valRedManual without redeclaration; prev: redeclared
             if (valRedManual && valRedManual.tagName !== 'INPUT') {
                 valRedManual.innerHTML = formatPHP(activePliSubtotal);
             }
@@ -5927,18 +6520,8 @@
                 }
             }
 
-            // (2026-07-13) Toggle Less Redemption accordion vs manual input; prev: none
-            const netprocAccordion = document.getElementById('dynamic-netproc-redemption-container');
-            const netprocManualRow = document.getElementById('dynamic-netproc-redemption-manual-container');
-            if (netprocAccordion && netprocManualRow) {
-                if (isOn) {
-                    netprocAccordion.style.setProperty('display', 'block', 'important');
-                    netprocManualRow.style.setProperty('display', 'none', 'important');
-                } else {
-                    netprocAccordion.style.setProperty('display', 'none', 'important');
-                    netprocManualRow.style.setProperty('display', 'flex', 'important');
-                }
-            }
+            // (2026-07-13) Trigger calculateNetProceeds; prev: direct display toggle
+            calculateNetProceeds();
         }
 
         // [2026-07-11 New: Toggles visibility of the custom interest rate input based on selected dropdown option]
@@ -5986,6 +6569,8 @@
             });
 
             const activeState = {
+                // (2026-07-13) Save selected account number; prev: none
+                selectedLcsAccount: document.getElementById('empSummaryAccountSelect') ? document.getElementById('empSummaryAccountSelect').value : null,
                 empNum: empNumVal,
                 month: monthVal,
                 loanAmount: safeFloat(document.getElementById('loanAmount').value),
@@ -6001,6 +6586,9 @@
                 toggleMasterPli: document.getElementById('toggleMasterPli') ? document.getElementById('toggleMasterPli').checked : false,
                 toggleAnticipated: document.getElementById('toggleAnticipated') ? document.getElementById('toggleAnticipated').checked : false,
                 togglePromotion: document.getElementById('togglePromotion') ? document.getElementById('togglePromotion').checked : false,
+                // (2026-07-13) Save Less Old Redemption checkbox states; prev: none
+                toggleLessOldRedemption: document.getElementById('toggleLessOldRedemption') ? document.getElementById('toggleLessOldRedemption').checked : true,
+                toggleLessOldRedemptionManual: document.getElementById('toggleLessOldRedemptionManual') ? document.getElementById('toggleLessOldRedemptionManual').checked : true,
                 // [2026-07-14 New: Save evaluationModeSelect state]
                 evaluationMode: document.getElementById('evaluationModeSelect') ? document.getElementById('evaluationModeSelect').value : 'DEPED',
                 // [2026-07-14 New: Save searchFailedNoOnQueue state]
@@ -6028,7 +6616,11 @@
                         if (cb.checked) selections.push(idx);
                     });
                     return selections;
-                })()
+                })(),
+                // (2026-07-13) Save added PLIs map; prev: overrides and checkboxes only
+                netprocRedemptionInputs: window.activeSession.netprocRedemptionInputs || {},
+                netprocRedemptionCheckedState: window.activeSession.netprocRedemptionCheckedState || {},
+                addedNetprocRedemptions: window.activeSession.addedNetprocRedemptions || {}
             };
 
             localStorage.setItem('le_active_state', JSON.stringify(activeState));
@@ -6333,6 +6925,17 @@
             if (state.searchFailedNoOnQueue !== undefined) {
                 window.searchFailedNoOnQueue = state.searchFailedNoOnQueue;
             }
+
+            // (2026-07-13) Restore Less Old Redemption checkbox states; prev: none
+            const toggleRed = document.getElementById('toggleLessOldRedemption');
+            if (toggleRed && state.toggleLessOldRedemption !== undefined) {
+                toggleRed.checked = state.toggleLessOldRedemption;
+            }
+            const toggleRedManual = document.getElementById('toggleLessOldRedemptionManual');
+            if (toggleRedManual && state.toggleLessOldRedemptionManual !== undefined) {
+                toggleRedManual.checked = state.toggleLessOldRedemptionManual;
+            }
+
             // Restore redemption label doubled state
             if (state.redemptionDoubled !== undefined) {
                 const isDoubled = state.redemptionDoubled;
@@ -6372,9 +6975,60 @@
                     cb.checked = state.netprocRedemptionSelections.includes(idx);
                 });
             }
+            // (2026-07-13) Restore added PLIs map; prev: inputs and checked states only
+            if (state.netprocRedemptionInputs !== undefined) window.activeSession.netprocRedemptionInputs = state.netprocRedemptionInputs;
+            if (state.netprocRedemptionCheckedState !== undefined) window.activeSession.netprocRedemptionCheckedState = state.netprocRedemptionCheckedState;
+            if (state.addedNetprocRedemptions !== undefined) window.activeSession.addedNetprocRedemptions = state.addedNetprocRedemptions;
+
+            // (2026-07-13) Restore selected account number; prev: none
+            if (state.selectedLcsAccount !== undefined && state.selectedLcsAccount !== null) {
+                const selectEl = document.getElementById('empSummaryAccountSelect');
+                if (selectEl) {
+                    selectEl.value = state.selectedLcsAccount;
+                    onLcsAccountChange(state.selectedLcsAccount);
+                }
+            }
 
             onModeChange();
             // Re-run calculations matrix
+            runCalculations();
+            calculateNetProceeds();
+        }
+
+        // (2026-07-13) New: interactive PLI click addition helper; prev: auto-pop
+        function addPliToLessOldRedemption(slot) {
+            if (!window.activeSession) return;
+            if (!window.activeSession.addedNetprocRedemptions) {
+                window.activeSession.addedNetprocRedemptions = {};
+            }
+            window.activeSession.addedNetprocRedemptions[slot] = true;
+            if (!window.activeSession.netprocRedemptionInputs) {
+                window.activeSession.netprocRedemptionInputs = {};
+            }
+            window.activeSession.netprocRedemptionInputs[slot] = 0;
+            saveActiveEvaluationState();
+            runCalculations();
+            
+            const targetEl = document.getElementById('dynamic-netproc-redemption-container');
+            if (targetEl) {
+                const bodyEl = document.getElementById('netprocRedemptionAccordionBody');
+                if (bodyEl && bodyEl.style.display === 'none') {
+                    toggleNetprocRedemptionAccordion();
+                }
+                targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // (2026-07-13) Delete button handler to remove PLI slot; prev: none
+        function removePliFromLessOldRedemption(slot) {
+            if (!window.activeSession) return;
+            if (window.activeSession.addedNetprocRedemptions) {
+                delete window.activeSession.addedNetprocRedemptions[slot];
+            }
+            if (window.activeSession.netprocRedemptionInputs) {
+                delete window.activeSession.netprocRedemptionInputs[slot];
+            }
+            saveActiveEvaluationState();
             runCalculations();
             calculateNetProceeds();
         }
