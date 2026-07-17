@@ -2948,13 +2948,14 @@
         }
 
         /* (2026-07-13) CSS styles for profile card layout; prev: standard columns */
+        /* (2026-07-13) Profile card overflow; prev: hidden which clipped table */
         .profile-card {
             background: rgba(14, 20, 44, 0.45);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border-radius: 16px;
             border: 1px solid rgba(255, 255, 255, 0.08);
-            overflow: hidden;
+            overflow: visible;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
             margin-top: 15px;
             margin-bottom: 20px;
@@ -2962,64 +2963,64 @@
         .profile-header {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
+            gap: 10px;
+            padding: 8px 12px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.06);
             background: rgba(255, 255, 255, 0.02);
         }
         .profile-avatar {
-            width: 42px;
-            height: 42px;
+            width: 32px;
+            height: 32px;
             background: rgba(229, 169, 60, 0.15);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 15px;
             color: #E5A93C;
             border: 1px solid rgba(229, 169, 60, 0.3);
             flex-shrink: 0;
         }
         .profile-title h3 {
             margin: 0;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 750;
             color: #F0F4F8;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         .profile-title span {
-            font-size: 11px;
+            font-size: 10px;
             color: #8B9BB4;
             display: block;
-            margin-top: 2px;
+            margin-top: 1px;
         }
         .profile-list {
-            padding: 8px 16px;
+            padding: 6px 12px;
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 12px;
+            gap: 8px;
         }
         .profile-item {
             display: flex;
             align-items: center;
-            padding: 6px 0;
+            padding: 4px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            gap: 10px;
+            gap: 8px;
         }
         .profile-item:last-child {
             border-bottom: none;
         }
         .profile-icon {
-            width: 32px;
-            height: 32px;
+            width: 26px;
+            height: 26px;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #E5A93C;
-            font-size: 14px;
+            font-size: 12px;
             flex-shrink: 0;
         }
         .profile-details {
@@ -3028,7 +3029,7 @@
             flex-direction: column;
         }
         .profile-details .label {
-            font-size: 9px;
+            font-size: 8px;
             color: #8B9BB4;
             letter-spacing: 0.5px;
             text-transform: uppercase;
@@ -3036,15 +3037,15 @@
             margin-bottom: 1px;
         }
         .profile-details .value {
-            font-size: 12px;
+            font-size: 11px;
             color: #F0F4F8;
             font-weight: 600;
         }
         .profile-action {
             color: #8B9BB4;
-            font-size: 14px;
+            font-size: 12px;
             cursor: pointer;
-            padding: 4px;
+            padding: 3px;
             border-radius: 50%;
             transition: all 0.2s;
             display: flex;
@@ -3157,57 +3158,41 @@
             <div id="empSummaryCard" class="mt-3 employee-summary-card" data-label="Employee Details Summary Card">
                 <div class="row align-items-center text-white-50">
                     <!-- Client Name -->
-                    <!-- 2026-07-13: Make employee columns 1 column stack on mobile (was: col-6 col-md-3) -->
-                    <div class="col-12 col-md-3 mb-2 mb-md-0">
+                    <!-- 2026-07-13: Make employee columns 2 columns on mobile (was: col-6 col-md-3) -->
+                    <div class="col-6 col-md-4 mb-2 mb-md-0">
                         <div class="d-flex align-items-center">
                             <div class="summary-icon-box mr-2">
                                 <i class="bi bi-person-fill text-warning"></i>
                             </div>
                             <div class="d-flex flex-column">
                                 <span class="summary-label text-uppercase">Client Name</span>
-                                <span id="empSummaryName" class="text-white font-weight-bold">-</span>
+                                <span id="empSummaryName" class="text-white font-weight-bold" style="font-size: 0.75rem;">-</span>
                             </div>
                         </div>
                     </div>
                     <!-- Employee ID -->
-                    <!-- 2026-07-13: Make employee columns 1 column stack on mobile (was: col-6 col-md-3) -->
-                    <div class="col-12 col-md-3 mb-2 mb-md-0">
+                    <!-- 2026-07-13: Make employee columns 2 columns on mobile (was: col-6 col-md-3) -->
+                    <div class="col-6 col-md-4 mb-2 mb-md-0">
                         <div class="d-flex align-items-center">
                             <div class="summary-icon-box mr-2">
                                 <i class="bi bi-card-text text-warning"></i>
                             </div>
                             <div class="d-flex flex-column">
                                 <span class="summary-label text-uppercase">Employee ID</span>
-                                <span id="empSummaryID" class="text-white font-weight-bold">-</span>
+                                <span id="empSummaryID" class="text-white font-weight-bold" style="font-size: 0.75rem;">-</span>
                             </div>
                         </div>
                     </div>
                     <!-- Div / Station -->
-                    <!-- 2026-07-13: Make employee columns 1 column stack on mobile (was: col-6 col-md-3) -->
-                    <div class="col-12 col-md-3 mb-2 mb-md-0">
+                    <!-- 2026-07-13: Make employee columns 2 columns on mobile (was: col-6 col-md-3) -->
+                    <div class="col-12 col-md-4 mb-2 mb-md-0">
                         <div class="d-flex align-items-center">
                             <div class="summary-icon-box mr-2">
                                 <i class="bi bi-building text-warning"></i>
                             </div>
                             <div class="d-flex flex-column">
                                 <span class="summary-label text-uppercase">Div / Station</span>
-                                <span id="empSummaryDiv" class="text-white font-weight-bold">-</span>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Mode Selector -->
-                    <!-- 2026-07-13: Make employee columns 1 column stack on mobile (was: col-6 col-md-3) -->
-                    <div class="col-12 col-md-3 mb-2 mb-md-0">
-                        <div class="d-flex align-items-center">
-                            <div class="summary-icon-box mr-2">
-                                <i class="bi bi-gear-fill text-warning"></i>
-                            </div>
-                            <div class="d-flex flex-column" style="width: 100%;">
-                                <span class="summary-label text-uppercase">Evaluation Mode</span>
-                                <select id="evaluationModeSelect" class="form-control bank-select select-sm text-white font-weight-bold" style="background: rgba(8,12,28,0.6); border: 1px solid rgba(255,255,255,0.1); height: 32px; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px;" onchange="onModeChange()">
-                                    <option value="DEPED" selected>DEPED</option>
-                                    <option value="AUTONOMOUS">AUTONOMOUS</option>
-                                </select>
+                                <span id="empSummaryDiv" class="text-white font-weight-bold" style="font-size: 0.75rem;">-</span>
                             </div>
                         </div>
                     </div>
@@ -3478,8 +3463,8 @@
                             <!-- 2. Old Balance Row (Manual Input) -->
                             <div class="baseline-row mb-2" id="row-netproc-old-balance">
                                 <span class="netpay-label"><i class="bi bi-dash-lg text-warning mr-2"></i>Less Old Balance</span>
-                                <!-- 2026-07-13: Remove oninput runCalculations from old balance (was: oninput="runCalculations()") -->
-                                <input type="number" step="0.01" id="input-netproc-old-balance" class="form-control bank-input input-sm tabular-nums text-right font-weight-bold" style="width: 110px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; height: 26px; padding: 2px 8px; font-size: 0.8rem; border-radius: 4px;" value="0" oninput="calculateNetProceeds()">
+                                <!-- 2026-07-13: type=text for comma formatting; prev: type=number -->
+                                <input type="text" inputmode="decimal" id="input-netproc-old-balance" class="form-control bank-input input-sm tabular-nums text-right font-weight-bold" style="width: 110px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; height: 26px; padding: 2px 8px; font-size: 0.8rem; border-radius: 4px;" value="0" oninput="fmtBalanceOnInput(this);calculateNetProceeds();" onfocus="this.value=this.value.replace(/,/g,'');" onblur="this.value=fmtWithCommas(parseFloat(this.value.replace(/,/g,''))||0);calculateNetProceeds();">
                             </div>
 
                             <!-- (2026-07-13) Less Redemption accordion; prev: display default -->
@@ -4102,14 +4087,17 @@
                         const empNumStr = String(empNum).trim().replace(/^0+/, '');
                         if (!empNumStr) continue;
                         
-                        const accountNum = cleanedRow[9]; // J
-                        const branchName = cleanedRow[1]; // B
+                        const accountNum = cleanedRow[9];  // J
+                        const branchName = cleanedRow[1];  // B
                         const accountName = cleanedRow[17]; // R
-                        const loanDate = cleanedRow[18]; // S (2026-07-13: Add loan date; prev: none)
+                        const loanDate = cleanedRow[18];    // S (2026-07-13: Add loan date; prev: none)
                         const outstandingBalance = safeFloat(cleanedRow[25]); // Z
                         const amortization = safeFloat(cleanedRow[34]); // AI
-                        const contactNum = cleanedRow[60]; // BI
-                        const groupName = cleanedRow[65]; // BN
+                        const contactNum = cleanedRow[60];  // BI
+                        const groupName = cleanedRow[65];   // BN
+                        // (2026-07-13) Add loan amount col Y (idx 24) and term col V (idx 21); prev: none
+                        const loanAmount = safeFloat(cleanedRow[24]); // Y
+                        const loanTerm = cleanedRow[21] ? String(cleanedRow[21]).trim() : ''; // V
                         
                         const accountObj = {
                             accountNum: accountNum ? String(accountNum).trim() : 'N/A',
@@ -4119,7 +4107,10 @@
                             outstandingBalance: outstandingBalance,
                             amortization: amortization,
                             contactNum: contactNum ? String(contactNum).trim() : 'N/A',
-                            groupName: groupName ? String(groupName).trim() : 'N/A'
+                            groupName: groupName ? String(groupName).trim() : 'N/A',
+                            // (2026-07-13) Store loan amount and term; prev: none
+                            loanAmount: loanAmount,
+                            loanTerm: loanTerm
                         };
                         
                         if (!lcsEmpMap.has(empNumStr)) {
@@ -4178,10 +4169,69 @@
             // Pre-populate Less Old Balance input field
             const oldBalanceInput = document.getElementById('input-netproc-old-balance');
             if (oldBalanceInput) {
-                oldBalanceInput.value = account.outstandingBalance;
+                // (2026-07-13) Format with commas on account switch; prev: raw number
+                oldBalanceInput.value = fmtWithCommas(account.outstandingBalance);
             }
             
             calculateNetProceeds();
+        }
+
+        // (2026-07-13) Toggle accordion visibility for loan accounts table; prev: none
+        function toggleLcsAcctAccordion() {
+            const body = document.getElementById('lcs-acct-accordion-body');
+            const chevron = document.getElementById('lcs-acct-chevron');
+            if (!body) return;
+            const open = body.style.display !== 'none';
+            body.style.display = open ? 'none' : 'block';
+            if (chevron) chevron.style.transform = open ? 'rotate(-90deg)' : 'rotate(0deg)';
+        }
+
+        // (2026-07-13) Select/deselect all loan account checkboxes; prev: none
+        function toggleAllLcsAccts(masterCb) {
+            document.querySelectorAll('.lcs-acct-cb').forEach(cb => { cb.checked = masterCb.checked; });
+            recalcLcsAcctSums();
+        }
+
+        // (2026-07-13) Recalculate sum row from checked loan account rows; prev: none
+        // (2026-07-13) Format a number with comma thousands separator; prev: none
+        function fmtWithCommas(n) {
+            if (isNaN(n)) return '0';
+            const parts = n.toFixed(2).split('.');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            return parts.join('.');
+        }
+
+        // (2026-07-13) Allow only digits/dot while typing, keep cursor stable; prev: none
+        function fmtBalanceOnInput(el) {
+            const raw = el.value.replace(/[^0-9.]/g, '');
+            el.value = raw;
+        }
+
+        function recalcLcsAcctSums() {
+            let sumBal = 0, sumAmort = 0;
+            document.querySelectorAll('.lcs-acct-cb').forEach(cb => {
+                if (cb.checked) {
+                    sumBal += parseFloat(cb.dataset.balance) || 0;
+                    sumAmort += parseFloat(cb.dataset.amort) || 0;
+                }
+            });
+            const balEl = document.getElementById('lcs-sum-balance');
+            const amortEl = document.getElementById('lcs-sum-amort');
+            // (2026-07-13) Use innerHTML so formatPHP HTML renders; prev: textContent (broke span tags)
+            if (balEl) balEl.innerHTML = formatPHP(sumBal);
+            if (amortEl) amortEl.innerHTML = formatPHP(sumAmort);
+            // sync master checkbox indeterminate state
+            const cbs = document.querySelectorAll('.lcs-acct-cb');
+            const allChecked = [...cbs].every(c => c.checked);
+            const noneChecked = [...cbs].every(c => !c.checked);
+            const master = document.getElementById('lcs-acct-select-all');
+            if (master) { master.checked = allChecked; master.indeterminate = !allChecked && !noneChecked; }
+            // (2026-07-13) Sync sum into old balance input with comma format; prev: no sync
+            const oldBalInput = document.getElementById('input-netproc-old-balance');
+            if (oldBalInput && document.activeElement !== oldBalInput) {
+                oldBalInput.value = fmtWithCommas(sumBal);
+                calculateNetProceeds();
+            }
         }
 
         function getFallbackCardHtml(empNum) {
@@ -4227,7 +4277,8 @@
                             </div>
                             <div class="d-flex flex-column" style="width: 100%;">
                                 <span class="summary-label text-uppercase">Evaluation Mode</span>
-                                <select id="evaluationModeSelect" class="form-control bank-select select-sm text-white font-weight-bold" style="background: rgba(8,12,28,0.6); border: 1px solid rgba(255,255,255,0.1); height: 32px; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px;" onchange="onModeChange()">
+                                <!-- (2026-07-13) Removed bank-select class; prev: bank-select hides with display:none !important -->
+                                <select id="evaluationModeSelect" class="form-control text-white font-weight-bold" style="background: rgba(8,12,28,0.6); border: 1px solid rgba(255,255,255,0.1); height: 28px; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px;" onchange="onModeChange()">
                                     <option value="DEPED" selected>DEPED</option>
                                     <option value="AUTONOMOUS">AUTONOMOUS</option>
                                 </select>
@@ -4286,87 +4337,133 @@
                     window.activeSession.lcsAccounts = lcsRowsNow;
                     
                     const firstAccount = lcsRowsNow[0];
-                    const optionsHtml = lcsRowsNow.map(acc => {
-                        return `<option value="${acc.accountNum}">${acc.accountNum}</option>`;
-                    }).join('');
-                    
+
+                    // (2026-07-13) Format loan date as "Jan 00 0000"; prev: raw string
+                    const fmtLoanDate = (raw) => {
+                        if (!raw || raw === 'N/A') return 'N/A';
+                        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                        // handles MM-DD-YYYY or MM/DD/YYYY
+                        const parts = raw.split(/[-\/]/);
+                        if (parts.length === 3) {
+                            const m = parseInt(parts[0], 10) - 1;
+                            const d = parts[1].padStart(2, '0');
+                            const y = parts[2];
+                            return `${months[m] || parts[0]} ${d} ${y}`;
+                        }
+                        return raw;
+                    };
+
+                    // (2026-07-13) Stack date under account number; prev: separate date column
+                    const acctRowsHtml = lcsRowsNow.map((acc, idx) => `
+                        <tr style="border-bottom:1px solid rgba(255,255,255,0.05);transition:background 0.15s;">
+                            <td style="text-align:center;vertical-align:middle;padding:8px 6px;">
+                                <input type="checkbox" class="lcs-acct-cb" data-balance="${acc.outstandingBalance}" data-amort="${acc.amortization}" data-idx="${idx}" checked onchange="recalcLcsAcctSums()" style="width:13px;height:13px;cursor:pointer;accent-color:var(--accent-orange);">
+                            </td>
+                            <td style="text-align:left;vertical-align:middle;padding:8px 8px;cursor:pointer;" onclick="onLcsAccountChange('${acc.accountNum}');document.querySelectorAll('.lcs-acct-row').forEach(r=>r.classList.remove('lcs-row-active'));this.parentElement.classList.add('lcs-row-active');" class="lcs-acct-row ${idx===0?'lcs-row-active':''}">
+                                <div style="font-size:0.65rem;font-family:var(--font-mono);font-weight:700;color:rgba(255,255,255,0.92);letter-spacing:0.02em;white-space:nowrap;">${acc.accountNum}</div>
+                                <div style="font-size:0.57rem;color:rgba(255,255,255,0.45);margin-top:2px;white-space:nowrap;">${fmtLoanDate(acc.loanDate)}</div>
+                            </td>
+                            <td style="text-align:left;vertical-align:middle;padding:8px 8px;">
+                                <div id="lcs-balance-${idx}" style="font-size:0.72rem;white-space:nowrap;font-weight:700;color:var(--accent-orange);">${formatPHP(acc.outstandingBalance)}</div>
+                                <!-- (2026-07-13) Loan amount+term subtitle; prev: none -->
+                                <div id="lcs-loaninfo-${idx}" class="lcs-loaninfo" style="font-size:0.54rem;color:rgba(255,255,255,0.38);margin-top:2px;white-space:nowrap;font-weight:500;">${acc.loanAmount ? 'Loan: ' + fmtWithCommas(acc.loanAmount) + (acc.loanTerm ? ' @' + acc.loanTerm + ' mo' : '') : ''}</div>
+                            </td>
+                            <td style="text-align:right;vertical-align:middle;padding:8px 8px;font-size:0.72rem;white-space:nowrap;font-weight:600;color:rgba(255,255,255,0.85);">${formatPHP(acc.amortization)}</td>
+                        </tr>
+                    `).join('');
+
+                    const totalBal = lcsRowsNow.reduce((s, a) => s + a.outstandingBalance, 0);
+                    const totalAmort = lcsRowsNow.reduce((s, a) => s + a.amortization, 0);
+
                     profileCardContainer.innerHTML = `
                         <div class="profile-card">
                             <div class="profile-header">
                                 <div class="profile-avatar">
                                     <i class="bi bi-person-fill"></i>
                                 </div>
-                                <div class="profile-title" style="flex-grow: 1;">
+                                <div class="profile-title" style="flex-grow:1;">
                                     <h3 id="lbl-profile-name">${firstAccount.accountName}</h3>
                                     <span id="lbl-profile-school">${firstAccount.groupName}</span>
                                 </div>
                             </div>
                             
                             <div class="profile-list">
-                                <div class="profile-item">
-                                    <div class="profile-icon"><i class="bi bi-person-badge-fill"></i></div>
-                                    <div class="profile-details">
-                                        <span class="label">EMPLOYEE NUMBER</span>
-                                        <span class="value">${empNum}</span>
+                                <div style="display:flex;gap:12px;width:100%;">
+                                    <div class="profile-item" style="flex:1;">
+                                        <div class="profile-icon"><i class="bi bi-person-badge-fill"></i></div>
+                                        <div class="profile-details">
+                                            <span class="label">EMPLOYEE NUMBER</span>
+                                            <span class="value">${empNum}</span>
+                                        </div>
+                                        <div class="profile-action" onclick="copyToClipboard('${empNum}')" title="Copy"><i class="bi bi-copy"></i></div>
                                     </div>
-                                    <div class="profile-action" onclick="copyToClipboard('${empNum}')" title="Copy">
-                                        <i class="bi bi-copy"></i>
-                                    </div>
-                                </div>
-                                
-                                <div class="profile-item">
-                                    <div class="profile-icon"><i class="bi bi-buildings-fill"></i></div>
-                                    <div class="profile-details">
-                                        <span class="label">BRANCH</span>
-                                        <span id="lbl-profile-branch" class="value">${firstAccount.branchName}</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="profile-item">
-                                    <div class="profile-icon"><i class="bi bi-wallet-fill"></i></div>
-                                    <div class="profile-details">
-                                        <span class="label">ACCOUNT NUMBER</span>
-                                        <select id="empSummaryAccountSelect" class="form-control bank-select select-sm text-white font-weight-bold" style="background: rgba(8,12,28,0.6); border: 1px solid rgba(255,255,255,0.1); height: 24px; font-size: 0.75rem; padding: 0px 6px; border-radius: 4px; width: 140px; margin-top: 2px;" onchange="onLcsAccountChange(this.value)">
-                                            ${optionsHtml}
-                                        </select>
-                                    </div>
-                                    <div class="profile-action" onclick="copyToClipboard(document.getElementById('empSummaryAccountSelect').value)" title="Copy">
-                                        <i class="bi bi-copy"></i>
+                                    <div class="profile-item" style="flex:1;">
+                                        <div class="profile-icon"><i class="bi bi-telephone-fill"></i></div>
+                                        <div class="profile-details">
+                                            <span class="label">PHONE NUMBER</span>
+                                            <span id="lbl-profile-contact" class="value">${firstAccount.contactNum}</span>
+                                        </div>
+                                        <div class="profile-action" onclick="window.open('tel:${firstAccount.contactNum}')" title="Call"><i class="bi bi-telephone-outbound"></i></div>
                                     </div>
                                 </div>
-                                
-                                <div class="profile-item">
-                                    <div class="profile-icon"><i class="bi bi-calendar-event-fill"></i></div>
-                                    <div class="profile-details">
-                                        <span class="label">DATE OF LOAN</span>
-                                        <span id="lbl-profile-loandate" class="value">${firstAccount.loanDate}</span>
+                                <div style="display:flex;gap:12px;width:100%;">
+                                    <div class="profile-item" style="flex:1;border-bottom:none;">
+                                        <div class="profile-icon"><i class="bi bi-buildings-fill"></i></div>
+                                        <div class="profile-details">
+                                            <span class="label">BRANCH</span>
+                                            <span id="lbl-profile-branch" class="value">${firstAccount.branchName}</span>
+                                        </div>
+                                    </div>
+                                    <div class="profile-item" style="flex:1;border-bottom:none;">
+                                        <div class="profile-icon"><i class="bi bi-gear-fill"></i></div>
+                                        <div class="profile-details" style="width:100%;">
+                                            <span class="label">EVALUATION MODE</span>
+                                            <!-- (2026-07-13) Removed bank-select class; prev: display:none !important -->
+                                            <select id="evaluationModeSelect" class="form-control text-white font-weight-bold" style="background: rgba(8,12,28,0.6); border: 1px solid rgba(255,255,255,0.1); height: 24px; font-size: 0.70rem; padding: 0px 6px; border-radius: 4px; margin-top: 2px; width:100%;" onchange="onModeChange()">
+                                                <option value="DEPED" selected>DEPED</option>
+                                                <option value="AUTONOMOUS">AUTONOMOUS</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
-                                
-                                <div class="profile-item">
-                                    <div class="profile-icon"><i class="bi bi-cash-coin"></i></div>
-                                    <div class="profile-details">
-                                        <span class="label">OUTSTANDING BALANCE</span>
-                                        <span id="lbl-profile-balance" class="value text-warning">${formatPHP(firstAccount.outstandingBalance)}</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="profile-item">
-                                    <div class="profile-icon"><i class="bi bi-calculator"></i></div>
-                                    <div class="profile-details">
-                                        <span class="label">AMORTIZATION</span>
-                                        <span id="lbl-profile-amortization" class="value text-warning">${formatPHP(firstAccount.amortization)}</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="profile-item">
-                                    <div class="profile-icon"><i class="bi bi-telephone-fill"></i></div>
-                                    <div class="profile-details">
-                                        <span class="label">PHONE NUMBER</span>
-                                        <span id="lbl-profile-contact" class="value">${firstAccount.contactNum}</span>
-                                    </div>
-                                    <div class="profile-action" onclick="window.open('tel:${firstAccount.contactNum}')" title="Call">
-                                        <i class="bi bi-telephone-outbound"></i>
+                            </div>
+
+                            <!-- (2026-07-13) Accounts accordion table; prev: no fixed layout, tiny fonts -->
+                            <div style="margin-top:10px;">
+                                <button type="button" onclick="toggleLcsAcctAccordion()" style="width:100%;background:rgba(255,165,0,0.08);border:1px solid rgba(255,165,0,0.22);border-radius:8px;color:rgba(255,255,255,0.92);font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;outline:none;" id="btn-lcs-acct-accordion">
+                                    <span><i class="bi bi-wallet2" style="color:var(--accent-orange);margin-right:8px;"></i>Loan Accounts (${lcsRowsNow.length})</span>
+                                    <i class="bi bi-chevron-down" id="lcs-acct-chevron" style="font-size:0.68rem;transition:transform 0.25s ease;"></i>
+                                </button>
+                                <div id="lcs-acct-accordion-body" style="display:block;margin-top:6px;border-radius:8px;overflow:hidden;">
+                                    <div style="overflow-x:auto;border-radius:8px;border:1px solid rgba(255,255,255,0.09);background:rgba(10,14,32,0.5);box-shadow:0 4px 18px rgba(0,0,0,0.38);">
+                                    <table id="tableLcsAccounts" style="width:100%;border-collapse:collapse;table-layout:fixed;">
+                                        <colgroup>
+                                            <col style="width:34px">
+                                            <col style="width:38%">
+                                            <col style="width:31%">
+                                            <col style="width:31%">
+                                        </colgroup>
+                                        <thead>
+                                            <!-- (2026-07-13) 4-col header: account+date stacked; prev: 5 cols -->
+                                            <tr style="background:rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.1);">
+                                                <th style="text-align:center;padding:7px 6px;"><input type="checkbox" id="lcs-acct-select-all" checked onchange="toggleAllLcsAccts(this)" style="width:13px;height:13px;accent-color:var(--accent-orange);cursor:pointer;"></th>
+                                                <th style="text-align:left;padding:7px 8px;font-size:0.60rem;font-weight:700;text-transform:uppercase;color:rgba(255,255,255,0.45);letter-spacing:0.06em;">Account / Date</th>
+                                                <th style="text-align:left;padding:7px 8px;font-size:0.60rem;font-weight:700;text-transform:uppercase;color:rgba(255,255,255,0.45);letter-spacing:0.06em;white-space:nowrap;">Balance</th>
+                                                <th style="text-align:right;padding:7px 8px;font-size:0.60rem;font-weight:700;text-transform:uppercase;color:rgba(255,255,255,0.45);letter-spacing:0.06em;white-space:nowrap;">Amort.</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="lcs-acct-tbody">
+                                            ${acctRowsHtml}
+                                        </tbody>
+                                        <tfoot>
+                                            <!-- (2026-07-13) Fix sum row font sizes; prev: 0.48-0.50rem -->
+                                            <tr style="border-top:1px solid rgba(253,126,20,0.28);background:rgba(253,126,20,0.07);">
+                                                <td colspan="2" style="padding:7px 8px;font-size:0.65rem;font-weight:700;text-transform:uppercase;color:rgba(253,126,20,0.95);letter-spacing:0.06em;white-space:nowrap;">Total (Checked)</td>
+                                                <td id="lcs-sum-balance" style="text-align:left;padding:7px 8px;font-size:0.72rem;font-weight:700;white-space:nowrap;color:var(--accent-orange);">${formatPHP(totalBal)}</td>
+                                                <td id="lcs-sum-amort" style="text-align:right;padding:7px 8px;font-size:0.72rem;font-weight:700;white-space:nowrap;color:rgba(255,255,255,0.92);">${formatPHP(totalAmort)}</td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
                                     </div>
                                 </div>
                             </div>
@@ -4375,16 +4472,67 @@
                     
                     profileCardContainer.style.display = 'block';
                     
-                    // (2026-07-13) Run initCustomDropdowns to render select; prev: hidden by CSS
-                    initCustomDropdowns();
-                    
                     const oldBalanceInput = document.getElementById('input-netproc-old-balance');
-                    if (oldBalanceInput) {
-                        oldBalanceInput.value = firstAccount.outstandingBalance;
+                    if (oldBalanceInput && (!oldBalanceInput.value || oldBalanceInput.value === '0' || oldBalanceInput.value === '0.00')) {
+                        // (2026-07-13) Format with commas on initial load; prev: raw number
+                        oldBalanceInput.value = fmtWithCommas(totalBal);
                     }
                 } else {
-                    profileCardContainer.style.display = 'none';
-                    profileCardContainer.innerHTML = '';
+                    // (2026-07-13) Render fallback profile card when no ledger rows exist; prev: hidden container
+                    profileCardContainer.innerHTML = `
+                        <div class="profile-card">
+                            <div class="profile-header">
+                                <div class="profile-avatar">
+                                    <i class="bi bi-person-fill"></i>
+                                </div>
+                                <div class="profile-title" style="flex-grow:1;">
+                                    <h3 id="lbl-profile-name">${clientName}</h3>
+                                    <span id="lbl-profile-school">${div && sta ? div + ' / ' + sta : 'Manual / Autonomous Entry'}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="profile-list">
+                                <div style="display:flex;gap:12px;width:100%;">
+                                    <div class="profile-item" style="flex:1;">
+                                        <div class="profile-icon"><i class="bi bi-person-badge-fill"></i></div>
+                                        <div class="profile-details">
+                                            <span class="label">EMPLOYEE NUMBER</span>
+                                            <span class="value">${empNum || '-'}</span>
+                                        </div>
+                                        <div class="profile-action" onclick="copyToClipboard('${empNum}')" title="Copy"><i class="bi bi-copy"></i></div>
+                                    </div>
+                                    <div class="profile-item" style="flex:1;">
+                                        <div class="profile-icon"><i class="bi bi-telephone-fill"></i></div>
+                                        <div class="profile-details">
+                                            <span class="label">PHONE NUMBER</span>
+                                            <span id="lbl-profile-contact" class="value">N/A</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="display:flex;gap:12px;width:100%;">
+                                    <div class="profile-item" style="flex:1;border-bottom:none;">
+                                        <div class="profile-icon"><i class="bi bi-buildings-fill"></i></div>
+                                        <div class="profile-details">
+                                            <span class="label">BRANCH</span>
+                                            <span id="lbl-profile-branch" class="value">N/A</span>
+                                        </div>
+                                    </div>
+                                    <div class="profile-item" style="flex:1;border-bottom:none;">
+                                        <div class="profile-icon"><i class="bi bi-gear-fill"></i></div>
+                                        <div class="profile-details" style="width:100%;">
+                                            <span class="label">EVALUATION MODE</span>
+                                            <!-- (2026-07-13) Removed bank-select class; prev: display:none !important -->
+                                            <select id="evaluationModeSelect" class="form-control text-white font-weight-bold" style="background: rgba(8,12,28,0.6); border: 1px solid rgba(255,255,255,0.1); height: 24px; font-size: 0.70rem; padding: 0px 6px; border-radius: 4px; margin-top: 2px; width:100%;" onchange="onModeChange()">
+                                                <option value="DEPED" selected>DEPED</option>
+                                                <option value="AUTONOMOUS">AUTONOMOUS</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    profileCardContainer.style.display = 'block';
                 }
             }
         }
@@ -6264,7 +6412,8 @@
 
             const loanAmount = safeFloat(document.getElementById('loanAmount').value);
             const loanProceeds = Math.round((loanAmount - (loanAmount * 0.06)) * 100) / 100;
-            const oldBalance = Math.round(safeFloat(document.getElementById('input-netproc-old-balance').value) * 100) / 100;
+            // (2026-07-13) Strip commas before parse; prev: direct safeFloat on value
+            const oldBalance = Math.round(safeFloat((document.getElementById('input-netproc-old-balance').value || '').replace(/,/g, '')) * 100) / 100;
             const advanceMonths = parseInt(document.getElementById('select-netproc-advance-months').value, 10) || 0;
 
             const useAnticipated = document.getElementById('toggleAnticipated') ? document.getElementById('toggleAnticipated').checked : false;
