@@ -3,6 +3,8 @@
 
 <head>
   <meta charset="UTF-8">
+  <!-- (2026-07-13) Save current page for PWA last-page restore; prev: no save -->
+  <script>localStorage.setItem('pwa_last_page','index4.html');</script>
   <title>Historical Netpay - PLI</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -308,6 +310,12 @@
 
       // Ensure hidden on first load
       if (resultsSection) resultsSection.style.display = "none";
+
+      // (2026-07-13) Enter key fires search; prev: no enter support
+      const pliInp = document.getElementById('searchInputPLI');
+      if (pliInp) pliInp.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') { var b = document.getElementById('searchButtonPLI'); if (b) b.click(); }
+      });
     });
 
     // Voice Recognition (Integrated)

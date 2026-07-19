@@ -3,6 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
+    <!-- (2026-07-13) Save current page for PWA last-page restore; prev: no save -->
+    <script>localStorage.setItem('pwa_last_page','index3.html');</script>
     <title>Historical Netpay</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -856,16 +858,19 @@
             }
         }
 
-        // Auto-trigger search on load
+        // (2026-07-13) Fill only; no auto-search; prev: auto-clicked searchButtonOnq on load
         document.addEventListener("DOMContentLoaded", function () {
             var employeeNumber = localStorage.getItem("employeeNumber");
-
-            if (employeeNumber) {
-                console.log("Retrieved Employee Number:", employeeNumber);
-                document.getElementById("searchInputOnq").value = employeeNumber;
-                document.getElementById("searchButtonOnq").click();
-            } else {
-                console.log("No employee number found in localStorage.");
+            var inp = document.getElementById("searchInputOnq");
+            if (inp) {
+                if (employeeNumber) inp.value = employeeNumber;
+                // (2026-07-13) Enter key fires search; prev: no enter support
+                inp.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        var btn = document.getElementById('searchButtonOnq');
+                        if (btn) btn.click();
+                    }
+                });
             }
         });
     </script>

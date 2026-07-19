@@ -3,6 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
+    <!-- (2026-07-13) Save current page; prev: no save -->
+    <script>localStorage.setItem('pwa_last_page','index.html');</script>
     <title>Historical Netpay</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -19,6 +21,17 @@
     <link rel="manifest" href="/csbnetpay/manifest.json">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="icon" href="favicon.png" type="image/png" sizes="any">
+    <!-- (2026-07-13) PWA last-page restore: redirect to saved page on cold open; prev: always opened index.html -->
+    <script>
+        (function() {
+            var saved = localStorage.getItem('pwa_last_page');
+            var pages = ['index.html','index2.html','index3.html','index4.html','index5.html',
+                         'index6.html','index7.html','index8.html','index9.html'];
+            if (saved && pages.indexOf(saved) !== -1 && saved !== 'index.html') {
+                window.location.replace(saved);
+            }
+        })();
+    </script>
 
     <meta name="theme-color" id="theme-meta" content="#4F2683">
 
@@ -139,7 +152,8 @@
             <h1 style="margin: 0;">HISTORICAL NETPAY</h1>
 
             <label class="switch">
-                <input type="checkbox" id="ttsSwitch" checked>
+                <!-- (2026-07-13) TTS defaults to OFF; prev: checked by default -->
+                <input type="checkbox" id="ttsSwitch">
                 <span class="slider round">
                     <i class="bi bi-volume-up-fill icon"></i>
                 </span>
@@ -916,7 +930,8 @@
     <script>
         let currentUtterance = null;
         let autoReadDisabled = false; // gate to stop auto TTS when user interacts
-        let ttsEnabled = localStorage.getItem("ttsEnabled") === "false" ? false : true; // default ON
+        // (2026-07-13) TTS defaults OFF; prev: default ON (true)
+        let ttsEnabled = localStorage.getItem("ttsEnabled") === "true" ? true : false; // default OFF
 
         function disableAutoRead() {
             autoReadDisabled = true;
@@ -1091,34 +1106,36 @@
             });
         }
 
-        // Auto-fill from localStorage and initial search trigger
+        // (2026-07-13) Fill from localStorage; no auto-search; prev: auto-triggered search on load
         window.addEventListener("DOMContentLoaded", () => {
             populateMonthDropdown();
             populateYearDropdown();
             const employeeNumber = localStorage.getItem("employeeNumber");
             if (employeeNumber) {
                 const possibleInputIds = ["searchInputNetpay", "searchInputPos", "searchInputOnq", "searchInputPLI", ""];
-                let inputFieldFound = false;
                 for (const id of possibleInputIds) {
                     const inputField = document.getElementById(id);
                     if (inputField) {
                         inputField.value = employeeNumber;
-                        inputFieldFound = true;
+                        // (2026-07-13) Enter key fires search; prev: no enter support
+                        inputField.addEventListener('keydown', function(e) {
+                            if (e.key === 'Enter') {
+                                const btn = document.getElementById('searchButtonNetpay');
+                                if (btn) btn.click();
+                            }
+                        });
                         break;
                     }
                 }
-
-                // If an input field was found and populated, trigger search for Netpay page
-                if (inputFieldFound && document.getElementById("searchInputNetpay")) {
-                    console.log("Retrieved Employee Number for auto-search:", employeeNumber);
-                    // Trigger search automatically
-                    setTimeout(() => {
-                        const searchButton = document.getElementById("searchButtonNetpay");
-                        if (searchButton) searchButton.click();
-                    }, 100);
-                }
             } else {
-                console.log("No employee number found in localStorage.");
+                // Still wire Enter key when no saved number
+                const inp = document.getElementById('searchInputNetpay');
+                if (inp) inp.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        const btn = document.getElementById('searchButtonNetpay');
+                        if (btn) btn.click();
+                    }
+                });
             }
         });
 

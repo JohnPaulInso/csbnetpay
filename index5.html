@@ -3,6 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
+    <!-- (2026-07-13) Save current page for PWA last-page restore; prev: no save -->
+    <script>localStorage.setItem('pwa_last_page','index5.html');</script>
     <title>CitySavings Credit Portal - Loan Evaluation Console</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="styles.css">
@@ -292,42 +294,51 @@
             line-height: 1;
         }
 
-        input[type="radio"].pli-radio {
+        /* (2026-07-13) PLI checkbox style; prev: radio circle */
+        input[type="checkbox"].pli-cb,
+        input[type="checkbox"].pli-select-all {
             appearance: none;
             -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             border: 2px solid rgba(255, 255, 255, 0.25);
-            border-radius: 50%;
+            border-radius: 4px;
             background: rgba(10, 14, 23, 0.5);
             cursor: pointer;
             position: relative;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             vertical-align: middle;
             outline: none;
+            flex-shrink: 0;
+            padding: 0 !important; /* (2026-07-13) Reset padding for centering; prev: inherited padding */
+            box-sizing: border-box !important;
         }
 
-        input[type="radio"].pli-radio:hover {
+        input[type="checkbox"].pli-cb:hover,
+        input[type="checkbox"].pli-select-all:hover {
             border-color: var(--accent);
             box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.15);
         }
 
-        input[type="radio"].pli-radio:checked {
+        input[type="checkbox"].pli-cb:checked,
+        input[type="checkbox"].pli-select-all:checked {
             border-color: var(--accent-strong);
+            background: var(--accent-strong);
             box-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
         }
 
-        input[type="radio"].pli-radio:checked::after {
+        input[type="checkbox"].pli-cb:checked::after,
+        input[type="checkbox"].pli-select-all:checked::after {
             content: "";
-            width: 8px;
-            height: 8px;
-            /* [2026-07-11 Old: background: #020617; ] */
-            /* [2026-07-11 Fix: Gold fill inside circle instead of black/slate fill] */
-            background: var(--accent-strong);
-            border-radius: 50%;
+            width: 5px;
+            height: 9px;
+            border: 2px solid #000;
+            border-top: none;
+            border-left: none;
+            transform: rotate(45deg) translate(-1px, -1px);
             display: block;
         }
 
@@ -496,6 +507,15 @@
             color: #CBD5E1;
             vertical-align: middle;
             background: rgba(255, 255, 255, 0.01);
+        }
+
+        /* (2026-07-13) Centered select columns styles; prev: none */
+        .bank-table td.td-select,
+        .bank-table th.th-select {
+            padding: 4px 0 !important;
+            text-align: center !important;
+            vertical-align: middle !important;
+            width: 32px !important;
         }
 
         .bank-table tbody tr:nth-child(even) td {
@@ -3124,7 +3144,8 @@
                 <div class="col-lg-4 col-md-5 mb-2 mb-md-0">
                     <div class="currency-input-wrapper">
                         <span class="currency-prefix"><i class="bi bi-person-badge text-warning"></i></span>
-                        <input type="text" id="employeeNumber" class="form-control bank-input font-weight-bold" value="4694264" placeholder="Search Employee ID..." style="padding-left: 36px !important;">
+                        <!-- (2026-07-13) Removed default value; prev: value="4694264" -->
+                        <input type="text" id="employeeNumber" class="form-control bank-input font-weight-bold" placeholder="Search Employee ID..." style="padding-left: 36px !important;">
                     </div>
                 </div>
                 <div class="col-lg-2 col-md-3 mb-0">
@@ -3216,19 +3237,25 @@
                         
                         <!-- [2026-07-11 Fix: section-panel-inner for LOAN AMOUNT panel moved on top (higher in document order) with mb-3 spacing class] -->
                         <div class="section-panel-inner mb-3" id="panel-loanamt-inner">
-                            <div class="orange-node mb-2" id="node-loanamt">
-                                <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg>
-                                LOAN AMOUNT
-                                <span class="math-popover">
-                                    <strong>Remaining Value = NetPay + DEDAMT - OnQueue</strong><br>
-                                    <strong>Initial Loan = floor(Remaining Value / 20.01) * 1000</strong>
+                            <!-- (2026-07-13) Flex row for LOAN AMOUNT header with ESTIMATED hint on right; prev: inline hint after label -->
+                            <div class="orange-node mb-2" id="node-loanamt" style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+                                <span style="display:inline-flex;align-items:center;gap:6px;">
+                                    <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg>
+                                    LOAN AMOUNT
+                                    <span class="math-popover">
+                                        <strong>Remaining Value = NetPay + DEDAMT - OnQueue</strong><br>
+                                        <strong>Initial Loan = floor(Remaining Value / 20.01) * 1000</strong>
+                                    </span>
                                 </span>
+                                <!-- (2026-07-13) ESTIMATED hint aligned right; prev: inline after text, labeled Suggested -->
+                                <span id="lbl-loan-capacity-hint" style="font-size:0.60rem;color:rgba(255,255,255,0.30);font-weight:600;letter-spacing:0.06em;text-transform:uppercase;"></span>
                             </div>
                             <!-- 2026-07-13: Add paste button icon inside input wrapper (was: default input wrapper, no action button) -->
                             <!-- 2026-07-14: Added copy button to the left of the paste button (was: paste button only) -->
                             <div class="currency-input-wrapper mb-1" style="position: relative;">
                                 <span class="currency-prefix">₱</span>
-                                <input type="text" id="loanAmount" class="form-control bank-input font-weight-bold text-white tabular-nums" style="padding-right: 68px !important;" oninput="formatLoanAmountField(); runCalculations();">
+                                <!-- (2026-07-13) Set manualOverride flag on user edit; prev: no override tracking -->
+                                <input type="text" id="loanAmount" class="form-control bank-input font-weight-bold text-white tabular-nums" style="padding-right: 68px !important;" oninput="this.dataset.manualOverride='1'; formatLoanAmountField(); runCalculations();">
                                 <button type="button" id="btn-copy-loan" class="btn-input-action" title="Copy to clipboard" onclick="copyLoanAmount()" style="right: 38px;">
                                     <i class="bi bi-files text-warning"></i>
                                 </button>
@@ -3236,9 +3263,11 @@
                                     <i class="bi bi-clipboard-plus text-warning"></i>
                                 </button>
                             </div>
-                            <div id="lbl-total-interest" class="text-white-50 tabular-nums mt-2" style="font-size: 0.75rem; font-weight: 500;">
-                                Total Interest: ₱0.00
-                            </div>
+                             <!-- (2026-07-13) Stacked readable interest labels more muted; prev: brighter labels -->
+                              <div id="lbl-total-interest" class="tabular-nums mt-1" style="font-size: 0.72rem; font-weight: 500; color: rgba(255,255,255,0.35); line-height: 1.35;">
+                                  <div>Total Interest: ₱0.00</div>
+                                  <div>Est. Interest/mo: ₱0.00</div>
+                              </div>
 
                             <div class="row mt-3">
                                 <div class="col-6 px-2">
@@ -3893,59 +3922,37 @@
 
                         <!-- [2026-07-12 Dashboard Visualizations Row (NEW) - Labeled dashboard-visuals-row] -->
                         <div class="row g-2 mt-3" id="dashboard-visuals-row">
-                            <!-- Column: Cash Flow Allocation Donut Chart -->
-                            <div class="col-md-6 d-flex">
-                                <div class="inner-summary-card w-100 d-flex flex-column" id="card-donut-chart" style="height: 148px;">
-                                    <div class="orange-node mb-1" id="node-donut-chart">
+                            <div class="col-12 d-flex">
+                                <div class="inner-summary-card w-100 d-flex flex-column" id="card-donut-chart" style="height: 160px; margin-bottom: 12px;">
+                                    <div class="orange-node mb-2" id="node-donut-chart">
                                         <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a7 7 0 1 0 10 10"/></svg>
                                         CASH FLOW ALLOCATION
                                     </div>
-                                    <div class="flex-grow-1 d-flex align-items-center justify-content-center" style="position: relative; height: 90px; width: 100%;">
-                                        <canvas id="donutChartCanvas"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Column: Cash Flow Breakdown Bar -->
-                            <div class="col-md-6 d-flex">
-                                <div class="inner-summary-card w-100 d-flex flex-column" id="card-line-chart" style="height: 148px;">
-                                    <div class="orange-node mb-1" id="node-line-chart">
-                                        <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><path d="M12 12h.01"/></svg>
-                                        CASH FLOW BREAKDOWN
-                                    </div>
-                                    <div class="flex-grow-1 d-flex flex-column justify-content-center px-1">
-                                        <!-- [2026-07-12 Fix: Updated cash flow breakdown progress bar colors to a uniform red-orange-amber-yellow sunset palette for improved readability] -->
-                                        <div class="progress allocation-progress-bar" style="height: 18px; background: rgba(255,255,255,0.05); border-radius: 9px; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);">
-                                            <!-- bar-new-net-pay: Progress bar segment showing Net Pay (Red) -->
-                                            <div class="progress-bar" id="bar-new-net-pay" role="progressbar" style="width: 0%; background: #EF4444; font-weight: 800; font-size: 0.68rem;" title="New Net Pay"></div>
-                                            <!-- bar-csb-amortization: Progress bar segment showing CSB Loan (Orange) -->
-                                            <div class="progress-bar" id="bar-csb-amortization" role="progressbar" style="width: 0%; background: #F97316; font-weight: 800; font-size: 0.68rem;" title="New CSB Amort"></div>
-                                            <!-- bar-pli-deductions: Progress bar segment showing PLIs (Amber) -->
-                                            <div class="progress-bar" id="bar-pli-deductions" role="progressbar" style="width: 0%; background: #F59E0B; font-weight: 800; font-size: 0.68rem;" title="Redemptions/PLIs"></div>
-                                            <!-- bar-onqueue: Progress bar segment showing OnQueue (Yellow) -->
-                                            <div class="progress-bar" id="bar-onqueue" role="progressbar" style="width: 0%; background: #FACC15; font-weight: 800; font-size: 0.68rem;" title="OnQueue"></div>
-                                        </div>
-                                        <!-- [2026-07-12 Fix: Updated legend items to use matching red-orange-amber-yellow colors and added semantic ID labels/comments] -->
-                                        <div class="mt-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 0.68rem; font-weight: 600;">
-                                            <!-- legend-net-pay: Legend item detailing Net Pay percentage contribution -->
-                                            <div class="d-flex align-items-center justify-content-between p-1 px-2" id="legend-net-pay" style="background: rgba(239, 68, 68, 0.08); border-radius: 4px; border: 1px solid rgba(239, 68, 68, 0.15); min-height: 24px;">
-                                                <span class="text-white-50"><span style="display:inline-block; width:6px; height:6px; background:#EF4444; border-radius:50%; margin-right:4px;"></span>Net Pay</span>
-                                                <span id="bar-val-net-pay" class="text-white font-weight-bold">0%</span>
+                                    <div class="flex-grow-1 d-flex align-items-center justify-content-center">
+                                        <div class="row align-items-center" style="width: 100%; margin: 0;">
+                                            <div class="col-5 col-sm-4 d-flex justify-content-center">
+                                                <div style="position: relative; height: 110px; width: 110px;">
+                                                    <canvas id="donutChartCanvas"></canvas>
+                                                </div>
                                             </div>
-                                            <!-- legend-csb-loan: Legend item detailing CSB Loan percentage contribution -->
-                                            <div class="d-flex align-items-center justify-content-between p-1 px-2" id="legend-csb-loan" style="background: rgba(249, 115, 22, 0.08); border-radius: 4px; border: 1px solid rgba(249, 115, 22, 0.15); min-height: 24px;">
-                                                <span class="text-white-50"><span style="display:inline-block; width:6px; height:6px; background:#F97316; border-radius:50%; margin-right:4px;"></span>CSB Loan</span>
-                                                <span id="bar-val-csb" class="text-white font-weight-bold">0%</span>
-                                            </div>
-                                            <!-- legend-pli: Legend item detailing PLIs percentage contribution -->
-                                            <div class="d-flex align-items-center justify-content-between p-1 px-2" id="legend-pli" style="background: rgba(245, 158, 11, 0.08); border-radius: 4px; border: 1px solid rgba(245, 158, 11, 0.15); min-height: 24px;">
-                                                <span class="text-white-50"><span style="display:inline-block; width:6px; height:6px; background:#F59E0B; border-radius:50%; margin-right:4px;"></span>PLIs</span>
-                                                <span id="bar-val-pli" class="text-white font-weight-bold">0%</span>
-                                            </div>
-                                            <!-- legend-onqueue: Legend item detailing OnQueue percentage contribution -->
-                                            <div class="d-flex align-items-center justify-content-between p-1 px-2" id="legend-onqueue" style="background: rgba(250, 204, 21, 0.08); border-radius: 4px; border: 1px solid rgba(250, 204, 21, 0.15); min-height: 24px;">
-                                                <span class="text-white-50"><span style="display:inline-block; width:6px; height:6px; background:#FACC15; border-radius:50%; margin-right:4px;"></span>OnQueue</span>
-                                                <span id="bar-val-onq" class="text-white font-weight-bold">0%</span>
+                                            <div class="col-7 col-sm-8">
+                                                <div style="display: flex; flex-direction: column; gap: 6px;">
+                                                    <!-- legend-net-pay: Legend item detailing Net Pay percentage contribution -->
+                                                    <div class="d-flex align-items-center justify-content-between p-1 px-3" id="legend-net-pay" style="background: rgba(239, 68, 68, 0.08); border-radius: 4px; border: 1px solid rgba(239, 68, 68, 0.15); min-height: 24px; font-size: 0.68rem; font-weight: 600;">
+                                                        <span class="text-white-50"><span style="display:inline-block; width:6px; height:6px; background:#EF4444; border-radius:50%; margin-right:6px; vertical-align: middle;"></span>Net Pay</span>
+                                                        <span id="bar-val-net-pay" class="text-white font-weight-bold">0%</span>
+                                                    </div>
+                                                    <!-- legend-csb-loan: Legend item detailing CSB Loan percentage contribution -->
+                                                    <div class="d-flex align-items-center justify-content-between p-1 px-3" id="legend-csb-loan" style="background: rgba(249, 115, 22, 0.08); border-radius: 4px; border: 1px solid rgba(249, 115, 22, 0.15); min-height: 24px; font-size: 0.68rem; font-weight: 600;">
+                                                        <span class="text-white-50"><span style="display:inline-block; width:6px; height:6px; background:#F97316; border-radius:50%; margin-right:6px; vertical-align: middle;"></span>CSB Loan</span>
+                                                        <span id="bar-val-csb" class="text-white font-weight-bold">0%</span>
+                                                    </div>
+                                                    <!-- legend-pli: Legend item detailing PLIs percentage contribution -->
+                                                    <div class="d-flex align-items-center justify-content-between p-1 px-3" id="legend-pli" style="background: rgba(245, 158, 11, 0.08); border-radius: 4px; border: 1px solid rgba(245, 158, 11, 0.15); min-height: 24px; font-size: 0.68rem; font-weight: 600;">
+                                                        <span class="text-white-50"><span style="display:inline-block; width:6px; height:6px; background:#F59E0B; border-radius:50%; margin-right:6px; vertical-align: middle;"></span>Redemptions</span>
+                                                        <span id="bar-val-pli" class="text-white font-weight-bold">0%</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -4098,6 +4105,7 @@
                         // (2026-07-13) Add loan amount col Y (idx 24) and term col V (idx 21); prev: none
                         const loanAmount = safeFloat(cleanedRow[24]); // Y
                         const loanTerm = cleanedRow[21] ? String(cleanedRow[21]).trim() : ''; // V
+                        const nplBucket = cleanedRow[51] ? String(cleanedRow[51]).trim() : ''; // AZ (2026-07-13: Fetch NPL bucket column)
                         
                         const accountObj = {
                             accountNum: accountNum ? String(accountNum).trim() : 'N/A',
@@ -4110,7 +4118,8 @@
                             groupName: groupName ? String(groupName).trim() : 'N/A',
                             // (2026-07-13) Store loan amount and term; prev: none
                             loanAmount: loanAmount,
-                            loanTerm: loanTerm
+                            loanTerm: loanTerm,
+                            nplBucket: nplBucket
                         };
                         
                         if (!lcsEmpMap.has(empNumStr)) {
@@ -4368,7 +4377,20 @@
                                 <!-- (2026-07-13) Loan amount+term subtitle; prev: none -->
                                 <div id="lcs-loaninfo-${idx}" class="lcs-loaninfo" style="font-size:0.54rem;color:rgba(255,255,255,0.38);margin-top:2px;white-space:nowrap;font-weight:500;">${acc.loanAmount ? 'Loan: ' + fmtWithCommas(acc.loanAmount) + (acc.loanTerm ? ' @' + acc.loanTerm + ' mo' : '') : ''}</div>
                             </td>
-                            <td style="text-align:right;vertical-align:middle;padding:8px 8px;font-size:0.72rem;white-space:nowrap;font-weight:600;color:rgba(255,255,255,0.85);">${formatPHP(acc.amortization)}</td>
+                            <td style="text-align:right;vertical-align:middle;padding:8px 8px;font-size:0.72rem;white-space:nowrap;font-weight:600;color:rgba(255,255,255,0.85);">
+                                <div>${formatPHP(acc.amortization)}</div>
+                                ${(() => {
+                                    const bucketStr = acc.nplBucket || '';
+                                    if (!bucketStr) return '';
+                                    const match = bucketStr.match(/DL(\d+)/i);
+                                    let color = 'rgba(255,255,255,0.38)';
+                                    if (match) {
+                                        const num = parseInt(match[1], 10);
+                                        color = num >= 2 ? '#EF4444' : '#10B981';
+                                    }
+                                    return `<div style="font-size:0.55rem;font-weight:800;color:${color};margin-top:2px;letter-spacing:0.02em;">${bucketStr}</div>`;
+                                })()}
+                            </td>
                         </tr>
                     `).join('');
 
@@ -4614,10 +4636,8 @@
             }
             if (!restored && employeeNumber) {
                 const empInput = document.getElementById('employeeNumber');
-                if (empInput) {
-                    empInput.value = employeeNumber;
-                    await performSearch(true);
-                }
+                // (2026-07-13) Fill input only; no auto-search; prev: auto-performed search on load
+                if (empInput) empInput.value = employeeNumber;
             }
 
             // 2026-07-13: Scroll to node-baseline on value wrapper click with custom smooth scrolling logic (was: scrollIntoView on mapped card elements)
@@ -5288,9 +5308,14 @@
             // Determine Initial Loan Amount capacity
             // Formula: Capacity = NETPAY + CSB Deductions + PLI INCLUDED - ONQUEUE - 5300 (where 5300 is constant)
             // [2026-07-12 Initial loanable amount capacity pre-calc]
-            const initialCapacity = netPayVal + posSum + initialPliSum - initialOnqSum - 5300;
-            const initLoan = Math.max(0, Math.floor(initialCapacity / 20.01) * 1000);
-            document.getElementById('loanAmount').value = initLoan.toLocaleString('en');
+            // (2026-07-13) New formula: netpay+dedamt+papsubtotal+anticipated+promotion-onqueue-incoming-5300; prev: netPayVal+posSum+pliSum-onqSum-5300
+            const initNetpay = safeFloat(document.getElementById('lbl-netpay') ? document.getElementById('lbl-netpay').textContent.replace(/[^\d.]/g,'') : 0);
+            const initDedamt = safeFloat(document.getElementById('lbl-dedamt') ? document.getElementById('lbl-dedamt').textContent.replace(/[^\d.]/g,'') : 0);
+            const initCapacity = initNetpay + initDedamt + initialPliSum - initialOnqSum - 5300;
+            const initLoan = Math.max(0, Math.floor(initCapacity / 20.01) * 1000);
+            // (2026-07-13) Clear manual override on new search so formula can auto-update; prev: no flag
+            const loanAmtEl = document.getElementById('loanAmount');
+            if (loanAmtEl) { delete loanAmtEl.dataset.manualOverride; loanAmtEl.value = initLoan.toLocaleString('en'); }
 
             // Phase C baseline steps matching
             const stepLabel = `Step-${originalStep}`;
@@ -5343,6 +5368,38 @@
             runCalculations();
             calculateNetProceeds();
 
+            // (2026-07-13) Cache the search results for faster reload; prev: no caching
+            {
+                const _cacheKey = 'le_search_cache_' + empNum + '_' + window.currentData.month;
+                // Prune currentData to only contain matching rows for searched employee; avoids QuotaExceededError
+                const _cachedCurrentData = {
+                    empNum: window.currentData.empNum,
+                    month: window.currentData.month,
+                    netpay: [window.currentData.netpay[0], empRow],
+                    pos: [window.currentData.pos[0], ...matchingPos],
+                    onq: [window.currentData.onq[0], ...matchingOnq],
+                    pli: [window.currentData.pli[0], ...matchingPli],
+                    tranch: window.currentData.tranch,
+                    tranch2027: window.currentData.tranch2027
+                };
+                const _cacheData = {
+                    empNum: empNum,
+                    month: window.currentData.month,
+                    session: window.activeSession,
+                    currentData: _cachedCurrentData,
+                    empSummaryHTML: document.getElementById('empSummaryCard') ? document.getElementById('empSummaryCard').innerHTML : '',
+                    profileHTML: document.getElementById('lcsProfileCard') ? document.getElementById('lcsProfileCard').innerHTML : '',
+                    csbTbodyHTML: document.getElementById('csb-deductions-tbody') ? document.getElementById('csb-deductions-tbody').innerHTML : '',
+                    pliAccordionsHTML: document.getElementById('pliAccordions') ? document.getElementById('pliAccordions').innerHTML : '',
+                    onqContainerHTML: document.getElementById('onqTableContainer') ? document.getElementById('onqTableContainer').innerHTML : ''
+                };
+                try {
+                    localStorage.setItem(_cacheKey, JSON.stringify(_cacheData));
+                } catch (e) {
+                    console.warn('[Cache] Failed to write search cache:', e);
+                }
+            }
+
             // Log the initial state if requested
             if (!skipHistoryLog) {
                 logCurrentState();
@@ -5377,7 +5434,10 @@
                         <table class="bank-table text-white">
                             <thead>
                                 <tr>
-                                    <th>Select</th>
+                                    <!-- (2026-07-13) Centered select-all checkbox; prev: text checkmark -->
+                                    <th class="th-select">
+                                        <input type="checkbox" class="pli-select-all" data-slot="${i}" onchange="toggleAllPliDeductions(this, ${i})">
+                                    </th>
                                     <th>CODE</th>
                                     <th>EFF</th>
                                     <th>TERM</th>
@@ -5386,16 +5446,6 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr onclick="togglePliRow(event, this)" style="cursor: pointer;">
-                                    <td data-label="Select" onclick="event.stopPropagation()">
-                                        <input type="radio" name="pli_radio_${i}" class="pli-radio" data-dedpli="0" data-row-index="none" data-plicode="None" checked onchange="updatePLIHeaderValue(${i}); runCalculations();">
-                                    </td>
-                                    <td data-label="Code" class="text-muted">None</td>
-                                    <td data-label="EFF" class="text-muted">-</td>
-                                    <td data-label="TERM" class="text-muted">-</td>
-                                    <td data-label="DEDPLI" class="text-muted">₱0.00</td>
-                                    <td data-label="Policy No" class="text-muted">-</td>
-                                </tr>
                                 ${pliRows.map((row, idx) => {
                                     const pliCode = row[9] || '';
                                     const eff = `${row[12] || ''}/${row[11] || ''}`;
@@ -5404,8 +5454,9 @@
                                     const plcyno = row[16] || '';
                                     return `
                                         <tr onclick="togglePliRow(event, this)" style="cursor: pointer;">
-                                            <td data-label="Select" onclick="event.stopPropagation()">
-                                                <input type="radio" name="pli_radio_${i}" class="pli-radio" data-dedpli="${dedpli}" data-row-index="${idx}" data-plicode="${pliCode}" onchange="updatePLIHeaderValue(${i}); runCalculations();">
+                                            <!-- (2026-07-13) Centered checkbox cell; prev: uncentered -->
+                                            <td class="td-select" onclick="event.stopPropagation()">
+                                                <input type="checkbox" class="pli-cb" data-slot="${i}" data-dedpli="${dedpli}" data-plicode="${pliCode}" onchange="updatePLIHeaderValue(${i}); runCalculations();">
                                             </td>
                                             <td data-label="Code">${pliCode}</td>
                                             <td data-label="EFF">${eff}</td>
@@ -5427,10 +5478,12 @@
                             <button class="bank-accordion-btn" type="button" onclick="toggleCustomAccordion('${accordionId}')">
                                 <span class="orange-node font-weight-bold" style="display: inline-flex; align-items: center; gap: 8px;">
                                     <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
-                                    PLI ${i}
-                                    ${i >= 3 ? `<span class="pli-delete-btn" onclick="event.stopPropagation(); deletePliSlot(${i});" title="Delete PLI slot ${i}" style="margin-left: 4px; margin-right: 0;"><i class="bi bi-trash"></i></span>` : ''}
+                                    <!-- (2026-07-13) Rename PLI 1 to DOUBLE DEDUCTION, others to REDEMPTION starting at 1; prev: PLI slot names -->
+                                    ${i === 1 ? 'DOUBLE DEDUCTION' : `REDEMPTION ${i - 1}`}
+                                    ${i >= 3 ? `<span class="pli-delete-btn" onclick="event.stopPropagation(); deletePliSlot(${i});" title="Delete Redemption slot ${i - 1}" style="margin-left: 4px; margin-right: 0;"><i class="bi bi-trash"></i></span>` : ''}
                                     <span class="math-popover">
-                                        Private Lending Institution slot ${i}. Rendered from pli_june26.csv.
+                                        <!-- (2026-07-13) Rename PLI 1 to DOUBLE DEDUCTION, others to REDEMPTION starting at 1; prev: PLI slot names -->
+                                        ${i === 1 ? 'Double Deduction slot' : `Redemption slot ${i - 1}`}. Rendered from pli_june26.csv.
                                     </span>
                                 </span>
                                 <span class="d-flex align-items-center">
@@ -5461,7 +5514,7 @@
                 container.innerHTML += `
                     <button type="button" class="pli-add-slot-btn" onclick="addPliSlot()">
                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                        ADD PLI
+                        ADD REDEMPTION
                     </button>
                 `;
             }
@@ -5469,11 +5522,36 @@
             attachTooltipBehaviors();
         }
 
-        /* [2026-07-10 Fix: Changed textContent to innerHTML for PLI accordion header value] */
+        /* (2026-07-13) Sum all checked pli-cb in this slot and sync select-all checkbox; prev: no sync */
         function updatePLIHeaderValue(pliIndex) {
-            const checkedRadio = document.querySelector(`input[name="pli_radio_${pliIndex}"]:checked`);
-            const val = checkedRadio ? safeFloat(checkedRadio.getAttribute('data-dedpli')) : 0;
-            document.getElementById(`lbl-pli-${pliIndex}-selected`).innerHTML = formatPHP(val);
+            const accordion = document.getElementById(`collapsePLI${pliIndex}`);
+            if (!accordion) return;
+            let total = 0;
+            const cbs = accordion.querySelectorAll('.pli-cb');
+            let allChecked = cbs.length > 0;
+            cbs.forEach(cb => {
+                if (cb.checked) {
+                    total += safeFloat(cb.getAttribute('data-dedpli'));
+                } else {
+                    allChecked = false;
+                }
+            });
+            const master = accordion.querySelector('.pli-select-all');
+            if (master) master.checked = allChecked;
+
+            const lbl = document.getElementById(`lbl-pli-${pliIndex}-selected`);
+            if (lbl) lbl.innerHTML = formatPHP(total);
+        }
+
+        // (2026-07-13) Toggle all checkboxes in PLI slot; prev: none
+        function toggleAllPliDeductions(masterCb, pliIndex) {
+            const accordion = document.getElementById(`collapsePLI${pliIndex}`);
+            if (!accordion) return;
+            accordion.querySelectorAll('.pli-cb').forEach(cb => {
+                cb.checked = masterCb.checked;
+            });
+            updatePLIHeaderValue(pliIndex);
+            runCalculations();
         }
 
         // Render OnQueue table checklist
@@ -5507,7 +5585,8 @@
                             return `
                                 <tr onclick="toggleOnqRow(event, this)" style="cursor: pointer;">
                                     <td data-label="Select" onclick="event.stopPropagation()">
-                                        <input type="checkbox" class="onq-checkbox" data-dedamt="${dedamt}" onchange="runCalculations()">
+                                        <!-- (2026-07-13) Checkboxes checked by default; prev: unchecked -->
+                                        <input type="checkbox" class="onq-checkbox" data-dedamt="${dedamt}" checked onchange="runCalculations()">
                                     </td>
                                     <td data-label="CODE">${pliCode}</td>
                                     <td data-label="EFF">${eff}</td>
@@ -5535,15 +5614,11 @@
             }
         }
 
+        // (2026-07-13) Toggle pli-cb on row click; prev: set radio to checked
         function togglePliRow(event, rowEl) {
-            if (event.target.tagName.toLowerCase() === 'input' || event.target.closest('td[data-label="Select"]')) {
-                return;
-            }
-            const radio = rowEl.querySelector('.pli-radio');
-            if (radio && !radio.checked) {
-                radio.checked = true;
-                radio.dispatchEvent(new Event('change'));
-            }
+            if (event.target.tagName.toLowerCase() === 'input' || event.target.closest('td[data-label="Select"]')) return;
+            const cb = rowEl.querySelector('.pli-cb');
+            if (cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); }
         }
 
         // Hover or click popup modal bindings
@@ -5668,8 +5743,8 @@
             const mode = modeSelect ? modeSelect.value : 'DEPED';
             const isAutonomous = (mode === 'AUTONOMOUS');
 
-            // Ingest variables safely
-            const loanAmount = safeFloat(document.getElementById('loanAmount').value);
+            // (2026-07-13) Use let so suggestion can update it before PMT; prev: const
+            let loanAmount = safeFloat(document.getElementById('loanAmount').value.replace(/,/g,''));
             const loanTerm = safeInt(document.getElementById('loanTerm').value);
             const interestRate = getInterestRateValue();
 
@@ -5692,27 +5767,71 @@
                 rowProAuto.style.setProperty('display', 'none', 'important');
             }
 
-            // (2026-07-13) Revert redemption inputs; prev: custom input fields
+            // (2026-07-13) Sum all checked pli-cb across all slots; prev: one checkedRadio per slot
             let pliSubtotal = 0;
             const selectedPlis = [];
+            let hasPli1Checked = false;
+            let hasOtherPliChecked = false;
 
             const slotCount = getPliSlotCount();
             for (let i = 1; i <= slotCount; i++) {
-                const checkedRadio = document.querySelector(`input[name="pli_radio_${i}"]:checked`);
-                if (checkedRadio) {
-                    const val = safeFloat(checkedRadio.getAttribute('data-dedpli'));
-                    const code = checkedRadio.getAttribute('data-plicode');
-                    if (val > 0 && code && code !== 'None') {
-                        selectedPlis.push({
-                            slot: i,
-                            label: `PLI ${i} (CODE ${code})`,
-                            value: val
-                        });
+                const accordion = document.getElementById(`collapsePLI${i}`);
+                if (!accordion) continue;
+                accordion.querySelectorAll('.pli-cb:checked').forEach(cb => {
+                    const val = safeFloat(cb.getAttribute('data-dedpli'));
+                    const code = cb.getAttribute('data-plicode');
+                    if (val > 0 && code) {
+                        selectedPlis.push({ slot: i, label: `${i === 1 ? 'DOUBLE DEDUCTION' : `REDEMPTION ${i - 1}`} (${code})`, value: val });
                         pliSubtotal += val;
+                        if (i === 1) {
+                            hasPli1Checked = true;
+                        } else {
+                            hasOtherPliChecked = true;
+                        }
+                    }
+                });
+            }
+            pliSubtotal = Math.round(pliSubtotal * 100) / 100;
+
+            // (2026-07-13) Dynamic label update based on checked PLI slots; prev: manual toggle label
+            {
+                const lbl = document.getElementById('lbl-redemption-toggle-text');
+                const lblAuto = document.getElementById('lbl-redemption-toggle-text-autonomous');
+                const cardTitleEl = document.getElementById('lbl-pli-card-title-text');
+                let labelHTML = '<i class="bi bi-plus-lg text-success mr-2"></i>Redemption';
+                let isDoubled = false;
+                let fontSize = ''; // default
+                if (hasPli1Checked && !hasOtherPliChecked) {
+                    labelHTML = '<i class="bi bi-plus-lg text-success mr-2"></i>DOUBLE DEDUCTION';
+                    isDoubled = true;
+                } else if (hasPli1Checked && hasOtherPliChecked) {
+                    labelHTML = '<i class="bi bi-plus-lg text-success mr-2"></i>REDEMPTION + DOUBLE DEDUCTION';
+                    isDoubled = true;
+                    fontSize = '0.52rem'; // smaller font size to fit on one line
+                }
+                if (lbl) {
+                    lbl.innerHTML = labelHTML;
+                    lbl.dataset.doubled = isDoubled ? '1' : '0';
+                    lbl.style.fontSize = fontSize;
+                }
+                if (lblAuto) {
+                    lblAuto.innerHTML = labelHTML;
+                    lblAuto.dataset.doubled = isDoubled ? '1' : '0';
+                    lblAuto.style.fontSize = fontSize;
+                }
+                if (cardTitleEl) {
+                    if (hasPli1Checked && !hasOtherPliChecked) {
+                        cardTitleEl.textContent = 'DOUBLE DEDUCTION';
+                        cardTitleEl.style.fontSize = '';
+                    } else if (hasPli1Checked && hasOtherPliChecked) {
+                        cardTitleEl.textContent = 'REDEMPTION + DOUBLE DEDUCTION';
+                        cardTitleEl.style.fontSize = '0.52rem'; // smaller font size
+                    } else {
+                        cardTitleEl.textContent = 'REDEMPTION';
+                        cardTitleEl.style.fontSize = '';
                     }
                 }
             }
-            pliSubtotal = Math.round(pliSubtotal * 100) / 100;
 
             /* [2026-07-10 Fix: Changed all calculation result assignments from textContent to innerHTML to render muted currency span HTML cleanly] */
             document.getElementById('val-plisubtotal').innerHTML = formatPHP(pliSubtotal);
@@ -5932,9 +6051,9 @@
                 panelPliInner.style.filter = useMasterPli ? 'none' : 'grayscale(100%)';
                 panelPliInner.style.transition = 'opacity 0.25s ease, filter 0.25s ease';
                 
-                // Disable all radio buttons inside PLI accordions if master is off
-                panelPliInner.querySelectorAll('input[type="radio"]').forEach(radio => {
-                    radio.disabled = !useMasterPli;
+                // (2026-07-13) Disable pli-cb checkboxes; prev: radio buttons
+                panelPliInner.querySelectorAll('input[type="checkbox"].pli-cb').forEach(cb => {
+                    cb.disabled = !useMasterPli;
                 });
                 
                 // Disable custom accordion buttons if master is off
@@ -5967,12 +6086,12 @@
 
             // [2026-07-11 New: Update PAP subtotal label dynamically based on toggle state]
             const titleParts = [];
-            if (useMasterPli) titleParts.push('PLI');
+            if (useMasterPli) titleParts.push('REDEMPTION');
             if (useAnticipated) titleParts.push('ANTICIPATED');
             if (usePromotion)   titleParts.push('PROMOTION');
             const papTitleEl = document.getElementById('lbl-papsubtotal-title');
             if (papTitleEl) {
-                papTitleEl.textContent = titleParts.length > 0 ? (titleParts.join(' + ') + ' COMBINED SUBTOTAL') : 'NO PLI/COMPENSATION SUBTOTAL';
+                papTitleEl.textContent = titleParts.length > 0 ? (titleParts.join(' + ') + ' COMBINED SUBTOTAL') : 'NO REDEMPTION/COMPENSATION SUBTOTAL';
             }
 
             // (2026-07-13) Render static redemption values; prev: input fields
@@ -6208,6 +6327,23 @@
                 panelRevisedEl.style.setProperty('display', 'flex', 'important');
             }
 
+            // (2026-07-13) Compute suggestion BEFORE PMT so amortization uses correct loan; prev: suggestion was at end
+            // Formula: netpay + dedamt + pliSubtotal + anticipated + promotion - onqueue - incoming - 5300
+            {
+                const _cap = netPayVal + posSum + pliSubtotal
+                           + (useAnticipated ? anticipatedVal : 0)
+                           + (usePromotion   ? promotionMargin : 0)
+                           - activeOnqSum - incoming - 5300;
+                const _suggested = Math.max(0, Math.floor(_cap / 20.01) * 1000);
+                const _hintEl = document.getElementById('lbl-loan-capacity-hint');
+                if (_hintEl) _hintEl.textContent = `ESTIMATED: ₱${_suggested.toLocaleString('en')}`;
+                const _loanInp = document.getElementById('loanAmount');
+                if (_loanInp && !_loanInp.dataset.manualOverride) {
+                    _loanInp.value = _suggested.toLocaleString('en');
+                    loanAmount = _suggested; // update variable so PMT uses the right amount
+                }
+            }
+
             // Calculate Amortization
             const monthlyRate = interestRate / 100 / 12;
             const pmtResult = calculatePMT(monthlyRate, loanTerm, loanAmount);
@@ -6221,11 +6357,14 @@
                 valNewCsbAmortEl.innerHTML = formatPHP(amortization);
             }
 
-            // Compute Total Interest Paid over the loan term
-            const totalRepayment = amortization * loanTerm;
-            const totalInterest = Math.max(0, totalRepayment - loanAmount);
-            // [2026-07-14 Fix: Calculator icon changed from text-warning (amber) to text-muted (gray); previous: text-warning]
-            document.getElementById('lbl-total-interest').innerHTML = `<i class="bi bi-calculator text-muted mr-1"></i>Est. Interest: <strong class="text-white-50">${formatPHP(totalInterest)}</strong>`;
+             // (2026-07-13) Add Est. Interest per month inline stacked with clean line spacing and muted colors; prev: white colors
+             const totalRepayment = amortization * loanTerm;
+             const totalInterest = Math.max(0, totalRepayment - loanAmount);
+             const monthlyInterest = totalInterest / loanTerm;
+             document.getElementById('lbl-total-interest').innerHTML = `
+                 <div><i class="bi bi-calculator text-muted mr-1" style="font-size: 0.75rem;"></i>Est. Interest: <strong style="color: rgba(255,255,255,0.65);">${formatPHP(totalInterest)}</strong></div>
+                 <div style="margin-top: 1px;"><i class="bi bi-calendar3 text-muted mr-1" style="font-size: 0.75rem;"></i>Est. Interest per month: <strong style="color: rgba(255,255,255,0.65);">${formatPHP(monthlyInterest)}</strong></div>
+             `;
 
             // Determine final New NetPay
             // [2026-07-11 Fix: newNetPay is calculated from revisedBaseline (which is Subtotal - LESS ONQUEUE - LESS INCOMING) minus amortization]
@@ -6310,11 +6449,11 @@
                     window.donutChart = new Chart(ctx, {
                         type: 'doughnut',
                         data: {
-                            labels: ['Net Pay', 'CSB Loan', 'PLIs', 'OnQueue'],
+                            labels: ['Net Pay', 'CSB Loan', 'Redemptions'],
                             datasets: [{
-                                data: [0, 0, 0, 0],
-                                // [2026-07-12 Fix: Updated Chart colors to follow the red-orange-amber-yellow sunset theme]
-                                backgroundColor: ['#EF4444', '#F97316', '#F59E0B', '#FACC15'],
+                                data: [0, 0, 0],
+                                // Updated Chart colors to follow the sunset theme without OnQueue
+                                backgroundColor: ['#EF4444', '#F97316', '#F59E0B'],
                                 borderColor: 'rgba(8, 12, 28, 0.65)',
                                 borderWidth: 2
                             }]
@@ -6342,62 +6481,27 @@
                 window.donutChart.data.datasets[0].data = [
                     Math.max(0, newNetPay),
                     Math.max(0, amortization),
-                    Math.max(0, papSubtotal),
-                    Math.max(0, activeOnqSum)
+                    Math.max(0, papSubtotal)
                 ];
                 window.donutChart.update();
             }
 
             // Update Cash Flow Breakdown 
-            const barNewNetPay = document.getElementById('bar-new-net-pay');
-            const barCsbAmort = document.getElementById('bar-csb-amortization');
-            const barPliDeductions = document.getElementById('bar-pli-deductions');
-            const barOnqueue = document.getElementById('bar-onqueue');
-
             const lblBarNetPay = document.getElementById('bar-val-net-pay');
             const lblBarCsb = document.getElementById('bar-val-csb');
             const lblBarPli = document.getElementById('bar-val-pli');
-            const lblBarOnq = document.getElementById('bar-val-onq');
 
-            if (barNewNetPay && barCsbAmort && barPliDeductions && barOnqueue) {
-                const totalBaseVal = baselineSubVal || 1; // prevent divide by zero
-                
-                // Calculate percentages relative to baseline for legends
-                const pctNetPay = Math.max(0, (newNetPay / totalBaseVal) * 100);
-                const pctCsb = Math.max(0, (amortization / totalBaseVal) * 100);
-                const pctPli = Math.max(0, (papSubtotal / totalBaseVal) * 100);
-                const pctOnq = Math.max(0, (activeOnqSum / totalBaseVal) * 100);
+            // Sum of active parts (NetPay, Amortization, PLI subtotal) to take 100% of the donut/breakdown
+            const sumOfParts = Math.max(0, newNetPay) + Math.max(0, amortization) + Math.max(0, papSubtotal) || 1;
+            const pctNetPay = (Math.max(0, newNetPay) / sumOfParts) * 100;
+            const pctCsb = (Math.max(0, amortization) / sumOfParts) * 100;
+            const pctPli = (Math.max(0, papSubtotal) / sumOfParts) * 100;
 
-                // Compute sum of active parts to scale segments to exactly 100% container width
-                const sumOfParts = Math.max(0, newNetPay) + Math.max(0, amortization) + Math.max(0, papSubtotal) + Math.max(0, activeOnqSum) || 1;
-                const widthNetPay = (Math.max(0, newNetPay) / sumOfParts) * 100;
-                const widthCsb = (Math.max(0, amortization) / sumOfParts) * 100;
-                const widthPli = (Math.max(0, papSubtotal) / sumOfParts) * 100;
-                const widthOnq = (Math.max(0, activeOnqSum) / sumOfParts) * 100;
+            if (lblBarNetPay) lblBarNetPay.textContent = `${pctNetPay.toFixed(1)}%`;
+            if (lblBarCsb) lblBarCsb.textContent = `${pctCsb.toFixed(1)}%`;
+            if (lblBarPli) lblBarPli.textContent = `${pctPli.toFixed(1)}%`;
 
-                // Set widths
-                barNewNetPay.style.width = `${widthNetPay}%`;
-                barCsbAmort.style.width = `${widthCsb}%`;
-                barPliDeductions.style.width = `${widthPli}%`;
-                barOnqueue.style.width = `${widthOnq}%`;
-
-                // Omit inner text labels to avoid visual overlaps on narrow containers
-                barNewNetPay.textContent = '';
-                barCsbAmort.textContent = '';
-                barPliDeductions.textContent = '';
-                barOnqueue.textContent = '';
-
-                // Set detail legend labels text
-                if (lblBarNetPay) lblBarNetPay.textContent = `${pctNetPay.toFixed(1)}%`;
-                if (lblBarCsb) lblBarCsb.textContent = `${pctCsb.toFixed(1)}%`;
-                if (lblBarPli) lblBarPli.textContent = `${pctPli.toFixed(1)}%`;
-                if (lblBarOnq) lblBarOnq.textContent = `${pctOnq.toFixed(1)}%`;
-            }
-
-            // [2026-07-14 New: Calculate Net Proceeds values moved to dedicated calculateNetProceeds() function]
-            // 2026-07-13: Net Proceeds now only calculated when user presses the Calculate button (was: auto-triggered via runCalculations)
-
-            // (2026-07-13) Auto-calculate net proceeds on value change; prev: manual only
+            // (2026-07-13) Suggestion already applied before PMT; just save + calc; prev: suggestion block was here
             saveActiveEvaluationState();
             calculateNetProceeds();
         }
@@ -6420,19 +6524,8 @@
             const usePromotion   = document.getElementById('togglePromotion')   ? document.getElementById('togglePromotion').checked   : false;
             const useMasterPli   = document.getElementById('toggleMasterPli')   ? document.getElementById('toggleMasterPli').checked   : true;
 
-            // (2026-07-13) Show Less Old Redemption row only if selected; prev: always
-            let pliIsSelected = false;
-            const slotCount = getPliSlotCount();
-            for (let i = 1; i <= slotCount; i++) {
-                const checkedRadio = document.querySelector(`input[name="pli_radio_${i}"]:checked`);
-                if (checkedRadio) {
-                    const code = checkedRadio.getAttribute('data-plicode');
-                    if (code && code !== 'None') {
-                        pliIsSelected = true;
-                        break;
-                    }
-                }
-            }
+            // (2026-07-13) Check if any pli-cb is checked; prev: checkedRadio per slot
+            const pliIsSelected = document.querySelector('.pli-cb:checked') !== null;
             const showNetprocRedemption = useMasterPli && pliIsSelected;
 
             const netprocAccordion = document.getElementById('dynamic-netproc-redemption-container');
@@ -6471,22 +6564,16 @@
                     activePliSubtotal = valRedManual ? safeFloat(valRedManual.value) : 0;
                 } else {
                     if (showNetprocRedemption) {
+                        // (2026-07-13) Build selectedPlis from pli-cb; prev: checkedRadio per slot
                         const selectedPlis = [];
-                        const slotCount = getPliSlotCount();
-                        for (let i = 1; i <= slotCount; i++) {
-                            const checkedRadio = document.querySelector(`input[name="pli_radio_${i}"]:checked`);
-                            if (checkedRadio) {
-                                const val = safeFloat(checkedRadio.getAttribute('data-dedpli'));
-                                const code = checkedRadio.getAttribute('data-plicode');
-                                if (val > 0 && code && code !== 'None') {
-                                    selectedPlis.push({
-                                        slot: i,
-                                        label: `PLI ${i} (CODE ${code})`,
-                                        value: val
-                                    });
-                                }
+                        document.querySelectorAll('.pli-cb:checked').forEach(cb => {
+                            const slot = parseInt(cb.getAttribute('data-slot'));
+                            const val = safeFloat(cb.getAttribute('data-dedpli'));
+                            const code = cb.getAttribute('data-plicode');
+                            if (val > 0 && code) {
+                                selectedPlis.push({ slot, label: `<span style="font-size: 0.85em;">${slot === 1 ? 'DOUBLE DEDUCTION' : `REDEMPTION ${slot - 1}`} (${code})</span>`, value: val });
                             }
-                        }
+                        });
                         const addedPlis = selectedPlis.filter(pli => {
                             return window.activeSession.addedNetprocRedemptions && window.activeSession.addedNetprocRedemptions[pli.slot];
                         });
@@ -6506,16 +6593,10 @@
             if (isAutonomous) {
                 baselinePliSum = safeFloat(document.getElementById('input-redemption').value);
             } else {
-                const slotCount = getPliSlotCount();
-                for (let i = 1; i <= slotCount; i++) {
-                    const checkedRadio = document.querySelector(`input[name="pli_radio_${i}"]:checked`);
-                    if (checkedRadio) {
-                        const code = checkedRadio.getAttribute('data-plicode');
-                        if (code && code !== 'None') {
-                            baselinePliSum += safeFloat(checkedRadio.getAttribute('data-dedpli'));
-                        }
-                    }
-                }
+                // (2026-07-13) baselinePliSum from all checked pli-cb; prev: checkedRadio per slot
+                document.querySelectorAll('.pli-cb:checked').forEach(cb => {
+                    baselinePliSum += safeFloat(cb.getAttribute('data-dedpli'));
+                });
             }
 
             // (2026-07-13) Sum csb-deduction-cb for basis; prev: netproc-deduction-cb
@@ -6539,9 +6620,8 @@
                 amortization = Math.ceil(parseFloat(rawPmt.toFixed(6)) * 100) / 100;
             }
 
-            // (2026-07-13) Subtract baseline PLI subtotal from basis; prev: redemptionSub
-            const basis = Math.max(0, amortization - oldDeduction - baselinePliSum);
-            const advancePayment = Math.round(basis * advanceMonths * 100) / 100;
+            // (2026-07-13) Advance payment = amortization × months only; prev: subtracted oldDeduction+baselinePliSum from basis
+            const advancePayment = Math.round(amortization * advanceMonths * 100) / 100;
 
             // Final net proceeds
             const netProceeds = Math.round((loanProceeds - oldBalance - activePliSubtotal - advancePayment) * 100) / 100;
@@ -6708,8 +6788,14 @@
             const pliSelections = [];
             const slotCount = getPliSlotCount();
             for (let i = 1; i <= slotCount; i++) {
-                const checkedRadio = document.querySelector(`input[name="pli_radio_${i}"]:checked`);
-                pliSelections.push(checkedRadio ? checkedRadio.getAttribute('data-row-index') : 'none');
+                const slotSels = [];
+                const accordion = document.getElementById(`collapsePLI${i}`);
+                if (accordion) {
+                    accordion.querySelectorAll('.pli-cb').forEach((cb, idx) => {
+                        if (cb.checked) slotSels.push(idx);
+                    });
+                }
+                pliSelections.push(slotSels);
             }
 
             const onqSelections = [];
@@ -6790,8 +6876,14 @@
             const pliSelections = [];
             const slotCount = getPliSlotCount();
             for (let i = 1; i <= slotCount; i++) {
-                const checkedRadio = document.querySelector(`input[name="pli_radio_${i}"]:checked`);
-                pliSelections.push(checkedRadio ? checkedRadio.getAttribute('data-row-index') : 'none');
+                const slotSels = [];
+                const accordion = document.getElementById(`collapsePLI${i}`);
+                if (accordion) {
+                    accordion.querySelectorAll('.pli-cb').forEach((cb, idx) => {
+                        if (cb.checked) slotSels.push(idx);
+                    });
+                }
+                pliSelections.push(slotSels);
             }
 
             const onqSelections = [];
@@ -7007,12 +7099,81 @@
                 localStorage.setItem('pli_slot_count', state.pliSlotCount);
             }
 
-            // Trigger lookup reload first asynchronously
-            await performSearch(true); // skip auto-logging initial state to avoid loop duplication
+            // (2026-07-13) Check search cache first; skip CSV re-parse if same empNum+month cached; prev: always full performSearch
+            const _cacheKey = 'le_search_cache_' + state.empNum + '_' + state.month;
+            const _cached = localStorage.getItem(_cacheKey);
+            let _skipSearch = false;
+            if (_cached) {
+                try {
+                    const _cs = JSON.parse(_cached);
+                    if (_cs && _cs.empNum === state.empNum && _cs.month === state.month) {
+                        window.currentData = _cs.currentData; // Restore parsed CSV data matrix; prev: none
+                        window.activeSession = _cs.session;
+                        // Restore rendered HTML from cache
+                        if (_cs.empSummaryHTML && document.getElementById('empSummaryCard')) {
+                            const sumCard = document.getElementById('empSummaryCard');
+                            sumCard.innerHTML = _cs.empSummaryHTML;
+                            sumCard.classList.remove('d-none');
+                        }
+                        // (2026-07-13) Re-render profile details card to ensure NPL status and color-coding is shown fresh; prev: loaded static HTML
+                        if (_cs.currentData && _cs.currentData.netpay) {
+                            const empRow = _cs.currentData.netpay.find(row => row[3] && String(row[3]).trim().replace(/^0+/, '') === String(state.empNum).trim().replace(/^0+/, ''));
+                            if (empRow) {
+                                const fname = empRow[4] || '';
+                                const mi = empRow[5] || '';
+                                const lname = empRow[6] || '';
+                                updateEmployeeDetailsCard(state.empNum, fname, mi, lname, empRow[1], empRow[2]);
+                            } else if (_cs.profileHTML && document.getElementById('lcsProfileCard')) {
+                                const profileEl = document.getElementById('lcsProfileCard');
+                                profileEl.innerHTML = _cs.profileHTML;
+                                profileEl.style.display = 'block';
+                            }
+                        } else if (_cs.profileHTML && document.getElementById('lcsProfileCard')) {
+                            const profileEl = document.getElementById('lcsProfileCard');
+                            profileEl.innerHTML = _cs.profileHTML;
+                            profileEl.style.display = 'block';
+                        }
+                        if (_cs.csbTbodyHTML && document.getElementById('csb-deductions-tbody')) {
+                            document.getElementById('csb-deductions-tbody').innerHTML = _cs.csbTbodyHTML;
+                        }
+                        if (_cs.pliAccordionsHTML && document.getElementById('pliAccordions')) {
+                            document.getElementById('pliAccordions').innerHTML = _cs.pliAccordionsHTML;
+                        }
+                        if (_cs.onqContainerHTML && document.getElementById('onqTableContainer')) {
+                            document.getElementById('onqTableContainer').innerHTML = _cs.onqContainerHTML;
+                        }
+                        // Show results section and workspace
+                        const resultsEl = document.getElementById('resultsSection');
+                        if (resultsEl) resultsEl.style.display = 'block';
+                        const evalWorkspace = document.getElementById('evaluationWorkspace');
+                        if (evalWorkspace) evalWorkspace.classList.remove('d-none');
+                        
+                        // Restore baseline visual DOM labels from cached session
+                        if (document.getElementById('lbl-netpay') && window.activeSession.netPay !== undefined) {
+                            document.getElementById('lbl-netpay').innerHTML = formatPHP(window.activeSession.netPay);
+                        }
+                        if (document.getElementById('lbl-dedamt') && window.activeSession.posSum !== undefined) {
+                            document.getElementById('lbl-dedamt').innerHTML = formatPHP(window.activeSession.posSum);
+                        }
+                        if (document.getElementById('val-baseline') && window.activeSession.baselineSub !== undefined) {
+                            document.getElementById('val-baseline').innerHTML = formatPHP(window.activeSession.baselineSub);
+                        }
+                        
+                        _skipSearch = true;
+                        console.log('[Cache] Restored from search cache for', state.empNum);
+                    }
+                } catch(e) { /* cache miss */ }
+            }
+            if (!_skipSearch) {
+                // Trigger lookup reload first asynchronously
+                await performSearch(true); // skip auto-logging initial state to avoid loop duplication
+            }
 
-            /* [2026-07-10 Fix: Restore and cleanly format financial inputs using comma formatting] */
-            document.getElementById('loanAmount').value = state.loanAmount.toLocaleString('en');
-            document.getElementById('loanTerm').value = state.loanTerm;
+            /* [2026-07-10 Fix: Restore and cleanly format financial inputs using comma formatting with safe null guards] */
+            const loanAmountEl = document.getElementById('loanAmount');
+            if (loanAmountEl) loanAmountEl.value = state.loanAmount.toLocaleString('en');
+            const loanTermEl = document.getElementById('loanTerm');
+            if (loanTermEl) loanTermEl.value = state.loanTerm;
             // Restore interest rate select/custom values
             const selectEl = document.getElementById('interestRateSelect');
             const customInput = document.getElementById('interestRateCustom');
@@ -7028,18 +7189,25 @@
                     if (customInput) customInput.value = state.interestRate;
                 }
             }
-            document.getElementById('promoGrade').value = state.promoGrade;
-            document.getElementById('promoStep').value = state.promoStep;
-            document.getElementById('incomingDeduction').value = state.incomingDeduction.toLocaleString('en');
-            formatNumberInput(document.getElementById('incomingDeduction'));
+            const promoGradeEl = document.getElementById('promoGrade');
+            if (promoGradeEl) promoGradeEl.value = state.promoGrade;
+            const promoStepEl = document.getElementById('promoStep');
+            if (promoStepEl) promoStepEl.value = state.promoStep;
+            const incomingDeductionEl = document.getElementById('incomingDeduction');
+            if (incomingDeductionEl) {
+                incomingDeductionEl.value = state.incomingDeduction.toLocaleString('en');
+                formatNumberInput(incomingDeductionEl);
+            }
 
-            // Restore PLI radio selections
+            // Restore PLI checkbox selections; prev: radio restore
             const slotCount = getPliSlotCount();
             for (let i = 1; i <= slotCount; i++) {
-                const selIndex = state.pliSelections && state.pliSelections[i - 1] !== undefined ? state.pliSelections[i - 1] : 'none';
-                const radio = document.querySelector(`input[name="pli_radio_${i}"][data-row-index="${selIndex}"]`);
-                if (radio) {
-                    radio.checked = true;
+                const accordion = document.getElementById(`collapsePLI${i}`);
+                if (accordion && state.pliSelections && state.pliSelections[i - 1]) {
+                    const slotSels = state.pliSelections[i - 1];
+                    accordion.querySelectorAll('.pli-cb').forEach((cb, idx) => {
+                        cb.checked = slotSels.includes(idx);
+                    });
                     updatePLIHeaderValue(i);
                 }
             }
@@ -7067,9 +7235,10 @@
                 onTogglePromotion();
             }
 
-            // [2026-07-14 New: Restore Evaluation Mode, searchFailedNoOnQueue flag, and autonomous inputs]
-            if (state.evaluationMode !== undefined) {
-                document.getElementById('evaluationModeSelect').value = state.evaluationMode;
+            // [2026-07-14 New: Restore Evaluation Mode, searchFailedNoOnQueue flag, and autonomous inputs with safe null guards]
+            const evalModeEl = document.getElementById('evaluationModeSelect');
+            if (evalModeEl && state.evaluationMode !== undefined) {
+                evalModeEl.value = state.evaluationMode;
             }
             if (state.searchFailedNoOnQueue !== undefined) {
                 window.searchFailedNoOnQueue = state.searchFailedNoOnQueue;
@@ -7630,6 +7799,16 @@
             }
             // (2026-07-13) Init custom dropdown selectors; prev: standard HTML selects
             initCustomDropdowns();
+            // (2026-07-13) Enter key triggers search; prev: no enter support on employee input
+            const empInp = document.getElementById('employeeNumber');
+            if (empInp) {
+                empInp.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        const btn = document.getElementById('searchBtn');
+                        if (btn) btn.click();
+                    }
+                });
+            }
         });
 
         // (2026-07-13) Helpers for custom select UI overlays; prev: none
