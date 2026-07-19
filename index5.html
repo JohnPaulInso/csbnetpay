@@ -332,14 +332,13 @@
 
         input[type="checkbox"].pli-cb:checked::after,
         input[type="checkbox"].pli-select-all:checked::after {
-            content: "";
-            width: 5px;
-            height: 9px;
-            border: 2px solid #000;
-            border-top: none;
-            border-left: none;
-            transform: rotate(45deg) translate(-1px, -1px);
+            content: "\F26E";
+            font-family: "bootstrap-icons" !important;
+            color: #020617;
+            font-size: 10px;
+            font-weight: 900;
             display: block;
+            line-height: 1;
         }
 
         /* [2026-07-11 Fix: Removed white outline ring on :focus/:focus-visible for all buttons, inputs, and accordions] */
@@ -3085,8 +3084,13 @@
 
     <!-- Mobile Header -->
     <!-- Mobile Header (Polished: Inline styles removed; style handled by .mobile-header in stylesheet) -->
-    <header class="mobile-header d-md-none">
+    <header class="mobile-header d-md-none" style="display: flex; justify-content: space-between; align-items: center;">
         <img src="citysavings_logo.png" alt="CitySavings" style="height: 20px; filter: brightness(0) invert(1);">
+        <!-- (2026-07-13) Sticky mobile active loan indicator; prev: none -->
+        <div id="sticky-loan-indicator-mobile" style="font-size: 0.65rem; font-weight: 700; color: rgba(255, 255, 255, 0.45); font-family: 'Montserrat', sans-serif; letter-spacing: 0.05em; display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px; margin-left: auto; margin-right: 12px;">
+            <span style="opacity: 0.65;">LOAN:</span>
+            <span id="sticky-val-loan-amount-mobile" style="color: #F59E0B; font-weight: 800;">₱0.00</span>
+        </div>
         <div>
             <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button>
         </div>
@@ -3104,6 +3108,11 @@
                     <a class="nav-link px-3" href="index4.html">PLI</a>
                     <a class="nav-link px-3 active" href="index5.html">EVALUATION</a>
                 </div>
+            </div>
+            <!-- (2026-07-13) Sticky navbar active loan indicator; prev: none -->
+            <div id="sticky-loan-indicator" style="font-size: 0.72rem; font-weight: 700; color: rgba(255, 255, 255, 0.45); font-family: 'Montserrat', sans-serif; letter-spacing: 0.05em; display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 6px; margin-left: auto; margin-right: 20px;">
+                <span style="opacity: 0.65;">LOAN AMOUNT:</span>
+                <span id="sticky-val-loan-amount" style="color: #F59E0B; font-weight: 800;">₱0.00</span>
             </div>
             <div class="d-flex align-items-center">
                 <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Log out</button>
@@ -3454,10 +3463,22 @@
                                 <span id="val-new-csb-amortization" class="bank-value-display">₱0.00</span>
                             </div>
                             
-                            <!-- [2026-07-12 New Net Pay Row - Final calculated net pay. Labeled netpay-row-new-netpay] -->
-                            <div class="baseline-row netpay-row-new-netpay font-weight-bold pt-2" id="row-final-new-netpay" style="border-top: 1px solid rgba(255,255,255,0.08);">
+                            <div class="baseline-row netpay-row-new-netpay font-weight-bold pt-2 mb-0" id="row-final-new-netpay" style="border-top: 1px solid rgba(255,255,255,0.08);">
                                 <span class="netpay-label-bold" id="lbl-new-net-pay-text"><i class="bi bi-check-circle-fill text-success mr-2" id="icon-final-netpay"></i>New Net Pay</span>
                                 <span id="val-final-new-netpay" class="bank-value-display">₱0.00</span>
+                            </div>
+                            <!-- (2026-07-13) Polished dynamic limit input and fit link; prev: cramped input box -->
+                            <div class="d-flex align-items-center justify-content-between mt-2 pt-1" id="wrapper-adjust-loan-netpay" style="line-height: 1; flex-wrap: wrap; gap: 8px; border-top: 1px dashed rgba(255,255,255,0.05); margin-top: 8px !important;">
+                                <div class="d-flex align-items-center" style="gap: 6px;">
+                                    <span style="font-size: 0.62rem; color: rgba(255,255,255,0.35); font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; font-family: 'Montserrat', sans-serif;">LIMIT:</span>
+                                    <div class="d-inline-flex align-items-center" style="background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 4px; padding: 0px 5px; height: 18px; width: 72px; justify-content: flex-start; transition: border-color 0.2s, box-shadow 0.2s;" onfocusin="this.style.borderColor='rgba(245, 158, 11, 0.5)'; this.style.boxShadow='0 0 0 2px rgba(245, 158, 11, 0.15)';" onfocusout="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none';">
+                                        <span style="color: rgba(255, 255, 255, 0.3); font-size: 0.54rem; font-weight: 700; margin-right: 2px; user-select: none;">₱</span>
+                                        <input type="text" inputmode="numeric" id="input-target-limit" class="font-weight-bold text-left tabular-nums" style="width: 52px !important; background: transparent !important; border: none !important; outline: none !important; box-shadow: none !important; color: #F59E0B !important; font-size: 0.58rem !important; padding: 0 !important; margin: 0 !important; line-height: 1; text-indent: 0 !important;" value="5300" oninput="onTargetLimitInput()">
+                                    </div>
+                                </div>
+                                <a href="javascript:void(0)" onclick="adjustLoanForExactThreshold()" class="text-warning" id="lnk-adjust-loan-netpay" style="font-size: 0.65rem; font-weight: 700; text-decoration: none; border-bottom: 1px dashed rgba(245, 158, 11, 0.4); padding-bottom: 1px; transition: all 0.2s ease;" onmouseover="this.style.borderBottomColor='#F59E0B'" onmouseout="this.style.borderBottomColor='rgba(245, 158, 11, 0.4)'">
+                                    <i class="bi bi-magic mr-1"></i>Fit Limit
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -3553,14 +3574,14 @@
                                 <!-- 2026-07-13: Remove onchange runCalculations from advance months selector (was: onchange="runCalculations()") -->
                                 <!-- (2026-07-13) Add 0 option to advance months; prev: 1-9 options -->
                                 <select id="select-netproc-advance-months" class="form-control bank-select select-sm tabular-nums text-right font-weight-bold" style="width: 60px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; height: 26px; padding: 2px; font-size: 0.8rem; border-radius: 4px;" onchange="calculateNetProceeds()">
-                                    <option value="0" selected>0</option>
+                                    <option value="0">0</option>
                                     <option value="1">1</option>
                                     <option value="2">2</option>
                                     <option value="3">3</option>
                                     <option value="4">4</option>
                                     <option value="5">5</option>
                                     <option value="6">6</option>
-                                    <option value="7">7</option>
+                                    <option value="7" selected>7</option>
                                     <option value="8">8</option>
                                     <option value="9">9</option>
                                 </select>
@@ -3580,6 +3601,24 @@
                                     <span id="val-netproc-total" class="bank-value-display">₱0.00</span>
                                     <span id="lbl-netproc-tap-hint"><i class="bi bi-clipboard" style="font-size:0.55rem;"></i> tap to copy</span>
                                 </div>
+                            </div>
+
+                            <!-- (2026-07-13) Billing Type Row; prev: in NetPay Computation card -->
+                            <div class="baseline-row pt-1 mb-0" id="row-billing-type" style="font-size: 0.72rem; font-weight: 700; color: rgba(255, 255, 255, 0.45); display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed rgba(255,255,255,0.05); margin-top: 4px;">
+                                <span class="netpay-label"><i class="bi bi-receipt-cutoff text-muted mr-2"></i>BILLING TYPE</span>
+                                <span id="val-billing-type" style="color: #10B981; font-weight: 800; padding-right: 0px !important;">NEW BILLING</span>
+                            </div>
+
+                            <!-- (2026-07-13) Bill 1 Row; prev: none -->
+                            <div class="baseline-row pt-1 mb-0" id="row-bill-one" style="font-size: 0.72rem; font-weight: 700; color: rgba(255, 255, 255, 0.45); display: none !important; justify-content: space-between; align-items: center; margin-top: 2px;">
+                                <span class="netpay-label" style="padding-left: 15px;"><i class="bi bi-arrow-return-right text-muted mr-2"></i>BILL 1</span>
+                                <span id="val-bill-one" style="color: rgba(255, 255, 255, 0.8); font-weight: 700; padding-right: 0px !important;">₱0.00</span>
+                            </div>
+
+                            <!-- (2026-07-13) Bill 2 Row; prev: none -->
+                            <div class="baseline-row pt-1 mb-0" id="row-bill-two" style="font-size: 0.72rem; font-weight: 700; color: rgba(255, 255, 255, 0.45); display: none !important; justify-content: space-between; align-items: center; margin-top: 2px;">
+                                <span class="netpay-label" style="padding-left: 15px;"><i class="bi bi-arrow-return-right text-muted mr-2"></i>BILL 2</span>
+                                <span id="val-bill-two" style="color: rgba(255, 255, 255, 0.8); font-weight: 700; padding-right: 0px !important;">₱0.00</span>
                             </div>
                         </div>
                     </div>
@@ -6112,10 +6151,17 @@
                         rowEl.style.justifyContent = 'space-between';
                         rowEl.onmouseover = () => { rowEl.style.background = 'rgba(255, 255, 255, 0.05)'; };
                         rowEl.onmouseout = () => { rowEl.style.background = 'transparent'; };
-                        rowEl.onclick = () => { addPliToLessOldRedemption(pli.slot); };
+                        const isAdded = window.activeSession.addedNetprocRedemptions && window.activeSession.addedNetprocRedemptions[pli.slot];
+                        rowEl.onclick = () => {
+                            if (isAdded) {
+                                removePliFromLessOldRedemption(pli.slot);
+                            } else {
+                                addPliToLessOldRedemption(pli.slot);
+                            }
+                        };
                         rowEl.innerHTML = `
-                            <span style="display: flex; align-items: center; gap: 4px;">
-                                <i class="bi bi-plus-circle text-success" style="font-size: 0.85rem;"></i>
+                            <span style="display: flex; align-items: center; gap: 6px;">
+                                <i class="bi ${isAdded ? 'bi-check-circle-fill' : 'bi-plus-circle'} text-success" style="font-size: 0.85rem;"></i>
                                 ${pli.label}
                             </span>
                             <span class="tabular-nums font-weight-bold text-white">${formatPHP(pli.value)}</span>
@@ -6149,6 +6195,7 @@
                         redemptionTbody.innerHTML = addedPlis.map(pli => {
                             const savedVal = window.activeSession.netprocRedemptionInputs[pli.slot];
                             const inputVal = savedVal !== undefined ? savedVal : 0;
+                            const displayVal = inputVal > 0 ? fmtWithCommas(inputVal) : '';
                             
                             return `
                                 <div class="receipt-row align-items-center" style="display: flex; justify-content: space-between; width: 100%;">
@@ -6157,8 +6204,8 @@
                                         <i class="bi bi-trash3 text-danger mr-2" style="cursor: pointer; font-size: 0.65rem;" onclick="removePliFromLessOldRedemption(${pli.slot})"></i>
                                         <span style="font-size: 0.58rem; font-weight: 500;">${pli.label}</span>
                                     </div>
-                                    <!-- (2026-07-13) Make input thicker; prev: height 16px, font 0.58 -->
-                                    <input type="number" step="0.01" id="input-netproc-redemption-amount-${pli.slot}" class="form-control bank-input input-sm tabular-nums text-right font-weight-bold" style="width: 100px !important; background: rgba(0,0,0,0.3) !important; border: 1px solid rgba(255,255,255,0.1) !important; color: white !important; height: 22px !important; min-height: 22px !important; padding: 2px 6px !important; font-size: 0.75rem !important; border-radius: 4px !important; margin-left: auto !important;" value="${inputVal}" oninput="if(!window.activeSession.netprocRedemptionInputs)window.activeSession.netprocRedemptionInputs={};window.activeSession.netprocRedemptionInputs[${pli.slot}]=safeFloat(this.value);calculateNetProceeds()">
+                                    <!-- (2026-07-13) Make input thicker with text-type comma formatting; prev: type=number -->
+                                    <input type="text" id="input-netproc-redemption-amount-${pli.slot}" class="form-control bank-input input-sm tabular-nums text-right font-weight-bold" style="width: 100px !important; background: rgba(0,0,0,0.3) !important; border: 1px solid rgba(255,255,255,0.1) !important; color: white !important; height: 22px !important; min-height: 22px !important; padding: 2px 6px !important; font-size: 0.75rem !important; border-radius: 4px !important; margin-left: auto !important;" value="${displayVal}" oninput="if(!window.activeSession.netprocRedemptionInputs)window.activeSession.netprocRedemptionInputs={};window.activeSession.netprocRedemptionInputs[${pli.slot}]=safeFloat(this.value.replace(/,/g,''));formatNumberInput(this);calculateNetProceeds()">
                                 </div>
                             `;
                         }).join('');
@@ -6168,7 +6215,7 @@
                             if (inputEl && document.activeElement !== inputEl) {
                                 const savedVal = window.activeSession.netprocRedemptionInputs[pli.slot];
                                 const inputVal = savedVal !== undefined ? savedVal : 0;
-                                inputEl.value = inputVal;
+                                inputEl.value = inputVal > 0 ? fmtWithCommas(inputVal) : '';
                             }
                         });
                     }
@@ -6317,7 +6364,7 @@
             }
 
             // [2026-07-11 New: Calculate and display the revised baseline (Subtotal + PLIs - Less OnQueue - Less Incoming) addition dynamically]
-            revisedBaseline = baselineSubVal + papSubtotal - activeOnqSum - incoming;
+            revisedBaseline = Math.round((baselineSubVal + papSubtotal - activeOnqSum - incoming) * 100) / 100;
             const valRevisedEl = document.getElementById('val-revised-baseline');
             if (valRevisedEl) {
                 valRevisedEl.innerHTML = formatPHP(revisedBaseline);
@@ -6327,14 +6374,35 @@
                 panelRevisedEl.style.setProperty('display', 'flex', 'important');
             }
 
-            // (2026-07-13) Compute suggestion BEFORE PMT so amortization uses correct loan; prev: suggestion was at end
-            // Formula: netpay + dedamt + pliSubtotal + anticipated + promotion - onqueue - incoming - 5300
+            // (2026-07-13) Compute suggestion BEFORE PMT so amortization uses correct loan using exact limit solver; prev: cap/20.01 approximation
             {
-                const _cap = netPayVal + posSum + pliSubtotal
-                           + (useAnticipated ? anticipatedVal : 0)
-                           + (usePromotion   ? promotionMargin : 0)
-                           - activeOnqSum - incoming - 5300;
-                const _suggested = Math.max(0, Math.floor(_cap / 20.01) * 1000);
+                let capacityLimit = 5300.00;
+                if (interestRate === 9.66) {
+                    capacityLimit = 5000.00;
+                }
+                const requiredAmort = Math.round((revisedBaseline - capacityLimit) * 100) / 100;
+                
+                let exactP = 0;
+                let _suggested = 0;
+                if (requiredAmort > 0 && loanTerm > 0 && interestRate > 0) {
+                    const r = interestRate / 100 / 12;
+                    exactP = requiredAmort * (1 - Math.pow(1 + r, -loanTerm)) / r;
+                    
+                    let bestP = exactP;
+                    for (let iter = 0; iter < 100; iter++) {
+                        const rawPmt = calculatePMT(r, loanTerm, bestP);
+                        const actualAmort = Math.ceil(parseFloat(rawPmt.toFixed(6)) * 100) / 100;
+                        const diff = actualAmort - requiredAmort;
+                        if (Math.abs(diff) < 0.0001) {
+                            break;
+                        }
+                        bestP = bestP - diff * (exactP / requiredAmort);
+                    }
+                    
+                    _suggested = Math.floor(bestP / 1000) * 1000;
+                    if (_suggested < 0) _suggested = 0;
+                }
+
                 const _hintEl = document.getElementById('lbl-loan-capacity-hint');
                 if (_hintEl) _hintEl.textContent = `ESTIMATED: ₱${_suggested.toLocaleString('en')}`;
                 const _loanInp = document.getElementById('loanAmount');
@@ -6362,8 +6430,8 @@
              const totalInterest = Math.max(0, totalRepayment - loanAmount);
              const monthlyInterest = totalInterest / loanTerm;
              document.getElementById('lbl-total-interest').innerHTML = `
-                 <div><i class="bi bi-calculator text-muted mr-1" style="font-size: 0.75rem;"></i>Est. Interest: <strong style="color: rgba(255,255,255,0.65);">${formatPHP(totalInterest)}</strong></div>
-                 <div style="margin-top: 1px;"><i class="bi bi-calendar3 text-muted mr-1" style="font-size: 0.75rem;"></i>Est. Interest per month: <strong style="color: rgba(255,255,255,0.65);">${formatPHP(monthlyInterest)}</strong></div>
+                 <div style="color: rgba(255,255,255,0.3); font-size: 0.65rem;"><i class="bi bi-calculator mr-1" style="opacity: 0.4;"></i>Est. Interest: <strong style="color: rgba(255,255,255,0.45); font-weight: 500;">${formatPHP(totalInterest)}</strong></div>
+                 <div style="margin-top: 1px; color: rgba(255,255,255,0.3); font-size: 0.65rem;"><i class="bi bi-calendar3 mr-1" style="opacity: 0.4;"></i>Est. Interest per month: <strong style="color: rgba(255,255,255,0.45); font-weight: 500;">${formatPHP(monthlyInterest)}</strong></div>
              `;
 
             // Determine final New NetPay
@@ -6374,12 +6442,25 @@
             const netPayElement = document.getElementById('val-newnetpay');
             netPayElement.innerHTML = formatPHP(newNetPay);
 
-            // [2026-07-12 Fix: Determine statutory limit threshold dynamically based on active interest rate]
+            // [2026-07-12 Fix: Determine statutory limit threshold dynamically based on active interest rate or user custom input]
             let thresholdLimit = 5300.00;
             const warningMsg = `<i class="bi bi-exclamation-triangle-fill"></i> Cannot be accommodated`;
 
             if (interestRate === 9.66) {
                 thresholdLimit = 5000.00;
+            }
+            const limitInput = document.getElementById('input-target-limit');
+            if (limitInput) {
+                if (limitInput.dataset.manual === '1') {
+                    thresholdLimit = safeFloat(limitInput.value);
+                } else {
+                    limitInput.value = thresholdLimit;
+                }
+            }
+
+            const adjustLnk = document.getElementById('lnk-adjust-loan-netpay');
+            if (adjustLnk) {
+                adjustLnk.innerHTML = `<i class="bi bi-magic mr-1"></i>Fit ₱${thresholdLimit.toLocaleString()} Limit`;
             }
 
             // [2026-07-11 New: Update Final New Net Pay display value in NetPay Computation block]
@@ -6404,6 +6485,51 @@
                     if (finalIcon) {
                         finalIcon.className = 'bi bi-check-circle-fill text-success mr-2';
                     }
+                }
+            }
+
+            // (2026-07-13) Update Billing Type, Bill 1, and Bill 2 calculations; prev: only Billing Type
+            const valBillingType = document.getElementById('val-billing-type');
+            if (valBillingType) {
+                const isRedemptionOn = isAutonomous ? (document.getElementById('toggleLessOldRedemptionManual') ? document.getElementById('toggleLessOldRedemptionManual').checked : true) : useMasterPli;
+                const redemptionVal = isAutonomous ? safeFloat(document.getElementById('input-redemption').value) : pliSubtotal;
+                
+                // (2026-07-13) Must only be standard redemptions (Redemption 1, 2, 3...) to count as Split Billing; Double Deduction is excluded
+                const isDoubleDeduction = isAutonomous ? (lblAuto && lblAuto.dataset.doubled === '1') : (!hasOtherPliChecked);
+                const hasRedemption = isRedemptionOn && (redemptionVal > 0) && !isDoubleDeduction;
+                
+                const anticipatedActive = isAutonomous ? (safeFloat(document.getElementById('input-anticipated').value) > 0) : (useAnticipated && anticipatedVal > 0);
+                const promoActive = isAutonomous ? (safeFloat(document.getElementById('input-promotion').value) > 0) : (usePromotion && promotionMargin > 0);
+                
+                const isSplitBilling = hasRedemption && (anticipatedActive || promoActive);
+                
+                const rowBillOne = document.getElementById('row-bill-one');
+                const rowBillTwo = document.getElementById('row-bill-two');
+                
+                if (isSplitBilling) {
+                    valBillingType.textContent = 'SPLIT BILLING';
+                    valBillingType.style.setProperty('color', '#F97316', 'important'); // Orange
+                    
+                    // BILL 1: id="lbl-netpay" + id="lbl-dedamt" + id="val-baseline-papsubtotal" - 5050
+                    const lblNetPayVal = safeFloat(document.getElementById('lbl-netpay') ? document.getElementById('lbl-netpay').textContent.replace(/[^0-9.]/g, '') : '0');
+                    const lblDedAmtVal = safeFloat(document.getElementById('lbl-dedamt') ? document.getElementById('lbl-dedamt').textContent.replace(/[^0-9.]/g, '') : '0');
+                    const valBaselinePapSubtotalVal = safeFloat(document.getElementById('val-baseline-papsubtotal') ? document.getElementById('val-baseline-papsubtotal').textContent.replace(/[^0-9.]/g, '') : '0');
+                    
+                    const billoneAmount = Math.round((lblNetPayVal + lblDedAmtVal + valBaselinePapSubtotalVal - 5050) * 100) / 100;
+                    const billtwoAmount = Math.round((amortization - billoneAmount) * 100) / 100;
+                    
+                    const valBillOne = document.getElementById('val-bill-one');
+                    const valBillTwo = document.getElementById('val-bill-two');
+                    if (valBillOne) valBillOne.innerHTML = formatPHP(billoneAmount);
+                    if (valBillTwo) valBillTwo.innerHTML = formatPHP(billtwoAmount);
+                    
+                    if (rowBillOne) rowBillOne.style.setProperty('display', 'flex', 'important');
+                    if (rowBillTwo) rowBillTwo.style.setProperty('display', 'flex', 'important');
+                } else {
+                    valBillingType.textContent = 'NEW BILLING';
+                    valBillingType.style.setProperty('color', '#10B981', 'important'); // Green
+                    if (rowBillOne) rowBillOne.style.setProperty('display', 'none', 'important');
+                    if (rowBillTwo) rowBillTwo.style.setProperty('display', 'none', 'important');
                 }
             }
 
@@ -6502,6 +6628,15 @@
             if (lblBarPli) lblBarPli.textContent = `${pctPli.toFixed(1)}%`;
 
             // (2026-07-13) Suggestion already applied before PMT; just save + calc; prev: suggestion block was here
+            window.activeSession.revisedBaseline = revisedBaseline;
+            const stickyValLoanEl = document.getElementById('sticky-val-loan-amount');
+            if (stickyValLoanEl) {
+                stickyValLoanEl.innerHTML = formatPHP(loanAmount);
+            }
+            const stickyValLoanElMobile = document.getElementById('sticky-val-loan-amount-mobile');
+            if (stickyValLoanElMobile) {
+                stickyValLoanElMobile.innerHTML = formatPHP(loanAmount);
+            }
             saveActiveEvaluationState();
             calculateNetProceeds();
         }
@@ -6580,7 +6715,7 @@
                         let pliSubtotal = 0;
                         addedPlis.forEach(pli => {
                             const inputEl = document.getElementById('input-netproc-redemption-amount-' + pli.slot);
-                            const val = inputEl ? safeFloat(inputEl.value) : (window.activeSession.netprocRedemptionInputs && window.activeSession.netprocRedemptionInputs[pli.slot] !== undefined ? window.activeSession.netprocRedemptionInputs[pli.slot] : 0);
+                            const val = inputEl ? safeFloat(inputEl.value.replace(/,/g, '')) : (window.activeSession.netprocRedemptionInputs && window.activeSession.netprocRedemptionInputs[pli.slot] !== undefined ? window.activeSession.netprocRedemptionInputs[pli.slot] : 0);
                             pliSubtotal += val;
                         });
                         activePliSubtotal = Math.round(pliSubtotal * 100) / 100;
@@ -6620,8 +6755,9 @@
                 amortization = Math.ceil(parseFloat(rawPmt.toFixed(6)) * 100) / 100;
             }
 
-            // (2026-07-13) Advance payment = amortization × months only; prev: subtracted oldDeduction+baselinePliSum from basis
-            const advancePayment = Math.round(amortization * advanceMonths * 100) / 100;
+            // (2026-07-13) Advance payment = (new amortization - baseline CSB deduction sum - checked redemptions subtotal) * months; prev: amortization * months
+            const basis = Math.max(0, amortization - oldDeduction - baselinePliSum);
+            const advancePayment = Math.round(basis * advanceMonths * 100) / 100;
 
             // Final net proceeds
             const netProceeds = Math.round((loanProceeds - oldBalance - activePliSubtotal - advancePayment) * 100) / 100;
@@ -6663,6 +6799,75 @@
             }
 
             saveActiveEvaluationState();
+        }
+
+        // (2026-07-13) Auto-adjust loanAmount to hit threshold limit exactly; prev: none
+        function adjustLoanForExactThreshold() {
+            if (!window.activeSession) return;
+            const modeSelect = document.getElementById('evaluationModeSelect');
+            const mode = modeSelect ? modeSelect.value : 'DEPED';
+            const isAutonomous = (mode === 'AUTONOMOUS');
+            
+            const interestRate = getInterestRateValue();
+            const limitInput = document.getElementById('input-target-limit');
+            let thresholdLimit = 5300.00;
+            if (interestRate === 9.66) {
+                thresholdLimit = 5000.00;
+            }
+            if (limitInput && limitInput.value) {
+                thresholdLimit = safeFloat(limitInput.value);
+            }
+            
+            // Round revisedBaseline to 2 decimal places to prevent floating point inaccuracies
+            const rawBaseline = window.activeSession.revisedBaseline || 0;
+            const revisedBaseline = Math.round(rawBaseline * 100) / 100;
+            
+            const requiredAmort = Math.round((revisedBaseline - thresholdLimit) * 100) / 100;
+            if (requiredAmort <= 0) {
+                alert("Cannot accommodate: revised baseline is already below the limit.");
+                return;
+            }
+            
+            const loanTerm = safeInt(document.getElementById('loanTerm').value);
+            if (loanTerm <= 0) return;
+            
+            const r = interestRate / 100 / 12;
+            
+            // Initial analytical guess for P: P = PMT * (1 - (1+r)^-n) / r
+            let exactP = requiredAmort * (1 - Math.pow(1 + r, -loanTerm)) / r;
+            
+            // Numerical refinement to guarantee EXACT match with Math.ceil rounding
+            let bestP = exactP;
+            for (let iter = 0; iter < 100; iter++) {
+                const rawPmt = calculatePMT(r, loanTerm, bestP);
+                const actualAmort = Math.ceil(parseFloat(rawPmt.toFixed(6)) * 100) / 100;
+                const diff = actualAmort - requiredAmort;
+                if (Math.abs(diff) < 0.0001) {
+                    break;
+                }
+                bestP = bestP - diff * (exactP / requiredAmort);
+            }
+            
+            // (2026-07-13) Round down to the nearest 1,000 to keep net pay safely above threshold; prev: exact decimals
+            let roundedP = Math.floor(bestP / 1000) * 1000;
+            if (roundedP < 0) roundedP = 0;
+            
+            const loanInput = document.getElementById('loanAmount');
+            if (loanInput) {
+                loanInput.dataset.manualOverride = '1';
+                loanInput.value = roundedP.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                formatLoanAmountField();
+                runCalculations();
+            }
+        }
+
+        // (2026-07-13) Set manual flag on target limit input; prev: none
+        function onTargetLimitInput() {
+            const inp = document.getElementById('input-target-limit');
+            if (inp) {
+                inp.dataset.manual = '1';
+            }
+            runCalculations();
         }
 
         // [2026-07-11 New: Toggle handler for Anticipated — updates label color when toggled]
@@ -6764,6 +6969,11 @@
                     wrapper.classList.add('d-none');
                 }
             }
+            // (2026-07-13) Reset custom limit manual override flag when rate changes; prev: none
+            const limitInput = document.getElementById('input-target-limit');
+            if (limitInput) {
+                limitInput.dataset.manual = '0';
+            }
         }
 
         // [2026-07-11 New: Retrieves the active interest rate value (preset or custom input value)]
@@ -6842,8 +7052,8 @@
                 netprocOldBalance: document.getElementById('input-netproc-old-balance') ? document.getElementById('input-netproc-old-balance').value : "0",
                 // (2026-07-13) Save manual redemption input; prev: table values
                 netprocRedemptionManual: document.getElementById('val-netproc-redemption-manual-total') ? document.getElementById('val-netproc-redemption-manual-total').value : "0",
-                // (2026-07-13) Set advance months default value to "0"; prev: "3"
-                netprocAdvanceMonths: document.getElementById('select-netproc-advance-months') ? document.getElementById('select-netproc-advance-months').value : "0",
+                // (2026-07-13) Set advance months default value to "7"; prev: "0"
+                netprocAdvanceMonths: document.getElementById('select-netproc-advance-months') ? document.getElementById('select-netproc-advance-months').value : "7",
                 // (2026-07-13) Save netproc-redemption-cb checked state; prev: netproc-deduction-cb
                 netprocRedemptionSelections: (() => {
                     const selections = [];
