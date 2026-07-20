@@ -7214,7 +7214,7 @@
             localStorage.setItem('le_active_state', JSON.stringify(activeState));
         }
 
-        // (2026-07-13) Format and send evaluation cards via email & copy HTML snippet; prev: literal body tag broke html script parser
+        // (2026-07-13) Format and send evaluation cards via email & copy HTML snippet (includes profile card); prev: no profile card
         function sendEvaluationEmail() {
             if (!window.activeSession) {
                 showCustomAlert("Please run a successful employee lookup or enter Autonomous Mode first.");
@@ -7222,6 +7222,12 @@
             }
 
             const empNum = window.activeSession.empNum || document.getElementById('employeeNumber')?.value.trim() || 'N/A';
+            const clientName = document.getElementById('lbl-profile-name')?.innerText || (window.activeSession ? window.activeSession.accountName : '') || 'N/A';
+            const stationSchool = document.getElementById('lbl-profile-school')?.innerText || (window.activeSession ? window.activeSession.groupName : '') || 'N/A';
+            const phoneNumber = document.getElementById('lbl-profile-contact')?.innerText || (window.activeSession ? window.activeSession.contactNum : '') || 'N/A';
+            const branchName = document.getElementById('lbl-profile-branch')?.innerText || (window.activeSession ? window.activeSession.branchName : '') || 'N/A';
+            const evalMode = document.getElementById('evaluationModeSelect')?.value || 'DEPED';
+
             const loanAmt = document.getElementById('loanAmount')?.value || '0';
             const loanTerm = document.getElementById('loanTerm')?.value || '60';
             const interestRate = getInterestRateValue() + '%';
@@ -7246,6 +7252,14 @@
             const plainText = [
                 'CSB LOAN EVALUATION SUMMARY',
                 'Employee No: ' + empNum,
+                '',
+                '--- CLIENT PROFILE ---',
+                'Client Name: ' + clientName,
+                'Station / School: ' + stationSchool,
+                'Employee Number: ' + empNum,
+                'Phone Number: ' + phoneNumber,
+                'Branch: ' + branchName,
+                'Evaluation Mode: ' + evalMode,
                 '',
                 '--- LOAN SETUP & CAPITAL BASE ---',
                 'Loan Amount: ₱' + loanAmt,
@@ -7277,6 +7291,19 @@
                 '  <div style="max-width:580px; margin:0 auto; background:#0B0F19; border:1px solid rgba(245,158,11,0.3); border-radius:12px; padding:24px;">',
                 '    <h2 style="color:#F59E0B; font-size:18px; margin-top:0; margin-bottom:4px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px;">CSB Loan Evaluation Summary</h2>',
                 '    <p style="color:#94A3B8; font-size:13px; margin-top:6px; margin-bottom:18px;">Employee ID: <strong style="color:#FFFFFF;">' + empNum + '</strong></p>',
+                '    <!-- CLIENT PROFILE -->',
+                '    <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:14px; margin-bottom:14px;">',
+                '      <div style="color:#F59E0B; font-size:12px; font-weight:700; text-transform:uppercase; margin-bottom:10px;">CLIENT PROFILE</div>',
+                '      <table style="width:100%; font-size:13px; border-collapse:collapse;">',
+                '        <tr><td style="color:#94A3B8; padding:4px 0;">Client Name</td><td style="text-align:right; font-weight:700; color:#FFF;">' + clientName + '</td></tr>',
+                '        <tr><td style="color:#94A3B8; padding:4px 0;">Station / School</td><td style="text-align:right; color:#FFF;">' + stationSchool + '</td></tr>',
+                '        <tr><td style="color:#94A3B8; padding:4px 0;">Employee Number</td><td style="text-align:right; font-weight:700; color:#FFF;">' + empNum + '</td></tr>',
+                '        <tr><td style="color:#94A3B8; padding:4px 0;">Phone Number</td><td style="text-align:right; color:#FFF;">' + phoneNumber + '</td></tr>',
+                '        <tr><td style="color:#94A3B8; padding:4px 0;">Branch</td><td style="text-align:right; color:#FFF;">' + branchName + '</td></tr>',
+                '        <tr><td style="color:#94A3B8; padding:4px 0;">Evaluation Mode</td><td style="text-align:right; font-weight:700; color:#10B981;">' + evalMode + '</td></tr>',
+                '      </table>',
+                '    </div>',
+                '    <!-- LOAN SETUP -->',
                 '    <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:14px; margin-bottom:14px;">',
                 '      <div style="color:#F59E0B; font-size:12px; font-weight:700; text-transform:uppercase; margin-bottom:10px;">LOAN AMOUNT</div>',
                 '      <table style="width:100%; font-size:13px; border-collapse:collapse;">',
@@ -7286,6 +7313,7 @@
                 '      </table>',
                 '      <div style="font-size:11px; color:#64748B; margin-top:6px;">' + totalInterestText + '</div>',
                 '    </div>',
+                '    <!-- NETPAY COMPUTATION -->',
                 '    <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:14px; margin-bottom:14px;">',
                 '      <div style="color:#F59E0B; font-size:12px; font-weight:700; text-transform:uppercase; margin-bottom:10px;">NETPAY COMPUTATION</div>',
                 '      <table style="width:100%; font-size:13px; border-collapse:collapse;">',
@@ -7302,6 +7330,7 @@
                 '        <span style="color:#10B981; font-weight:800; font-size:15px; font-family:Consolas,monospace;">' + newNetPay + '</span>',
                 '      </div>',
                 '    </div>',
+                '    <!-- NET PROCEEDS -->',
                 '    <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:14px;">',
                 '      <div style="color:#F59E0B; font-size:12px; font-weight:700; text-transform:uppercase; margin-bottom:10px;">NET PROCEEDS</div>',
                 '      <table style="width:100%; font-size:13px; border-collapse:collapse;">',
