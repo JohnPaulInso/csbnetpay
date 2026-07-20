@@ -4092,15 +4092,15 @@
                         </div>
                     </div>
                 </div>
-            <!-- (2026-07-13) Email Summary Rendered HTML Preview Modal; prev: none -->
-            <div class="modal fade" id="emailSummaryModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <!-- (2026-07-13) Email Summary Rendered HTML Preview Modal with explicit close handler; prev: data-dismiss only -->
+            <div class="modal fade" id="emailSummaryModal" tabindex="-1" role="dialog" aria-hidden="true" onclick="if(event.target === this) closeEmailSummaryModal();">
                 <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                     <div class="modal-content" style="background: #080c19; border: 1px solid rgba(245,158,11,0.4); border-radius: 16px; color: #f0f4f8;">
                         <div class="modal-header" style="border-bottom: 1px solid rgba(255,255,255,0.1); padding: 16px 24px;">
                             <h5 class="modal-title font-weight-bold" style="color: #F59E0B; font-size: 1.05rem;">
                                 <i class="bi bi-envelope-paper-fill mr-2"></i> HTML Email Summary Preview
                             </h5>
-                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close" style="opacity: 0.8;">
+                            <button type="button" class="close text-white" onclick="closeEmailSummaryModal()" aria-label="Close" style="opacity: 0.8; cursor: pointer;">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -4114,7 +4114,7 @@
                             <button type="button" class="btn btn-sm font-weight-bold" onclick="triggerMailtoLink()" style="background: rgba(255,255,255,0.1); color: #E2E8F0; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; padding: 8px 18px;">
                                 <i class="bi bi-envelope-arrow-up mr-1.5"></i> OPEN MAIL APP
                             </button>
-                            <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="closeEmailSummaryModal()">Close</button>
                         </div>
                     </div>
                 </div>
@@ -7432,13 +7432,27 @@
             }
         }
 
-        // (2026-07-13) Modal action helpers for email summary; prev: none
+        // (2026-07-13) Modal action helpers for email summary & explicit closing; prev: no close helper
+        function closeEmailSummaryModal() {
+            const modal = document.getElementById('emailSummaryModal');
+            if (modal) {
+                if (typeof $ !== 'undefined' && typeof $('#emailSummaryModal').modal === 'function') {
+                    $('#emailSummaryModal').modal('hide');
+                }
+                modal.style.display = 'none';
+                modal.classList.remove('show');
+                document.body.classList.remove('modal-open');
+                const backdrop = document.querySelector('.modal-backdrop');
+                if (backdrop) backdrop.remove();
+            }
+        }
+
         function copyEmailHtmlSnippet() {
             if (window.currentEmailHtml && navigator.clipboard) {
                 const blobHtml = new Blob([window.currentEmailHtml], { type: 'text/html' });
                 const blobText = new Blob([window.currentEmailPlainText || ''], { type: 'text/plain' });
                 navigator.clipboard.write([new ClipboardItem({ 'text/html': blobHtml, 'text/plain': blobText })]).then(function() {
-                    showCustomAlert("HTML Snippet copied to clipboard! Paste into Outlook/Gmail.", "Copied");
+                    showCustomAlert("Rich HTML Cards copied to clipboard! Open your email and press Ctrl+V.", "Copied");
                 }).catch(function() {
                     navigator.clipboard.writeText(window.currentEmailPlainText || '');
                     showCustomAlert("Text summary copied to clipboard!", "Copied");
