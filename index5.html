@@ -6918,7 +6918,14 @@
             
             const requiredAmort = Math.round((revisedBaseline - thresholdLimit) * 100) / 100;
             if (requiredAmort <= 0) {
-                alert("Cannot accommodate: revised baseline is already below the limit.");
+                // (2026-07-13) Set loan to 0 and recalculate on below-threshold limit fit; prev: raw alert only
+                const loanInput = document.getElementById('loanAmount');
+                if (loanInput) {
+                    loanInput.value = "0";
+                    loanInput.dataset.manualOverride = '1';
+                }
+                runCalculations();
+                showCustomAlert("Cannot accommodate: Revised baseline (₱" + revisedBaseline.toLocaleString('en-US', {minimumFractionDigits:2}) + ") is below statutory limit (₱" + thresholdLimit.toLocaleString('en-US', {minimumFractionDigits:2}) + "). Loan amount set to ₱0.");
                 return;
             }
             
