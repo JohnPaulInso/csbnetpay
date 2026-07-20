@@ -314,12 +314,14 @@ let customerDataPromise = fetchCustomerData();
 document.addEventListener("DOMContentLoaded", function() {
     // Initial fetch started at top level
     
-    // Sync TTS switch with localStorage
+    // (2026-07-13) Sync TTS switch with localStorage (disabled by default); prev: enabled
     const ttsSwitch = document.getElementById('ttsSwitch');
     if (ttsSwitch) {
         const savedState = localStorage.getItem('ttsEnabled');
-        if (savedState !== null) {
-            ttsSwitch.checked = (savedState === 'true');
+        ttsSwitch.checked = (savedState === 'true');
+        const icon = ttsSwitch.nextElementSibling ? ttsSwitch.nextElementSibling.querySelector('.icon') : null;
+        if (icon) {
+            icon.className = ttsSwitch.checked ? "bi bi-volume-up-fill icon" : "bi bi-volume-mute-fill icon";
         }
         
         ttsSwitch.addEventListener('change', () => {
@@ -606,50 +608,19 @@ function displayResultsTablePos(allData) {
     const container = document.getElementById("resultspos");
     container.innerHTML = "";
 
+    // (2026-07-13) Pre-seed map in allData date order so missing months keep chronological position; prev: seed after
     const map = new Map();
+    allData.forEach(file => {
+        if (!map.has(file.monthName)) map.set(file.monthName, []);
+    });
 
     allData.forEach(file => {
         file.csvData.forEach((row, i) => {
-            /*
-             * CHANGE DETAILS:
-             * Element: displayResultsTablePos row filter
-             * Date: 2026-07-07
-             * Fix: Added Column H (row[7]) filter — only include rows where deduction code = 339.
-             *      Previously fetched ALL dedamt rows for an employee; now only sums 339-coded deductions.
-             *      row[3]  = Employee No
-             *      row[7]  = Deduction Code (Column H) — must equal "339"
-             *      row[13] = DEDAMT amount (Column N)
-             */
-            if (i === 0 || row[3] !== empNo) return;           // skip header and non-matching employees
-            if (parseInt(row[7], 10) !== 339) return;           // skip rows where Column H is NOT code 339 (handles "339" and "0339")
-
-            /*
-             * CHANGE DETAILS:
-             * Element: Column N (row[13]) amount parser — pos_ file fetch
-             * Date: 2026-07-07
-             * Fix: Strip commas before parseFloat so values like "11,541.97" parse correctly.
-             *      parseFloat("11,541.97") would silently return 11 without the strip.
-             *      Always sanitize: remove all commas, trim whitespace, then convert to number.
-             */
-            const amt = parseFloat(String(row[13]).replace(/,/g, '').trim()) || 0;  // strip commas → plain number
-
-            if (!map.has(file.monthName)) map.set(file.monthName, []);
+            if (i === 0 || row[3] !== empNo) return;
+            if (parseInt(row[7], 10) !== 339) return;
+            const amt = parseFloat(String(row[13]).replace(/,/g, '').trim()) || 0;
             map.get(file.monthName).push(amt);
         });
-    });
-
-    /*
-     * CHANGE DETAILS:
-     * Element: displayResultsTablePos — map pre-seeding
-     * Date: 2026-07-07
-     * Fix: Pre-seed the map with every fetched month set to [] so months with no
-     *      code-339 rows still appear in the table as ₱0.00 instead of being skipped.
-     *      The empty-check now only bails if the employee doesn't appear in any file.
-     */
-
-    // Step 1: seed every fetched month so they all appear in the table
-    allData.forEach(file => {
-        if (!map.has(file.monthName)) map.set(file.monthName, []);
     });
 
     // Step 2: only show "no results" if the employee has zero rows across all files
