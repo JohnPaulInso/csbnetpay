@@ -7237,14 +7237,9 @@
             localStorage.setItem('le_active_state', JSON.stringify(activeState));
         }
 
-        // (2026-07-13) Format and send evaluation cards via email & copy HTML snippet (includes profile card); prev: no profile card
+        // (2026-07-13) Format and send evaluation cards via email & copy HTML snippet (unconditional execution); prev: activeSession check blocked click
         function sendEvaluationEmail() {
-            if (!window.activeSession) {
-                showCustomAlert("Please run a successful employee lookup or enter Autonomous Mode first.");
-                return;
-            }
-
-            const empNum = window.activeSession.empNum || document.getElementById('employeeNumber')?.value.trim() || 'N/A';
+            const empNum = (window.activeSession ? window.activeSession.empNum : null) || document.getElementById('employeeNumber')?.value.trim() || 'N/A';
             const clientName = document.getElementById('lbl-profile-name')?.innerText || (window.activeSession ? window.activeSession.accountName : '') || 'N/A';
             const stationSchool = document.getElementById('lbl-profile-school')?.innerText || (window.activeSession ? window.activeSession.groupName : '') || 'N/A';
             const phoneNumber = document.getElementById('lbl-profile-contact')?.innerText || (window.activeSession ? window.activeSession.contactNum : '') || 'N/A';
@@ -7253,7 +7248,7 @@
 
             const loanAmt = document.getElementById('loanAmount')?.value || '0';
             const loanTerm = document.getElementById('loanTerm')?.value || '60';
-            const interestRate = getInterestRateValue() + '%';
+            const interestRate = (typeof getInterestRateValue === 'function' ? getInterestRateValue() : '7.5') + '%';
             const totalInterestText = document.getElementById('lbl-total-interest')?.innerText.replace(/\n/g, ' | ') || '';
 
             const currentNetPay = document.getElementById('lbl-netpay')?.innerText || '₱0.00';
@@ -7416,8 +7411,14 @@
                 modalBody.innerHTML = htmlContent;
             }
 
-            if (typeof $ !== 'undefined' && $('#emailSummaryModal').length) {
-                $('#emailSummaryModal').modal('show');
+            const emailModal = document.getElementById('emailSummaryModal');
+            if (emailModal) {
+                if (typeof $ !== 'undefined' && typeof $('#emailSummaryModal').modal === 'function') {
+                    $('#emailSummaryModal').modal('show');
+                } else {
+                    emailModal.style.display = 'block';
+                    emailModal.classList.add('show');
+                }
             }
 
             if (navigator.clipboard && window.ClipboardItem) {
