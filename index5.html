@@ -235,11 +235,18 @@
             transition: background-color 5000s ease-in-out 0s !important;
         }
 
-        /* (2026-07-13) Hide native select elements; prev: custom styles */
+        /* (2026-07-13) Hide native select elements strictly; prev: display:none only */
         select.bank-select,
         select.form-control.bank-select,
+        select#activeMonthSelect,
         .bank-select {
             display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            height: 0 !important;
+            width: 0 !important;
+            position: absolute !important;
+            pointer-events: none !important;
         }
 
         .bank-select.select-sm {
@@ -2781,6 +2788,7 @@
         }
 
         .custom-select-options {
+            display: none !important;
             position: absolute !important;
             top: calc(100% + 4px) !important;
             left: 0 !important;
@@ -2799,6 +2807,7 @@
         }
 
         .custom-select-wrapper.open .custom-select-options {
+            display: block !important;
             opacity: 1 !important;
             visibility: visible !important;
             transform: translateY(0) !important;
