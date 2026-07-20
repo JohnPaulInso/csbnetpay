@@ -7214,7 +7214,7 @@
             localStorage.setItem('le_active_state', JSON.stringify(activeState));
         }
 
-        // (2026-07-13) Format and send evaluation cards via email & copy HTML email template; prev: template string leak
+        // (2026-07-13) Format and send evaluation cards via email & copy HTML snippet; prev: literal body tag broke html script parser
         function sendEvaluationEmail() {
             if (!window.activeSession) {
                 showCustomAlert("Please run a successful employee lookup or enter Autonomous Mode first.");
@@ -7273,8 +7273,7 @@
             ].join('\n');
 
             const htmlContent = [
-                '<!DOCTYPE html><html><head><meta charset="utf-8"></head>',
-                '<body style="font-family:\'Segoe UI\',Helvetica,Arial,sans-serif; background-color:#080C1C; color:#F0F4F8; margin:0; padding:20px;">',
+                '<div style="font-family:\'Segoe UI\',Helvetica,Arial,sans-serif; background-color:#080C1C; color:#F0F4F8; padding:20px;">',
                 '  <div style="max-width:580px; margin:0 auto; background:#0B0F19; border:1px solid rgba(245,158,11,0.3); border-radius:12px; padding:24px;">',
                 '    <h2 style="color:#F59E0B; font-size:18px; margin-top:0; margin-bottom:4px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px;">CSB Loan Evaluation Summary</h2>',
                 '    <p style="color:#94A3B8; font-size:13px; margin-top:6px; margin-bottom:18px;">Employee ID: <strong style="color:#FFFFFF;">' + empNum + '</strong></p>',
@@ -7321,7 +7320,7 @@
                 '      </div>',
                 '    </div>',
                 '  </div>',
-                '</body></html>',
+                '</div>'
             ].join('\n');
 
             if (navigator.clipboard && window.ClipboardItem) {
