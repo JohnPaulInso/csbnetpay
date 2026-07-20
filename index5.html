@@ -4718,20 +4718,18 @@
                 }
             }
 
-            // (2026-07-13) Fill input only; no auto-search on page load; prev: await restoreActiveState(state)
-            const employeeNumber = localStorage.getItem("employeeNumber");
+            // (2026-07-13) Restore previous evaluation session on page reload; prev: fill input only
             const savedState = localStorage.getItem('le_active_state');
+            const employeeNumber = localStorage.getItem("employeeNumber");
             if (savedState) {
                 try {
                     const state = JSON.parse(savedState);
                     if (state && state.empNum) {
-                        const empInput = document.getElementById('employeeNumber');
-                        if (empInput) empInput.value = state.empNum;
-                        if (state.month && document.getElementById('activeMonthSelect')) {
-                            document.getElementById('activeMonthSelect').value = state.month;
-                        }
+                        await restoreActiveState(state);
                     }
-                } catch (e) {}
+                } catch (e) {
+                    console.warn('[Session] Failed to restore active state:', e);
+                }
             } else if (employeeNumber) {
                 const empInput = document.getElementById('employeeNumber');
                 if (empInput) empInput.value = employeeNumber;
