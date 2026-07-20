@@ -7214,7 +7214,7 @@
             localStorage.setItem('le_active_state', JSON.stringify(activeState));
         }
 
-        // (2026-07-13) Format and send evaluation cards via email & copy HTML email template; prev: none
+        // (2026-07-13) Format and send evaluation cards via email & copy HTML email template; prev: template string leak
         function sendEvaluationEmail() {
             if (!window.activeSession) {
                 showCustomAlert("Please run a successful employee lookup or enter Autonomous Mode first.");
@@ -7243,109 +7243,100 @@
             const netProceeds = document.getElementById('val-netproc-total')?.innerText || '₱0.00';
             const billingType = document.getElementById('val-billing-type')?.innerText || 'NEW BILLING';
 
-            const plainText = 
-`CSB LOAN EVALUATION SUMMARY
-Employee No: ${empNum}
+            const plainText = [
+                'CSB LOAN EVALUATION SUMMARY',
+                'Employee No: ' + empNum,
+                '',
+                '--- LOAN SETUP & CAPITAL BASE ---',
+                'Loan Amount: ₱' + loanAmt,
+                'Loan Term: ' + loanTerm + ' months',
+                'Interest Rate: ' + interestRate,
+                totalInterestText,
+                '',
+                '--- NETPAY COMPUTATION ---',
+                'Current Net Pay: ' + currentNetPay,
+                'CSB Deductions: ' + csbDeductions,
+                'Subtotal: ' + subtotal,
+                'Less OnQueue: ' + lessOnQueue,
+                'Less Incoming: ' + lessIncoming,
+                'Total Subtotal: ' + totalSubtotal,
+                'New CSB Amortization: ' + newAmort,
+                'New Net Pay: ' + newNetPay,
+                '',
+                '--- NET PROCEEDS ---',
+                'Loan Proceeds: ' + loanProceeds,
+                'Less Old Balance: ₱' + oldBalance,
+                'Advance Payment Months: ' + advanceMonths + ' months',
+                'Less Advance Payment: ' + lessAdvance,
+                'Net Proceeds: ' + netProceeds,
+                'Billing Type: ' + billingType
+            ].join('\n');
 
---- LOAN SETUP & CAPITAL BASE ---
-Loan Amount: ₱${loanAmt}
-Loan Term: ${loanTerm} months
-Interest Rate: ${interestRate}
-${totalInterestText}
-
---- NETPAY COMPUTATION ---
-Current Net Pay: ${currentNetPay}
-CSB Deductions: ${csbDeductions}
-Subtotal: ${subtotal}
-Less OnQueue: ${lessOnQueue}
-Less Incoming: ${lessIncoming}
-Total Subtotal: ${totalSubtotal}
-New CSB Amortization: ${newAmort}
-New Net Pay: ${newNetPay}
-
---- NET PROCEEDS ---
-Loan Proceeds: ${loanProceeds}
-Less Old Balance: ₱${oldBalance}
-Advance Payment Months: ${advanceMonths} months
-Less Advance Payment: ${lessAdvance}
-Net Proceeds: ${netProceeds}
-Billing Type: ${billingType}`;
-
-            const htmlContent = `
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-</head>
-<body style="font-family:'Segoe UI',Helvetica,Arial,sans-serif; background-color:#080C1C; color:#F0F4F8; margin:0; padding:20px;">
-  <div style="max-width:580px; margin:0 auto; background:#0B0F19; border:1px solid rgba(245,158,11,0.3); border-radius:12px; padding:24px;">
-    <h2 style="color:#F59E0B; font-size:18px; margin-top:0; margin-bottom:4px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px;">CSB Loan Evaluation Summary</h2>
-    <p style="color:#94A3B8; font-size:13px; margin-top:6px; margin-bottom:18px;">Employee ID: <strong style="color:#FFFFFF;">${empNum}</strong></p>
-
-    <!-- LOAN SETUP -->
-    <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:14px; margin-bottom:14px;">
-      <div style="color:#F59E0B; font-size:12px; font-weight:700; text-transform:uppercase; margin-bottom:10px;">LOAN AMOUNT</div>
-      <table style="width:100%; font-size:13px; border-collapse:collapse;">
-        <tr><td style="color:#94A3B8; padding:4px 0;">Loan Amount</td><td style="text-align:right; font-weight:700; color:#FFF;">₱${loanAmt}</td></tr>
-        <tr><td style="color:#94A3B8; padding:4px 0;">Loan Term</td><td style="text-align:right; font-weight:700; color:#FFF;">${loanTerm} months</td></tr>
-        <tr><td style="color:#94A3B8; padding:4px 0;">Interest Rate</td><td style="text-align:right; font-weight:700; color:#FFF;">${interestRate}</td></tr>
-      </table>
-      <div style="font-size:11px; color:#64748B; margin-top:6px;">${totalInterestText}</div>
-    </div>
-
-    <!-- NETPAY COMPUTATION -->
-    <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:14px; margin-bottom:14px;">
-      <div style="color:#F59E0B; font-size:12px; font-weight:700; text-transform:uppercase; margin-bottom:10px;">NETPAY COMPUTATION</div>
-      <table style="width:100%; font-size:13px; border-collapse:collapse;">
-        <tr><td style="color:#94A3B8; padding:4px 0;">Current Net Pay</td><td style="text-align:right; color:#FFF;">${currentNetPay}</td></tr>
-        <tr><td style="color:#94A3B8; padding:4px 0;">CSB Deductions</td><td style="text-align:right; color:#FFF;">${csbDeductions}</td></tr>
-        <tr><td style="color:#F59E0B; font-weight:700; padding:4px 0;">Subtotal</td><td style="text-align:right; font-weight:700; color:#F59E0B;">${subtotal}</td></tr>
-        <tr><td style="color:#94A3B8; padding:4px 0;">Less OnQueue</td><td style="text-align:right; color:#FFF;">${lessOnQueue}</td></tr>
-        <tr><td style="color:#94A3B8; padding:4px 0;">Less Incoming</td><td style="text-align:right; color:#FFF;">${lessIncoming}</td></tr>
-        <tr><td style="color:#FFF; font-weight:700; padding:4px 0;">Total Subtotal</td><td style="text-align:right; font-weight:700; color:#FFF;">${totalSubtotal}</td></tr>
-        <tr><td style="color:#94A3B8; padding:4px 0;">New CSB Amortization</td><td style="text-align:right; color:#FFF;">${newAmort}</td></tr>
-      </table>
-      <div style="background:rgba(16,185,129,0.15); border-radius:6px; padding:8px 12px; margin-top:8px; display:flex; justify-content:space-between; align-items:center;">
-        <span style="color:#10B981; font-weight:700; font-size:13px;">NEW NET PAY</span>
-        <span style="color:#10B981; font-weight:800; font-size:15px; font-family:Consolas,monospace;">${newNetPay}</span>
-      </div>
-    </div>
-
-    <!-- NET PROCEEDS -->
-    <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:14px;">
-      <div style="color:#F59E0B; font-size:12px; font-weight:700; text-transform:uppercase; margin-bottom:10px;">NET PROCEEDS</div>
-      <table style="width:100%; font-size:13px; border-collapse:collapse;">
-        <tr><td style="color:#94A3B8; padding:4px 0;">Loan Proceeds</td><td style="text-align:right; color:#FFF;">${loanProceeds}</td></tr>
-        <tr><td style="color:#94A3B8; padding:4px 0;">Less Old Balance</td><td style="text-align:right; color:#FFF;">₱${oldBalance}</td></tr>
-        <tr><td style="color:#94A3B8; padding:4px 0;">Advance Payment Months</td><td style="text-align:right; color:#FFF;">${advanceMonths} months</td></tr>
-        <tr><td style="color:#94A3B8; padding:4px 0;">Less Advance Payment</td><td style="text-align:right; color:#FFF;">${lessAdvance}</td></tr>
-      </table>
-      <div style="background:rgba(245,158,11,0.15); border-radius:6px; padding:8px 12px; margin-top:8px; display:flex; justify-content:space-between; align-items:center;">
-        <span style="color:#F59E0B; font-weight:700; font-size:13px;">NET PROCEEDS TOTAL</span>
-        <span style="color:#F59E0B; font-weight:800; font-size:15px; font-family:Consolas,monospace;">${netProceeds}</span>
-      </div>
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; font-size:12px;">
-        <span style="color:#94A3B8;">Billing Type</span>
-        <span style="color:#10B981; font-weight:700;">${billingType}</span>
-      </div>
-    </div>
-  </div>
-</body>
-</html>`;
+            const htmlContent = [
+                '<!DOCTYPE html><html><head><meta charset="utf-8"></head>',
+                '<body style="font-family:\'Segoe UI\',Helvetica,Arial,sans-serif; background-color:#080C1C; color:#F0F4F8; margin:0; padding:20px;">',
+                '  <div style="max-width:580px; margin:0 auto; background:#0B0F19; border:1px solid rgba(245,158,11,0.3); border-radius:12px; padding:24px;">',
+                '    <h2 style="color:#F59E0B; font-size:18px; margin-top:0; margin-bottom:4px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px;">CSB Loan Evaluation Summary</h2>',
+                '    <p style="color:#94A3B8; font-size:13px; margin-top:6px; margin-bottom:18px;">Employee ID: <strong style="color:#FFFFFF;">' + empNum + '</strong></p>',
+                '    <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:14px; margin-bottom:14px;">',
+                '      <div style="color:#F59E0B; font-size:12px; font-weight:700; text-transform:uppercase; margin-bottom:10px;">LOAN AMOUNT</div>',
+                '      <table style="width:100%; font-size:13px; border-collapse:collapse;">',
+                '        <tr><td style="color:#94A3B8; padding:4px 0;">Loan Amount</td><td style="text-align:right; font-weight:700; color:#FFF;">₱' + loanAmt + '</td></tr>',
+                '        <tr><td style="color:#94A3B8; padding:4px 0;">Loan Term</td><td style="text-align:right; font-weight:700; color:#FFF;">' + loanTerm + ' months</td></tr>',
+                '        <tr><td style="color:#94A3B8; padding:4px 0;">Interest Rate</td><td style="text-align:right; font-weight:700; color:#FFF;">' + interestRate + '</td></tr>',
+                '      </table>',
+                '      <div style="font-size:11px; color:#64748B; margin-top:6px;">' + totalInterestText + '</div>',
+                '    </div>',
+                '    <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:14px; margin-bottom:14px;">',
+                '      <div style="color:#F59E0B; font-size:12px; font-weight:700; text-transform:uppercase; margin-bottom:10px;">NETPAY COMPUTATION</div>',
+                '      <table style="width:100%; font-size:13px; border-collapse:collapse;">',
+                '        <tr><td style="color:#94A3B8; padding:4px 0;">Current Net Pay</td><td style="text-align:right; color:#FFF;">' + currentNetPay + '</td></tr>',
+                '        <tr><td style="color:#94A3B8; padding:4px 0;">CSB Deductions</td><td style="text-align:right; color:#FFF;">' + csbDeductions + '</td></tr>',
+                '        <tr><td style="color:#F59E0B; font-weight:700; padding:4px 0;">Subtotal</td><td style="text-align:right; font-weight:700; color:#F59E0B;">' + subtotal + '</td></tr>',
+                '        <tr><td style="color:#94A3B8; padding:4px 0;">Less OnQueue</td><td style="text-align:right; color:#FFF;">' + lessOnQueue + '</td></tr>',
+                '        <tr><td style="color:#94A3B8; padding:4px 0;">Less Incoming</td><td style="text-align:right; color:#FFF;">' + lessIncoming + '</td></tr>',
+                '        <tr><td style="color:#FFF; font-weight:700; padding:4px 0;">Total Subtotal</td><td style="text-align:right; font-weight:700; color:#FFF;">' + totalSubtotal + '</td></tr>',
+                '        <tr><td style="color:#94A3B8; padding:4px 0;">New CSB Amortization</td><td style="text-align:right; color:#FFF;">' + newAmort + '</td></tr>',
+                '      </table>',
+                '      <div style="background:rgba(16,185,129,0.15); border-radius:6px; padding:8px 12px; margin-top:8px; display:flex; justify-content:space-between; align-items:center;">',
+                '        <span style="color:#10B981; font-weight:700; font-size:13px;">NEW NET PAY</span>',
+                '        <span style="color:#10B981; font-weight:800; font-size:15px; font-family:Consolas,monospace;">' + newNetPay + '</span>',
+                '      </div>',
+                '    </div>',
+                '    <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:14px;">',
+                '      <div style="color:#F59E0B; font-size:12px; font-weight:700; text-transform:uppercase; margin-bottom:10px;">NET PROCEEDS</div>',
+                '      <table style="width:100%; font-size:13px; border-collapse:collapse;">',
+                '        <tr><td style="color:#94A3B8; padding:4px 0;">Loan Proceeds</td><td style="text-align:right; color:#FFF;">' + loanProceeds + '</td></tr>',
+                '        <tr><td style="color:#94A3B8; padding:4px 0;">Less Old Balance</td><td style="text-align:right; color:#FFF;">₱' + oldBalance + '</td></tr>',
+                '        <tr><td style="color:#94A3B8; padding:4px 0;">Advance Payment Months</td><td style="text-align:right; color:#FFF;">' + advanceMonths + ' months</td></tr>',
+                '        <tr><td style="color:#94A3B8; padding:4px 0;">Less Advance Payment</td><td style="text-align:right; color:#FFF;">' + lessAdvance + '</td></tr>',
+                '      </table>',
+                '      <div style="background:rgba(245,158,11,0.15); border-radius:6px; padding:8px 12px; margin-top:8px; display:flex; justify-content:space-between; align-items:center;">',
+                '        <span style="color:#F59E0B; font-weight:700; font-size:13px;">NET PROCEEDS TOTAL</span>',
+                '        <span style="color:#F59E0B; font-weight:800; font-size:15px; font-family:Consolas,monospace;">' + netProceeds + '</span>',
+                '      </div>',
+                '      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; font-size:12px;">',
+                '        <span style="color:#94A3B8;">Billing Type</span>',
+                '        <span style="color:#10B981; font-weight:700;">' + billingType + '</span>',
+                '      </div>',
+                '    </div>',
+                '  </div>',
+                '</body></html>'
+            ].join('\n');
 
             if (navigator.clipboard && window.ClipboardItem) {
                 const blobHtml = new Blob([htmlContent], { type: 'text/html' });
                 const blobText = new Blob([plainText], { type: 'text/plain' });
-                navigator.clipboard.write([new ClipboardItem({ 'text/html': blobHtml, 'text/plain': blobText })]).catch(() => {
+                navigator.clipboard.write([new ClipboardItem({ 'text/html': blobHtml, 'text/plain': blobText })]).catch(function() {
                     navigator.clipboard.writeText(plainText);
                 });
             } else if (navigator.clipboard) {
                 navigator.clipboard.writeText(plainText);
             }
 
-            const mailSubject = encodeURIComponent(`CSB Loan Evaluation - Employee #${empNum}`);
+            const mailSubject = encodeURIComponent('CSB Loan Evaluation - Employee #' + empNum);
             const mailBody = encodeURIComponent(plainText);
-            window.location.href = `mailto:?subject=${mailSubject}&body=${mailBody}`;
+            window.location.href = 'mailto:?subject=' + mailSubject + '&body=' + mailBody;
 
             showCustomAlert("Evaluation card details copied to clipboard & email application launched!", "Email Summary");
         }
