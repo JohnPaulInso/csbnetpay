@@ -833,15 +833,9 @@ async function displayEmployeeInfoOnq(monthName, csvData) {
                 });
             });
         } else {
-            // Render blank month row with DEDAMT = N/A and style muted
+            // (2026-07-13) Render blank cell for missing month; prev: N/A No Records
             monthRow.style.cursor = 'default';
-            monthRow.style.opacity = '0.7';
-            dedamtCell.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                    <span style="color: #888; font-weight: 500;">N/A</span>
-                    <span style="font-size: 0.75rem; color: #aaa; font-style: italic; margin-right: 0.2rem;">No Records</span>
-                </div>
-            `;
+            dedamtCell.innerHTML = ``;
             tbody.appendChild(monthRow);
         }
     });

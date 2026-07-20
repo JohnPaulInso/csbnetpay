@@ -183,7 +183,7 @@
                 });
 
                 if (empRows.length > 1) { // header + at least 1 data row
-                    filteredResults.push({ monthName: data.monthName, csvData: empRows, date: data.date });
+                    filteredResults.push({ monthName: data.monthName, csvData: empRows, date: data.date, isBlank: false });
                     filteredResults.sort((a, b) => b.date - a.date);
 
                     // Show first result immediately — don't wait for all files
@@ -191,13 +191,9 @@
                         displayEmployeeInfoNetpay(filteredResults[0].monthName, filteredResults[0].csvData);
                         firstResultShown = true;
                     }
-                    /*
-                     * CHANGE DETAILS:
-                     * Element: searchEmployeeNetpay loop display
-                     * Date: 2026-07-08
-                     * Fix: Removed displayResultsTableNetpay from loop to prevent table rendering
-                     *      and resetting pagination until fetching is fully completed.
-                     */
+                } else {
+                    // (2026-07-13) Retain missing month with isBlank true; prev: skipped month
+                    filteredResults.push({ monthName: data.monthName, csvData: [data.csvData[0] || []], date: data.date, isBlank: true });
                 }
             }
 
@@ -648,14 +644,16 @@
         let speechLines = [];
         let empNameForSpeech = '';
 
-        // Gather all matching rows first
+        // (2026-07-13) Gather matching rows or blank row for missing month; prev: matched rows only
         const allRows = [];
         fetchedDataNet.forEach(data => {
+            let foundMatch = false;
             data.csvData.forEach(row => {
                 if (row.length < 4) return;
 
                 const empno = row[3];
                 if (empno && searchEmpNo && empno.toString().replace(/^0+/, '') === searchEmpNo.toString().replace(/^0+/, '')) {
+                    foundMatch = true;
                     const cleanAmount = (row[7] || '0').replace(/[",]/g, '');
                     const takehomeVal = parseFloat(cleanAmount);
                     const takehome = takehomeVal.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
@@ -673,10 +671,20 @@
                     allRows.push({
                         monthName: data.monthName,
                         takehome: takehome,
-                        takehomeVal: takehomeVal
+                        takehomeVal: takehomeVal,
+                        isBlank: false
                     });
                 }
             });
+
+            if (!foundMatch) {
+                allRows.push({
+                    monthName: data.monthName,
+                    takehome: '',
+                    takehomeVal: 0,
+                    isBlank: true
+                });
+            }
         });
 
         // Pagination setup
@@ -695,7 +703,7 @@
 
                 const takehomeCell = document.createElement('td');
                 takehomeCell.setAttribute('data-label', 'TAKEHOME');
-                takehomeCell.innerHTML = `<b>${dataRow.takehome}</b>`;
+                takehomeCell.innerHTML = dataRow.isBlank ? `` : `<b>${dataRow.takehome}</b>`;
                 takehomeCell.classList.add('number-cell');
 
                 rowElement.appendChild(monthCell);

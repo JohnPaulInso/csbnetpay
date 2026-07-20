@@ -702,12 +702,10 @@ function displayResultsTablePos(allData) {
              *      render a dimmed ₱0.00 instead of skipping the month entirely.
              */
             if (item.vals.length === 0) {
-                // Month was uploaded but this employee had no code-339 deduction that month
+                // (2026-07-13) Render blank cell for missing month; prev: dimmed ₱0.00
                 tr.innerHTML = `
                     <td>${item.month}</td>
-                    <td style="text-align:right;color:#aaa;font-style:italic">
-                        <span title="No Code 339 deduction this month">₱0.00</span>
-                    </td>
+                    <td style="text-align:right"></td>
                 `;
             } else {
                 tr.innerHTML = `
