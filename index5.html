@@ -4092,10 +4092,33 @@
                         </div>
                     </div>
                 </div>
-                <!-- (2026-07-13) Pagination controls container; prev: none -->
-                <div id="historyPaginationControls" class="d-flex align-items-center justify-content-between mt-3 px-2"></div>
+            <!-- (2026-07-13) Email Summary Rendered HTML Preview Modal; prev: none -->
+            <div class="modal fade" id="emailSummaryModal" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                    <div class="modal-content" style="background: #080c19; border: 1px solid rgba(245,158,11,0.4); border-radius: 16px; color: #f0f4f8;">
+                        <div class="modal-header" style="border-bottom: 1px solid rgba(255,255,255,0.1); padding: 16px 24px;">
+                            <h5 class="modal-title font-weight-bold" style="color: #F59E0B; font-size: 1.05rem;">
+                                <i class="bi bi-envelope-paper-fill mr-2"></i> HTML Email Summary Preview
+                            </h5>
+                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close" style="opacity: 0.8;">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body" id="emailSummaryModalBody" style="padding: 24px; max-height: 75vh; overflow-y: auto;">
+                            <!-- Rendered HTML cards insert here -->
+                        </div>
+                        <div class="modal-footer" style="border-top: 1px solid rgba(255,255,255,0.1); padding: 14px 24px; gap: 10px;">
+                            <button type="button" class="btn btn-sm font-weight-bold" onclick="copyEmailHtmlSnippet()" style="background: linear-gradient(135deg, #F59E0B, #D97706); color: white; border: none; border-radius: 6px; padding: 8px 18px;">
+                                <i class="bi bi-clipboard-check mr-1.5"></i> COPY HTML SNIPPET
+                            </button>
+                            <button type="button" class="btn btn-sm font-weight-bold" onclick="triggerMailtoLink()" style="background: rgba(255,255,255,0.1); color: #E2E8F0; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; padding: 8px 18px;">
+                                <i class="bi bi-envelope-arrow-up mr-1.5"></i> OPEN MAIL APP
+                            </button>
+                            <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
             </div>
-
         </div>
 
     </div>
@@ -7385,6 +7408,18 @@
                 '</div>'
             ].join('\n');
 
+            window.currentEmailHtml = htmlContent;
+            window.currentEmailPlainText = plainText;
+
+            const modalBody = document.getElementById('emailSummaryModalBody');
+            if (modalBody) {
+                modalBody.innerHTML = htmlContent;
+            }
+
+            if (typeof $ !== 'undefined' && $('#emailSummaryModal').length) {
+                $('#emailSummaryModal').modal('show');
+            }
+
             if (navigator.clipboard && window.ClipboardItem) {
                 const blobHtml = new Blob([htmlContent], { type: 'text/html' });
                 const blobText = new Blob([plainText], { type: 'text/plain' });
@@ -7394,12 +7429,27 @@
             } else if (navigator.clipboard) {
                 navigator.clipboard.writeText(plainText);
             }
+        }
 
+        // (2026-07-13) Modal action helpers for email summary; prev: none
+        function copyEmailHtmlSnippet() {
+            if (window.currentEmailHtml && navigator.clipboard) {
+                const blobHtml = new Blob([window.currentEmailHtml], { type: 'text/html' });
+                const blobText = new Blob([window.currentEmailPlainText || ''], { type: 'text/plain' });
+                navigator.clipboard.write([new ClipboardItem({ 'text/html': blobHtml, 'text/plain': blobText })]).then(function() {
+                    showCustomAlert("HTML Snippet copied to clipboard! Paste into Outlook/Gmail.", "Copied");
+                }).catch(function() {
+                    navigator.clipboard.writeText(window.currentEmailPlainText || '');
+                    showCustomAlert("Text summary copied to clipboard!", "Copied");
+                });
+            }
+        }
+
+        function triggerMailtoLink() {
+            const empNum = window.activeSession ? (window.activeSession.empNum || 'N/A') : 'N/A';
             const mailSubject = encodeURIComponent('CSB Loan Evaluation - Employee #' + empNum);
-            const mailBody = encodeURIComponent(plainText);
+            const mailBody = encodeURIComponent(window.currentEmailPlainText || '');
             window.location.href = 'mailto:?subject=' + mailSubject + '&body=' + mailBody;
-
-            showCustomAlert("Evaluation card details copied to clipboard & email application launched!", "Email Summary");
         }
 
         // State history logger card controls
