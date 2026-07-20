@@ -4107,14 +4107,11 @@
                         <div class="modal-body" id="emailSummaryModalBody" style="padding: 24px; max-height: 75vh; overflow-y: auto;">
                             <!-- Rendered HTML cards insert here -->
                         </div>
-                        <div class="modal-footer" style="border-top: 1px solid rgba(255,255,255,0.1); padding: 14px 24px; gap: 10px;">
-                            <button type="button" class="btn btn-sm font-weight-bold" onclick="copyEmailHtmlSnippet()" style="background: linear-gradient(135deg, #F59E0B, #D97706); color: white; border: none; border-radius: 6px; padding: 8px 18px;">
-                                <i class="bi bi-clipboard-check mr-1.5"></i> COPY HTML SNIPPET
-                            </button>
-                            <button type="button" class="btn btn-sm font-weight-bold" onclick="triggerMailtoLink()" style="background: rgba(255,255,255,0.1); color: #E2E8F0; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; padding: 8px 18px;">
-                                <i class="bi bi-envelope-arrow-up mr-1.5"></i> OPEN MAIL APP
-                            </button>
+                        <div class="modal-footer" style="border-top: 1px solid rgba(255,255,255,0.1); padding: 14px 24px; justify-content: space-between;">
                             <button type="button" class="btn btn-sm btn-secondary" onclick="closeEmailSummaryModal()">Close</button>
+                            <button type="button" class="btn btn-sm font-weight-bold" onclick="copyAndOpenEmail()" style="background: linear-gradient(135deg, #F59E0B, #D97706); color: white; border: none; border-radius: 8px; padding: 10px 22px; font-size: 13px; letter-spacing: 0.03em;">
+                                <i class="bi bi-envelope-paper-fill mr-2"></i> FORWARD VIA EMAIL (COPY & OPEN)
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -7455,7 +7452,35 @@
             }
         }
 
-        // (2026-07-13) Modal action helpers for email summary & explicit closing; prev: no close helper
+        // (2026-07-13) Modal action helper to copy HTML snippet and launch email app in 1 click; prev: separate handlers
+        function copyAndOpenEmail() {
+            const empNum = (window.activeSession ? window.activeSession.empNum : null) || document.getElementById('employeeNumber')?.value.trim() || 'N/A';
+            const mailSubject = encodeURIComponent('CSB Loan Evaluation Summary - Employee #' + empNum);
+            const mailBody = encodeURIComponent(window.currentEmailPlainText || '');
+
+            const openMail = function() {
+                window.location.href = 'mailto:?subject=' + mailSubject;
+                closeEmailSummaryModal();
+                showCustomAlert("Rich HTML Cards copied to clipboard! Press Ctrl+V in your email body to paste.", "Email Ready");
+            };
+
+            if (window.currentEmailHtml && navigator.clipboard && window.ClipboardItem) {
+                const blobHtml = new Blob([window.currentEmailHtml], { type: 'text/html' });
+                const blobText = new Blob([window.currentEmailPlainText || ''], { type: 'text/plain' });
+                navigator.clipboard.write([new ClipboardItem({ 'text/html': blobHtml, 'text/plain': blobText })])
+                    .then(openMail)
+                    .catch(function() {
+                        if (navigator.clipboard.writeText) {
+                            navigator.clipboard.writeText(window.currentEmailPlainText || '').then(openMail);
+                        } else {
+                            openMail();
+                        }
+                    });
+            } else {
+                openMail();
+            }
+        }
+
         function closeEmailSummaryModal() {
             const modal = document.getElementById('emailSummaryModal');
             if (modal) {
@@ -7468,26 +7493,6 @@
                 const backdrop = document.querySelector('.modal-backdrop');
                 if (backdrop) backdrop.remove();
             }
-        }
-
-        function copyEmailHtmlSnippet() {
-            if (window.currentEmailHtml && navigator.clipboard) {
-                const blobHtml = new Blob([window.currentEmailHtml], { type: 'text/html' });
-                const blobText = new Blob([window.currentEmailPlainText || ''], { type: 'text/plain' });
-                navigator.clipboard.write([new ClipboardItem({ 'text/html': blobHtml, 'text/plain': blobText })]).then(function() {
-                    showCustomAlert("Rich HTML Cards copied to clipboard! Open your email and press Ctrl+V.", "Copied");
-                }).catch(function() {
-                    navigator.clipboard.writeText(window.currentEmailPlainText || '');
-                    showCustomAlert("Text summary copied to clipboard!", "Copied");
-                });
-            }
-        }
-
-        function triggerMailtoLink() {
-            const empNum = window.activeSession ? (window.activeSession.empNum || 'N/A') : 'N/A';
-            const mailSubject = encodeURIComponent('CSB Loan Evaluation - Employee #' + empNum);
-            const mailBody = encodeURIComponent(window.currentEmailPlainText || '');
-            window.location.href = 'mailto:?subject=' + mailSubject + '&body=' + mailBody;
         }
 
         // State history logger card controls
