@@ -848,19 +848,22 @@ function checkLoggedInUser() {
     document.addEventListener("DOMContentLoaded", () => {
         checkLoggedInUser();
 
-        // Auto-search if employee number is saved
+        // (2026-07-13) Fill input only; no auto-search on page load; prev: searchEmployeeNetpay()
         const savedEmpNo = localStorage.getItem("employeeNumber");
         if (savedEmpNo) {
             const input = document.getElementById('searchInputNetpay');
-            if (input) {
-                input.value = savedEmpNo;
-                searchEmployeeNetpay();
-            }
+            if (input) input.value = savedEmpNo;
         }
 
-        // Enter key support
+        // (2026-07-13) Reset search results when typing in employeeNumber input; prev: none
         const searchInput = document.getElementById('searchInputNetpay');
         if (searchInput) {
+            searchInput.addEventListener('input', () => {
+                const profileCard = document.getElementById('profileCard');
+                if (profileCard) profileCard.style.display = 'none';
+                const resSec = document.querySelector('.results-section');
+                if (resSec) resSec.style.display = 'none';
+            });
             searchInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     e.preventDefault();

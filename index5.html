@@ -224,8 +224,20 @@
             background: rgba(10, 14, 23, 0.8) !important;
         }
 
+        /* (2026-07-13) Fix browser white background on autofill inputs; prev: white autofill */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus, 
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 1000px #0b0f19 inset !important;
+            -webkit-text-fill-color: #F0F4F8 !important;
+            caret-color: #F0F4F8 !important;
+            transition: background-color 5000s ease-in-out 0s !important;
+        }
+
         /* (2026-07-13) Hide native select elements; prev: custom styles */
         select.bank-select,
+        select.form-control.bank-select,
         .bank-select {
             display: none !important;
         }
@@ -1415,9 +1427,9 @@
             padding-bottom: 0 !important;
         }
 
-        /* ============ AUDIT TRAIL ============ */
+        /* (2026-07-13) Increased top margin for audit panel; prev: margin-top: 40px */
         .bottom-history-panel {
-            margin-top: 40px;
+            margin-top: 90px !important;
             border-top: 1px solid rgba(255, 255, 255, 0.08);
             padding-top: 14px;
             padding-bottom: 160px !important;
@@ -2756,48 +2768,61 @@
             border-color: rgba(245, 158, 11, 0.35);
         }
 
+        /* (2026-07-13) Fix custom select options overlay for PC mode; prev: translucent options overlay */
+        .custom-select-wrapper {
+            position: relative !important;
+            user-select: none;
+            display: inline-block !important;
+            width: 100% !important;
+        }
+
+        .custom-select-wrapper.open {
+            z-index: 99999 !important;
+        }
+
         .custom-select-options {
-            position: absolute;
-            top: calc(100% + 4px);
-            left: 0;
-            right: 0;
-            background: rgba(14, 18, 38, 0.98);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 6px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
-            z-index: 9999;
-            max-height: 200px;
-            overflow-y: auto;
+            position: absolute !important;
+            top: calc(100% + 4px) !important;
+            left: 0 !important;
+            right: 0 !important;
+            background: #0D1126 !important;
+            border: 1px solid rgba(255, 255, 255, 0.18) !important;
+            border-radius: 8px !important;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.85) !important;
+            z-index: 99999 !important;
+            max-height: 240px !important;
+            overflow-y: auto !important;
             opacity: 0;
             visibility: hidden;
             transform: translateY(-8px);
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
         }
 
         .custom-select-wrapper.open .custom-select-options {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: translateY(0) !important;
         }
 
         .custom-option {
-            padding: 6px 10px;
-            font-size: 0.72rem;
-            color: rgba(255, 255, 255, 0.75);
-            cursor: pointer;
-            transition: all 0.15s ease;
-            text-align: left;
+            padding: 8px 12px !important;
+            font-size: 0.78rem !important;
+            color: #E2E8F0 !important;
+            background: #0D1126 !important;
+            cursor: pointer !important;
+            transition: all 0.15s ease !important;
+            text-align: left !important;
         }
 
         .custom-option:hover {
-            background: rgba(245, 158, 11, 0.15);
-            color: #fff;
+            background: rgba(245, 158, 11, 0.22) !important;
+            color: #FFFFFF !important;
         }
 
         .custom-option.selected {
-            background: rgba(245, 158, 11, 0.25);
-            color: #fff;
-            font-weight: 700;
+            background: rgba(245, 158, 11, 0.35) !important;
+            color: #F59E0B !important;
+            font-weight: 700 !important;
         }
 
         /* [2026-07-14 Fix: Responsive card-style display overrides for Session Runs Audit Trail on mobile viewports; previous: required horizontal scrolling] */
@@ -3580,8 +3605,9 @@
                                     <option value="3">3</option>
                                     <option value="4">4</option>
                                     <option value="5">5</option>
-                                    <option value="6">6</option>
-                                    <option value="7" selected>7</option>
+                                    <!-- (2026-07-13) Default advance months to 6; prev: option 7 selected -->
+                                    <option value="6" selected>6</option>
+                                    <option value="7">7</option>
                                     <option value="8">8</option>
                                     <option value="9">9</option>
                                 </select>
@@ -4004,20 +4030,20 @@
 
             </div>
 
-            <!-- Underwriting Screen Control Buttons — full-width row, independent of either column's height (Polished: Inline styling cleaned in favor of centralized CSS classes) -->
-            <div class="d-flex justify-content-end action-btn-row">
-                <button class="btn btn-outline-warning bank-btn-outline mr-2 font-weight-bold" onclick="logCurrentState()">
-                    <i class="bi bi-save"></i> SAVE
+            <!-- (2026-07-13) Improved Save & Reset control buttons; prev: standard outline -->
+            <div class="d-flex justify-content-end action-btn-row" style="gap: 10px;">
+                <button class="btn font-weight-bold" onclick="logCurrentState()" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; border: none; padding: 9px 22px; border-radius: 8px; font-size: 0.82rem; letter-spacing: 0.04em; box-shadow: 0 4px 14px rgba(16,185,129,0.3); transition: all 0.25s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 18px rgba(16,185,129,0.45)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 14px rgba(16,185,129,0.3)';">
+                    <i class="bi bi-floppy-fill mr-1.5"></i> SAVE EVALUATION
                 </button>
-                <button class="btn btn-secondary bank-btn-secondary font-weight-bold" onclick="clearInputsAndReload()">
-                    <i class="bi bi-arrow-counterclockwise"></i> RESET
+                <button class="btn font-weight-bold" onclick="clearInputsAndReload()" style="background: rgba(255, 255, 255, 0.07); color: #E2E8F0; border: 1px solid rgba(255, 255, 255, 0.15); padding: 9px 22px; border-radius: 8px; font-size: 0.82rem; letter-spacing: 0.04em; transition: all 0.25s ease;" onmouseover="this.style.background='rgba(239, 68, 68, 0.2)'; this.style.borderColor='rgba(239, 68, 68, 0.5)'; this.style.color='#FCA5A5'; this.style.transform='translateY(-2px)';" onmouseout="this.style.background='rgba(255, 255, 255, 0.07)'; this.style.borderColor='rgba(255, 255, 255, 0.15)'; this.style.color='#E2E8F0'; this.style.transform='translateY(0)';">
+                    <i class="bi bi-arrow-counterclockwise mr-1.5"></i> RESET FORM
                 </button>
             </div>
 
-            <!-- [2026-07-13 New: Clear Local Storage Cache and Reload Button with high-contrast warning design] -->
+            <!-- (2026-07-13) Replaced clear cache with delete cookies & site data reload button; prev: clear cache -->
             <div class="d-flex justify-content-center" style="margin-top: 60px; margin-bottom: 24px;">
-                <button type="button" class="btn btn-outline-danger font-weight-bold" id="btn-clear-cache" onclick="clearLocalStorageAndReload();" style="border-color: rgba(239, 68, 68, 0.4); color: #EF4444; background: rgba(239, 68, 68, 0.05); padding: 10px 20px; border-radius: var(--radius-sm); font-size: 0.8rem; letter-spacing: 0.06em; transition: all 0.25s ease;" onmouseover="this.style.background='rgba(239, 68, 68, 0.15)'; this.style.borderColor='#EF4444';" onmouseout="this.style.background='rgba(239, 68, 68, 0.05)'; this.style.borderColor='rgba(239, 68, 68, 0.4)';">
-                    <i class="bi bi-trash-fill mr-2"></i>CLEAR LOCAL STORAGE CACHE &amp; RELOAD
+                <button type="button" class="btn font-weight-bold" id="btn-clear-cache" onclick="clearAllDataAndReload();" style="border: 1px solid rgba(239, 68, 68, 0.5); color: #FCA5A5; background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.3)); padding: 10px 24px; border-radius: 8px; font-size: 0.82rem; letter-spacing: 0.05em; transition: all 0.25s ease; box-shadow: 0 4px 14px rgba(220,38,38,0.25);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 18px rgba(220,38,38,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 14px rgba(220,38,38,0.25)';">
+                    <i class="bi bi-trash3-fill mr-2"></i>DELETE COOKIES &amp; SITE DATA &amp; RELOAD
                 </button>
             </div>
 
@@ -4255,6 +4281,37 @@
             el.value = raw;
         }
 
+        // (2026-07-13) Scroll to CSB deduction on reminder click; prev: none
+        function scrollToCsbDeductions() {
+            const csbContainer = document.getElementById('dynamic-csb-deductions-container');
+            if (csbContainer) {
+                const csbBody = document.getElementById('csbAccordionBody');
+                if (csbBody && csbBody.style.display === 'none') {
+                    if (typeof toggleCsbAccordion === 'function') toggleCsbAccordion();
+                }
+                csbContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                csbContainer.style.transition = 'box-shadow 0.3s ease, border 0.3s ease';
+                csbContainer.style.boxShadow = '0 0 18px rgba(239, 68, 68, 0.9)';
+                csbContainer.style.borderRadius = '8px';
+                setTimeout(() => { csbContainer.style.boxShadow = 'none'; }, 2200);
+            }
+        }
+
+        // (2026-07-13) Render red warning toast below Loan Accounts table; prev: none
+        function showCsbDeductionReminder() {
+            let reminderEl = document.getElementById('csb-deduction-reminder-toast');
+            const accordionBody = document.getElementById('lcs-acct-accordion-body');
+            if (!accordionBody) return;
+            if (!reminderEl) {
+                reminderEl = document.createElement('div');
+                reminderEl.id = 'csb-deduction-reminder-toast';
+                reminderEl.style.cssText = "margin-top: 8px; padding: 8px 12px; background: rgba(220, 38, 38, 0.22); border: 1px solid rgba(239, 68, 68, 0.5); border-radius: 6px; color: #FCA5A5; font-size: 0.70rem; font-weight: 600; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: all 0.25s ease;";
+                reminderEl.onclick = scrollToCsbDeductions;
+                accordionBody.appendChild(reminderEl);
+            }
+            reminderEl.innerHTML = '<span><i class="bi bi-exclamation-triangle-fill text-danger mr-1.5"></i> Please Select Correct CSB Deduction for the designated Loan Account</span><span style="font-size: 0.62rem; background: #DC2626; padding: 2px 8px; border-radius: 4px; color: white; font-weight: 700; white-space: nowrap; margin-left: 6px;">Go to CSB Deduction &darr;</span>';
+        }
+
         function recalcLcsAcctSums() {
             let sumBal = 0, sumAmort = 0;
             document.querySelectorAll('.lcs-acct-cb').forEach(cb => {
@@ -4268,6 +4325,7 @@
             // (2026-07-13) Use innerHTML so formatPHP HTML renders; prev: textContent (broke span tags)
             if (balEl) balEl.innerHTML = formatPHP(sumBal);
             if (amortEl) amortEl.innerHTML = formatPHP(sumAmort);
+            showCsbDeductionReminder();
             // sync master checkbox indeterminate state
             const cbs = document.querySelectorAll('.lcs-acct-cb');
             const allChecked = [...cbs].every(c => c.checked);
@@ -4658,25 +4716,38 @@
                 }
             }
 
-            // [2026-07-14 Fix: Connect index 1-4 shared employeeNumber logic; check and auto-search global employeeNumber, previous: only restored from le_active_state]
+            // (2026-07-13) Fill input only; no auto-search on page load; prev: await restoreActiveState(state)
             const employeeNumber = localStorage.getItem("employeeNumber");
             const savedState = localStorage.getItem('le_active_state');
-            let restored = false;
             if (savedState) {
                 try {
                     const state = JSON.parse(savedState);
-                    if (state && state.empNum && state.month && (!employeeNumber || state.empNum === employeeNumber)) {
-                        await restoreActiveState(state);
-                        restored = true;
+                    if (state && state.empNum) {
+                        const empInput = document.getElementById('employeeNumber');
+                        if (empInput) empInput.value = state.empNum;
+                        if (state.month && document.getElementById('activeMonthSelect')) {
+                            document.getElementById('activeMonthSelect').value = state.month;
+                        }
                     }
-                } catch (e) {
-                    console.error("Failed to restore last active evaluation session state:", e);
-                }
-            }
-            if (!restored && employeeNumber) {
+                } catch (e) {}
+            } else if (employeeNumber) {
                 const empInput = document.getElementById('employeeNumber');
-                // (2026-07-13) Fill input only; no auto-search; prev: auto-performed search on load
                 if (empInput) empInput.value = employeeNumber;
+            }
+
+            // (2026-07-13) Clear search results when typing in employeeNumber input; prev: none
+            const empNumInput = document.getElementById('employeeNumber');
+            if (empNumInput) {
+                empNumInput.addEventListener('input', function() {
+                    const resultsEl = document.getElementById('resultsSection');
+                    if (resultsEl) resultsEl.style.display = 'none';
+                    const evalWorkspace = document.getElementById('evaluationWorkspace');
+                    if (evalWorkspace) evalWorkspace.classList.add('d-none');
+                    const empSummaryCard = document.getElementById('empSummaryCard');
+                    if (empSummaryCard) empSummaryCard.classList.add('d-none');
+                    const profileCard = document.getElementById('lcsProfileCard');
+                    if (profileCard) profileCard.style.display = 'none';
+                });
             }
 
             // 2026-07-13: Scroll to node-baseline on value wrapper click with custom smooth scrolling logic (was: scrollIntoView on mapped card elements)
@@ -5352,9 +5423,9 @@
             const initDedamt = safeFloat(document.getElementById('lbl-dedamt') ? document.getElementById('lbl-dedamt').textContent.replace(/[^\d.]/g,'') : 0);
             const initCapacity = initNetpay + initDedamt + initialPliSum - initialOnqSum - 5300;
             const initLoan = Math.max(0, Math.floor(initCapacity / 20.01) * 1000);
-            // (2026-07-13) Clear manual override on new search so formula can auto-update; prev: no flag
+            // (2026-07-13) Default loan amount to 0 after search; prev: initLoan
             const loanAmtEl = document.getElementById('loanAmount');
-            if (loanAmtEl) { delete loanAmtEl.dataset.manualOverride; loanAmtEl.value = initLoan.toLocaleString('en'); }
+            if (loanAmtEl) { delete loanAmtEl.dataset.manualOverride; loanAmtEl.value = "0"; }
 
             // Phase C baseline steps matching
             const stepLabel = `Step-${originalStep}`;
@@ -6406,7 +6477,8 @@
                 const _hintEl = document.getElementById('lbl-loan-capacity-hint');
                 if (_hintEl) _hintEl.textContent = `ESTIMATED: ₱${_suggested.toLocaleString('en')}`;
                 const _loanInp = document.getElementById('loanAmount');
-                if (_loanInp && !_loanInp.dataset.manualOverride) {
+                // (2026-07-13) Prevent auto-setting loanAmount to 0; prev: loanAmount = 0
+                if (_loanInp && !_loanInp.dataset.manualOverride && _suggested > 0) {
                     _loanInp.value = _suggested.toLocaleString('en');
                     loanAmount = _suggested; // update variable so PMT uses the right amount
                 }
@@ -6442,19 +6514,22 @@
             const netPayElement = document.getElementById('val-newnetpay');
             netPayElement.innerHTML = formatPHP(newNetPay);
 
-            // [2026-07-12 Fix: Determine statutory limit threshold dynamically based on active interest rate or user custom input]
-            let thresholdLimit = 5300.00;
+            // (2026-07-13) Limit min 5000 for 9.66%, 5300 others; prev: allowed < 5000
+            const minLimit = (interestRate === 9.66) ? 5000.00 : 5300.00;
+            let thresholdLimit = minLimit;
             const warningMsg = `<i class="bi bi-exclamation-triangle-fill"></i> Cannot be accommodated`;
 
-            if (interestRate === 9.66) {
-                thresholdLimit = 5000.00;
-            }
             const limitInput = document.getElementById('input-target-limit');
             if (limitInput) {
                 if (limitInput.dataset.manual === '1') {
-                    thresholdLimit = safeFloat(limitInput.value);
+                    let userVal = safeFloat(limitInput.value);
+                    if (userVal < minLimit && limitInput.value.trim() !== '') {
+                        userVal = minLimit;
+                        limitInput.value = minLimit;
+                    }
+                    thresholdLimit = Math.max(minLimit, userVal);
                 } else {
-                    limitInput.value = thresholdLimit;
+                    limitInput.value = minLimit;
                 }
             }
 
@@ -6801,6 +6876,21 @@
             saveActiveEvaluationState();
         }
 
+        // (2026-07-13) Handle target limit input min limit clamp; prev: no handler
+        function onTargetLimitInput() {
+            const limitInput = document.getElementById('input-target-limit');
+            if (!limitInput) return;
+            limitInput.dataset.manual = '1';
+            const interestRate = getInterestRateValue();
+            const minLimit = (interestRate === 9.66) ? 5000.00 : 5300.00;
+            let val = safeFloat(limitInput.value);
+            if (val < minLimit && limitInput.value.trim() !== '') {
+                val = minLimit;
+                limitInput.value = minLimit;
+            }
+            if (typeof calculateNetPay === 'function') calculateNetPay();
+        }
+
         // (2026-07-13) Auto-adjust loanAmount to hit threshold limit exactly; prev: none
         function adjustLoanForExactThreshold() {
             if (!window.activeSession) return;
@@ -6809,13 +6899,12 @@
             const isAutonomous = (mode === 'AUTONOMOUS');
             
             const interestRate = getInterestRateValue();
+            const minLimit = (interestRate === 9.66) ? 5000.00 : 5300.00;
             const limitInput = document.getElementById('input-target-limit');
-            let thresholdLimit = 5300.00;
-            if (interestRate === 9.66) {
-                thresholdLimit = 5000.00;
-            }
+            let thresholdLimit = minLimit;
             if (limitInput && limitInput.value) {
-                thresholdLimit = safeFloat(limitInput.value);
+                thresholdLimit = Math.max(minLimit, safeFloat(limitInput.value));
+                limitInput.value = thresholdLimit;
             }
             
             // Round revisedBaseline to 2 decimal places to prevent floating point inaccuracies
@@ -7052,8 +7141,8 @@
                 netprocOldBalance: document.getElementById('input-netproc-old-balance') ? document.getElementById('input-netproc-old-balance').value : "0",
                 // (2026-07-13) Save manual redemption input; prev: table values
                 netprocRedemptionManual: document.getElementById('val-netproc-redemption-manual-total') ? document.getElementById('val-netproc-redemption-manual-total').value : "0",
-                // (2026-07-13) Set advance months default value to "7"; prev: "0"
-                netprocAdvanceMonths: document.getElementById('select-netproc-advance-months') ? document.getElementById('select-netproc-advance-months').value : "7",
+                // (2026-07-13) Set advance months default value to "6"; prev: "7"
+                netprocAdvanceMonths: document.getElementById('select-netproc-advance-months') ? document.getElementById('select-netproc-advance-months').value : "6",
                 // (2026-07-13) Save netproc-redemption-cb checked state; prev: netproc-deduction-cb
                 netprocRedemptionSelections: (() => {
                     const selections = [];
@@ -7137,6 +7226,8 @@
                     hours = hours ? hours : 12;
                     return `${hours}:${String(minutes).padStart(2, '0')}${ampm}`;
                 })(),
+                // (2026-07-13) Save timestamp for 7-day expiration check; prev: none
+                createdTimestamp: Date.now(),
                 amortization: amortVal
             };
 
@@ -7150,7 +7241,21 @@
         /* [2026-07-14 Fix: Render audit trail with responsive, packed grid containing Date/Time, Client (Name & ID), Loan Amount, Term, Amortization, and NetPay; previous: layout without amortization and format variations] */
         function renderHistoryLog() {
             const list = document.getElementById('historyLogList');
-            const history = JSON.parse(localStorage.getItem('le_history') || '[]');
+            // (2026-07-13) Auto-delete session runs 7 days old or older; prev: kept forever
+            const rawHistory = JSON.parse(localStorage.getItem('le_history') || '[]');
+            const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+            const now = Date.now();
+            const history = rawHistory.filter(item => {
+                if (item.createdTimestamp) return (now - item.createdTimestamp) < SEVEN_DAYS_MS;
+                if (item.searchDate) {
+                    const d = new Date(item.searchDate);
+                    if (!isNaN(d.getTime())) return (now - d.getTime()) < SEVEN_DAYS_MS;
+                }
+                return true;
+            });
+            if (history.length !== rawHistory.length) {
+                localStorage.setItem('le_history', JSON.stringify(history));
+            }
 
             if (history.length === 0) {
                 list.innerHTML = `<div class="text-white-50 text-center py-4 w-100 font-italic">No historical assess runs recorded in this session.</div>`;
@@ -8118,11 +8223,24 @@
             }
         }
 
-        async function clearLocalStorageAndReload() {
-            if (await showCustomConfirm("Are you sure you want to clear all local storage cache and reload the application? This will reset all session data.")) {
+        // (2026-07-13) Clear cookies, storage, caches and reload; prev: clear storage only
+        async function clearAllDataAndReload() {
+            if (await showCustomConfirm("Are you sure you want to delete all cookies, site data, and reload the application?")) {
+                document.cookie.split(";").forEach(c => {
+                    document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+                });
                 localStorage.clear();
-                window.location.reload();
+                sessionStorage.clear();
+                if ('caches' in window) {
+                    const keys = await caches.keys();
+                    await Promise.all(keys.map(k => caches.delete(k)));
+                }
+                window.location.reload(true);
             }
+        }
+
+        async function clearLocalStorageAndReload() {
+            return clearAllDataAndReload();
         }
     </script>
     <!-- [2026-07-11 New: Custom global modal dialog for alerts and confirmations replacing native browser popups] -->

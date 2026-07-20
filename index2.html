@@ -731,6 +731,8 @@
                 btn.style.pointerEvents = 'none';
             }
             try {
+                // (2026-07-13) Delete all cookies; prev: no cookie clear
+                document.cookie.split(";").forEach(c => { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); });
                 localStorage.clear();
                 sessionStorage.clear();
                 if ('caches' in window) {

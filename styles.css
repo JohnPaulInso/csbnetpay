@@ -1,3 +1,14 @@
+/* (2026-07-13) Fix browser white background on autofill inputs; prev: white autofill */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px #0b0f19 inset !important;
+    -webkit-text-fill-color: #F0F4F8 !important;
+    caret-color: #F0F4F8 !important;
+    transition: background-color 5000s ease-in-out 0s !important;
+}
+
 body {
     font-family: Arial, sans-serif;
     background-color: #1f1f1f;

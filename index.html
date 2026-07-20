@@ -539,7 +539,7 @@
         </div>
     </div>
 
-    <!-- Clear Cache Button - Visible to All Users -->
+    <!-- (2026-07-13) Delete Cookies & Site Data & Reload; prev: Clear Cache & Reload -->
     <div style="margin-top:100px;padding: 1.5rem 1rem 2rem; text-align: center;">
         <button id="clearCacheBtn" onclick="clearAllDataAndReload()" style="
             background: linear-gradient(135deg, #dc3545, #c82333);
@@ -556,11 +556,11 @@
             box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
             transition: all 0.3s ease;
         " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(220, 53, 69, 0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(220, 53, 69, 0.3)';">
-            <i class="bi bi-trash3"></i>
-            Clear Cache & Reload
+            <i class="bi bi-trash3-fill"></i>
+            Delete Cookies &amp; Site Data &amp; Reload
         </button>
         <div style="margin-top: 0.5rem; font-size: 0.75rem; color: #6c757d;">
-            Clears all stored data and refreshes the page
+            Deletes all cookies, cached data, and reloads the page
         </div>
     </div>
 
@@ -1539,6 +1539,11 @@
             }
 
             try {
+                // (2026-07-13) Delete all cookies; prev: no cookie clear
+                document.cookie.split(";").forEach(c => {
+                    document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+                });
+
                 // 1. Clear localStorage
                 localStorage.clear();
                 console.log('✓ localStorage cleared');
