@@ -833,9 +833,9 @@ async function displayEmployeeInfoOnq(monthName, csvData) {
                 });
             });
         } else {
-            // (2026-07-13) Render No Records Found for missing month; prev: blank cell
+            // (2026-07-13) Render No Record Found for missing month; prev: blank cell
             monthRow.style.cursor = 'default';
-            dedamtCell.innerHTML = `<span style="color: #aaa; font-style: italic; font-size: 0.82rem;">No Records Found</span>`;
+            dedamtCell.innerHTML = `<span style="color: #aaa; font-style: italic; font-size: 0.82rem;">No Record Found</span>`;
             tbody.appendChild(monthRow);
         }
     });

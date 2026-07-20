@@ -703,8 +703,8 @@
 
                 const takehomeCell = document.createElement('td');
                 takehomeCell.setAttribute('data-label', 'TAKEHOME');
-                // (2026-07-13) Show No Records Found for missing month cell; prev: blank
-                takehomeCell.innerHTML = dataRow.isBlank ? `<span style="color: #aaa; font-style: italic; font-size: 0.82rem;">No Records Found</span>` : `<b>${dataRow.takehome}</b>`;
+                // (2026-07-13) Show No Record Found for missing month cell; prev: blank
+                takehomeCell.innerHTML = dataRow.isBlank ? `<span style="color: #aaa; font-style: italic; font-size: 0.82rem;">No Record Found</span>` : `<b>${dataRow.takehome}</b>`;
                 takehomeCell.classList.add('number-cell');
 
                 rowElement.appendChild(monthCell);

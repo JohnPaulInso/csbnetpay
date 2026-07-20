@@ -179,14 +179,16 @@ function searchEmployeePos() {
 
             valid.sort((a, b) => b.date - a.date);
 
-            // Filter valid data to only include rows for this employee to minimize cache size
+            // (2026-07-13) Retain all available months so missing months render No Record Found; prev: .filter(data => data.csvData.length > 1)
             const filteredResults = valid.map(data => ({
                 monthName: data.monthName,
                 date: data.date,
-                csvData: data.csvData.filter((row, idx) => idx === 0 || (row[3] && empNo && row[3].toString().replace(/^0+/, '') === empNo.toString().replace(/^0+/, ''))) // idx 0 is header
-            })).filter(data => data.csvData.length > 1); // Only keep months where employee was found
+                csvData: data.csvData.filter((row, idx) => idx === 0 || (row[3] && empNo && row[3].toString().replace(/^0+/, '') === empNo.toString().replace(/^0+/, '')))
+            }));
 
-            if (filteredResults.length > 0) {
+            const hasAnyMatch = filteredResults.some(data => data.csvData.length > 1);
+
+            if (hasAnyMatch) {
                 // Store in cache with 5-minute TTL
                 const cacheData = {
                     data: filteredResults,
@@ -702,10 +704,10 @@ function displayResultsTablePos(allData) {
              *      render a dimmed ₱0.00 instead of skipping the month entirely.
              */
             if (item.vals.length === 0) {
-                // (2026-07-13) Render No Records Found for missing month; prev: blank cell
+                // (2026-07-13) Render No Record Found for missing month; prev: blank cell
                 tr.innerHTML = `
                     <td>${item.month}</td>
-                    <td style="text-align:right;color:#aaa;font-style:italic;font-size:0.82rem">No Records Found</td>
+                    <td style="text-align:right;color:#aaa;font-style:italic;font-size:0.82rem">No Record Found</td>
                 `;
             } else {
                 tr.innerHTML = `
