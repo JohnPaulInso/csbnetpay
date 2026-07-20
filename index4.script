@@ -807,9 +807,9 @@ function appendResultsToTablePLI(validResults) {
                 }
             });
         } else {
-            // (2026-07-13) Render blank cell for missing month; prev: N/A No Records
+            // (2026-07-13) Render No Records Found for missing month; prev: blank cell
             row.style.cursor = 'default';
-            dedamtCell.innerHTML = ``;
+            dedamtCell.innerHTML = `<span style="color: #aaa; font-style: italic; font-size: 0.82rem;">No Records Found</span>`;
             tbody.appendChild(row);
         }
     });

@@ -702,10 +702,10 @@ function displayResultsTablePos(allData) {
              *      render a dimmed ₱0.00 instead of skipping the month entirely.
              */
             if (item.vals.length === 0) {
-                // (2026-07-13) Render blank cell for missing month; prev: dimmed ₱0.00
+                // (2026-07-13) Render No Records Found for missing month; prev: blank cell
                 tr.innerHTML = `
                     <td>${item.month}</td>
-                    <td style="text-align:right"></td>
+                    <td style="text-align:right;color:#aaa;font-style:italic;font-size:0.82rem">No Records Found</td>
                 `;
             } else {
                 tr.innerHTML = `
