@@ -6476,13 +6476,18 @@
                     if (_suggested < 0) _suggested = 0;
                 }
 
+                // (2026-07-13) Fallback estimated loan suggestion using first formula if requiredAmort <= 0; prev: 0
+                if (_suggested <= 0 && revisedBaseline > 0) {
+                    const fallbackCap = Math.max(0, revisedBaseline - (interestRate === 9.66 ? 5000 : 5300));
+                    _suggested = Math.floor((fallbackCap > 0 ? fallbackCap : revisedBaseline) / 20.01) * 1000;
+                }
+
                 const _hintEl = document.getElementById('lbl-loan-capacity-hint');
                 if (_hintEl) _hintEl.textContent = `ESTIMATED: ₱${_suggested.toLocaleString('en')}`;
                 const _loanInp = document.getElementById('loanAmount');
-                // (2026-07-13) Prevent auto-setting loanAmount to 0; prev: loanAmount = 0
                 if (_loanInp && !_loanInp.dataset.manualOverride && _suggested > 0) {
                     _loanInp.value = _suggested.toLocaleString('en');
-                    loanAmount = _suggested; // update variable so PMT uses the right amount
+                    loanAmount = _suggested;
                 }
             }
 
