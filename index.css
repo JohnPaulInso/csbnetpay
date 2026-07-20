@@ -5,14 +5,15 @@
     -webkit-tap-highlight-color: transparent !important;
 }
 
-/* (2026-07-13) Fix browser white background on autofill inputs; prev: white autofill */
+/* (2026-07-13) Light background on autofill inputs for index1-4; prev: dark autofill */
 input:-webkit-autofill,
 input:-webkit-autofill:hover, 
 input:-webkit-autofill:focus, 
 input:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 1000px #0b0f19 inset !important;
-    -webkit-text-fill-color: #F0F4F8 !important;
-    caret-color: #F0F4F8 !important;
+    -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+    -webkit-text-fill-color: #1e293b !important;
+    caret-color: #1e293b !important;
+    font-family: 'Poppins', sans-serif !important;
     transition: background-color 5000s ease-in-out 0s !important;
 }
 

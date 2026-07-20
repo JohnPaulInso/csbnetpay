@@ -127,6 +127,10 @@ function searchEmployeeOnq() {
     if (micBtn) micBtn.disabled = true;
     searchBtnOnq.innerHTML = '<i class="bi bi-hourglass-split"></i> Searching...';
 
+    // (2026-07-13) Save session timestamp for 10-minute session; prev: search start only
+    localStorage.setItem("employeeNumber", searchInputOnqGlobal);
+    localStorage.setItem("employeeNumberTime", Date.now().toString());
+
     loadingIndicatorOnq.style.display = 'block';
 
     /*
@@ -373,11 +377,26 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // (2026-07-13) Fill input only; no auto-search on page load; prev: searchEmployeeOnq()
+    // (2026-07-13) Auto-search on navigation if session <= 10 min; prev: fill only
+    const empTime = localStorage.getItem("employeeNumberTime");
     const savedEmpNo = localStorage.getItem("employeeNumber");
-    if (savedEmpNo) {
-        const input = document.getElementById('searchInputOnq');
-        if (input) input.value = savedEmpNo;
+    let validEmpNo = null;
+    if (savedEmpNo && empTime) {
+        if (Date.now() - parseInt(empTime, 10) <= 10 * 60 * 1000) {
+            validEmpNo = savedEmpNo;
+        } else {
+            localStorage.removeItem("employeeNumber");
+            localStorage.removeItem("employeeNumberTime");
+        }
+    }
+    const inputOnq = document.getElementById('searchInputOnq');
+    if (inputOnq) {
+        if (validEmpNo) {
+            inputOnq.value = validEmpNo;
+            searchEmployeeOnq();
+        } else {
+            inputOnq.value = '';
+        }
     }
 
     // (2026-07-13) Reset search results when typing in employeeNumber input; prev: none

@@ -64,6 +64,10 @@
             return;
         }
 
+        // (2026-07-13) Save employee search timestamp for 10-minute session; prev: input only
+        localStorage.setItem("employeeNumber", searchInputNetpay);
+        localStorage.setItem("employeeNumberTime", Date.now().toString());
+
         // --- Offline Check ---
         if (!navigator.onLine) {
             const cacheKey = `cache_netpay_${searchInputNetpay}`;
@@ -857,11 +861,26 @@ function checkLoggedInUser() {
     document.addEventListener("DOMContentLoaded", () => {
         checkLoggedInUser();
 
-        // (2026-07-13) Fill input only; no auto-search on page load; prev: searchEmployeeNetpay()
+        // (2026-07-13) Auto-search on navigation if session <= 10 min; prev: fill only
+        const empTime = localStorage.getItem("employeeNumberTime");
         const savedEmpNo = localStorage.getItem("employeeNumber");
-        if (savedEmpNo) {
-            const input = document.getElementById('searchInputNetpay');
-            if (input) input.value = savedEmpNo;
+        let validEmpNo = null;
+        if (savedEmpNo && empTime) {
+            if (Date.now() - parseInt(empTime, 10) <= 10 * 60 * 1000) {
+                validEmpNo = savedEmpNo;
+            } else {
+                localStorage.removeItem("employeeNumber");
+                localStorage.removeItem("employeeNumberTime");
+            }
+        }
+        const inputNet = document.getElementById('searchInputNetpay');
+        if (inputNet) {
+            if (validEmpNo) {
+                inputNet.value = validEmpNo;
+                searchEmployeeNetpay();
+            } else {
+                inputNet.value = '';
+            }
         }
 
         // (2026-07-13) Reset search results when typing in employeeNumber input; prev: none

@@ -224,7 +224,7 @@
             background: rgba(10, 14, 23, 0.8) !important;
         }
 
-        /* (2026-07-13) Fix browser white background on autofill inputs; prev: white autofill */
+        /* (2026-07-13) Dark background on autofill inputs for index5; prev: default autofill */
         input:-webkit-autofill,
         input:-webkit-autofill:hover, 
         input:-webkit-autofill:focus, 
@@ -232,6 +232,7 @@
             -webkit-box-shadow: 0 0 0 1000px #0b0f19 inset !important;
             -webkit-text-fill-color: #F0F4F8 !important;
             caret-color: #F0F4F8 !important;
+            font-family: 'Montserrat', sans-serif !important;
             transition: background-color 5000s ease-in-out 0s !important;
         }
 
@@ -4732,21 +4733,42 @@
                 }
             }
 
-            // (2026-07-13) Restore previous evaluation session on page reload; prev: fill input only
-            const savedState = localStorage.getItem('le_active_state');
-            const employeeNumber = localStorage.getItem("employeeNumber");
-            if (savedState) {
-                try {
-                    const state = JSON.parse(savedState);
-                    if (state && state.empNum) {
-                        await restoreActiveState(state);
-                    }
-                } catch (e) {
-                    console.warn('[Session] Failed to restore active state:', e);
+            // (2026-07-13) Auto-search/restore on navigation if session <= 10 min; prev: fill only
+            const empTime = localStorage.getItem("employeeNumberTime");
+            const savedEmpNo = localStorage.getItem("employeeNumber");
+            let validEmpNo = null;
+            if (savedEmpNo && empTime) {
+                if (Date.now() - parseInt(empTime, 10) <= 10 * 60 * 1000) {
+                    validEmpNo = savedEmpNo;
+                } else {
+                    localStorage.removeItem("employeeNumber");
+                    localStorage.removeItem("employeeNumberTime");
+                    localStorage.removeItem("le_active_state");
                 }
-            } else if (employeeNumber) {
-                const empInput = document.getElementById('employeeNumber');
-                if (empInput) empInput.value = employeeNumber;
+            }
+
+            const savedState = localStorage.getItem('le_active_state');
+            const empInput5 = document.getElementById('employeeNumber');
+
+            if (validEmpNo) {
+                if (empInput5) empInput5.value = validEmpNo;
+                if (savedState) {
+                    try {
+                        const state = JSON.parse(savedState);
+                        if (state && state.empNum) {
+                            await restoreActiveState(state);
+                        } else {
+                            await performSearch(true);
+                        }
+                    } catch (e) {
+                        await performSearch(true);
+                    }
+                } else {
+                    await performSearch(true);
+                }
+            } else {
+                localStorage.removeItem("le_active_state");
+                if (empInput5) empInput5.value = '';
             }
 
             // (2026-07-13) Clear search results when typing in employeeNumber input; prev: none
@@ -5123,6 +5145,10 @@
                 await showCustomAlert("Please enter a valid Employee Number.");
                 return;
             }
+
+            // (2026-07-13) Save session timestamp for 10-minute active session; prev: input only
+            localStorage.setItem("employeeNumber", empNumInput);
+            localStorage.setItem("employeeNumberTime", Date.now().toString());
 
             // [2026-07-14 Fix: Disable searchBtn while searching; previous: button stayed enabled during async fetch]
             const searchBtnEl = document.getElementById('searchBtn');

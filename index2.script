@@ -115,6 +115,7 @@ function searchEmployeePos() {
     // searchBtn.classList.add('searching'); // Removed pulse effect
     // if (particles) particles.classList.add('active'); // Removed start animation
     localStorage.setItem("employeeNumber", empNo);
+    localStorage.setItem("employeeNumberTime", Date.now().toString());
 
     // Reset display early to avoid duplicates
     if (resultsContainer) resultsContainer.innerHTML = "";
@@ -797,6 +798,29 @@ document.addEventListener("DOMContentLoaded", function() {
     if (!loginTime || (new Date().getTime() - loginTime) > 3 * 60 * 60 * 1000) {
         // Redirect to login page if no login session or session expired
         window.location.href = "login/index.html";
+        return;
+    }
+
+    // (2026-07-13) Auto-search on navigation if session <= 10 min; prev: fill only
+    const empTime = localStorage.getItem("employeeNumberTime");
+    const savedEmpNo = localStorage.getItem("employeeNumber");
+    let validEmpNo = null;
+    if (savedEmpNo && empTime) {
+        if (Date.now() - parseInt(empTime, 10) <= 10 * 60 * 1000) {
+            validEmpNo = savedEmpNo;
+        } else {
+            localStorage.removeItem("employeeNumber");
+            localStorage.removeItem("employeeNumberTime");
+        }
+    }
+    const inputPos = document.getElementById('searchInputPos');
+    if (inputPos) {
+        if (validEmpNo) {
+            inputPos.value = validEmpNo;
+            searchEmployeePos();
+        } else {
+            inputPos.value = '';
+        }
     }
 });
 
