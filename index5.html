@@ -2283,7 +2283,8 @@
             cursor: pointer;
             border-radius: 6px;
         }
-        #val-netproc-total.copy-glow {
+        #val-netproc-total.copy-glow,
+        #val-after-redemption.copy-glow {
             animation: netproc-copy-glow 0.7s ease-out forwards;
         }
         /* Tap-to-copy helper label beneath the value */
@@ -5182,7 +5183,16 @@
 
         /* [2026-07-10 Fix: Format currency values nicely with a muted currency span per user request] */
         function formatPHP(val) {
-            const formattedNum = parseFloat(val).toLocaleString('en-PH', {
+            const num = parseFloat(val);
+            if (isNaN(num)) return `<span class="muted-currency">₱</span>0.00`;
+            if (num < 0) {
+                const formattedNum = Math.abs(num).toLocaleString('en-PH', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+                return `-<span class="muted-currency">₱</span>${formattedNum}`;
+            }
+            const formattedNum = num.toLocaleString('en-PH', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             });
@@ -7189,8 +7199,17 @@
             if (rowAP) rowAP.style.opacity = '1';
 
             const valTotal = document.getElementById('val-netproc-total');
-            // 2026-07-14: Display net proceeds as absolute positive value (was: could display negative)
-            if (valTotal) valTotal.innerHTML = formatPHP(Math.abs(netProceeds));
+            // (2026-07-13) Display true net proceeds value and turn red if negative; prev: Math.abs forced positive
+            if (valTotal) {
+                valTotal.innerHTML = formatPHP(netProceeds);
+                if (netProceeds < 0) {
+                    valTotal.style.setProperty('color', '#EF4444', 'important');
+                    valTotal.style.setProperty('-webkit-text-fill-color', '#EF4444', 'important');
+                } else {
+                    valTotal.style.removeProperty('color');
+                    valTotal.style.removeProperty('-webkit-text-fill-color');
+                }
+            }
 
             // (2026-07-13) Show holdout rows when any redemption (slot 2+) is checked AND master toggle is ON; prev: toggle not checked
             const masterPliOn = document.getElementById('toggleMasterPli')?.checked;
@@ -7200,13 +7219,21 @@
             const valHoldout = document.getElementById('val-holdout');
             const valAfterRedemption = document.getElementById('val-after-redemption');
             if (hasRedemptionChecked) {
-                const netProcAbs = Math.abs(netProceeds);
-                const holdOutAmt = Math.round(netProcAbs * 0.20 * 100) / 100;
-                const afterRedemptionAmt = Math.round((netProcAbs - holdOutAmt) * 100) / 100;
+                const holdOutAmt = Math.round(netProceeds * 0.20 * 100) / 100;
+                const afterRedemptionAmt = Math.round((netProceeds - holdOutAmt) * 100) / 100;
                 if (rowHoldout) rowHoldout.style.setProperty('display', 'flex', 'important');
                 if (rowAfterRedemption) rowAfterRedemption.style.setProperty('display', 'flex', 'important');
                 if (valHoldout) valHoldout.innerHTML = formatPHP(holdOutAmt);
-                if (valAfterRedemption) valAfterRedemption.innerHTML = formatPHP(afterRedemptionAmt);
+                if (valAfterRedemption) {
+                    valAfterRedemption.innerHTML = formatPHP(afterRedemptionAmt);
+                    if (afterRedemptionAmt < 0) {
+                        valAfterRedemption.style.setProperty('color', '#EF4444', 'important');
+                        valAfterRedemption.style.setProperty('-webkit-text-fill-color', '#EF4444', 'important');
+                    } else {
+                        valAfterRedemption.style.removeProperty('color');
+                        valAfterRedemption.style.removeProperty('-webkit-text-fill-color');
+                    }
+                }
             } else {
                 if (rowHoldout) rowHoldout.style.setProperty('display', 'none', 'important');
                 if (rowAfterRedemption) rowAfterRedemption.style.setProperty('display', 'none', 'important');
