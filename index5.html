@@ -4123,13 +4123,16 @@
                         <div class="modal-body" id="emailSummaryModalBody" style="padding: 24px; max-height: 75vh; overflow-y: auto;">
                             <!-- Rendered HTML cards insert here -->
                         </div>
-                        <!-- (2026-07-13) Align buttons side-by-side; prev: stacked/wrapped -->
-                        <div class="modal-footer" style="border-top: 1px solid rgba(255,255,255,0.1); padding: 14px 24px; display: flex; flex-direction: row; justify-content: space-between; align-items: center; width: 100%; gap: 10px;">
-                            <button type="button" class="btn btn-sm font-weight-bold" onclick="shareAsPNG()" style="background: linear-gradient(135deg, #10B981, #059669); color: white; border: none; border-radius: 8px; padding: 10px 14px; font-size: 11px; letter-spacing: 0.03em; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                <i class="bi bi-image mr-1"></i> SHARE AS PNG
+                        <!-- (2026-07-13) Align action buttons side-by-side; prev: two buttons -->
+                        <div class="modal-footer" style="border-top: 1px solid rgba(255,255,255,0.1); padding: 14px 24px; display: flex; flex-direction: row; justify-content: space-between; align-items: center; width: 100%; gap: 8px;">
+                            <button type="button" class="btn btn-sm font-weight-bold" onclick="shareAsPNG()" style="background: linear-gradient(135deg, #10B981, #059669); color: white; border: none; border-radius: 8px; padding: 10px 4px; font-size: 11px; letter-spacing: 0.03em; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                <i class="bi bi-image mr-1"></i> PNG
                             </button>
-                            <button type="button" class="btn btn-sm font-weight-bold" onclick="copyAndOpenEmail()" style="background: linear-gradient(135deg, #F59E0B, #D97706); color: white; border: none; border-radius: 8px; padding: 10px 14px; font-size: 11px; letter-spacing: 0.03em; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                <i class="bi bi-envelope-paper-fill mr-1"></i> EMAIL SUMMARY
+                            <button type="button" class="btn btn-sm font-weight-bold" onclick="shareToMessenger()" style="background: linear-gradient(135deg, #00B2FF, #006AFF); color: white; border: none; border-radius: 8px; padding: 10px 4px; font-size: 11px; letter-spacing: 0.03em; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                <i class="bi bi-messenger mr-1"></i> MESSENGER
+                            </button>
+                            <button type="button" class="btn btn-sm font-weight-bold" onclick="copyAndOpenEmail()" style="background: linear-gradient(135deg, #F59E0B, #D97706); color: white; border: none; border-radius: 8px; padding: 10px 4px; font-size: 11px; letter-spacing: 0.03em; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                <i class="bi bi-envelope-fill mr-1"></i> EMAIL
                             </button>
                         </div>
                     </div>
@@ -7674,6 +7677,74 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             showCustomAlert("PNG downloaded successfully! You can now send it via Messenger or Email.");
+        }
+
+        /* (2026-07-13) Capture summary as PNG and share to Messenger; prev: none */
+        function shareToMessenger() {
+            const modalBody = document.getElementById('emailSummaryModalBody');
+            if (!modalBody) return;
+            const targetElement = modalBody.firstElementChild;
+            if (!targetElement) return;
+
+            const shareBtn = document.querySelector('.modal-footer button[onclick="shareToMessenger()"]');
+            const origContent = shareBtn ? shareBtn.innerHTML : '';
+            if (shareBtn) {
+                shareBtn.disabled = true;
+                shareBtn.innerHTML = '<i class="spinner-border spinner-border-sm mr-1" role="status"></i>';
+            }
+
+            html2canvas(targetElement, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: '#080c19',
+                logging: false
+            }).then(canvas => {
+                canvas.toBlob(blob => {
+                    if (shareBtn) {
+                        shareBtn.disabled = false;
+                        shareBtn.innerHTML = origContent;
+                    }
+
+                    const empNum = (window.activeSession ? window.activeSession.empNum : null) || document.getElementById('employeeNumber')?.value.trim() || 'N/A';
+                    const fileName = `CSB_Evaluation_EMP_${empNum}.png`;
+                    const file = new File([blob], fileName, { type: 'image/png' });
+
+                    if (navigator.clipboard && window.ClipboardItem) {
+                        navigator.clipboard.write([
+                            new ClipboardItem({ 'image/png': blob })
+                        ]).catch(err => console.error("Clipboard copy failed:", err));
+                    }
+
+                    const openMessengerApp = function() {
+                        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                        if (isMobile) {
+                            window.location.href = 'fb-messenger://';
+                        } else {
+                            window.open('https://www.messenger.com/', '_blank');
+                        }
+                        showCustomAlert("Image copied to clipboard! Just PASTE (Ctrl+V) in Messenger to send.");
+                    };
+
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        navigator.share({
+                            files: [file],
+                            title: `CSB Loan Evaluation - Employee #${empNum}`
+                        }).then(openMessengerApp).catch(err => {
+                            console.error("Web Share failed:", err);
+                            openMessengerApp();
+                        });
+                    } else {
+                        openMessengerApp();
+                    }
+                }, 'image/png');
+            }).catch(err => {
+                console.error("html2canvas error:", err);
+                if (shareBtn) {
+                    shareBtn.disabled = false;
+                    shareBtn.innerHTML = origContent;
+                }
+                showCustomAlert("Failed to generate PNG image. Please try again.");
+            });
         }
 
         /* (2026-07-13) Use mailto on mobile to open native app; prev: window.open */
