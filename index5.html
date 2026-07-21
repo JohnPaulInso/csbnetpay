@@ -5291,6 +5291,10 @@
             const toggleLessOldRedMan = document.getElementById('toggleLessOldRedemptionManual');
             if (toggleLessOldRedMan) toggleLessOldRedMan.checked = true;
 
+            // (2026-07-13) Default toggleLessAdvancePayment to checked; prev: none
+            const toggleLessAdv = document.getElementById('toggleLessAdvancePayment');
+            if (toggleLessAdv) toggleLessAdv.checked = true;
+
             const limitInput = document.getElementById('input-target-limit');
             if (limitInput) {
                 limitInput.value = "5300";

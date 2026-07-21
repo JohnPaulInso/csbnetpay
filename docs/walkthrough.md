@@ -11,7 +11,7 @@ A comprehensive update was implemented to resolve unstyled layout flashes, brows
 - **Login Page Theme Alignment**: Locked the color-scheme of the login body and card to `light` inside [login/index.html](file:///c:/Users/Lenovo/Desktop/filez/SEARCH/login/index.html) and updated the background to a light gradient. This keeps the login card white and prevents the browser from automatically inverting it to dark gray when system dark mode is active.
 
 ### 2. Service Worker Cache Invalidation
-- **Version Bump**: Bumped the service worker cache version to `v33` in [service-worker.js](file:///c:/Users/Lenovo/Desktop/filez/SEARCH/service-worker.js) to invalidate older index templates cached on client devices and ensure all changes are immediately pulled.
+- **Version Bump**: Bumped the service worker cache version to `v34` in [service-worker.js](file:///c:/Users/Lenovo/Desktop/filez/SEARCH/service-worker.js) to invalidate older index templates cached on client devices and ensure all changes are immediately pulled.
 
 ### 3. Restored Custom Dropdowns on Desktop
 - **Media Query Fix**: Fixed an unclosed `@media (max-width: 768px)` block at line 2207 in [index5.html](file:///c:/Users/Lenovo/Desktop/filez/SEARCH/index5.html) by adding the missing closing brace. This fixes the bug where all subsequent CSS rules (including the custom select dropdown styles, statuses, skeleton loading, and final net pay styles) were incorrectly ignored on desktop screens.
@@ -35,6 +35,7 @@ A comprehensive update was implemented to resolve unstyled layout flashes, brows
   - Adjusted the layout button order in the footer to place the MESSENGER button as the first action, followed by PNG and EMAIL.
   - Redesigned the email summary card template using a premium light-themed white background style.
   - Modified the email action so that the body query parameter is left completely blank, permitting direct manual paste of the clipboard's rich formatted HTML snippet into the opened email client.
+  - Configured `toggleLessAdvancePayment` (inside row-netproc-advance-payment) to default to `true` (checked) during search sessions and input resets.
 
 ## Verification
 - Checked that custom select dropdowns render correctly as inline capsules on mobile and positioned absolute overlay popups on desktop.
@@ -53,3 +54,4 @@ A comprehensive update was implemented to resolve unstyled layout flashes, brows
 - Checked that numbers and values in the PNG conversion display correctly in Montserrat font instead of monospace.
 - Verified that the MESSENGER button is ordered first in the action drawer.
 - Confirmed that the generated HTML summary clipboard snippet uses a white background layout and the launched email composer body opens empty.
+- Verified that `toggleLessAdvancePayment` is checked by default.
