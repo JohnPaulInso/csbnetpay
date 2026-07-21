@@ -11,7 +11,7 @@ A comprehensive update was implemented to resolve unstyled layout flashes, brows
 - **Login Page Theme Alignment**: Locked the color-scheme of the login body and card to `light` inside [login/index.html](file:///c:/Users/Lenovo/Desktop/filez/SEARCH/login/index.html) and updated the background to a light gradient. This keeps the login card white and prevents the browser from automatically inverting it to dark gray when system dark mode is active.
 
 ### 2. Service Worker Cache Invalidation
-- **Version Bump**: Bumped the service worker cache version to `v28` in [service-worker.js](file:///c:/Users/Lenovo/Desktop/filez/SEARCH/service-worker.js) to invalidate older index templates cached on client devices and ensure all changes are immediately pulled.
+- **Version Bump**: Bumped the service worker cache version to `v29` in [service-worker.js](file:///c:/Users/Lenovo/Desktop/filez/SEARCH/service-worker.js) to invalidate older index templates cached on client devices and ensure all changes are immediately pulled.
 
 ### 3. Restored Custom Dropdowns on Desktop
 - **Media Query Fix**: Fixed an unclosed `@media (max-width: 768px)` block at line 2207 in [index5.html](file:///c:/Users/Lenovo/Desktop/filez/SEARCH/index5.html) by adding the missing closing brace. This fixes the bug where all subsequent CSS rules (including the custom select dropdown styles, statuses, skeleton loading, and final net pay styles) were incorrectly ignored on desktop screens.
@@ -25,6 +25,7 @@ A comprehensive update was implemented to resolve unstyled layout flashes, brows
 - **Email Summary Fixes**: Fixed incorrect DOM element ID lookups in `sendEvaluationEmail()` (corrected `val-netproc-proceeds`, `val-netproc-advance`, `lbl-less-onqueue`, `lbl-less-incoming`, `val-total-subtotal`, and `lbl-amortization` lookup lookups to match their actual HTML counterparts), ensuring the generated summary displays accurate values instead of falling back to `0.00`.
 - **SHARE AS PNG Feature**: Integrated `html2canvas` library and added a "SHARE AS PNG" button in the summary preview modal. The button captures the visual evaluation summary cards into a double-scale high-DPI PNG image, launching the browser/device's native share sheet (via Web Share API) to share the file directly on Gmail, FB Messenger, Viber, etc., with automatic download fallback.
 - **Side-by-Side Flex Buttons**: Styled the action buttons in the email preview modal footer using a flex row layout (`flex-direction: row; gap: 10px;`) with equal flex grow weights (`flex: 1;`) to keep them side-by-side on all screen sizes, including mobile, and shortened the email forward button label to fit.
+- **Montserrat Font Specification**: Specified the Montserrat font family in the outer HTML wrapper of the email summary template inside [index5.html](file:///c:/Users/Lenovo/Desktop/filez/SEARCH/index5.html) to ensure the generated PNG screenshot uses it overall.
 
 ## Verification
 - Checked that custom select dropdowns render correctly as inline capsules on mobile and positioned absolute overlay popups on desktop.
@@ -37,3 +38,4 @@ A comprehensive update was implemented to resolve unstyled layout flashes, brows
 - Verified that the generated email summary correctly outputs all non-zero values (including subtotal, amortization, Less OnQueue, and Less Incoming) matching the active client setup exactly.
 - Verified that clicking "SHARE AS PNG" renders the high-contrast dashboard preview card accurately into a PNG file, opening the native share window or downloading the file cleanly.
 - Verified that buttons are laid out cleanly side-by-side with equal spacing on mobile screens.
+- Verified that the generated PNG screenshot renders the text using the Montserrat font family.
