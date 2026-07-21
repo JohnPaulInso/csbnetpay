@@ -3662,7 +3662,19 @@
                                 </div>
                             </div>
 
-                            <!-- (2026-07-13) Billing Type Row; prev: in NetPay Computation card -->
+                            <!-- (2026-07-13) Hold Out 20% row; shown when redemption is checked -->
+                            <div class="baseline-row netpay-row-new-netpay font-weight-bold pt-2 mb-0" id="row-holdout" style="border-top: 1px solid rgba(255,255,255,0.08); display: none !important;">
+                                <span class="netpay-label-bold"><i class="bi bi-lock-fill text-warning mr-2"></i>HOLD OUT (20%)</span>
+                                <span id="val-holdout" class="bank-value-display">₱0.00</span>
+                            </div>
+
+                            <!-- (2026-07-13) After Redemption row; shown when redemption is checked -->
+                            <div class="baseline-row netpay-row-new-netpay font-weight-bold pt-1 mb-0" id="row-after-redemption" style="display: none !important;">
+                                <span class="netpay-label-bold"><i class="bi bi-arrow-right-circle-fill text-success mr-2"></i>AFTER REDEMPTION</span>
+                                <span id="val-after-redemption" class="bank-value-display">₱0.00</span>
+                            </div>
+
+
                             <div class="baseline-row pt-1 mb-0" id="row-billing-type" style="font-size: 0.72rem; font-weight: 700; color: rgba(255, 255, 255, 0.45); display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed rgba(255,255,255,0.05); margin-top: 4px;">
                                 <span class="netpay-label"><i class="bi bi-receipt-cutoff text-muted mr-2"></i>BILLING TYPE</span>
                                 <span id="val-billing-type" style="color: #10B981; font-weight: 800; padding-right: 0px !important;">NEW BILLING</span>
@@ -7143,6 +7155,25 @@
             const valTotal = document.getElementById('val-netproc-total');
             // 2026-07-14: Display net proceeds as absolute positive value (was: could display negative)
             if (valTotal) valTotal.innerHTML = formatPHP(Math.abs(netProceeds));
+
+            // (2026-07-13) Show holdout rows when any redemption (slot 2+) is checked; prev: none
+            const hasRedemptionChecked = Array.from(document.querySelectorAll('.pli-cb:checked')).some(cb => parseInt(cb.getAttribute('data-slot')) >= 2);
+            const rowHoldout = document.getElementById('row-holdout');
+            const rowAfterRedemption = document.getElementById('row-after-redemption');
+            const valHoldout = document.getElementById('val-holdout');
+            const valAfterRedemption = document.getElementById('val-after-redemption');
+            if (hasRedemptionChecked) {
+                const netProcAbs = Math.abs(netProceeds);
+                const holdOutAmt = Math.round(netProcAbs * 0.20 * 100) / 100;
+                const afterRedemptionAmt = Math.round((netProcAbs - holdOutAmt) * 100) / 100;
+                if (rowHoldout) rowHoldout.style.setProperty('display', 'flex', 'important');
+                if (rowAfterRedemption) rowAfterRedemption.style.setProperty('display', 'flex', 'important');
+                if (valHoldout) valHoldout.innerHTML = formatPHP(holdOutAmt);
+                if (valAfterRedemption) valAfterRedemption.innerHTML = formatPHP(afterRedemptionAmt);
+            } else {
+                if (rowHoldout) rowHoldout.style.setProperty('display', 'none', 'important');
+                if (rowAfterRedemption) rowAfterRedemption.style.setProperty('display', 'none', 'important');
+            }
 
             // (2026-07-13) Animate button on manual click; prev: animated on all updates
             if (isManual) {

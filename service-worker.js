@@ -5,8 +5,8 @@
  * Fix: Bumped cache version to v18.
  *      Forces browsers to reload updated script files reverting fetch requests to raw CSV files directly.
  */
-/* (2026-07-13) Bump cache version to v41; prev: v40 */
-const CACHE_NAME = "csb-search-v41";
+/* (2026-07-13) Bump cache version to v42; prev: v41 */
+const CACHE_NAME = "csb-search-v42";
 const ASSETS = [
   "./",
   "index.html",
