@@ -34,6 +34,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- (2026-07-13) Add SheetJS CDN import; prev: no excel parsing library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- (2026-07-13) Add html2canvas library for PNG screenshots; prev: none -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         /* [2026-07-11 Fix: CSS vars updated — deeper shadow, wider emerald green added, liquid glass vars] */
         :root {
@@ -4122,7 +4124,11 @@
                             <!-- Rendered HTML cards insert here -->
                         </div>
                         <!-- (2026-07-13) Remove footer close button; prev: close button in footer -->
-                        <div class="modal-footer" style="border-top: 1px solid rgba(255,255,255,0.1); padding: 14px 24px; display: flex; justify-content: flex-end;">
+                        <div class="modal-footer" style="border-top: 1px solid rgba(255,255,255,0.1); padding: 14px 24px; display: flex; justify-content: flex-end; gap: 10px;">
+                            <!-- (2026-07-13) Add Share as PNG button; prev: forward via email only -->
+                            <button type="button" class="btn btn-sm font-weight-bold" onclick="shareAsPNG()" style="background: linear-gradient(135deg, #10B981, #059669); color: white; border: none; border-radius: 8px; padding: 10px 22px; font-size: 13px; letter-spacing: 0.03em;">
+                                <i class="bi bi-image mr-2"></i> SHARE AS PNG
+                            </button>
                             <button type="button" class="btn btn-sm font-weight-bold" onclick="copyAndOpenEmail()" style="background: linear-gradient(135deg, #F59E0B, #D97706); color: white; border: none; border-radius: 8px; padding: 10px 22px; font-size: 13px; letter-spacing: 0.03em;">
                                 <i class="bi bi-envelope-paper-fill mr-2"></i> FORWARD VIA EMAIL (COPY & OPEN)
                             </button>
@@ -7603,6 +7609,71 @@
             } else if (navigator.clipboard) {
                 navigator.clipboard.writeText(plainText);
             }
+        }
+
+        /* (2026-07-13) Capture summary as PNG and share/download it; prev: none */
+        function shareAsPNG() {
+            const modalBody = document.getElementById('emailSummaryModalBody');
+            if (!modalBody) return;
+            const targetElement = modalBody.firstElementChild;
+            if (!targetElement) return;
+
+            const shareBtn = document.querySelector('.modal-footer button[onclick="shareAsPNG()"]');
+            const origContent = shareBtn ? shareBtn.innerHTML : '';
+            if (shareBtn) {
+                shareBtn.disabled = true;
+                shareBtn.innerHTML = '<i class="spinner-border spinner-border-sm mr-2" role="status"></i>GENERATING...';
+            }
+
+            html2canvas(targetElement, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: '#080c19',
+                logging: false
+            }).then(canvas => {
+                canvas.toBlob(blob => {
+                    if (shareBtn) {
+                        shareBtn.disabled = false;
+                        shareBtn.innerHTML = origContent;
+                    }
+
+                    const empNum = (window.activeSession ? window.activeSession.empNum : null) || document.getElementById('employeeNumber')?.value.trim() || 'N/A';
+                    const fileName = `CSB_Evaluation_EMP_${empNum}.png`;
+                    const file = new File([blob], fileName, { type: 'image/png' });
+
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        navigator.share({
+                            files: [file],
+                            title: `CSB Loan Evaluation - Employee #${empNum}`,
+                            text: `Here is the CSB Loan Evaluation Summary for Employee #${empNum}`
+                        }).catch(err => {
+                            console.error("Error sharing via Web Share API:", err);
+                            triggerPNGDownload(blob, fileName);
+                        });
+                    } else {
+                        triggerPNGDownload(blob, fileName);
+                    }
+                }, 'image/png');
+            }).catch(err => {
+                console.error("html2canvas error:", err);
+                if (shareBtn) {
+                    shareBtn.disabled = false;
+                    shareBtn.innerHTML = origContent;
+                }
+                showCustomAlert("Failed to generate PNG image. Please try again.");
+            });
+        }
+
+        function triggerPNGDownload(blob, fileName) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showCustomAlert("PNG downloaded successfully! You can now send it via Messenger or Email.");
         }
 
         /* (2026-07-13) Use mailto on mobile to open native app; prev: window.open */
