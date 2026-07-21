@@ -1292,9 +1292,9 @@
         #val-after-redemption:hover {
             filter: brightness(1.2) drop-shadow(0 0 4px rgba(245, 158, 11, 0.4)) !important;
         }
-        /* (2026-07-13) After Redemption bigger than Net Proceeds; prev: same 0.95rem */
+        /* (2026-07-13) After Redemption font size reduced per user request; prev: 1.2rem */
         #val-after-redemption {
-            font-size: 1.2rem !important;
+            font-size: 1.0rem !important;
         }
 
         /* Compact inputs and dropdowns inside baseline receipt/computation rows */
@@ -5062,6 +5062,9 @@
                 if (t === 60) opt.selected = true;
                 termSelect.appendChild(opt);
             }
+            if (typeof syncAllCustomDropdowns === 'function') {
+                syncAllCustomDropdowns();
+            }
         }
 
         // SG override selector lists builder
@@ -7727,24 +7730,22 @@
                 '          <tr><td style="color:#1F2937 !important; border-bottom:1px solid #E5E7EB;" bgcolor="#F9FAFB"><font color="#1F2937"><b style="color:#1F2937 !important; -webkit-text-fill-color:#1F2937 !important;">Loan Proceeds</b></font></td><td align="right" style="color:#1F2937 !important; font-weight:800; font-family:\'Montserrat\',sans-serif; border-bottom:1px solid #E5E7EB;" bgcolor="#F9FAFB"><font color="#1F2937"><b style="color:#1F2937 !important; -webkit-text-fill-color:#1F2937 !important;">' + loanProceeds + '</b></font></td></tr>',
                 '          <tr><td style="color:#1F2937 !important; border-bottom:1px solid #E5E7EB;" bgcolor="#F9FAFB"><font color="#1F2937"><b style="color:#1F2937 !important; -webkit-text-fill-color:#1F2937 !important;">Less Old Balance</b></font></td><td align="right" style="color:#1F2937 !important; font-weight:800; font-family:\'Montserrat\',sans-serif; border-bottom:1px solid #E5E7EB;" bgcolor="#F9FAFB"><font color="#1F2937"><b style="color:#1F2937 !important; -webkit-text-fill-color:#1F2937 !important;">₱' + oldBalance + '</b></font></td></tr>',
                 '          <tr><td style="color:#1F2937 !important; border-bottom:1px solid #E5E7EB;" bgcolor="#F9FAFB"><font color="#1F2937"><b style="color:#1F2937 !important; -webkit-text-fill-color:#1F2937 !important;">Advance Payment Months</b></font></td><td align="right" style="color:#1F2937 !important; font-weight:800; border-bottom:1px solid #E5E7EB;" bgcolor="#F9FAFB"><font color="#1F2937"><b style="color:#1F2937 !important; -webkit-text-fill-color:#1F2937 !important;">' + advanceMonths + ' months</b></font></td></tr>',
-                '          <tr><td style="color:#1F2937 !important;" bgcolor="#F9FAFB"><font color="#1F2937"><b style="color:#1F2937 !important; -webkit-text-fill-color:#1F2937 !important;">Less Advance Payment</b></font></td><td align="right" style="color:#1F2937 !important; font-weight:800; font-family:\'Montserrat\',sans-serif;" bgcolor="#F9FAFB"><font color="#1F2937"><b style="color:#1F2937 !important; -webkit-text-fill-color:#1F2937 !important;">' + lessAdvance + '</b></font></td></tr>',
+                '          <tr><td style="color:#1F2937 !important;' + (hasHoldout ? ' border-bottom:1px solid #E5E7EB;' : '') + '" bgcolor="#F9FAFB"><font color="#1F2937"><b style="color:#1F2937 !important; -webkit-text-fill-color:#1F2937 !important;">Less Advance Payment</b></font></td><td align="right" style="color:#1F2937 !important; font-weight:800; font-family:\'Montserrat\',sans-serif;' + (hasHoldout ? ' border-bottom:1px solid #E5E7EB;' : '') + '" bgcolor="#F9FAFB"><font color="#1F2937"><b style="color:#1F2937 !important; -webkit-text-fill-color:#1F2937 !important;">' + lessAdvance + '</b></font></td></tr>',
+                ...(hasHoldout ? [
+                    '          <tr><td style="color:#D97706 !important; font-weight:800; border-bottom:1px solid #E5E7EB;" bgcolor="#F9FAFB"><font color="#D97706"><b style="color:#D97706 !important; -webkit-text-fill-color:#D97706 !important;">NET PROCEEDS</b></font></td><td align="right" style="color:#D97706 !important; font-weight:800; font-family:\'Montserrat\',sans-serif; border-bottom:1px solid #E5E7EB;" bgcolor="#F9FAFB"><font color="#D97706"><b style="color:#D97706 !important; -webkit-text-fill-color:#D97706 !important;">' + netProceeds + '</b></font></td></tr>',
+                    '          <tr><td style="color:#92400E !important; font-weight:700;" bgcolor="#F9FAFB"><font color="#92400E"><b style="color:#92400E !important; -webkit-text-fill-color:#92400E !important;">HOLD OUT (20%)</b></font></td><td align="right" style="color:#92400E !important; font-weight:800; font-family:\'Montserrat\',sans-serif;" bgcolor="#F9FAFB"><font color="#92400E"><b style="color:#92400E !important; -webkit-text-fill-color:#92400E !important;">' + holdoutVal + '</b></font></td></tr>'
+                ] : []),
                 '        </table>',
                 '        <div style="height:10px;"></div>',
                 '        <table width="100%" border="0" cellpadding="10" cellspacing="0" style="background-color:#FEF3C7; border:1px solid #D97706; border-radius:8px;" bgcolor="#FEF3C7">',
                 '          <tr>',
-                '            <td style="color:#D97706 !important; font-weight:800; font-size:14px; background-color:#FEF3C7;" bgcolor="#FEF3C7"><font color="#D97706"><b style="color:#D97706 !important; -webkit-text-fill-color:#D97706 !important;">NET PROCEEDS</b></font></td>',
-                '            <td align="right" style="color:#D97706 !important; font-weight:900; font-size:17px; font-family:\'Montserrat\',sans-serif; background-color:#FEF3C7;" bgcolor="#FEF3C7"><font color="#D97706"><b style="color:#D97706 !important; -webkit-text-fill-color:#D97706 !important;">' + netProceeds + '</b></font></td>',
+                (hasHoldout
+                    ? '            <td style="color:#047857 !important; font-weight:800; font-size:14px; background-color:#FEF3C7;" bgcolor="#FEF3C7"><font color="#047857"><b style="color:#047857 !important; -webkit-text-fill-color:#047857 !important;">AFTER REDEMPTION</b></font></td><td align="right" style="color:#D97706 !important; font-weight:900; font-size:17px; font-family:\'Montserrat\',sans-serif; background-color:#FEF3C7;" bgcolor="#FEF3C7"><font color="#D97706"><b style="color:#D97706 !important; -webkit-text-fill-color:#D97706 !important;">' + afterRedemptionVal + '</b></font></td>'
+                    : '            <td style="color:#D97706 !important; font-weight:800; font-size:14px; background-color:#FEF3C7;" bgcolor="#FEF3C7"><font color="#D97706"><b style="color:#D97706 !important; -webkit-text-fill-color:#D97706 !important;">NET PROCEEDS</b></font></td><td align="right" style="color:#D97706 !important; font-weight:900; font-size:17px; font-family:\'Montserrat\',sans-serif; background-color:#FEF3C7;" bgcolor="#FEF3C7"><font color="#D97706"><b style="color:#D97706 !important; -webkit-text-fill-color:#D97706 !important;">' + netProceeds + '</b></font></td>'
+                ),
                 '          </tr>',
                 '        </table>',
                 '        <div style="height:10px;"></div>',
-                // (2026-07-13) Insert holdout rows in HTML template when redemption active; prev: none
-                ...(hasHoldout ? [
-                    '        <table width="100%" border="0" cellpadding="6" cellspacing="0" style="font-size:12px; background:#FFFBEB; border:1px solid #FCD34D; border-radius:6px;">',
-                    '          <tr><td style="color:#92400E !important; font-weight:700;" bgcolor="#FFFBEB"><font color="#92400E"><b style="color:#92400E !important; -webkit-text-fill-color:#92400E !important;">HOLD OUT (20%)</b></font></td><td align="right" style="color:#92400E !important; font-weight:800; font-family:\'Montserrat\',sans-serif;" bgcolor="#FFFBEB"><font color="#92400E"><b style="color:#92400E !important; -webkit-text-fill-color:#92400E !important;">' + holdoutVal + '</b></font></td></tr>',
-                    '          <tr><td style="color:#047857 !important; font-weight:700;" bgcolor="#FFFBEB"><font color="#047857"><b style="color:#047857 !important; -webkit-text-fill-color:#047857 !important;">AFTER REDEMPTION</b></font></td><td align="right" style="color:#D97706 !important; font-weight:900; font-size:15px; font-family:\'Montserrat\',sans-serif;" bgcolor="#FFFBEB"><font color="#D97706"><b style="color:#D97706 !important; -webkit-text-fill-color:#D97706 !important;">' + afterRedemptionVal + '</b></font></td></tr>',
-                    '        </table>',
-                    '        <div style="height:10px;"></div>'
-                ] : []),
                 '        <table width="100%" border="0" cellpadding="0" cellspacing="0" style="font-size:12px;">',
                 '          <tr>',
                 '            <td style="color:#1F2937 !important; font-weight:700;" bgcolor="#F9FAFB"><font color="#1F2937"><b style="color:#1F2937 !important; -webkit-text-fill-color:#1F2937 !important;">BILLING TYPE</b></font></td>',
