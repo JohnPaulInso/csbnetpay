@@ -6172,7 +6172,9 @@
             }
 
             const netPayPliTotal = (isAutonomous ? safeFloat(document.getElementById('input-netpay').value) : window.activeSession.netPay) + redemptionSubtotal + doubleDeductionSubtotal;
-            document.getElementById('val-netpayplitotal').innerHTML = formatPHP(netPayPliTotal);
+            // (2026-07-13) Guard null; prev: direct set (val-netpayplitotal removed from card)
+            const valNetpayPliTotalEl = document.getElementById('val-netpayplitotal');
+            if (valNetpayPliTotalEl) valNetpayPliTotalEl.innerHTML = formatPHP(netPayPliTotal);
 
             // Phase C Salary Adjustments & overrides query matrix
             let anticipatedVal = 0;
@@ -6352,7 +6354,9 @@
             }
 
             const activeNetPayPliTotal = (isAutonomous ? safeFloat(document.getElementById('input-netpay').value) : window.activeSession.netPay) + activePliSubtotal + activeDoubleSubtotal;
-            document.getElementById('val-netpayplitotal').innerHTML = formatPHP(activeNetPayPliTotal);
+            // (2026-07-13) Guard null; prev: direct set (val-netpayplitotal removed from card)
+            const valNetpayPliTotalEl2 = document.getElementById('val-netpayplitotal');
+            if (valNetpayPliTotalEl2) valNetpayPliTotalEl2.innerHTML = formatPHP(activeNetPayPliTotal);
 
             // [2026-07-11 Fix: Overhauled visual dimming to gray out the entire column contents (nodes, labels, and inputs) except the toggle switch, and disable select elements]
             const colAnticipated = document.getElementById('colAnticipatedCompensation');
