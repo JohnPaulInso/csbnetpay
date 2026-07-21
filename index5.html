@@ -1272,7 +1272,8 @@
         #val-baseline, 
         #val-subtotal-after-redemption, 
         #val-revised-baseline,
-        #val-netproc-total {
+        #val-netproc-total,
+        #val-after-redemption {
             font-size: 0.95rem !important;
             font-weight: 800 !important;
             font-family: 'Montserrat', sans-serif !important;
@@ -1282,11 +1283,13 @@
             letter-spacing: -0.02em !important;
         }
         /* 2026-07-13: Make val-netproc-total clickable with copy hover effect (was: default cursor/hover) */
-        #val-netproc-total {
+        #val-netproc-total,
+        #val-after-redemption {
             cursor: pointer !important;
             transition: filter 0.2s ease !important;
         }
-        #val-netproc-total:hover {
+        #val-netproc-total:hover,
+        #val-after-redemption:hover {
             filter: brightness(1.2) drop-shadow(0 0 4px rgba(245, 158, 11, 0.4)) !important;
         }
 
@@ -2280,7 +2283,8 @@
             animation: netproc-copy-glow 0.7s ease-out forwards;
         }
         /* Tap-to-copy helper label beneath the value */
-        #lbl-netproc-tap-hint {
+        #lbl-netproc-tap-hint,
+        #lbl-after-redemption-tap-hint {
             font-size: 0.55rem;
             font-family: 'Montserrat', sans-serif;
             font-weight: 600;
@@ -2294,7 +2298,8 @@
             margin-top: 2px;
             transition: opacity 0.2s ease;
         }
-        #val-netproc-total.copy-glow + #lbl-netproc-tap-hint {
+        #val-netproc-total.copy-glow + #lbl-netproc-tap-hint,
+        #val-after-redemption.copy-glow + #lbl-after-redemption-tap-hint {
             opacity: 0;
         }
 
@@ -3671,7 +3676,11 @@
                             <!-- (2026-07-13) After Redemption row; shown when redemption is checked -->
                             <div class="baseline-row netpay-row-new-netpay font-weight-bold pt-1 mb-0" id="row-after-redemption" style="display: none !important;">
                                 <span class="netpay-label-bold"><i class="bi bi-arrow-right-circle-fill text-success mr-2"></i>AFTER REDEMPTION</span>
-                                <span id="val-after-redemption" class="bank-value-display">₱0.00</span>
+                                <!-- (2026-07-13) Match val-netproc-total tap-to-copy flex layout; prev: bare span -->
+                                <div class="d-flex flex-column align-items-end">
+                                    <span id="val-after-redemption" class="bank-value-display">₱0.00</span>
+                                    <span id="lbl-after-redemption-tap-hint"><i class="bi bi-clipboard" style="font-size:0.55rem;"></i> tap to copy</span>
+                                </div>
                             </div>
 
 
@@ -4937,6 +4946,26 @@
                     void netprocTotalEl.offsetWidth; // force reflow to restart animation
                     netprocTotalEl.classList.add('copy-glow');
                     setTimeout(() => netprocTotalEl.classList.remove('copy-glow'), 750);
+                });
+            }
+            // (2026-07-13) Add tap-to-copy on val-after-redemption; prev: none
+            const afterRedemptionCopyEl = document.getElementById('val-after-redemption');
+            if (afterRedemptionCopyEl) {
+                afterRedemptionCopyEl.addEventListener('click', async () => {
+                    const text = afterRedemptionCopyEl.textContent || "";
+                    const cleanNum = text.replace(/[^0-9.]/g, '');
+                    if (cleanNum) {
+                        try {
+                            await navigator.clipboard.writeText(cleanNum);
+                            showToast("Copied to Clipboard");
+                        } catch (err) {
+                            showToast("Failed to copy to clipboard");
+                        }
+                    }
+                    afterRedemptionCopyEl.classList.remove('copy-glow');
+                    void afterRedemptionCopyEl.offsetWidth;
+                    afterRedemptionCopyEl.classList.add('copy-glow');
+                    setTimeout(() => afterRedemptionCopyEl.classList.remove('copy-glow'), 750);
                 });
             }
         });
