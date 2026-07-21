@@ -3631,9 +3631,9 @@
                                     <option value="3">3</option>
                                     <option value="4">4</option>
                                     <option value="5">5</option>
-                                    <!-- (2026-07-13) Default advance months to 6; prev: option 7 selected -->
-                                    <option value="6" selected>6</option>
-                                    <option value="7">7</option>
+                                    <option value="6">6</option>
+                                    <!-- (2026-07-13) Default advance months to 7; prev: 6 -->
+                                    <option value="7" selected>7</option>
                                     <option value="8">8</option>
                                     <option value="9">9</option>
                                 </select>
@@ -5220,6 +5220,84 @@
             }
             return result;
         }
+        /* (2026-07-13) Reset inputs on new search to clear old values; prev: none */
+        function resetInputsOnSearch() {
+            const oldBalanceInput = document.getElementById('input-netproc-old-balance');
+            if (oldBalanceInput) oldBalanceInput.value = "0";
+
+            const incomingDeduction = document.getElementById('incomingDeduction');
+            if (incomingDeduction) incomingDeduction.value = "0";
+
+            const redemptionManual = document.getElementById('val-netproc-redemption-manual-total');
+            if (redemptionManual) redemptionManual.value = "0";
+
+            const csDeductions = document.getElementById('input-cs-deductions');
+            if (csDeductions) csDeductions.value = "0.00";
+
+            const redemptionInput = document.getElementById('input-redemption');
+            if (redemptionInput) redemptionInput.value = "0.00";
+
+            const anticipatedInput = document.getElementById('input-anticipated');
+            if (anticipatedInput) anticipatedInput.value = "0.00";
+
+            const promotionInput = document.getElementById('input-promotion');
+            if (promotionInput) promotionInput.value = "0.00";
+
+            const lessOnqueue = document.getElementById('input-less-onqueue');
+            if (lessOnqueue) lessOnqueue.value = "0.00";
+
+            const lessIncoming = document.getElementById('input-less-incoming');
+            if (lessIncoming) lessIncoming.value = "0.00";
+
+            const loanAmtEl = document.getElementById('loanAmount');
+            if (loanAmtEl) {
+                delete loanAmtEl.dataset.manualOverride;
+                loanAmtEl.value = "0";
+            }
+
+            const toggleMaster = document.getElementById('toggleMasterPli');
+            if (toggleMaster) {
+                toggleMaster.checked = false;
+                onToggleMasterPli();
+            }
+
+            const toggleAnticipated = document.getElementById('toggleAnticipated');
+            if (toggleAnticipated) {
+                toggleAnticipated.checked = false;
+                onToggleAnticipated();
+            }
+
+            const togglePromotion = document.getElementById('togglePromotion');
+            if (togglePromotion) {
+                togglePromotion.checked = false;
+                onTogglePromotion();
+            }
+
+            const toggleLessOldRed = document.getElementById('toggleLessOldRedemption');
+            if (toggleLessOldRed) toggleLessOldRed.checked = true;
+
+            const toggleLessOldRedMan = document.getElementById('toggleLessOldRedemptionManual');
+            if (toggleLessOldRedMan) toggleLessOldRedMan.checked = true;
+
+            const limitInput = document.getElementById('input-target-limit');
+            if (limitInput) {
+                limitInput.value = "5300";
+                limitInput.dataset.manual = '0';
+            }
+
+            /* (2026-07-13) Reset advance payment months default to 7; prev: 6 */
+            const advMonthsSelect = document.getElementById('select-netproc-advance-months');
+            if (advMonthsSelect) {
+                advMonthsSelect.value = "7";
+            }
+            syncAllCustomDropdowns();
+
+            if (window.activeSession) {
+                window.activeSession.netprocRedemptionInputs = {};
+                window.activeSession.netprocRedemptionCheckedState = {};
+                window.activeSession.addedNetprocRedemptions = {};
+            }
+        }
 
         async function performSearch(skipHistoryLog = false) {
             const empNumInput = document.getElementById('employeeNumber').value.trim();
@@ -5227,6 +5305,8 @@
                 await showCustomAlert("Please enter a valid Employee Number.");
                 return;
             }
+
+            resetInputsOnSearch();
 
             // (2026-07-13) Save session timestamp for 10-minute active session; prev: input only
             localStorage.setItem("employeeNumber", empNumInput);
@@ -7051,19 +7131,19 @@
                     }
                     bestP = bestP - diff * (exactP / requiredAmort);
                 }
-                exactRoundedP = Math.round(bestP * 100) / 100;
-                
-                // (2026-07-13) Ensure net pay is at least thresholdLimit; prev: round only
-                let testAmort = Math.ceil(parseFloat(calculatePMT(r, loanTerm, exactRoundedP).toFixed(6)) * 100) / 100;
-                while (testAmort > requiredAmort && exactRoundedP > 0) {
-                    exactRoundedP = Math.round((exactRoundedP - 0.01) * 100) / 100;
-                    testAmort = Math.ceil(parseFloat(calculatePMT(r, loanTerm, exactRoundedP).toFixed(6)) * 100) / 100;
+                /* (2026-07-13) Round loan to nearest thousand to prevent 5299; prev: decimals */
+                let finalP = Math.round(bestP / 1000) * 1000;
+                let testAmort = Math.ceil(parseFloat(calculatePMT(r, loanTerm, finalP).toFixed(6)) * 100) / 100;
+                while (testAmort > requiredAmort && finalP > 0) {
+                    finalP -= 1000;
+                    testAmort = Math.ceil(parseFloat(calculatePMT(r, loanTerm, finalP).toFixed(6)) * 100) / 100;
                 }
+                exactRoundedP = finalP;
             } else if (revisedBaseline > 0) {
                 // (2026-07-13) Fallback to capacity if requiredAmort <= 0; prev: set to 0
                 const fallbackCap = Math.max(0, revisedBaseline - thresholdLimit);
                 const rawSuggested = (fallbackCap > 0 ? fallbackCap : revisedBaseline) / 20.01 * 1000;
-                exactRoundedP = Math.round(rawSuggested * 100) / 100;
+                exactRoundedP = Math.round(rawSuggested / 1000) * 1000;
             }
 
             if (exactRoundedP < 0) exactRoundedP = 0;
@@ -7071,7 +7151,7 @@
             const loanInput = document.getElementById('loanAmount');
             if (loanInput) {
                 loanInput.dataset.manualOverride = '1';
-                loanInput.value = exactRoundedP.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                loanInput.value = exactRoundedP.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
                 formatLoanAmountField();
                 runCalculations();
             }
@@ -7268,8 +7348,8 @@
                 netprocOldBalance: document.getElementById('input-netproc-old-balance') ? document.getElementById('input-netproc-old-balance').value : "0",
                 // (2026-07-13) Save manual redemption input; prev: table values
                 netprocRedemptionManual: document.getElementById('val-netproc-redemption-manual-total') ? document.getElementById('val-netproc-redemption-manual-total').value : "0",
-                // (2026-07-13) Set advance months default value to "6"; prev: "7"
-                netprocAdvanceMonths: document.getElementById('select-netproc-advance-months') ? document.getElementById('select-netproc-advance-months').value : "6",
+                // (2026-07-13) Set advance months default value to "7"; prev: "6"
+                netprocAdvanceMonths: document.getElementById('select-netproc-advance-months') ? document.getElementById('select-netproc-advance-months').value : "7",
                 // (2026-07-13) Save netproc-redemption-cb checked state; prev: netproc-deduction-cb
                 netprocRedemptionSelections: (() => {
                     const selections = [];
@@ -7312,7 +7392,8 @@
 
             const loanProceeds = document.getElementById('val-netproc-proceeds')?.innerText || '₱0.00';
             const oldBalance = document.getElementById('input-netproc-old-balance')?.value || '0';
-            const advanceMonths = document.getElementById('select-netproc-advance-months')?.value || '6';
+            /* (2026-07-13) Set advance months default fallback to 7; prev: 6 */
+            const advanceMonths = document.getElementById('select-netproc-advance-months')?.value || '7';
             const lessAdvance = document.getElementById('val-netproc-advance')?.innerText || '₱0.00';
             const netProceeds = document.getElementById('val-netproc-total')?.innerText || '₱0.00';
             const billingType = document.getElementById('val-billing-type')?.innerText || 'NEW BILLING';
@@ -7505,14 +7586,19 @@
             }
         }
 
-        // (2026-07-13) Redirect to Gmail compose on copy; prev: opened mailto link
+        /* (2026-07-13) Use mailto on mobile to open native app; prev: window.open */
         function copyAndOpenEmail() {
             const empNum = (window.activeSession ? window.activeSession.empNum : null) || document.getElementById('employeeNumber')?.value.trim() || 'N/A';
             const mailSubject = encodeURIComponent('CSB Loan Evaluation Summary - Employee #' + empNum);
+            const mailBody = encodeURIComponent(window.currentEmailPlainText || '');
 
-            // (2026-07-13) Open Gmail compose in new tab; prev: redirected same tab
             const openMail = function() {
-                window.open('https://mail.google.com/mail/?view=cm&fs=1&su=' + mailSubject, '_blank');
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                if (isMobile) {
+                    window.location.href = 'mailto:?subject=' + mailSubject + '&body=' + mailBody;
+                } else {
+                    window.open('https://mail.google.com/mail/?view=cm&fs=1&su=' + mailSubject + '&body=' + mailBody, '_blank');
+                }
                 closeEmailSummaryModal();
             };
 
