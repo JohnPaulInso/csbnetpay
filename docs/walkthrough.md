@@ -11,7 +11,7 @@ A comprehensive update was implemented to resolve unstyled layout flashes, brows
 - **Login Page Theme Alignment**: Locked the color-scheme of the login body and card to `light` inside [login/index.html](file:///c:/Users/Lenovo/Desktop/filez/SEARCH/login/index.html) and updated the background to a light gradient. This keeps the login card white and prevents the browser from automatically inverting it to dark gray when system dark mode is active.
 
 ### 2. Service Worker Cache Invalidation
-- **Version Bump**: Bumped the service worker cache version to `v23` in [service-worker.js](file:///c:/Users/Lenovo/Desktop/filez/SEARCH/service-worker.js) to invalidate older index templates cached on client devices and ensure all changes are immediately pulled.
+- **Version Bump**: Bumped the service worker cache version to `v25` in [service-worker.js](file:///c:/Users/Lenovo/Desktop/filez/SEARCH/service-worker.js) to invalidate older index templates cached on client devices and ensure all changes are immediately pulled.
 
 ### 3. Restored Custom Dropdowns on Desktop
 - **Media Query Fix**: Fixed an unclosed `@media (max-width: 768px)` block at line 2207 in [index5.html](file:///c:/Users/Lenovo/Desktop/filez/SEARCH/index5.html) by adding the missing closing brace. This fixes the bug where all subsequent CSS rules (including the custom select dropdown styles, statuses, skeleton loading, and final net pay styles) were incorrectly ignored on desktop screens.
@@ -22,6 +22,7 @@ A comprehensive update was implemented to resolve unstyled layout flashes, brows
 - **Mobile Email Client Launcher**: Updated `copyAndOpenEmail()` to use the `mailto:` scheme with pre-filled subject and plain text body when on a mobile PWA or browser, allowing it to natively launch the default mobile email app (such as Gmail) instead of opening Gmail web interface in a new tab.
 - **Default Advance Months**: Changed the default selection and fallback value of the advance payment months selector in [index5.html](file:///c:/Users/Lenovo/Desktop/filez/SEARCH/index5.html) from 6 to 7.
 - **Less Advance Payment Toggle**: Added a toggle checkbox next to the "Less Advance Payment" label in [index5.html](file:///c:/Users/Lenovo/Desktop/filez/SEARCH/index5.html) to allow users to exclude PLI deductions from the advance payment basis calculation (uncapping the basis to just new amortization minus CSB deductions when unchecked).
+- **Shortened Email Layout**: Simplified the email summary generated in [index5.html](file:///c:/Users/Lenovo/Desktop/filez/SEARCH/index5.html) by removing the Client Profile, Loan Setup, and Net Pay computation cards, leaving only the Net Proceeds breakdown.
 
 ## Verification
 - Checked that custom select dropdowns render correctly as inline capsules on mobile and positioned absolute overlay popups on desktop.
@@ -31,3 +32,4 @@ A comprehensive update was implemented to resolve unstyled layout flashes, brows
 - Verified that clicking the copy/send email action on mobile redirects to the native mail client.
 - Confirmed that the advance months dropdown defaults to 7 on page load and reset.
 - Verified that checking/unchecking the "Less Advance Payment" checkbox correctly toggles the inclusion/exclusion of PLIs in the advance payment basis calculation.
+- Verified that the generated email summary only shows the clean Net Proceeds details.
