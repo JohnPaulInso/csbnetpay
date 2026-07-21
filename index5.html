@@ -6194,10 +6194,10 @@
                 valDoubleSub.innerHTML = formatPHP(doubleDeductionSubtotal);
             }
 
-            // [2026-07-14 Fix: Update Redemption Total Amount inside the PLI/Redemption card]
+            // (2026-07-13) Set card header total to pliSubtotal; prev: redemptionSubtotal
             const valPliTotalEl = document.getElementById('val-pli-total');
             if (valPliTotalEl) {
-                valPliTotalEl.innerHTML = formatPHP(redemptionSubtotal);
+                valPliTotalEl.innerHTML = formatPHP(pliSubtotal);
             }
 
             const netPayPliTotal = (isAutonomous ? safeFloat(document.getElementById('input-netpay').value) : window.activeSession.netPay) + redemptionSubtotal + doubleDeductionSubtotal;
@@ -6626,8 +6626,8 @@
             
             const valBaselinePapEl = document.getElementById('val-baseline-papsubtotal');
             if (valBaselinePapEl) {
-                // [2026-07-14 Fix: Show only activePliSubtotal in redemption accordion header value; previous: papSubtotal]
-                valBaselinePapEl.innerHTML = formatPHP(activePliSubtotal);
+                // (2026-07-13) Set accordion subtotal to pliSubtotal; prev: activePliSubtotal
+                valBaselinePapEl.innerHTML = formatPHP(useMasterPli ? pliSubtotal : 0);
             }
             const rowBaselinePapEl = document.getElementById('row-baseline-papsubtotal');
             if (rowBaselinePapEl) {
