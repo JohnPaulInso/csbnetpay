@@ -6416,7 +6416,9 @@
             const activeAnticipated = useAnticipated ? anticipatedVal    : 0;
             const activePromotion   = usePromotion   ? promotionMargin   : 0;
             const papSubtotal = activePliSubtotal + activeAnticipated + activePromotion;
-            document.getElementById('val-papsubtotal').innerHTML = formatPHP(papSubtotal);
+            // (2026-07-13) Guard null; prev: direct set (val-papsubtotal removed from card)
+            const valPapSubtotalEl = document.getElementById('val-papsubtotal');
+            if (valPapSubtotalEl) valPapSubtotalEl.innerHTML = formatPHP(papSubtotal);
 
             // (2026-07-13) Rename subtotal variable to fix duplicate; prev: duplicate
             const valDoubleSubtotalCombinedEl = document.getElementById('val-doublededuction-subtotal');
