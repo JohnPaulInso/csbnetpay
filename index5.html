@@ -5354,6 +5354,44 @@
             }
             syncAllCustomDropdowns();
 
+            // (2026-07-13) Uncheck all PLI/redemption checkboxes; prev: none
+            document.querySelectorAll('.pli-cb').forEach(cb => { cb.checked = false; });
+
+            // (2026-07-13) Reset promo grade/step selects to first option; prev: retained previous teacher
+            const promoGradeEl = document.getElementById('promoGrade');
+            if (promoGradeEl) promoGradeEl.selectedIndex = 0;
+            const promoStepEl = document.getElementById('promoStep');
+            if (promoStepEl) promoStepEl.selectedIndex = 0;
+            syncAllCustomDropdowns();
+
+            // (2026-07-13) Hide holdout/after-redemption rows and clear their values; prev: retained
+            const rowHoldoutReset = document.getElementById('row-holdout');
+            if (rowHoldoutReset) rowHoldoutReset.style.setProperty('display', 'none', 'important');
+            const rowAfterRedReset = document.getElementById('row-after-redemption');
+            if (rowAfterRedReset) rowAfterRedReset.style.setProperty('display', 'none', 'important');
+            const valHoldoutReset = document.getElementById('val-holdout');
+            if (valHoldoutReset) valHoldoutReset.innerHTML = '<span class="muted-currency">₱</span>0.00';
+            const valAfterRedReset = document.getElementById('val-after-redemption');
+            if (valAfterRedReset) {
+                valAfterRedReset.innerHTML = '<span class="muted-currency">₱</span>0.00';
+                valAfterRedReset.style.removeProperty('color');
+                valAfterRedReset.style.removeProperty('-webkit-text-fill-color');
+            }
+
+            // (2026-07-13) Reset net proceeds display; prev: retained previous teacher
+            const valNetprocTotal = document.getElementById('val-netproc-total');
+            if (valNetprocTotal) {
+                valNetprocTotal.innerHTML = '<span class="muted-currency">₱</span>0.00';
+                valNetprocTotal.style.removeProperty('color');
+                valNetprocTotal.style.removeProperty('-webkit-text-fill-color');
+            }
+            const valNetprocLP = document.getElementById('val-netproc-loan-proceeds');
+            if (valNetprocLP) valNetprocLP.innerHTML = '<span class="muted-currency">₱</span>0.00';
+            const valNetprocAdv = document.getElementById('val-netproc-advance-payment');
+            if (valNetprocAdv) valNetprocAdv.innerHTML = '<span class="muted-currency">₱</span>0.00';
+            const valNetprocRed = document.getElementById('val-netproc-redemption');
+            if (valNetprocRed) valNetprocRed.innerHTML = '<span class="muted-currency">₱</span>0.00';
+
             if (window.activeSession) {
                 window.activeSession.netprocRedemptionInputs = {};
                 window.activeSession.netprocRedemptionCheckedState = {};
