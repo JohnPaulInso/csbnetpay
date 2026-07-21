@@ -4146,17 +4146,33 @@
                         <div class="modal-body" id="emailSummaryModalBody" style="padding: 24px; max-height: 75vh; overflow-y: auto;">
                             <!-- Rendered HTML cards insert here -->
                         </div>
-                        <!-- (2026-07-13) Set MESSENGER as first flex child; prev: PNG first -->
-                        <div class="modal-footer" style="border-top: 1px solid rgba(255,255,255,0.1); padding: 14px 24px; display: flex; flex-direction: row; justify-content: space-between; align-items: center; width: 100%; gap: 8px;">
-                            <button type="button" class="btn btn-sm font-weight-bold" onclick="shareToMessenger()" style="background: linear-gradient(135deg, #00B2FF, #006AFF); color: white; border: none; border-radius: 8px; padding: 10px 4px; font-size: 11px; letter-spacing: 0.03em; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                <i class="bi bi-messenger mr-1"></i> MESSENGER
+                        <!-- (2026-07-13) 4-action modal footer: Download, Messenger, Email, Clipboard; prev: 3 text buttons -->
+                        <div class="modal-footer" style="border-top: 1px solid rgba(255,255,255,0.1); padding: 12px 20px; display: flex; flex-direction: row; justify-content: space-around; align-items: center; width: 100%; gap: 10px;">
+
+                            <!-- Download PNG -->
+                            <button type="button" id="btn-modal-download-png" onclick="shareAsPNG()" title="Download as PNG" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; background:linear-gradient(135deg,#10B981,#059669); color:white; border:none; border-radius:10px; padding:10px 6px; font-size:10px; font-weight:700; letter-spacing:0.04em; cursor:pointer; min-width:0;">
+                                <i class="bi bi-download" style="font-size:1.2rem;"></i>
+                                <span>DOWNLOAD</span>
                             </button>
-                            <button type="button" class="btn btn-sm font-weight-bold" onclick="shareAsPNG()" style="background: linear-gradient(135deg, #10B981, #059669); color: white; border: none; border-radius: 8px; padding: 10px 4px; font-size: 11px; letter-spacing: 0.03em; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                <i class="bi bi-image mr-1"></i> PNG
+
+                            <!-- Messenger -->
+                            <button type="button" id="btn-modal-messenger" onclick="shareToMessenger()" title="Share via Messenger" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; background:linear-gradient(135deg,#00B2FF,#006AFF); color:white; border:none; border-radius:10px; padding:10px 6px; font-size:10px; font-weight:700; letter-spacing:0.04em; cursor:pointer; min-width:0;">
+                                <i class="bi bi-messenger" style="font-size:1.2rem;"></i>
+                                <span>MESSENGER</span>
                             </button>
-                            <button type="button" class="btn btn-sm font-weight-bold" onclick="copyAndOpenEmail()" style="background: linear-gradient(135deg, #F59E0B, #D97706); color: white; border: none; border-radius: 8px; padding: 10px 4px; font-size: 11px; letter-spacing: 0.03em; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                <i class="bi bi-envelope-fill mr-1"></i> EMAIL
+
+                            <!-- Email with subject/body -->
+                            <button type="button" id="btn-modal-email" onclick="copyAndOpenEmail()" title="Send via Email" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; background:linear-gradient(135deg,#F59E0B,#D97706); color:white; border:none; border-radius:10px; padding:10px 6px; font-size:10px; font-weight:700; letter-spacing:0.04em; cursor:pointer; min-width:0;">
+                                <i class="bi bi-envelope-fill" style="font-size:1.2rem;"></i>
+                                <span>EMAIL</span>
                             </button>
+
+                            <!-- Copy snippet to clipboard -->
+                            <button type="button" id="btn-modal-clipboard" onclick="copyEmailToClipboard()" title="Copy to Clipboard" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; background:linear-gradient(135deg,#8B5CF6,#6D28D9); color:white; border:none; border-radius:10px; padding:10px 6px; font-size:10px; font-weight:700; letter-spacing:0.04em; cursor:pointer; min-width:0;">
+                                <i class="bi bi-clipboard-fill" style="font-size:1.2rem;"></i>
+                                <span>CLIPBOARD</span>
+                            </button>
+
                         </div>
                     </div>
                 </div>
@@ -8027,6 +8043,30 @@
                     });
             } else {
                 openMail();
+            }
+        }
+
+        // (2026-07-13) Copy-only clipboard action; prev: none (was bundled inside copyAndOpenEmail)
+        function copyEmailToClipboard() {
+            if (window.currentEmailHtml && navigator.clipboard && window.ClipboardItem) {
+                const blobHtml = new Blob([window.currentEmailHtml], { type: 'text/html' });
+                const blobText = new Blob([window.currentEmailPlainText || ''], { type: 'text/plain' });
+                navigator.clipboard.write([new ClipboardItem({ 'text/html': blobHtml, 'text/plain': blobText })])
+                    .then(() => showToast('Copied! Paste it inside your email body.'))
+                    .catch(() => {
+                        if (navigator.clipboard.writeText) {
+                            navigator.clipboard.writeText(window.currentEmailPlainText || '')
+                                .then(() => showToast('Copied as plain text. Paste inside your email body.'));
+                        } else {
+                            showToast('Clipboard not available. Try a different browser.');
+                        }
+                    });
+            } else if (window.currentEmailPlainText && navigator.clipboard) {
+                navigator.clipboard.writeText(window.currentEmailPlainText)
+                    .then(() => showToast('Copied! Paste it inside your email body.'))
+                    .catch(() => showToast('Clipboard not available.'));
+            } else {
+                showToast('No summary to copy. Generate the summary first.');
             }
         }
 
