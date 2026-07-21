@@ -8081,7 +8081,7 @@
             });
         }
 
-        /* (2026-07-13) Generates and downloads PNG first, then opens Gmail compose for attaching; prev: blank mailto */
+        /* (2026-07-13) Generates PNG, copies image to clipboard, downloads file, and opens Gmail; prev: mailto without clipboard image */
         function copyAndOpenEmail() {
             const modalBody = document.getElementById('emailSummaryModalBody');
             if (!modalBody) return;
@@ -8112,16 +8112,23 @@
                     const mailSubject = encodeURIComponent('CSB Loan Evaluation Summary - Employee #' + empNum);
                     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-                    // Download PNG to device first
+                    // 1. Copy image blob directly to clipboard for instant Ctrl+V paste
+                    if (navigator.clipboard && window.ClipboardItem) {
+                        navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
+                            .catch(err => console.error("Clipboard PNG copy failed:", err));
+                    }
+
+                    // 2. Download PNG to device
                     triggerPNGDownload(blob, fileName);
 
-                    // Then open Gmail / Email app
+                    // 3. Open Gmail / Email app
                     setTimeout(() => {
                         if (isMobile) {
                             window.location.href = 'mailto:?subject=' + mailSubject;
                         } else {
                             window.open('https://mail.google.com/mail/?view=cm&fs=1&su=' + mailSubject, '_blank');
                         }
+                        showCustomAlert("Image copied to clipboard & downloaded! In Gmail, press Ctrl+V to paste the image or attach the downloaded PNG.");
                         closeEmailSummaryModal();
                     }, 800);
                 }, 'image/png');
