@@ -3430,7 +3430,7 @@
                             <div id="dynamic-pli-rows-container" class="receipt-container-accordion mt-0 mb-0" style="background: transparent; border: none; overflow: hidden; width: 100%;">
                                 <!-- [2026-07-14 Fix: Split accordion header so label-text click toggles REDEMPTION/Double Deduction without opening accordion; previous: whole button was one onclick] -->
                                 <div class="baseline-row netpay-row-redemption-header w-100" id="btn-redemption-accordion-header" style="background: transparent; border: none; outline: none !important; width: 100%; cursor: default; margin-bottom: 0 !important;">
-                                    <span class="netpay-label" style="cursor: pointer; user-select: none;" id="lbl-redemption-toggle-text" onclick="toggleRedemptionLabel(event)" title="Click to toggle label"><i class="bi bi-plus-lg text-success mr-2"></i>Redemption</span>
+                                    <span class="netpay-label" style="user-select: none;" id="lbl-redemption-toggle-text"><i class="bi bi-plus-lg text-success mr-2"></i>Redemption</span>
                                     <span class="d-flex align-items-center" style="gap: 8px; cursor: pointer;" onclick="toggleReceiptAccordion()">
                                         <span id="val-baseline-papsubtotal" class="tabular-nums font-weight-bold">₱0.00</span>
                                         <i class="bi bi-chevron-down text-white-50" id="redemption-chevron" style="font-size: 0.75rem; transition: transform 0.2s ease;"></i>
@@ -3443,7 +3443,7 @@
 
                             <!-- [2026-07-14 New: Redemption manual input row for Autonomous Mode] -->
                             <div class="baseline-row netpay-row-redemption-autonomous mb-2 d-none" id="row-redemption-autonomous" style="display: none !important;">
-                                <span class="netpay-label" style="cursor: pointer; user-select: none;" id="lbl-redemption-toggle-text-autonomous" onclick="toggleRedemptionLabel(event)" title="Click to toggle label"><i class="bi bi-plus-lg text-success mr-2"></i>Redemption</span>
+                                <span class="netpay-label" style="user-select: none;" id="lbl-redemption-toggle-text-autonomous"><i class="bi bi-plus-lg text-success mr-2"></i>Redemption</span>
                                 <input type="number" step="0.01" id="input-redemption" class="form-control bank-input input-sm tabular-nums text-right font-weight-bold" style="width: 110px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; height: 26px; padding: 2px 8px; font-size: 0.8rem; border-radius: 4px;" value="0.00" oninput="runCalculations()">
                             </div>
 
@@ -6436,9 +6436,10 @@
             const papSubtotal = activePliSubtotal + activeAnticipated + activePromotion;
             document.getElementById('val-papsubtotal').innerHTML = formatPHP(papSubtotal);
 
-            const valDoubleSubtotalEl = document.getElementById('val-doublededuction-subtotal');
-            if (valDoubleSubtotalEl) {
-                valDoubleSubtotalEl.innerHTML = formatPHP(activeDoubleSubtotal);
+            // (2026-07-13) Rename subtotal variable to fix duplicate; prev: duplicate
+            const valDoubleSubtotalCombinedEl = document.getElementById('val-doublededuction-subtotal');
+            if (valDoubleSubtotalCombinedEl) {
+                valDoubleSubtotalCombinedEl.innerHTML = formatPHP(activeDoubleSubtotal);
             }
 
             // Dynamically show/hide combined subtotal rows
@@ -8460,39 +8461,7 @@
         }
 
         // [2026-07-14 New: Toggle Redemption label text between REDEMPTION and Double Deduction on click; does not open accordion]
-        function toggleRedemptionLabel(event) {
-            event.stopPropagation(); // Prevent accordion from opening
-            const lbl = document.getElementById('lbl-redemption-toggle-text');
-            const lblAuto = document.getElementById('lbl-redemption-toggle-text-autonomous');
-            const cardTitleEl = document.getElementById('lbl-pli-card-title-text');
-            
-            let isDouble = false;
-            if (lbl) {
-                isDouble = lbl.dataset.doubled === '1';
-                if (isDouble) {
-                    lbl.innerHTML = '<i class="bi bi-plus-lg text-success mr-2"></i>Redemption';
-                    lbl.dataset.doubled = '0';
-                } else {
-                    lbl.innerHTML = '<i class="bi bi-plus-lg text-success mr-2"></i>Double Deduction';
-                    lbl.dataset.doubled = '1';
-                }
-            }
-            if (lblAuto) {
-                isDouble = lblAuto.dataset.doubled === '1';
-                if (isDouble) {
-                    lblAuto.innerHTML = '<i class="bi bi-plus-lg text-success mr-2"></i>Redemption';
-                    lblAuto.dataset.doubled = '0';
-                } else {
-                    lblAuto.innerHTML = '<i class="bi bi-plus-lg text-success mr-2"></i>Double Deduction';
-                    lblAuto.dataset.doubled = '1';
-                }
-            }
-
-            if (cardTitleEl) {
-                // If previous was Double Deduction, it is toggled back to REDEMPTION
-                cardTitleEl.textContent = isDouble ? 'REDEMPTION' : 'Double Deduction';
-            }
-        }
+        // (2026-07-13) Remove toggleRedemptionLabel; prev: defined toggleRedemptionLabel
 
         // [2026-07-14 New: Mode Selector change handler to toggle display-only elements vs manual numeric inputs in NETPAY COMPUTATION]
         function onModeChange() {
