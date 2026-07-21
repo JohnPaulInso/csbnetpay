@@ -26,10 +26,14 @@ When you check or uncheck a checkbox under the PLI section:
 ---
 
 ## 3. Formula for Less Advance Payment (id="val-netproc-advance-payment")
-Advance Payment is the difference in amortizations multiplied by the number of advance payment months:
+Advance Payment is the difference in amortizations multiplied by the number of advance payment months, active only when checked:
 
 **Formula:**
+If "Less Advance Payment" checkbox is Checked:
 Advance Payment = (New CSB Amortization - Sum of Checked CSB Deductions - Sum of Checked PLI Deductions) * Advance Payment Months
+
+If "Less Advance Payment" checkbox is Unchecked:
+Advance Payment = 0
 
 ---
 
