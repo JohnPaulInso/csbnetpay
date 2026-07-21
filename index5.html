@@ -7400,10 +7400,11 @@
             const currentNetPay = document.getElementById('lbl-netpay')?.innerText || '₱0.00';
             const csbDeductions = document.getElementById('lbl-dedamt')?.innerText || '₱0.00';
             const subtotal = document.getElementById('val-baseline')?.innerText || '₱0.00';
-            const lessOnQueue = document.getElementById('lbl-less-onqueue')?.innerText || '₱0.00';
-            const lessIncoming = document.getElementById('lbl-less-incoming')?.innerText || '₱0.00';
-            const totalSubtotal = document.getElementById('val-total-subtotal')?.innerText || '₱0.00';
-            const newAmort = document.getElementById('lbl-amortization')?.innerText || '₱0.00';
+            /* (2026-07-13) Fix netpay calculation elements lookup IDs; prev: wrong IDs */
+            const lessOnQueue = document.getElementById('val-less-onqueue')?.innerText || '₱0.00';
+            const lessIncoming = document.getElementById('val-less-incoming')?.innerText || '₱0.00';
+            const totalSubtotal = document.getElementById('val-revised-baseline')?.innerText || '₱0.00';
+            const newAmort = document.getElementById('val-new-csb-amortization')?.innerText || '₱0.00';
             const newNetPay = document.getElementById('val-final-new-netpay')?.innerText || document.getElementById('val-newnetpay')?.innerText || '₱0.00';
 
             /* (2026-07-13) Fix loan proceeds ID in email summary; prev: proceeds */
