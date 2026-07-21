@@ -3641,7 +3641,11 @@
 
                             <!-- 6. Advance Payment Row -->
                             <div class="baseline-row mb-2" id="row-netproc-advance-payment">
-                                <span class="netpay-label"><i class="bi bi-dash-lg text-warning mr-2"></i>Less Advance Payment</span>
+                                <span class="netpay-label">
+                                    <!-- (2026-07-13) Add toggle checkbox for advance payment; prev: label -->
+                                    <input type="checkbox" id="toggleLessAdvancePayment" checked style="margin-right: 8px; transform: scale(1.1); cursor: pointer;" onclick="event.stopPropagation();" onchange="calculateNetProceeds();">
+                                    Less Advance Payment
+                                </span>
                                 <span id="val-netproc-advance-payment" class="netpay-value tabular-nums font-weight-bold" style="padding-right: 0px !important; font-size: 0.8rem;">₱0.00</span>
                             </div>
 
@@ -6962,6 +6966,10 @@
             const toggleEl = isAutonomous ? document.getElementById('toggleLessOldRedemptionManual') : document.getElementById('toggleLessOldRedemption');
             const useRedemption = toggleEl ? toggleEl.checked : true;
 
+            /* (2026-07-13) Check if Less Advance Payment is ON; prev: always true */
+            const toggleLessAdv = document.getElementById('toggleLessAdvancePayment');
+            const useAdvancePayment = toggleLessAdv ? toggleLessAdv.checked : true;
+
             // Style update for dynamic redemption checklist
             const redemptionTbody = document.getElementById('netproc-redemption-tbody');
             if (redemptionTbody) {
@@ -7047,7 +7055,9 @@
             const advancePayment = Math.round(basis * advanceMonths * 100) / 100;
 
             // Final net proceeds
-            const netProceeds = Math.round((loanProceeds - oldBalance - activePliSubtotal - advancePayment) * 100) / 100;
+            /* (2026-07-13) Apply advance payment toggle state; prev: always on */
+            const advPayValue = useAdvancePayment ? advancePayment : 0;
+            const netProceeds = Math.round((loanProceeds - oldBalance - activePliSubtotal - advPayValue) * 100) / 100;
 
             // Update all display elements
             const valLP = document.getElementById('val-netproc-loan-proceeds');
@@ -7062,7 +7072,10 @@
             }
 
             const valAdv = document.getElementById('val-netproc-advance-payment');
-            if (valAdv) valAdv.innerHTML = formatPHP(advancePayment);
+            if (valAdv) valAdv.innerHTML = formatPHP(advPayValue);
+
+            const rowAP = document.getElementById('row-netproc-advance-payment');
+            if (rowAP) rowAP.style.opacity = useAdvancePayment ? '1' : '0.4';
 
             const valTotal = document.getElementById('val-netproc-total');
             // 2026-07-14: Display net proceeds as absolute positive value (was: could display negative)
@@ -7330,6 +7343,8 @@
                 // (2026-07-13) Save Less Old Redemption checkbox states; prev: none
                 toggleLessOldRedemption: document.getElementById('toggleLessOldRedemption') ? document.getElementById('toggleLessOldRedemption').checked : true,
                 toggleLessOldRedemptionManual: document.getElementById('toggleLessOldRedemptionManual') ? document.getElementById('toggleLessOldRedemptionManual').checked : true,
+                // (2026-07-13) Save Less Advance Payment checkbox state; prev: none
+                toggleLessAdvancePayment: document.getElementById('toggleLessAdvancePayment') ? document.getElementById('toggleLessAdvancePayment').checked : true,
                 // [2026-07-14 New: Save evaluationModeSelect state]
                 evaluationMode: document.getElementById('evaluationModeSelect') ? document.getElementById('evaluationModeSelect').value : 'DEPED',
                 // [2026-07-14 New: Save searchFailedNoOnQueue state]
@@ -7394,7 +7409,8 @@
             const oldBalance = document.getElementById('input-netproc-old-balance')?.value || '0';
             /* (2026-07-13) Set advance months default fallback to 7; prev: 6 */
             const advanceMonths = document.getElementById('select-netproc-advance-months')?.value || '7';
-            const lessAdvance = document.getElementById('val-netproc-advance')?.innerText || '₱0.00';
+            /* (2026-07-13) Fix advance payment ID in email summary; prev: advance */
+            const lessAdvance = document.getElementById('val-netproc-advance-payment')?.innerText || '₱0.00';
             const netProceeds = document.getElementById('val-netproc-total')?.innerText || '₱0.00';
             const billingType = document.getElementById('val-billing-type')?.innerText || 'NEW BILLING';
 
@@ -8040,6 +8056,11 @@
             const toggleRedManual = document.getElementById('toggleLessOldRedemptionManual');
             if (toggleRedManual && state.toggleLessOldRedemptionManual !== undefined) {
                 toggleRedManual.checked = state.toggleLessOldRedemptionManual;
+            }
+            // (2026-07-13) Restore Less Advance Payment checkbox state; prev: none
+            const toggleLessAdv = document.getElementById('toggleLessAdvancePayment');
+            if (toggleLessAdv && state.toggleLessAdvancePayment !== undefined) {
+                toggleLessAdv.checked = state.toggleLessAdvancePayment;
             }
 
             // Restore redemption label doubled state
