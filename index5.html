@@ -4123,14 +4123,13 @@
                         <div class="modal-body" id="emailSummaryModalBody" style="padding: 24px; max-height: 75vh; overflow-y: auto;">
                             <!-- Rendered HTML cards insert here -->
                         </div>
-                        <!-- (2026-07-13) Remove footer close button; prev: close button in footer -->
-                        <div class="modal-footer" style="border-top: 1px solid rgba(255,255,255,0.1); padding: 14px 24px; display: flex; justify-content: flex-end; gap: 10px;">
-                            <!-- (2026-07-13) Add Share as PNG button; prev: forward via email only -->
-                            <button type="button" class="btn btn-sm font-weight-bold" onclick="shareAsPNG()" style="background: linear-gradient(135deg, #10B981, #059669); color: white; border: none; border-radius: 8px; padding: 10px 22px; font-size: 13px; letter-spacing: 0.03em;">
-                                <i class="bi bi-image mr-2"></i> SHARE AS PNG
+                        <!-- (2026-07-13) Align buttons side-by-side; prev: stacked/wrapped -->
+                        <div class="modal-footer" style="border-top: 1px solid rgba(255,255,255,0.1); padding: 14px 24px; display: flex; flex-direction: row; justify-content: space-between; align-items: center; width: 100%; gap: 10px;">
+                            <button type="button" class="btn btn-sm font-weight-bold" onclick="shareAsPNG()" style="background: linear-gradient(135deg, #10B981, #059669); color: white; border: none; border-radius: 8px; padding: 10px 14px; font-size: 11px; letter-spacing: 0.03em; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                <i class="bi bi-image mr-1"></i> SHARE AS PNG
                             </button>
-                            <button type="button" class="btn btn-sm font-weight-bold" onclick="copyAndOpenEmail()" style="background: linear-gradient(135deg, #F59E0B, #D97706); color: white; border: none; border-radius: 8px; padding: 10px 22px; font-size: 13px; letter-spacing: 0.03em;">
-                                <i class="bi bi-envelope-paper-fill mr-2"></i> FORWARD VIA EMAIL (COPY & OPEN)
+                            <button type="button" class="btn btn-sm font-weight-bold" onclick="copyAndOpenEmail()" style="background: linear-gradient(135deg, #F59E0B, #D97706); color: white; border: none; border-radius: 8px; padding: 10px 14px; font-size: 11px; letter-spacing: 0.03em; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                <i class="bi bi-envelope-paper-fill mr-1"></i> EMAIL SUMMARY
                             </button>
                         </div>
                     </div>
