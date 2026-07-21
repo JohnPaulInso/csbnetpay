@@ -11,7 +11,7 @@ A comprehensive update was implemented to resolve unstyled layout flashes, brows
 - **Login Page Theme Alignment**: Locked the color-scheme of the login body and card to `light` inside [login/index.html](file:///c:/Users/Lenovo/Desktop/filez/SEARCH/login/index.html) and updated the background to a light gradient. This keeps the login card white and prevents the browser from automatically inverting it to dark gray when system dark mode is active.
 
 ### 2. Service Worker Cache Invalidation
-- **Version Bump**: Bumped the service worker cache version to `v31` in [service-worker.js](file:///c:/Users/Lenovo/Desktop/filez/SEARCH/service-worker.js) to invalidate older index templates cached on client devices and ensure all changes are immediately pulled.
+- **Version Bump**: Bumped the service worker cache version to `v32` in [service-worker.js](file:///c:/Users/Lenovo/Desktop/filez/SEARCH/service-worker.js) to invalidate older index templates cached on client devices and ensure all changes are immediately pulled.
 
 ### 3. Restored Custom Dropdowns on Desktop
 - **Media Query Fix**: Fixed an unclosed `@media (max-width: 768px)` block at line 2207 in [index5.html](file:///c:/Users/Lenovo/Desktop/filez/SEARCH/index5.html) by adding the missing closing brace. This fixes the bug where all subsequent CSS rules (including the custom select dropdown styles, statuses, skeleton loading, and final net pay styles) were incorrectly ignored on desktop screens.
@@ -31,6 +31,8 @@ A comprehensive update was implemented to resolve unstyled layout flashes, brows
   - Replaced the pipe symbol (` | `) in the HTML template's interest field with a standard `<br>` line break to separate the total interest and monthly interest cleanly.
   - Implemented smarter profile field validation fallback (`getValOrFallback`) in the email summary function to ensure that employee details (e.g. name, school/division) never fall back to `"N/A"` when manual/autonomous session variables or top summary card texts are present.
   - Fixed the top right `EMP #` badge wrapping bug by adding `white-space: nowrap;` styling to the badge element and cell container.
+  - Replaced all explicit `font-family: Consolas, monospace` definitions on numerical summary columns inside the email template with Montserrat to ensure numbers render consistently in Montserrat.
+  - Adjusted the layout button order in the footer to place the MESSENGER button as the first action, followed by PNG and EMAIL.
 
 ## Verification
 - Checked that custom select dropdowns render correctly as inline capsules on mobile and positioned absolute overlay popups on desktop.
@@ -46,3 +48,5 @@ A comprehensive update was implemented to resolve unstyled layout flashes, brows
 - Verified that the generated PNG screenshot renders the text using the Montserrat font family.
 - Verified that clicking "MESSENGER" copies the PNG to clipboard and launches the Messenger app/website correctly.
 - Confirmed that interest outputs have line breaks instead of pipe symbols, the top-right EMP badge does not wrap, and client details display correctly in all modes.
+- Checked that numbers and values in the PNG conversion display correctly in Montserrat font instead of monospace.
+- Verified that the MESSENGER button is ordered first in the action drawer.
