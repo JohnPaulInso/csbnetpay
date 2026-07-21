@@ -3870,67 +3870,33 @@
                                         </div>
                                 </div>
                             </div>
-                            <!-- (2026-07-13) Separate redemption and double deduction panels -->
+                            <!-- (2026-07-13) Set subtotals card to three rows; prev: five rows -->
                             <div class="bank-card private-liabilities-card mt-3" id="card-pli-subtotals" data-label="Subtotals Card">
-                                 <!-- [2026-07-11 Note: PAP label updates dynamically based on which toggles are active] -->
-                                 <div class="baseline-row mt-0 d-none" id="panel-papsubtotal">
-                                     <div class="orange-node font-weight-bold" id="node-papsubtotal">
+                                 <!-- Redemption Total Row -->
+                                 <div class="baseline-row mt-0" id="row-plisubtotal">
+                                     <div class="orange-node font-weight-bold" id="node-plisubtotal">
                                          <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16v1a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v1"/><path d="M18 8h4a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-4"/><circle cx="8" cy="12" r="2"/></svg>
-                                         <span id="lbl-papsubtotal-title">REDEMPTION COMBINED SUBTOTAL</span>
-                                         <span class="math-popover">
-                                             <strong>Sum of active redemption PLI deductions + toggled components</strong>
-                                         </span>
+                                         <span id="lbl-plisubtotal-title">REDEMPTION TOTAL</span>
                                      </div>
-                                     <div id="val-papsubtotal" class="bank-value-display">₱0.00</div>
+                                     <div id="val-plisubtotal" class="bank-value-display">₱0.00</div>
                                  </div>
-                                 <div class="baseline-row mt-1 d-none" id="panel-doublededuction-subtotal">
-                                     <div class="orange-node font-weight-bold" id="node-doublededuction-subtotal">
+                                 <!-- Double Deduction Row -->
+                                 <div class="baseline-row mt-1" id="row-doubledeductionsubtotal">
+                                     <div class="orange-node font-weight-bold" id="node-doubledeductionsubtotal">
                                          <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                                         <span id="lbl-doublededuction-subtotal-title">DOUBLE DEDUCTION COMBINED</span>
-                                         <span class="math-popover">
-                                             <strong>Sum of active double deduction PLI deductions</strong>
-                                         </span>
+                                         <span id="lbl-doubledeductionsubtotal-title">DOUBLE DEDUCTION</span>
                                      </div>
-                                     <div id="val-doublededuction-subtotal" class="bank-value-display">₱0.00</div>
+                                     <div id="val-doubledeductionsubtotal" class="bank-value-display">₱0.00</div>
                                  </div>
-
-                                 <!-- (2026-07-13) Set compact aligned rows; prev: bootstrap columns layout -->
-                                 <div class="mt-1" id="panel-pli-totals" style="padding-top: 0;">
-                                     <!-- PLI Subtotal Row -->
-                                     <div class="baseline-row mt-1" id="row-plisubtotal">
-                                         <div class="orange-node font-weight-bold" id="node-plisubtotal">
-                                             <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
-                                             <span id="lbl-plisubtotal-title">REDEMPTION TOTAL</span>
-                                             <span class="math-popover">
-                                                 Sum of selected redemption PLI deductions (slots 2+).
-                                             </span>
-                                         </div>
-                                         <div id="val-plisubtotal" class="bank-value-display">₱0.00</div>
+                                 <!-- Redemption + Double Deduction Total Row -->
+                                 <div class="baseline-row mt-1" id="row-combined-pli-total">
+                                     <div class="orange-node font-weight-bold" id="node-combined-pli-total">
+                                         <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                         <span id="lbl-combined-pli-total-title">REDEMPTION + DOUBLE DEDUCTION TOTAL</span>
                                      </div>
-                                     <!-- Double Deduction Row -->
-                                     <div class="baseline-row mt-1" id="row-doubledeductionsubtotal">
-                                         <div class="orange-node font-weight-bold" id="node-doubledeductionsubtotal">
-                                             <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                                             <span id="lbl-doubledeductionsubtotal-title">DOUBLE DEDUCTION</span>
-                                             <span class="math-popover">
-                                                 Sum of selected double deduction PLI deductions (slot 1).
-                                             </span>
-                                         </div>
-                                         <div id="val-doubledeductionsubtotal" class="bank-value-display">₱0.00</div>
-                                     </div>
-                                     <!-- NetPay + PLI Total Row -->
-                                     <div class="baseline-row mt-1" id="row-netpayplitotal">
-                                         <div class="orange-node font-weight-bold" id="node-netpayplitotal">
-                                             <svg class="bank-node-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                                             <span id="lbl-netpayplitotal-title">NETPAY + PLI TOTAL</span>
-                                             <span class="math-popover">
-                                                 <strong>NetPay + PLI Total Margin</strong>
-                                             </span>
-                                         </div>
-                                         <div id="val-netpayplitotal" class="bank-value-display">₱0.00</div>
-                                     </div>
+                                     <div id="val-combined-pli-total" class="bank-value-display">₱0.00</div>
                                  </div>
-                             </div>
+                            </div>
                           </div>
 
                 <!-- Right Column (Compensation, Final Underwriting) -->
@@ -6193,6 +6159,11 @@
             if (valDoubleSub) {
                 valDoubleSub.innerHTML = formatPHP(doubleDeductionSubtotal);
             }
+            // (2026-07-13) Update combined total row; prev: not present
+            const valCombinedPliTotal = document.getElementById('val-combined-pli-total');
+            if (valCombinedPliTotal) {
+                valCombinedPliTotal.innerHTML = formatPHP(redemptionSubtotal + doubleDeductionSubtotal);
+            }
 
             // (2026-07-13) Set card header total to pliSubtotal; prev: redemptionSubtotal
             const valPliTotalEl = document.getElementById('val-pli-total');
@@ -6374,6 +6345,11 @@
             if (valDoubleSubtotalEl) {
                 valDoubleSubtotalEl.innerHTML = formatPHP(activeDoubleSubtotal);
             }
+            // (2026-07-13) Update combined total row; prev: not present
+            const valCombinedPliTotal2 = document.getElementById('val-combined-pli-total');
+            if (valCombinedPliTotal2) {
+                valCombinedPliTotal2.innerHTML = formatPHP(activePliSubtotal + activeDoubleSubtotal);
+            }
 
             const activeNetPayPliTotal = (isAutonomous ? safeFloat(document.getElementById('input-netpay').value) : window.activeSession.netPay) + activePliSubtotal + activeDoubleSubtotal;
             document.getElementById('val-netpayplitotal').innerHTML = formatPHP(activeNetPayPliTotal);
@@ -6481,31 +6457,44 @@
                 let hasItems = false;
                 
                 // (2026-07-13) Make PLI rows clickable with plus icon; prev: plain rows
+                // (2026-07-13) Skip slot 1 (DOUBLE DEDUCTION) in accordion; prev: all slots shown
                 if (useMasterPli) {
                     selectedPlis.forEach(pli => {
                         const rowEl = document.createElement('div');
                         rowEl.className = 'receipt-row';
-                        rowEl.style.cursor = 'pointer';
                         rowEl.style.display = 'flex';
                         rowEl.style.alignItems = 'center';
                         rowEl.style.justifyContent = 'space-between';
-                        rowEl.onmouseover = () => { rowEl.style.background = 'rgba(255, 255, 255, 0.05)'; };
-                        rowEl.onmouseout = () => { rowEl.style.background = 'transparent'; };
-                        const isAdded = window.activeSession.addedNetprocRedemptions && window.activeSession.addedNetprocRedemptions[pli.slot];
-                        rowEl.onclick = () => {
-                            if (isAdded) {
-                                removePliFromLessOldRedemption(pli.slot);
-                            } else {
-                                addPliToLessOldRedemption(pli.slot);
-                            }
-                        };
-                        rowEl.innerHTML = `
-                            <span style="display: flex; align-items: center; gap: 6px;">
-                                <i class="bi ${isAdded ? 'bi-check-circle-fill' : 'bi-plus-circle'} text-success" style="font-size: 0.85rem;"></i>
-                                ${pli.label}
-                            </span>
-                            <span class="tabular-nums font-weight-bold text-white">${formatPHP(pli.value)}</span>
-                        `;
+                        if (pli.slot === 1) {
+                            // DOUBLE DEDUCTION: show read-only, no click-to-add
+                            rowEl.style.cursor = 'default';
+                            rowEl.innerHTML = `
+                                <span style="display: flex; align-items: center; gap: 6px;">
+                                    <i class="bi bi-lock-fill" style="font-size: 0.85rem; color: #6B7280;"></i>
+                                    ${pli.label}
+                                </span>
+                                <span class="tabular-nums font-weight-bold text-white">${formatPHP(pli.value)}</span>
+                            `;
+                        } else {
+                            rowEl.style.cursor = 'pointer';
+                            rowEl.onmouseover = () => { rowEl.style.background = 'rgba(255, 255, 255, 0.05)'; };
+                            rowEl.onmouseout = () => { rowEl.style.background = 'transparent'; };
+                            const isAdded = window.activeSession.addedNetprocRedemptions && window.activeSession.addedNetprocRedemptions[pli.slot];
+                            rowEl.onclick = () => {
+                                if (isAdded) {
+                                    removePliFromLessOldRedemption(pli.slot);
+                                } else {
+                                    addPliToLessOldRedemption(pli.slot);
+                                }
+                            };
+                            rowEl.innerHTML = `
+                                <span style="display: flex; align-items: center; gap: 6px;">
+                                    <i class="bi ${isAdded ? 'bi-check-circle-fill' : 'bi-plus-circle'} text-success" style="font-size: 0.85rem;"></i>
+                                    ${pli.label}
+                                </span>
+                                <span class="tabular-nums font-weight-bold text-white">${formatPHP(pli.value)}</span>
+                            `;
+                        }
                         receiptBody.appendChild(rowEl);
                         hasItems = true;
                     });
@@ -6521,7 +6510,8 @@
                 if (!window.activeSession.netprocRedemptionInputs) window.activeSession.netprocRedemptionInputs = {};
                 if (!window.activeSession.addedNetprocRedemptions) window.activeSession.addedNetprocRedemptions = {};
                 
-                const addedPlis = selectedPlis.filter(pli => window.activeSession.addedNetprocRedemptions[pli.slot]);
+                // (2026-07-13) Exclude slot 1 (DOUBLE DEDUCTION) from Less Old Redemption; prev: all added slots
+                const addedPlis = selectedPlis.filter(pli => pli.slot !== 1 && window.activeSession.addedNetprocRedemptions[pli.slot]);
                 
                 if (addedPlis.length > 0) {
                     const selectedKeys = addedPlis.map(p => p.slot + '-' + p.label).join(',');
