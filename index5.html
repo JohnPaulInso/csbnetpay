@@ -3672,13 +3672,20 @@
                                 </div>
                             </div>
 
-                            <!-- (2026-07-13) Hold Out 20% row; shown when redemption is checked -->
-                            <div class="baseline-row netpay-row-new-netpay font-weight-bold pt-2 mb-0" id="row-holdout" style="border-top: 1px solid rgba(255,255,255,0.08); display: none !important;">
+                        </div>
+                    </div>
+
+                    <!-- (2026-07-13) Summary Card: Hold Out + After Redemption + Billing Type -->
+                    <div class="bank-card mt-3" id="card-netproc-summary" data-label="Net Proceeds Summary Card">
+                        <div class="section-panel-inner" id="panel-netproc-summary-inner">
+
+                            <!-- Hold Out row; shown when redemption is checked -->
+                            <div class="baseline-row netpay-row-new-netpay font-weight-bold pt-1 mb-0" id="row-holdout" style="display: none !important;">
                                 <span class="netpay-label-bold"><i class="bi bi-lock-fill text-warning mr-2"></i>HOLD OUT (20%)</span>
                                 <span id="val-holdout" class="bank-value-display">₱0.00</span>
                             </div>
 
-                            <!-- (2026-07-13) After Redemption row; shown when redemption is checked -->
+                            <!-- After Redemption row; shown when redemption is checked -->
                             <div class="baseline-row netpay-row-new-netpay font-weight-bold pt-1 mb-0" id="row-after-redemption" style="display: none !important;">
                                 <span class="netpay-label-bold"><i class="bi bi-arrow-right-circle-fill text-success mr-2"></i>AFTER REDEMPTION</span>
                                 <!-- (2026-07-13) Match val-netproc-total tap-to-copy flex layout; prev: bare span -->
@@ -3688,7 +3695,7 @@
                                 </div>
                             </div>
 
-
+                            <!-- Billing Type row -->
                             <div class="baseline-row pt-1 mb-0" id="row-billing-type" style="font-size: 0.72rem; font-weight: 700; color: rgba(255, 255, 255, 0.45); display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed rgba(255,255,255,0.05); margin-top: 4px;">
                                 <span class="netpay-label"><i class="bi bi-receipt-cutoff text-muted mr-2"></i>BILLING TYPE</span>
                                 <span id="val-billing-type" style="color: #10B981; font-weight: 800; padding-right: 0px !important;">NEW BILLING</span>
@@ -3705,6 +3712,7 @@
                                 <span class="netpay-label" style="padding-left: 15px;"><i class="bi bi-arrow-return-right text-muted mr-2"></i>BILL 2</span>
                                 <span id="val-bill-two" style="color: rgba(255, 255, 255, 0.8); font-weight: 700; padding-right: 0px !important;">₱0.00</span>
                             </div>
+
                         </div>
                     </div>
 
