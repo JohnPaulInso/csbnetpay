@@ -7903,20 +7903,9 @@
 
                     const empNum = (window.activeSession ? window.activeSession.empNum : null) || document.getElementById('employeeNumber')?.value.trim() || 'N/A';
                     const fileName = `CSB_Evaluation_EMP_${empNum}.png`;
-                    const file = new File([blob], fileName, { type: 'image/png' });
 
-                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                        navigator.share({
-                            files: [file],
-                            title: `CSB Loan Evaluation - Employee #${empNum}`,
-                            text: `Here is the CSB Loan Evaluation Summary for Employee #${empNum}`
-                        }).catch(err => {
-                            console.error("Error sharing via Web Share API:", err);
-                            triggerPNGDownload(blob, fileName);
-                        });
-                    } else {
-                        triggerPNGDownload(blob, fileName);
-                    }
+                    // (2026-07-13) Always download first; prev: Web Share API attached directly causing outbox queue
+                    triggerPNGDownload(blob, fileName);
                 }, 'image/png');
             }).catch(err => {
                 console.error("html2canvas error:", err);
@@ -7936,8 +7925,8 @@
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            showCustomAlert("PNG downloaded successfully! You can now send it via Messenger or Email.");
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            showToast("PNG saved! Open your email and attach the downloaded image.");
         }
 
         /* (2026-07-13) Capture summary as PNG and share to Messenger; prev: none */
