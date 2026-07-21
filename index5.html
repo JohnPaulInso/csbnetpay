@@ -8112,10 +8112,23 @@
                     const mailSubject = encodeURIComponent('CSB Loan Evaluation Summary - Employee #' + empNum);
                     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-                    // 1. Copy image blob directly to clipboard for instant Ctrl+V paste
+                    // 1. Copy image blob directly to clipboard for instant Ctrl+V paste into Gmail composer
                     if (navigator.clipboard && window.ClipboardItem) {
-                        navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
-                            .catch(err => console.error("Clipboard PNG copy failed:", err));
+                        try {
+                            const blobHtml = new Blob([window.currentEmailHtml || ''], { type: 'text/html' });
+                            const blobText = new Blob([window.currentEmailPlainText || ''], { type: 'text/plain' });
+                            navigator.clipboard.write([
+                                new ClipboardItem({
+                                    'image/png': blob,
+                                    'text/html': blobHtml,
+                                    'text/plain': blobText
+                                })
+                            ]).catch(() => {
+                                navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]).catch(e => console.error(e));
+                            });
+                        } catch (e) {
+                            console.error(e);
+                        }
                     }
 
                     // 2. Download PNG to device
@@ -8128,7 +8141,7 @@
                         } else {
                             window.open('https://mail.google.com/mail/?view=cm&fs=1&su=' + mailSubject, '_blank');
                         }
-                        showCustomAlert("Image copied to clipboard & downloaded! In Gmail, press Ctrl+V to paste the image or attach the downloaded PNG.");
+                        showCustomAlert("Image copied to clipboard & downloaded! In Gmail, press Ctrl+V to paste the image directly into the message body.");
                         closeEmailSummaryModal();
                     }, 800);
                 }, 'image/png');
