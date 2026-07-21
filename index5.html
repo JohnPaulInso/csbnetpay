@@ -7645,6 +7645,10 @@
             const lessAdvance = document.getElementById('val-netproc-advance-payment')?.innerText || '₱0.00';
             const netProceeds = document.getElementById('val-netproc-total')?.innerText || '₱0.00';
             const billingType = document.getElementById('val-billing-type')?.innerText || 'NEW BILLING';
+            // (2026-07-13) Read split billing values for email; prev: none
+            const isSplitBilling = billingType.includes('SPLIT');
+            const bill1Val = document.getElementById('val-bill-one')?.innerText || '₱0.00';
+            const bill2Val = document.getElementById('val-bill-two')?.innerText || '₱0.00';
             // (2026-07-13) Read holdout/after-redemption only when row is visible AND master toggle is ON; prev: toggle not checked
             const rowHoldoutEl = document.getElementById('row-holdout');
             const masterPliOnEmail = document.getElementById('toggleMasterPli')?.checked;
@@ -7691,7 +7695,12 @@
                     'Hold Out (20%): ' + holdoutVal,
                     'After Redemption: ' + afterRedemptionVal
                 ] : []),
-                'Billing Type: ' + billingType
+                'Billing Type: ' + billingType,
+                // (2026-07-13) Append BILL 1 / BILL 2 for split billing; prev: none
+                ...(isSplitBilling ? [
+                    '  Bill 1: ' + bill1Val,
+                    '  Bill 2: ' + bill2Val
+                ] : [])
             ].join('\n');
 
             /* (2026-07-13) Set email template font to Montserrat with premium white background layout; prev: dark theme */
@@ -7816,6 +7825,11 @@
                 '            <td style="color:#1F2937 !important; font-weight:700;" bgcolor="#F9FAFB"><font color="#1F2937"><b style="color:#1F2937 !important; -webkit-text-fill-color:#1F2937 !important;">BILLING TYPE</b></font></td>',
                 '            <td align="right" style="color:#047857 !important; font-weight:900; font-size:13px;" bgcolor="#F9FAFB"><font color="#047857"><b style="color:#047857 !important; -webkit-text-fill-color:#047857 !important;">' + billingType + '</b></font></td>',
                 '          </tr>',
+                // (2026-07-13) Add BILL 1 / BILL 2 sub-rows when SPLIT BILLING; prev: none
+                ...(isSplitBilling ? [
+                    '          <tr><td style="color:#6B7280 !important; font-weight:600; padding-left:16px; font-size:11px;" bgcolor="#F9FAFB"><font color="#6B7280">↳ Bill 1</font></td><td align="right" style="color:#1F2937 !important; font-weight:800; font-size:12px; font-family:\'Montserrat\',sans-serif;" bgcolor="#F9FAFB"><font color="#1F2937"><b style="color:#1F2937 !important; -webkit-text-fill-color:#1F2937 !important;">' + bill1Val + '</b></font></td></tr>',
+                    '          <tr><td style="color:#6B7280 !important; font-weight:600; padding-left:16px; font-size:11px;" bgcolor="#F9FAFB"><font color="#6B7280">↳ Bill 2</font></td><td align="right" style="color:#1F2937 !important; font-weight:800; font-size:12px; font-family:\'Montserrat\',sans-serif;" bgcolor="#F9FAFB"><font color="#1F2937"><b style="color:#1F2937 !important; -webkit-text-fill-color:#1F2937 !important;">' + bill2Val + '</b></font></td></tr>'
+                ] : []),
                 '        </table>',
                 '      </td>',
                 '    </tr>',
