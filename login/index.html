@@ -4,6 +4,10 @@
 <head>
     <title>Netpay Login</title>
     <meta charset="UTF-8">
+    <!-- (2026-07-13) Prevent dark scheme flash on load; prev: no meta -->
+    <meta name="color-scheme" content="light">
+    <!-- (2026-07-13) Prevent dark scheme flash on load; prev: no inline style -->
+    <style>:root { color-scheme: light !important; }</style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="/csbnetpay/manifest.json">
     <link rel="icon" type="image/png" href="../favicon.png" />
@@ -29,11 +33,13 @@
         }
 
         body {
+            /* (2026-07-13) Use light bg to prevent dark mode; prev: dark gradient */
+            color-scheme: light !important;
             font-family: 'Poppins', sans-serif;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #1a0b2e 0%, #2d1657 25%, #4F2683 50%, #6b35a8 75%, #8b4fc7 100%);
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
             position: relative;
         }
 
@@ -72,6 +78,8 @@
         }
 
         .login-card {
+            /* (2026-07-13) Set light color scheme on login card; prev: none */
+            color-scheme: light !important;
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(20px);
             border-radius: 24px;

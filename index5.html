@@ -3,6 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
+    <!-- (2026-07-13) Prevent light scheme flash on load; prev: no meta -->
+    <meta name="color-scheme" content="dark">
     <!-- (2026-07-13) Save current page for PWA last-page restore; prev: no save -->
     <script>localStorage.setItem('pwa_last_page','index5.html');</script>
     <title>CitySavings Credit Portal - Loan Evaluation Console</title>
@@ -2203,7 +2205,9 @@
                 font-size: 0.75rem;
             }
             ] */
-            /* [2026-07-11 Fix: Retain regular table columns on mobile with horizontal scroll wrapper instead of display:block card lists] */
+        }
+        /* (2026-07-13) Close media query to fix desktop styling; prev: unclosed */
+        /* [2026-07-11 Fix: Retain regular table columns on mobile with horizontal scroll wrapper instead of display:block card lists] */
 
 
 
@@ -4327,7 +4331,36 @@
             el.value = raw;
         }
 
-        // (2026-07-13) Scroll to CSB deduction on reminder click; prev: none
+        // (2026-07-13) Helper for custom smooth scrolling animation; prev: none
+        function smoothScrollToElement(element, duration = 800) {
+            if (!element) return;
+            const targetPosition = element.getBoundingClientRect().top + window.pageYOffset - (window.innerHeight / 2) + (element.clientHeight / 2);
+            const startPosition = window.pageYOffset;
+            const distance = targetPosition - startPosition;
+            let startTime = null;
+
+            function easeInOutQuad(t, b, c, d) {
+                t /= d / 2;
+                if (t < 1) return c / 2 * t * t + b;
+                t--;
+                return -c / 2 * (t * (t - 2) - 1) + b;
+            }
+
+            function animation(currentTime) {
+                if (startTime === null) startTime = currentTime;
+                const timeElapsed = currentTime - startTime;
+                const run = easeInOutQuad(timeElapsed, startPosition, distance, duration);
+                window.scrollTo(0, run);
+                if (timeElapsed < duration) {
+                    requestAnimationFrame(animation);
+                } else {
+                    window.scrollTo(0, targetPosition);
+                }
+            }
+            requestAnimationFrame(animation);
+        }
+
+        // (2026-07-13) Use custom smooth scroll for deductions; prev: scrollIntoView
         function scrollToCsbDeductions() {
             const csbContainer = document.getElementById('dynamic-csb-deductions-container');
             if (csbContainer) {
@@ -4335,11 +4368,31 @@
                 if (csbBody && csbBody.style.display === 'none') {
                     if (typeof toggleCsbAccordion === 'function') toggleCsbAccordion();
                 }
-                csbContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                smoothScrollToElement(csbContainer);
                 csbContainer.style.transition = 'box-shadow 0.3s ease, border 0.3s ease';
-                csbContainer.style.boxShadow = '0 0 18px rgba(239, 68, 68, 0.9)';
+                csbContainer.style.boxShadow = '0 0 8px rgba(239, 68, 68, 0.8)';
                 csbContainer.style.borderRadius = '8px';
                 setTimeout(() => { csbContainer.style.boxShadow = 'none'; }, 2200);
+            }
+        }
+
+        // (2026-07-13) Use custom smooth scroll for redemptions; prev: scrollIntoView
+        function highlightRedemptionHeader() {
+            const container = document.getElementById('dynamic-pli-rows-container');
+            if (container) {
+                const body = document.getElementById('receiptAccordionBody');
+                if (body && body.style.display === 'none') {
+                    if (typeof toggleReceiptAccordion === 'function') toggleReceiptAccordion();
+                }
+                smoothScrollToElement(container);
+                container.style.transition = 'box-shadow 0.3s ease, border 0.3s ease';
+                container.style.boxShadow = '0 0 10px rgba(16, 185, 129, 0.8)';
+                container.style.border = '1px solid rgba(16, 185, 129, 0.8)';
+                container.style.borderRadius = '6px';
+                setTimeout(() => {
+                    container.style.boxShadow = 'none';
+                    container.style.border = 'none';
+                }, 2200);
             }
         }
 
@@ -6356,8 +6409,9 @@
                         });
                     }
                 } else {
+                    // (2026-07-13) Add scroll-to-redemption link and glow; prev: static text
                     redemptionTbody.removeAttribute('data-rendered-keys');
-                    redemptionTbody.innerHTML = `<div class="text-white-50 text-center py-2">No redemption records found</div>`;
+                    redemptionTbody.innerHTML = `<div class="text-white-50 text-center py-2" style="font-size: 0.65rem;">No redemption records found.<br><span class="glow-hover-text" style="color: #10B981; text-decoration: underline; cursor: pointer; font-weight: 700; transition: all 0.2s;" onclick="highlightRedemptionHeader()">Scroll up to add redemption here</span></div>`;
                 }
             }
 
@@ -6998,6 +7052,13 @@
                     bestP = bestP - diff * (exactP / requiredAmort);
                 }
                 exactRoundedP = Math.round(bestP * 100) / 100;
+                
+                // (2026-07-13) Ensure net pay is at least thresholdLimit; prev: round only
+                let testAmort = Math.ceil(parseFloat(calculatePMT(r, loanTerm, exactRoundedP).toFixed(6)) * 100) / 100;
+                while (testAmort > requiredAmort && exactRoundedP > 0) {
+                    exactRoundedP = Math.round((exactRoundedP - 0.01) * 100) / 100;
+                    testAmort = Math.ceil(parseFloat(calculatePMT(r, loanTerm, exactRoundedP).toFixed(6)) * 100) / 100;
+                }
             } else if (revisedBaseline > 0) {
                 // (2026-07-13) Fallback to capacity if requiredAmort <= 0; prev: set to 0
                 const fallbackCap = Math.max(0, revisedBaseline - thresholdLimit);

@@ -17,7 +17,9 @@ input:-webkit-autofill:active {
     transition: background-color 5000s ease-in-out 0s !important;
 }
 
+/* (2026-07-13) Set color scheme to light to prevent forced dark mode; prev: none */
 :root {
+    color-scheme: light;
     --primary-color: #4F2683;
     --secondary-color: #7a4b00;
     --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);

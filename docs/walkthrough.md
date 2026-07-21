@@ -1,0 +1,21 @@
+# Theme Sync & CSS Fixes Walkthrough
+
+A comprehensive update was implemented to resolve unstyled layout flashes, browser-forced dark-mode inversion, and broken desktop styling in the application.
+
+## Key Changes
+
+### 1. Locked Color Schemes & Prevented Forced Dark Mode
+- **CSS Color Lock**: Added `color-scheme: light;` to the root of [index.css](file:///c:/Users/Lenovo/Desktop/filez/SEARCH/index.css) to explicitly tell modern browsers that the application is built for light mode.
+- **HTML Meta Sync**: Added `<meta name="color-scheme" content="light">` to the `<head>` of all light-themed pages, and `<meta name="color-scheme" content="dark">` to the `<head>` of dark-themed pages.
+- **Synchronous Inline Styles**: Added inline `<style>` tags setting `:root { color-scheme: ... }` at the very beginning of `<head>` in all templates. This ensures the correct color scheme is active on the first parsed frame, preventing any flash of unstyled dark/light theme before external CSS loads.
+- **Login Page Theme Alignment**: Locked the color-scheme of the login body and card to `light` inside [login/index.html](file:///c:/Users/Lenovo/Desktop/filez/SEARCH/login/index.html) and updated the background to a light gradient. This keeps the login card white and prevents the browser from automatically inverting it to dark gray when system dark mode is active.
+
+### 2. Service Worker Cache Invalidation
+- **Version Bump**: Bumped the service worker cache version to `v19` in [service-worker.js](file:///c:/Users/Lenovo/Desktop/filez/SEARCH/service-worker.js) to invalidate older index templates cached on client devices and ensure all changes are immediately pulled.
+
+### 3. Restored Custom Dropdowns on Desktop
+- **Media Query Fix**: Fixed an unclosed `@media (max-width: 768px)` block at line 2207 in [index5.html](file:///c:/Users/Lenovo/Desktop/filez/SEARCH/index5.html) by adding the missing closing brace. This fixes the bug where all subsequent CSS rules (including the custom select dropdown styles, statuses, skeleton loading, and final net pay styles) were incorrectly ignored on desktop screens.
+
+## Verification
+- Checked that custom select dropdowns render correctly as inline capsules on mobile and positioned absolute overlay popups on desktop.
+- Verified that loading pages no longer show any layout flashes or forced dark inversion.

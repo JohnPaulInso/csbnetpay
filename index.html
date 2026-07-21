@@ -3,6 +3,10 @@
 
 <head>
     <meta charset="UTF-8">
+    <!-- (2026-07-13) Prevent dark scheme flash on load; prev: no meta -->
+    <meta name="color-scheme" content="light">
+    <!-- (2026-07-13) Prevent dark scheme flash on load; prev: no inline style -->
+    <style>:root { color-scheme: light !important; }</style>
     <!-- (2026-07-13) Save current page; prev: no save -->
     <script>localStorage.setItem('pwa_last_page','index.html');</script>
     <title>Historical Netpay</title>
