@@ -7394,16 +7394,43 @@
         // (2026-07-13) Format and send evaluation cards via email & copy HTML snippet (unconditional execution); prev: activeSession check blocked click
         function sendEvaluationEmail() {
             const empNum = (window.activeSession ? window.activeSession.empNum : null) || document.getElementById('employeeNumber')?.value.trim() || 'N/A';
-            const clientName = document.getElementById('lbl-profile-name')?.innerText || (window.activeSession ? window.activeSession.accountName : '') || 'N/A';
-            const stationSchool = document.getElementById('lbl-profile-school')?.innerText || (window.activeSession ? window.activeSession.groupName : '') || 'N/A';
-            const phoneNumber = document.getElementById('lbl-profile-contact')?.innerText || (window.activeSession ? window.activeSession.contactNum : '') || 'N/A';
-            const branchName = document.getElementById('lbl-profile-branch')?.innerText || (window.activeSession ? window.activeSession.branchName : '') || 'N/A';
+            /* (2026-07-13) Smarter fallback to avoid N/A for profile details; prev: direct DOM lookup */
+            const getValOrFallback = (id, fallback) => {
+                const el = document.getElementById(id);
+                if (el) {
+                    const txt = el.innerText.trim();
+                    if (txt && txt !== 'N/A' && txt !== '-') return txt;
+                }
+                return fallback;
+            };
+
+            const clientName = getValOrFallback('lbl-profile-name', 
+                getValOrFallback('empSummaryName', 
+                    (window.activeSession ? window.activeSession.accountName : '') || 'Manual / Autonomous Entry'
+                )
+            );
+
+            const stationSchool = getValOrFallback('lbl-profile-school', 
+                getValOrFallback('empSummaryDiv', 
+                    (window.activeSession ? window.activeSession.groupName : '') || 'N/A'
+                )
+            );
+
+            const phoneNumber = getValOrFallback('lbl-profile-contact', 
+                (window.activeSession ? window.activeSession.contactNum : '') || 'N/A'
+            );
+
+            const branchName = getValOrFallback('lbl-profile-branch', 
+                (window.activeSession ? window.activeSession.branchName : '') || 'N/A'
+            );
+
             const evalMode = document.getElementById('evaluationModeSelect')?.value || 'DEPED';
 
             const loanAmt = document.getElementById('loanAmount')?.value || '0';
             const loanTerm = document.getElementById('loanTerm')?.value || '60';
             const interestRate = (typeof getInterestRateValue === 'function' ? getInterestRateValue() : '7.5') + '%';
             const totalInterestText = document.getElementById('lbl-total-interest')?.innerText.replace(/\n/g, ' | ') || '';
+            const totalInterestTextHtml = document.getElementById('lbl-total-interest')?.innerHTML || '';
 
             const currentNetPay = document.getElementById('lbl-netpay')?.innerText || '₱0.00';
             const csbDeductions = document.getElementById('lbl-dedamt')?.innerText || '₱0.00';
@@ -7471,7 +7498,7 @@
                 '        <table width="100%" border="0" cellpadding="0" cellspacing="0">',
                 '          <tr>',
                 '            <td style="color:#F59E0B !important; font-weight:800; font-size:16px;"><font color="#F59E0B"><b style="color:#F59E0B !important; -webkit-text-fill-color:#F59E0B !important;">CitySavings</b></font> <font color="#FFFFFF"><b style="color:#FFFFFF !important; -webkit-text-fill-color:#FFFFFF !important; font-weight:400; font-size:12px;">LOAN EVALUATION</b></font></td>',
-                '            <td align="right" style="color:#F59E0B !important;"><span style="background-color:#282214; color:#F59E0B !important; font-size:11px; font-weight:800; padding:4px 10px; border-radius:12px; border:1px solid #F59E0B;"><font color="#F59E0B"><b style="color:#F59E0B !important; -webkit-text-fill-color:#F59E0B !important;">EMP #' + empNum + '</b></font></span></td>',
+                '            <td align="right" style="color:#F59E0B !important; white-space: nowrap;"><span style="background-color:#282214; color:#F59E0B !important; font-size:11px; font-weight:800; padding:4px 10px; border-radius:12px; border:1px solid #F59E0B; white-space: nowrap;"><font color="#F59E0B"><b style="color:#F59E0B !important; -webkit-text-fill-color:#F59E0B !important; white-space: nowrap;">EMP #' + empNum + '</b></font></span></td>',
                 '          </tr>',
                 '        </table>',
                 '      </td>',
@@ -7514,7 +7541,7 @@
                 '      <td style="background-color:#0E1226; border:1px solid #222944; border-radius:12px; padding:16px; color:#FFFFFF;" bgcolor="#0E1226">',
                 '        <div style="color:#F59E0B !important; font-size:12px; font-weight:800; margin-bottom:10px;"><font color="#F59E0B"><b style="color:#F59E0B !important; -webkit-text-fill-color:#F59E0B !important;">LOAN AMOUNT</b></font></div>',
                 '        <div style="background-color:#060914; border:1px solid #222944; border-radius:8px; padding:10px 14px; color:#FFFFFF !important; font-size:20px; font-weight:800; font-family:Consolas,monospace; margin-bottom:6px;" bgcolor="#060914"><font color="#FFFFFF"><b style="color:#FFFFFF !important; -webkit-text-fill-color:#FFFFFF !important;">₱' + loanAmt + '</b></font></div>',
-                '        <div style="font-size:11px; color:#FFFFFF !important; margin-bottom:12px;"><font color="#FFFFFF"><b style="color:#FFFFFF !important; -webkit-text-fill-color:#FFFFFF !important;">' + totalInterestText + '</b></font></div>',
+                '        <div style="font-size:11px; color:#FFFFFF !important; margin-bottom:12px; line-height:1.4;"><font color="#FFFFFF"><b style="color:#FFFFFF !important; -webkit-text-fill-color:#FFFFFF !important;">' + totalInterestTextHtml + '</b></font></div>',
                 '        <table width="100%" border="0" cellpadding="0" cellspacing="6">',
                 '          <tr>',
                 '            <td width="50%" style="background-color:#060914; border:1px solid #222944; border-radius:8px; padding:8px 10px; color:#FFFFFF;" bgcolor="#060914">',
