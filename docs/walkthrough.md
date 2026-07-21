@@ -22,7 +22,7 @@ A comprehensive update was implemented to resolve unstyled layout flashes, brows
 - **Mobile Email Client Launcher**: Updated `copyAndOpenEmail()` to use the `mailto:` scheme with pre-filled subject and plain text body when on a mobile PWA or browser, allowing it to natively launch the default mobile email app (such as Gmail) instead of opening Gmail web interface in a new tab.
 - **Default Advance Months**: Changed the default selection and fallback value of the advance payment months selector in [index5.html](file:///c:/Users/Lenovo/Desktop/filez/SEARCH/index5.html) from 6 to 7.
 - **Less Advance Payment Toggle**: Added a toggle checkbox next to the "Less Advance Payment" label in [index5.html](file:///c:/Users/Lenovo/Desktop/filez/SEARCH/index5.html) to allow users to exclude PLI deductions from the advance payment basis calculation (uncapping the basis to just new amortization minus CSB deductions when unchecked).
-- **Shortened Email Layout**: Simplified the email summary generated in [index5.html](file:///c:/Users/Lenovo/Desktop/filez/SEARCH/index5.html) by removing the Client Profile, Loan Setup, and Net Pay computation cards, leaving only the Net Proceeds breakdown.
+- **Email Summary Fixes**: Fixed incorrect DOM element ID lookups for `loanProceeds` and `lessAdvance` in `sendEvaluationEmail()` to pull their actual values from `val-netproc-loan-proceeds` and `val-netproc-advance-payment` instead of incorrect IDs, ensuring the HTML/Plain text email output renders accurate values.
 
 ## Verification
 - Checked that custom select dropdowns render correctly as inline capsules on mobile and positioned absolute overlay popups on desktop.
@@ -32,4 +32,4 @@ A comprehensive update was implemented to resolve unstyled layout flashes, brows
 - Verified that clicking the copy/send email action on mobile redirects to the native mail client.
 - Confirmed that the advance months dropdown defaults to 7 on page load and reset.
 - Verified that checking/unchecking the "Less Advance Payment" checkbox correctly toggles the inclusion/exclusion of PLIs in the advance payment basis calculation.
-- Verified that the generated email summary only shows the clean Net Proceeds details.
+- Verified that the generated email summary correctly outputs non-zero values matching the active loan proceeds and advance payment details.
