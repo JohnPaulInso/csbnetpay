@@ -1292,6 +1292,10 @@
         #val-after-redemption:hover {
             filter: brightness(1.2) drop-shadow(0 0 4px rgba(245, 158, 11, 0.4)) !important;
         }
+        /* (2026-07-13) After Redemption bigger than Net Proceeds; prev: same 0.95rem */
+        #val-after-redemption {
+            font-size: 1.2rem !important;
+        }
 
         /* Compact inputs and dropdowns inside baseline receipt/computation rows */
         /* (2026-07-13) Remove select from baseline styles; prev: select included */
@@ -7185,8 +7189,9 @@
             // 2026-07-14: Display net proceeds as absolute positive value (was: could display negative)
             if (valTotal) valTotal.innerHTML = formatPHP(Math.abs(netProceeds));
 
-            // (2026-07-13) Show holdout rows when any redemption (slot 2+) is checked; prev: none
-            const hasRedemptionChecked = Array.from(document.querySelectorAll('.pli-cb:checked')).some(cb => parseInt(cb.getAttribute('data-slot')) >= 2);
+            // (2026-07-13) Show holdout rows when any redemption (slot 2+) is checked AND master toggle is ON; prev: toggle not checked
+            const masterPliOn = document.getElementById('toggleMasterPli')?.checked;
+            const hasRedemptionChecked = masterPliOn && Array.from(document.querySelectorAll('.pli-cb:checked')).some(cb => parseInt(cb.getAttribute('data-slot')) >= 2);
             const rowHoldout = document.getElementById('row-holdout');
             const rowAfterRedemption = document.getElementById('row-after-redemption');
             const valHoldout = document.getElementById('val-holdout');
@@ -7572,9 +7577,10 @@
             const lessAdvance = document.getElementById('val-netproc-advance-payment')?.innerText || '₱0.00';
             const netProceeds = document.getElementById('val-netproc-total')?.innerText || '₱0.00';
             const billingType = document.getElementById('val-billing-type')?.innerText || 'NEW BILLING';
-            // (2026-07-13) Read holdout/after-redemption only when row is visible; prev: none
+            // (2026-07-13) Read holdout/after-redemption only when row is visible AND master toggle is ON; prev: toggle not checked
             const rowHoldoutEl = document.getElementById('row-holdout');
-            const hasHoldout = rowHoldoutEl && getComputedStyle(rowHoldoutEl).display !== 'none';
+            const masterPliOnEmail = document.getElementById('toggleMasterPli')?.checked;
+            const hasHoldout = masterPliOnEmail && rowHoldoutEl && getComputedStyle(rowHoldoutEl).display !== 'none';
             const holdoutVal = document.getElementById('val-holdout')?.innerText || '₱0.00';
             const afterRedemptionVal = document.getElementById('val-after-redemption')?.innerText || '₱0.00';
 
