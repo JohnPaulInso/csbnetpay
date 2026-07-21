@@ -42,6 +42,7 @@ A comprehensive update was implemented to resolve unstyled layout flashes, brows
   - Excluded the slot 1 double deduction from the advance payment basis calculation when checked.
   - Fixed `valDoubleSubtotalEl` duplicate declaration SyntaxError.
   - Removed redundant manual `toggleRedemptionLabel` click handler from redemption labels.
+  - Linked the entire redemption accordion header row to open/close the accordion on click.
 
 ## Verification
 - Checked that custom select dropdowns render correctly as inline capsules on mobile and positioned absolute overlay popups on desktop.
@@ -64,3 +65,4 @@ A comprehensive update was implemented to resolve unstyled layout flashes, brows
 - Verified that interest labels and values display correctly in dark text on white backgrounds and the brand header text is removed.
 - Confirmed that redemption totals and double deductions are separated, and slot 1 is excluded from the advance payment basis calculation.
 - Verified that syntax errors are cleared and redemption labels do not intercept manual toggles.
+- Verified that clicking any part of the redemption accordion header row toggles the accordion open/close.

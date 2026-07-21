@@ -3429,9 +3429,9 @@
                             <!-- [2026-07-12 Redemption Accordion Row - Labeled dynamic-pli-rows-container. Styled like a transparent baseline row that drops down to show dynamic PLIs] -->
                             <div id="dynamic-pli-rows-container" class="receipt-container-accordion mt-0 mb-0" style="background: transparent; border: none; overflow: hidden; width: 100%;">
                                 <!-- [2026-07-14 Fix: Split accordion header so label-text click toggles REDEMPTION/Double Deduction without opening accordion; previous: whole button was one onclick] -->
-                                <div class="baseline-row netpay-row-redemption-header w-100" id="btn-redemption-accordion-header" style="background: transparent; border: none; outline: none !important; width: 100%; cursor: default; margin-bottom: 0 !important;">
+                                <div class="baseline-row netpay-row-redemption-header w-100" id="btn-redemption-accordion-header" style="background: transparent; border: none; outline: none !important; width: 100%; cursor: pointer; margin-bottom: 0 !important;" onclick="toggleReceiptAccordion()">
                                     <span class="netpay-label" style="user-select: none;" id="lbl-redemption-toggle-text"><i class="bi bi-plus-lg text-success mr-2"></i>Redemption</span>
-                                    <span class="d-flex align-items-center" style="gap: 8px; cursor: pointer;" onclick="toggleReceiptAccordion()">
+                                    <span class="d-flex align-items-center" style="gap: 8px;">
                                         <span id="val-baseline-papsubtotal" class="tabular-nums font-weight-bold">₱0.00</span>
                                         <i class="bi bi-chevron-down text-white-50" id="redemption-chevron" style="font-size: 0.75rem; transition: transform 0.2s ease;"></i>
                                     </span>
