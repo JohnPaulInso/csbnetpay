@@ -3515,12 +3515,17 @@
                                     <span style="font-size: 0.62rem; color: rgba(255,255,255,0.35); font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; font-family: 'Montserrat', sans-serif;">LIMIT:</span>
                                     <div class="d-inline-flex align-items-center" style="background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 4px; padding: 0px 5px; height: 18px; width: 72px; justify-content: flex-start; transition: border-color 0.2s, box-shadow 0.2s;" onfocusin="this.style.borderColor='rgba(245, 158, 11, 0.5)'; this.style.boxShadow='0 0 0 2px rgba(245, 158, 11, 0.15)';" onfocusout="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none';">
                                         <span style="color: rgba(255, 255, 255, 0.3); font-size: 0.54rem; font-weight: 700; margin-right: 2px; user-select: none;">₱</span>
-                                        <input type="text" inputmode="numeric" id="input-target-limit" class="font-weight-bold text-left tabular-nums" style="width: 52px !important; background: transparent !important; border: none !important; outline: none !important; box-shadow: none !important; color: #F59E0B !important; font-size: 0.58rem !important; padding: 0 !important; margin: 0 !important; line-height: 1; text-indent: 0 !important;" value="5300" oninput="onTargetLimitInput()">
+                                        <input type="number" inputmode="numeric" id="input-target-limit" class="font-weight-bold text-left tabular-nums" style="width: 52px !important; background: transparent !important; border: none !important; outline: none !important; box-shadow: none !important; color: #F59E0B !important; font-size: 0.58rem !important; padding: 0 !important; margin: 0 !important; line-height: 1; text-indent: 0 !important;" value="5300" oninput="onTargetLimitInput()">
                                     </div>
                                 </div>
                                 <a href="javascript:void(0)" onclick="adjustLoanForExactThreshold()" class="text-warning" id="lnk-adjust-loan-netpay" style="font-size: 0.65rem; font-weight: 700; text-decoration: none; border-bottom: 1px dashed rgba(245, 158, 11, 0.4); padding-bottom: 1px; transition: all 0.2s ease;" onmouseover="this.style.borderBottomColor='#F59E0B'" onmouseout="this.style.borderBottomColor='rgba(245, 158, 11, 0.4)'">
                                     <i class="bi bi-magic mr-1"></i>Fit Limit
                                 </a>
+                            </div>
+                            <!-- (2026-07-13) Add target limit validation element; prev: no message -->
+                            <!-- Target limit warning message -->
+                            <div id="validation-target-limit" style="display: none; color: #EF4444; font-size: 0.6rem; font-weight: 700; margin-top: 4px; font-family: 'Montserrat', sans-serif;">
+                                <i class="bi bi-exclamation-triangle-fill mr-1"></i>Limit is below the required minimum
                             </div>
                         </div>
                     </div>
@@ -4096,19 +4101,20 @@
             <div class="modal fade" id="emailSummaryModal" tabindex="-1" role="dialog" aria-hidden="true" onclick="if(event.target === this) closeEmailSummaryModal();">
                 <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                     <div class="modal-content" style="background: #080c19; border: 1px solid rgba(245,158,11,0.4); border-radius: 16px; color: #f0f4f8;">
-                        <div class="modal-header" style="border-bottom: 1px solid rgba(255,255,255,0.1); padding: 16px 24px;">
-                            <h5 class="modal-title font-weight-bold" style="color: #F59E0B; font-size: 1.05rem;">
+                        <!-- (2026-07-13) Close button on top right with X icon; prev: no close button -->
+                        <div class="modal-header" style="border-bottom: 1px solid rgba(255,255,255,0.1); padding: 16px 24px; display: flex; justify-content: space-between; align-items: center;">
+                            <h5 class="modal-title font-weight-bold" style="color: #F59E0B; font-size: 1.05rem; margin: 0;">
                                 <i class="bi bi-envelope-paper-fill mr-2"></i> HTML Email Summary Preview
                             </h5>
-                            <button type="button" class="close text-white" onclick="closeEmailSummaryModal()" aria-label="Close" style="opacity: 0.8; cursor: pointer;">
-                                <span aria-hidden="true">&times;</span>
+                            <button type="button" class="close text-white-50" onclick="closeEmailSummaryModal()" aria-label="Close" style="cursor: pointer; border: none; background: transparent; font-size: 1.1rem; line-height: 1; padding: 4px; outline: none !important; transition: all 0.2s;" onmouseover="this.style.color='white'; this.style.transform='scale(1.1)';" onmouseout="this.style.color='rgba(255,255,255,0.5)'; this.style.transform='scale(1)';">
+                                <i class="bi bi-x-lg"></i>
                             </button>
                         </div>
                         <div class="modal-body" id="emailSummaryModalBody" style="padding: 24px; max-height: 75vh; overflow-y: auto;">
                             <!-- Rendered HTML cards insert here -->
                         </div>
-                        <div class="modal-footer" style="border-top: 1px solid rgba(255,255,255,0.1); padding: 14px 24px; justify-content: space-between;">
-                            <button type="button" class="btn btn-sm btn-secondary" onclick="closeEmailSummaryModal()">Close</button>
+                        <!-- (2026-07-13) Remove footer close button; prev: close button in footer -->
+                        <div class="modal-footer" style="border-top: 1px solid rgba(255,255,255,0.1); padding: 14px 24px; display: flex; justify-content: flex-end;">
                             <button type="button" class="btn btn-sm font-weight-bold" onclick="copyAndOpenEmail()" style="background: linear-gradient(135deg, #F59E0B, #D97706); color: white; border: none; border-radius: 8px; padding: 10px 22px; font-size: 13px; letter-spacing: 0.03em;">
                                 <i class="bi bi-envelope-paper-fill mr-2"></i> FORWARD VIA EMAIL (COPY & OPEN)
                             </button>
@@ -6305,12 +6311,8 @@
                     });
                 }
                 
-                // [2026-07-14 Fix: Anticipated and Promotion now rendered as separate plain rows, not inside accordion body; previous: appended into receiptBody]
-                if (hasItems) {
-                    dynamicPliContainer.classList.add('show');
-                } else {
-                    dynamicPliContainer.classList.remove('show');
-                }
+                // (2026-07-13) Make redemption row always visible; prev: toggled based on hasItems
+                dynamicPliContainer.classList.add('show');
             }
 
             // (2026-07-13) Filter and render added PLIs with default 0; prev: all selected
@@ -6582,22 +6584,28 @@
             const netPayElement = document.getElementById('val-newnetpay');
             netPayElement.innerHTML = formatPHP(newNetPay);
 
-            // (2026-07-13) Limit min 5000 for 9.66%, 5300 others; prev: allowed < 5000
+            // (2026-07-13) Validate limit instead of clamping; prev: clamped input
             const minLimit = (interestRate === 9.66) ? 5000.00 : 5300.00;
             let thresholdLimit = minLimit;
             const warningMsg = `<i class="bi bi-exclamation-triangle-fill"></i> Cannot be accommodated`;
 
             const limitInput = document.getElementById('input-target-limit');
+            const validationEl = document.getElementById('validation-target-limit');
             if (limitInput) {
                 if (limitInput.dataset.manual === '1') {
                     let userVal = safeFloat(limitInput.value);
-                    if (userVal < minLimit && limitInput.value.trim() !== '') {
-                        userVal = minLimit;
-                        limitInput.value = minLimit;
-                    }
-                    thresholdLimit = Math.max(minLimit, userVal);
+                    thresholdLimit = (isNaN(userVal) || limitInput.value.trim() === '') ? minLimit : userVal;
                 } else {
                     limitInput.value = minLimit;
+                }
+                if (validationEl) {
+                    const currentVal = safeFloat(limitInput.value);
+                    if (limitInput.value.trim() !== '' && currentVal < minLimit) {
+                        validationEl.innerHTML = `<i class="bi bi-exclamation-triangle-fill mr-1"></i>Limit is below the required ₱${minLimit.toLocaleString()}`;
+                        validationEl.style.display = 'block';
+                    } else {
+                        validationEl.style.display = 'none';
+                    }
                 }
             }
 
@@ -6806,10 +6814,11 @@
             const pliIsSelected = document.querySelector('.pli-cb:checked') !== null;
             const showNetprocRedemption = useMasterPli && pliIsSelected;
 
+            // (2026-07-13) Restore declarations and set visibility; prev: declarations removed
             const netprocAccordion = document.getElementById('dynamic-netproc-redemption-container');
             const netprocManualRow = document.getElementById('dynamic-netproc-redemption-manual-container');
             if (netprocAccordion) {
-                netprocAccordion.style.setProperty('display', (!isAutonomous && showNetprocRedemption) ? 'block' : 'none', 'important');
+                netprocAccordion.style.setProperty('display', !isAutonomous ? 'block' : 'none', 'important');
             }
             if (netprocManualRow) {
                 netprocManualRow.style.setProperty('display', isAutonomous ? 'flex' : 'none', 'important');
@@ -6866,15 +6875,16 @@
                 }
             }
 
-            // Calculate baselinePliSum (redemption amount shown in val-baseline-papsubtotal) for advance payment subtraction
+            // (2026-07-13) Exclude redemption if master PLI is off; prev: included
             let baselinePliSum = 0;
-            if (isAutonomous) {
-                baselinePliSum = safeFloat(document.getElementById('input-redemption').value);
-            } else {
-                // (2026-07-13) baselinePliSum from all checked pli-cb; prev: checkedRadio per slot
-                document.querySelectorAll('.pli-cb:checked').forEach(cb => {
-                    baselinePliSum += safeFloat(cb.getAttribute('data-dedpli'));
-                });
+            if (useMasterPli) {
+                if (isAutonomous) {
+                    baselinePliSum = safeFloat(document.getElementById('input-redemption').value);
+                } else {
+                    document.querySelectorAll('.pli-cb:checked').forEach(cb => {
+                        baselinePliSum += safeFloat(cb.getAttribute('data-dedpli'));
+                    });
+                }
             }
 
             // (2026-07-13) Sum csb-deduction-cb for basis; prev: netproc-deduction-cb
@@ -6898,8 +6908,8 @@
                 amortization = Math.ceil(parseFloat(rawPmt.toFixed(6)) * 100) / 100;
             }
 
-            // (2026-07-13) Advance payment = (new amortization - baseline CSB deduction sum - checked redemptions subtotal) * months; prev: amortization * months
-            const basis = Math.max(0, amortization - oldDeduction - baselinePliSum);
+            // (2026-07-13) Allow negative advance payment; prev: clamped to zero
+            const basis = amortization - oldDeduction - baselinePliSum;
             const advancePayment = Math.round(basis * advanceMonths * 100) / 100;
 
             // Final net proceeds
@@ -6944,22 +6954,9 @@
             saveActiveEvaluationState();
         }
 
-        // (2026-07-13) Handle target limit input min limit clamp; prev: no handler
-        function onTargetLimitInput() {
-            const limitInput = document.getElementById('input-target-limit');
-            if (!limitInput) return;
-            limitInput.dataset.manual = '1';
-            const interestRate = getInterestRateValue();
-            const minLimit = (interestRate === 9.66) ? 5000.00 : 5300.00;
-            let val = safeFloat(limitInput.value);
-            if (val < minLimit && limitInput.value.trim() !== '') {
-                val = minLimit;
-                limitInput.value = minLimit;
-            }
-            if (typeof calculateNetPay === 'function') calculateNetPay();
-        }
+        // (2026-07-13) Remove duplicate target limit handler; prev: duplicate function
 
-        // (2026-07-13) Auto-adjust loanAmount to hit threshold limit exactly; prev: none
+        // (2026-07-13) Fit to custom limit value; prev: clamped to minLimit
         function adjustLoanForExactThreshold() {
             if (!window.activeSession) return;
             const modeSelect = document.getElementById('evaluationModeSelect');
@@ -6970,8 +6967,9 @@
             const minLimit = (interestRate === 9.66) ? 5000.00 : 5300.00;
             const limitInput = document.getElementById('input-target-limit');
             let thresholdLimit = minLimit;
-            if (limitInput && limitInput.value) {
-                thresholdLimit = Math.max(minLimit, safeFloat(limitInput.value));
+            if (limitInput && limitInput.value.trim() !== '') {
+                const userVal = safeFloat(limitInput.value);
+                thresholdLimit = isNaN(userVal) ? minLimit : userVal;
                 limitInput.value = thresholdLimit;
             }
             
@@ -6980,45 +6978,39 @@
             const revisedBaseline = Math.round(rawBaseline * 100) / 100;
             
             const requiredAmort = Math.round((revisedBaseline - thresholdLimit) * 100) / 100;
-            if (requiredAmort <= 0) {
-                // (2026-07-13) Set loan to 0 silently without popup alert; prev: notification popup
-                const loanInput = document.getElementById('loanAmount');
-                if (loanInput) {
-                    loanInput.value = "0";
-                    loanInput.dataset.manualOverride = '1';
-                }
-                runCalculations();
-                return;
-            }
-            
             const loanTerm = safeInt(document.getElementById('loanTerm').value);
-            if (loanTerm <= 0) return;
-            
-            const r = interestRate / 100 / 12;
-            
-            // Initial analytical guess for P: P = PMT * (1 - (1+r)^-n) / r
-            let exactP = requiredAmort * (1 - Math.pow(1 + r, -loanTerm)) / r;
-            
-            // Numerical refinement to guarantee EXACT match with Math.ceil rounding
-            let bestP = exactP;
-            for (let iter = 0; iter < 100; iter++) {
-                const rawPmt = calculatePMT(r, loanTerm, bestP);
-                const actualAmort = Math.ceil(parseFloat(rawPmt.toFixed(6)) * 100) / 100;
-                const diff = actualAmort - requiredAmort;
-                if (Math.abs(diff) < 0.0001) {
-                    break;
+            const r = (interestRate > 0 && loanTerm > 0) ? (interestRate / 100 / 12) : 0;
+            let exactRoundedP = 0;
+
+            if (requiredAmort > 0 && loanTerm > 0 && interestRate > 0) {
+                // Initial analytical guess for P: P = PMT * (1 - (1+r)^-n) / r
+                let exactP = requiredAmort * (1 - Math.pow(1 + r, -loanTerm)) / r;
+                
+                // Numerical refinement to guarantee EXACT match with Math.ceil rounding
+                let bestP = exactP;
+                for (let iter = 0; iter < 100; iter++) {
+                    const rawPmt = calculatePMT(r, loanTerm, bestP);
+                    const actualAmort = Math.ceil(parseFloat(rawPmt.toFixed(6)) * 100) / 100;
+                    const diff = actualAmort - requiredAmort;
+                    if (Math.abs(diff) < 0.0001) {
+                        break;
+                    }
+                    bestP = bestP - diff * (exactP / requiredAmort);
                 }
-                bestP = bestP - diff * (exactP / requiredAmort);
+                exactRoundedP = Math.round(bestP * 100) / 100;
+            } else if (revisedBaseline > 0) {
+                // (2026-07-13) Fallback to capacity if requiredAmort <= 0; prev: set to 0
+                const fallbackCap = Math.max(0, revisedBaseline - thresholdLimit);
+                const rawSuggested = (fallbackCap > 0 ? fallbackCap : revisedBaseline) / 20.01 * 1000;
+                exactRoundedP = Math.round(rawSuggested * 100) / 100;
             }
-            
-            // (2026-07-13) Round down to the nearest 1,000 to keep net pay safely above threshold; prev: exact decimals
-            let roundedP = Math.floor(bestP / 1000) * 1000;
-            if (roundedP < 0) roundedP = 0;
+
+            if (exactRoundedP < 0) exactRoundedP = 0;
             
             const loanInput = document.getElementById('loanAmount');
             if (loanInput) {
                 loanInput.dataset.manualOverride = '1';
-                loanInput.value = roundedP.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                loanInput.value = exactRoundedP.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
                 formatLoanAmountField();
                 runCalculations();
             }
@@ -7452,14 +7444,14 @@
             }
         }
 
-        // (2026-07-13) Modal action helper to copy HTML snippet and launch email app with body prefilled; prev: empty body
+        // (2026-07-13) Redirect to Gmail compose on copy; prev: opened mailto link
         function copyAndOpenEmail() {
             const empNum = (window.activeSession ? window.activeSession.empNum : null) || document.getElementById('employeeNumber')?.value.trim() || 'N/A';
             const mailSubject = encodeURIComponent('CSB Loan Evaluation Summary - Employee #' + empNum);
-            const mailBody = encodeURIComponent(window.currentEmailPlainText || '');
 
+            // (2026-07-13) Open Gmail compose in new tab; prev: redirected same tab
             const openMail = function() {
-                window.location.href = 'mailto:?subject=' + mailSubject + '&body=' + mailBody;
+                window.open('https://mail.google.com/mail/?view=cm&fs=1&su=' + mailSubject, '_blank');
                 closeEmailSummaryModal();
             };
 
