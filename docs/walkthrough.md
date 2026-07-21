@@ -21,7 +21,7 @@ A comprehensive update was implemented to resolve unstyled layout flashes, brows
 - **Threshold Loan Rounding**: Modified `adjustLoanForExactThreshold()` to round the fitted loan amount to the nearest thousand (multiple of 1,000) and format it with zero decimal points, ensuring the final loan amount has no cents, is a multiple of 1,000, and Net Pay matches the threshold target.
 - **Mobile Email Client Launcher**: Updated `copyAndOpenEmail()` to use the `mailto:` scheme with pre-filled subject and plain text body when on a mobile PWA or browser, allowing it to natively launch the default mobile email app (such as Gmail) instead of opening Gmail web interface in a new tab.
 - **Default Advance Months**: Changed the default selection and fallback value of the advance payment months selector in [index5.html](file:///c:/Users/Lenovo/Desktop/filez/SEARCH/index5.html) from 6 to 7.
-- **Less Advance Payment Toggle**: Added a toggle checkbox next to the "Less Advance Payment" label in [index5.html](file:///c:/Users/Lenovo/Desktop/filez/SEARCH/index5.html) to allow users to include or exclude it from the Net Proceeds calculation.
+- **Less Advance Payment Toggle**: Added a toggle checkbox next to the "Less Advance Payment" label in [index5.html](file:///c:/Users/Lenovo/Desktop/filez/SEARCH/index5.html) to allow users to exclude PLI deductions from the advance payment basis calculation (uncapping the basis to just new amortization minus CSB deductions when unchecked).
 
 ## Verification
 - Checked that custom select dropdowns render correctly as inline capsules on mobile and positioned absolute overlay popups on desktop.
@@ -30,4 +30,4 @@ A comprehensive update was implemented to resolve unstyled layout flashes, brows
 - Checked that fitting the loan amount produces a multiple of 1,000 without cents and respects the net pay limit.
 - Verified that clicking the copy/send email action on mobile redirects to the native mail client.
 - Confirmed that the advance months dropdown defaults to 7 on page load and reset.
-- Verified that toggling the "Less Advance Payment" checkbox correctly updates the Net Proceeds display and calculations.
+- Verified that checking/unchecking the "Less Advance Payment" checkbox correctly toggles the inclusion/exclusion of PLIs in the advance payment basis calculation.

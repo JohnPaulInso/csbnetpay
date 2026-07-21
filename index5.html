@@ -7051,13 +7051,14 @@
             }
 
             // (2026-07-13) Allow negative advance payment; prev: clamped to zero
-            const basis = amortization - oldDeduction - baselinePliSum;
+            /* (2026-07-13) Check toggle to include baseline PLIs; prev: always included */
+            const basis = useAdvancePayment
+                ? (amortization - oldDeduction - baselinePliSum)
+                : (amortization - oldDeduction);
             const advancePayment = Math.round(basis * advanceMonths * 100) / 100;
 
             // Final net proceeds
-            /* (2026-07-13) Apply advance payment toggle state; prev: always on */
-            const advPayValue = useAdvancePayment ? advancePayment : 0;
-            const netProceeds = Math.round((loanProceeds - oldBalance - activePliSubtotal - advPayValue) * 100) / 100;
+            const netProceeds = Math.round((loanProceeds - oldBalance - activePliSubtotal - advancePayment) * 100) / 100;
 
             // Update all display elements
             const valLP = document.getElementById('val-netproc-loan-proceeds');
@@ -7072,10 +7073,10 @@
             }
 
             const valAdv = document.getElementById('val-netproc-advance-payment');
-            if (valAdv) valAdv.innerHTML = formatPHP(advPayValue);
+            if (valAdv) valAdv.innerHTML = formatPHP(advancePayment);
 
             const rowAP = document.getElementById('row-netproc-advance-payment');
-            if (rowAP) rowAP.style.opacity = useAdvancePayment ? '1' : '0.4';
+            if (rowAP) rowAP.style.opacity = '1';
 
             const valTotal = document.getElementById('val-netproc-total');
             // 2026-07-14: Display net proceeds as absolute positive value (was: could display negative)
