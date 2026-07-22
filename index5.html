@@ -6837,7 +6837,9 @@
 
             // [2026-07-14 Fix: Removed dynamic header rename — Redemption/Anticipated/Promotion are now separate rows; previous: single accordion renamed based on active toggles]
             
-            const hasActiveRedemptions = (useMasterPli && (isAutonomous || selectedPlis.length > 0)) || (useAnticipated && anticipatedVal > 0) || (usePromotion && promotionMargin !== 0);
+            // (2026-07-13) Show subtotal if redemption header visible; prev: PLI check
+            const isRedemptionHeaderVisible = useMasterPli || Array.from(document.querySelectorAll('.netpay-row-redemption-header')).some(el => el.style.display !== 'none');
+            const hasActiveRedemptions = isRedemptionHeaderVisible || (useAnticipated && anticipatedVal > 0) || (usePromotion && promotionMargin !== 0);
             const showSubtotalAfterRedemption = hasActiveRedemptions;
 
             const rowSubtotalAfterRedemptionEl = document.getElementById('row-subtotal-after-redemption'); // Div row element for subtotal after redemption in receipt
