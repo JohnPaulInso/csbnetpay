@@ -6893,8 +6893,8 @@
                 valLessIncomingEl.innerHTML = formatPHP(incoming);
             }
 
-            // (2026-07-22) Update Total Subtotal formula; prev: baselineSubVal+papSubtotal
-            revisedBaseline = Math.round((baselineSubVal - activeOnqSum - incoming) * 100) / 100;
+            // (2026-07-13) Total subtotal uses subtotalAfterRedemption; prev: baselineSubVal
+            revisedBaseline = Math.round((subtotalAfterRedemption - activeOnqSum - incoming) * 100) / 100;
             const valRevisedEl = document.getElementById('val-revised-baseline');
             if (valRevisedEl) {
                 valRevisedEl.innerHTML = formatPHP(revisedBaseline);
@@ -7208,6 +7208,11 @@
             // (2026-07-13) Check if any pli-cb is checked; prev: checkedRadio per slot
             const pliIsSelected = document.querySelector('.pli-cb:checked') !== null;
             const showNetprocRedemption = useMasterPli && pliIsSelected;
+
+            // (2026-07-13) Hide redemption headers if PLI off; prev: always visible
+            document.querySelectorAll('.netpay-row-redemption-header').forEach(el => {
+                el.style.setProperty('display', useMasterPli ? '' : 'none', 'important');
+            });
 
             // (2026-07-13) Restore declarations and set visibility; prev: declarations removed
             const netprocAccordion = document.getElementById('dynamic-netproc-redemption-container');
@@ -7578,6 +7583,11 @@
                     collapseBody.classList.remove('show');
                 }
             }
+
+            // (2026-07-13) Hide redemption headers if PLI off; prev: always visible
+            document.querySelectorAll('.netpay-row-redemption-header').forEach(el => {
+                el.style.setProperty('display', isOn ? '' : 'none', 'important');
+            });
 
             // (2026-07-13) Trigger calculateNetProceeds; prev: direct display toggle
             calculateNetProceeds();
