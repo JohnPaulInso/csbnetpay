@@ -6816,7 +6816,8 @@
 
             // [2026-07-12 New: Compute and update Subtotal after Redemption display value]
             // [2026-07-13 Fix: Show "Subtotal after Redemption" if any redemptions or adjustments (PLI, Anticipated, or Promotion) are active, regardless of master PLI toggle state]
-            const subtotalAfterRedemption = baselineSubVal + papSubtotal;
+            // (2026-07-13) Add pliSubtotal to subtotal; prev: baselineSubVal + papSubtotal
+            const subtotalAfterRedemption = baselineSubVal + (useMasterPli ? pliSubtotal : 0) + activeAnticipated + activePromotion;
             const valSubtotalAfterRedemptionEl = document.getElementById('val-subtotal-after-redemption'); // Span element showing subtotal value after redemption/adjustments
             if (valSubtotalAfterRedemptionEl) {
                 valSubtotalAfterRedemptionEl.innerHTML = formatPHP(subtotalAfterRedemption);
