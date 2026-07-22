@@ -6893,8 +6893,8 @@
                 valLessIncomingEl.innerHTML = formatPHP(incoming);
             }
 
-            // [2026-07-11 New: Calculate and display the revised baseline (Subtotal + PLIs - Less OnQueue - Less Incoming) addition dynamically]
-            revisedBaseline = Math.round((baselineSubVal + papSubtotal - activeOnqSum - incoming) * 100) / 100;
+            // (2026-07-22) Update Total Subtotal formula; prev: baselineSubVal+papSubtotal
+            revisedBaseline = Math.round((baselineSubVal - activeOnqSum - incoming) * 100) / 100;
             const valRevisedEl = document.getElementById('val-revised-baseline');
             if (valRevisedEl) {
                 valRevisedEl.innerHTML = formatPHP(revisedBaseline);
@@ -7039,7 +7039,8 @@
                 const isRedemptionOn = isAutonomous ? (document.getElementById('toggleLessOldRedemptionManual') ? document.getElementById('toggleLessOldRedemptionManual').checked : true) : useMasterPli;
                 const redemptionVal = isAutonomous ? safeFloat(document.getElementById('input-redemption').value) : pliSubtotal;
                 
-                // (2026-07-13) Must only be standard redemptions (Redemption 1, 2, 3...) to count as Split Billing; Double Deduction is excluded
+                // (2026-07-22) Fetch lblAuto for isAutonomous check; prev: missing lblAuto
+                const lblAuto = document.getElementById('lbl-redemption-toggle-text-autonomous');
                 const isDoubleDeduction = isAutonomous ? (lblAuto && lblAuto.dataset.doubled === '1') : (!hasOtherPliChecked);
                 const hasRedemption = isRedemptionOn && (redemptionVal > 0) && !isDoubleDeduction;
                 
