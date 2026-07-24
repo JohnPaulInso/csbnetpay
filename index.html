@@ -1414,18 +1414,39 @@
                             sheetMatchesConfig(name, sheetConfig)
                         );
                         let sheet = workbook.Sheets[sheetName];
-                        let rawRows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false, defval: "" });
+                        let netpayTakehomeCol = -1;
+                        let netpayAccountCol = -1;
 
+                        // (2026-07-13) Fix NETPAY TAKEHOME column H positioning; prev: hardcoded splice
                         let processedRows = rawRows.map((r, rowIndex) => {
+                            if (sheetConfig.id === "NETPAY" && rowIndex === 0) {
+                                let thIdx = r.findIndex(c => c && /take\s*home|nthp/i.test(String(c)));
+                                if (thIdx !== -1) netpayTakehomeCol = thIdx;
+                                let accIdx = r.findIndex(c => c && /account/i.test(String(c)));
+                                if (accIdx !== -1) netpayAccountCol = accIdx;
+                            }
+
                             let row = [...r].map(c => (c === null || c === undefined) ? "" : String(c).trim());
                             while (row.length < 30) row.push("");
 
                             if (sheetConfig.id === "NETPAY") {
                                 row.splice(4, 1);
+                                let thCol = netpayTakehomeCol > 4 ? netpayTakehomeCol - 1 : netpayTakehomeCol;
                                 row.splice(8, 9);
-                                let takehome = row.splice(14, 1)[0] || "";
+                                if (thCol >= 17) thCol -= 9;
+                                else if (thCol >= 8) thCol = 8;
+                                if (thCol === -1 || thCol >= row.length) thCol = 14;
+
+                                let takehome = row.splice(thCol, 1)[0] || "";
                                 row.splice(7, 0, takehome);
-                                let account = row.splice(15, 1)[0] || "";
+
+                                let accCol = netpayAccountCol > 4 ? netpayAccountCol - 1 : netpayAccountCol;
+                                if (accCol >= 17) accCol -= 9;
+                                if (accCol >= thCol) accCol--;
+                                if (accCol >= 7) accCol++;
+                                if (accCol < 0 || accCol >= row.length) accCol = 15;
+
+                                let account = row.splice(accCol, 1)[0] || "";
                                 row.splice(12, 0, account);
                                 row.splice(12, 0, "");
                                 row = row.slice(0, 14);
@@ -1498,6 +1519,7 @@
                         progressBar.textContent = "100%";
                     }
                     if (progressText) progressText.textContent = "Conversion complete!";
+                    try { sessionStorage.clear(); } catch(e) {}
 
                     // (2026-07-13) Stagger multiple file downloads & fix keyword match; prev: loop click
                     const downloadBtn = document.createElement("button");
