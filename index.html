@@ -1381,21 +1381,22 @@
                         }
                     ];
 
+                    // (2026-07-13) Fix PLI/POS sheet keyword matching; prev: regex test
                     const sheetMatchesConfig = (sheetName, sheetConfig) => {
-                        const nameLower = sheetName.toLowerCase().trim();
+                        const s = sheetName.toLowerCase().trim();
                         if (sheetConfig.id === "PLI") {
-                            return /\bplis?\b|pli/i.test(nameLower);
+                            return s.includes("pli");
                         }
                         if (sheetConfig.id === "POS") {
-                            return /\bpos(itive)?\b|positive|dedamt|csb/i.test(nameLower);
+                            return (s.includes("positive") || s.includes("pos")) && !s.includes("pli") && !s.includes("onq") && !s.includes("queue");
                         }
                         if (sheetConfig.id === "ONQUEUE") {
-                            return /\bonq(ueue)?\b|on queue|onque|queque/i.test(nameLower);
+                            return (s.includes("onqueue") || s.includes("onq") || s.includes("queue") || s.includes("onque")) && !s.includes("pli");
                         }
                         if (sheetConfig.id === "NETPAY") {
-                            return /\bnet\s*pay\b|netpay|nthp|^net$/i.test(nameLower);
+                            return s.includes("netpay") || s.includes("net pay") || s.includes("nthp") || s === "net";
                         }
-                        return sheetConfig.keywords.some(kw => nameLower.includes(kw));
+                        return false;
                     };
 
                     const presentSheets = sheetsToProcess.filter(sheetConfig =>
@@ -1498,19 +1499,22 @@
                     }
                     if (progressText) progressText.textContent = "Conversion complete!";
 
+                    // (2026-07-13) Stagger multiple file downloads & fix keyword match; prev: loop click
                     const downloadBtn = document.createElement("button");
                     downloadBtn.className = "btn btn-success";
                     downloadBtn.textContent = "Download All Files";
                     downloadBtn.onclick = () => {
-                        filesToDownload.forEach(file => {
-                            const link = document.createElement('a');
-                            link.href = URL.createObjectURL(file.blob);
-                            link.download = file.filename;
-                            link.style.display = "none";
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-                            URL.revokeObjectURL(link.href);
+                        filesToDownload.forEach((file, index) => {
+                            setTimeout(() => {
+                                const link = document.createElement('a');
+                                link.href = URL.createObjectURL(file.blob);
+                                link.download = file.filename;
+                                link.style.display = "none";
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                                setTimeout(() => URL.revokeObjectURL(link.href), 2000);
+                            }, index * 600);
                         });
                     };
                     if (downloadButtonsContainer) {
