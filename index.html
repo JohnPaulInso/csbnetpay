@@ -1357,41 +1357,49 @@
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: "array" });
 
+                    // (2026-07-13) Keyword sheet detect & auto column delete; prev: exact match
                     const sheetsToProcess = [
                         {
-                            names: ["NETPAY", "Net Pay", "netpay", "net", "NETPAY", "NTHP"],
-                            output: `${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
-                            numberColumn: "H"
+                            id: "NETPAY",
+                            keywords: ["netpay", "net pay", "nthp", "net"],
+                            output: `${monthSelect.value}${yearSelect.value.slice(-2)}.csv`
                         },
                         {
-                            names: ["POS", "pos", "positive", "dedamt", "DED", "CSB", "CSB DEDNS", "POSITIVE", "ALL POSITIVE", "ALL POSITIVES", "CSB POSITIVE"],
-                            output: `pos_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
-                            numberColumn: "N"
+                            id: "POS",
+                            keywords: ["pos", "positive", "dedamt", "csb"],
+                            output: `pos_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`
                         },
                         {
-                            names: ["ONQUEUE", "ONQ", "QUEQUE", "ON QUEUE", "ALL ON QUEUE", "ALL ONQUEUE", "ONQUE", "onQUEUE"],
-                            output: `onq_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
-                            numberColumn: "N"
+                            id: "ONQUEUE",
+                            keywords: ["onqueue", "onq", "queue", "queque", "onque"],
+                            output: `onq_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`
                         },
                         {
-                            names: ["PLI", "pli", "ALL PLIs", "ALL PLI", "ALL PLIS", "allPLIs Dedns"],
-                            output: `pli_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`,
-                            clearColumns: ["A", "S", "T", "U", "V", "W", "X", "Y", "Z"],
-                            numberColumn: "N"
+                            id: "PLI",
+                            keywords: ["pli", "plis"],
+                            output: `pli_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`
                         }
                     ];
 
+                    const sheetMatchesConfig = (sheetName, sheetConfig) => {
+                        const nameLower = sheetName.toLowerCase().trim();
+                        if (sheetConfig.id === "PLI") {
+                            return /\bplis?\b|pli/i.test(nameLower);
+                        }
+                        if (sheetConfig.id === "POS") {
+                            return /\bpos(itive)?\b|positive|dedamt|csb/i.test(nameLower);
+                        }
+                        if (sheetConfig.id === "ONQUEUE") {
+                            return /\bonq(ueue)?\b|on queue|onque|queque/i.test(nameLower);
+                        }
+                        if (sheetConfig.id === "NETPAY") {
+                            return /\bnet\s*pay\b|netpay|nthp|^net$/i.test(nameLower);
+                        }
+                        return sheetConfig.keywords.some(kw => nameLower.includes(kw));
+                    };
 
-                    /* 
-                     * CHANGE DETAILS:
-                     * Element: sheet detection matching logic (presentSheets filtering)
-                     * Date: 2026-07-07
-                     * Fix: Change exact matching to case-insensitive and trimmed string matching to recognize sheets like "onqueue" correctly.
-                     */
                     const presentSheets = sheetsToProcess.filter(sheetConfig =>
-                        Object.keys(workbook.Sheets).some(name =>
-                            sheetConfig.names.some(configName => configName.toLowerCase() === name.toLowerCase().trim())
-                        )
+                        Object.keys(workbook.Sheets).some(name => sheetMatchesConfig(name, sheetConfig))
                     );
 
                     if (presentSheets.length === 0) {
@@ -1401,53 +1409,61 @@
                     }
 
                     for (const sheetConfig of presentSheets) {
-                        /* 
-                         * CHANGE DETAILS:
-                         * Element: sheet retrieval logic
-                         * Date: 2026-07-07
-                         * Fix: Retrieve sheet name case-insensitively to match correct key in workbook.Sheets.
-                         */
                         const sheetName = Object.keys(workbook.Sheets).find(name =>
-                            sheetConfig.names.some(configName => configName.toLowerCase() === name.toLowerCase().trim())
+                            sheetMatchesConfig(name, sheetConfig)
                         );
                         let sheet = workbook.Sheets[sheetName];
+                        let rawRows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false, defval: "" });
 
-                        if (sheetConfig.clearColumns) {
-                            const range = XLSX.utils.decode_range(sheet["!ref"]);
-                            for (let col = range.s.c; col <= range.e.c; col++) {
-                                const colLetter = XLSX.utils.encode_col(col);
-                                if (sheetConfig.clearColumns.includes(colLetter)) {
-                                    for (let row = range.s.r; row <= range.e.r; row++) {
-                                        const cellAddress = `${colLetter}${row + 1}`;
-                                        delete sheet[cellAddress];
+                        let processedRows = rawRows.map((r, rowIndex) => {
+                            let row = [...r].map(c => (c === null || c === undefined) ? "" : String(c).trim());
+                            while (row.length < 30) row.push("");
+
+                            if (sheetConfig.id === "NETPAY") {
+                                row.splice(4, 1);
+                                row.splice(8, 9);
+                                let takehome = row.splice(14, 1)[0] || "";
+                                row.splice(7, 0, takehome);
+                                let account = row.splice(15, 1)[0] || "";
+                                row.splice(12, 0, account);
+                                row.splice(12, 0, "");
+                                row = row.slice(0, 14);
+                            } else if (sheetConfig.id === "POS") {
+                                row.splice(4, 1);
+                                row.splice(7, 1);
+                                row = row.slice(0, 16);
+                            } else if (sheetConfig.id === "ONQUEUE") {
+                                row.splice(0, 0, rowIndex === 0 ? "BLANK" : "");
+                                row.splice(5, 1);
+                                row.splice(8, 1);
+                                row.splice(15, 0, "");
+                                row = row.slice(0, 17);
+                            } else if (sheetConfig.id === "PLI") {
+                                row.splice(0, 0, rowIndex === 0 ? "BLANK" : "");
+                                row.splice(1, 1);
+                                row = row.slice(0, 18);
+                            }
+
+                            return row;
+                        });
+
+                        for (let r = 1; r < processedRows.length; r++) {
+                            for (let c = 0; c < processedRows[r].length; c++) {
+                                let val = processedRows[r][c];
+                                if (val !== "") {
+                                    let cleanVal = val.replace(/,/g, '');
+                                    let num = parseFloat(cleanVal);
+                                    if (!isNaN(num) && /^-?\d+(\.\d+)?$/.test(cleanVal)) {
+                                        if (cleanVal.includes('.') || (sheetConfig.id === 'NETPAY' && c === 7) || (sheetConfig.id !== 'NETPAY' && c >= 12)) {
+                                            processedRows[r][c] = num.toFixed(2);
+                                        }
                                     }
                                 }
                             }
                         }
 
-                        if (sheetConfig.numberColumn) {
-                            const range = XLSX.utils.decode_range(sheet["!ref"]);
-                            const colIndex = XLSX.utils.decode_col(sheetConfig.numberColumn);
-                            for (let row = range.s.r + 1; row <= range.e.r; row++) {
-                                const cellAddress = XLSX.utils.encode_cell({ c: colIndex, r: row });
-                                const cell = sheet[cellAddress];
-                                if (cell && cell.v !== undefined) {
-                                    let val = String(cell.v).replace(/,/g, '');
-                                    const numeric = parseFloat(val);
-                                    if (!isNaN(numeric)) {
-                                        // Save as raw string to prevent XLSX from re-formatting with commas
-                                        const cleanVal = numeric.toFixed(2);
-                                        cell.v = cleanVal;
-                                        cell.t = 's';
-                                        // CRITICAL: Delete formatted text and format string
-                                        delete cell.w;
-                                        delete cell.z;
-                                    }
-                                }
-                            }
-                        }
-
-                        const csv = XLSX.utils.sheet_to_csv(sheet, {
+                        const newSheet = XLSX.utils.aoa_to_sheet(processedRows);
+                        const csv = XLSX.utils.sheet_to_csv(newSheet, {
                             FS: ",",
                             RS: "\r\n",
                             blankrows: false
