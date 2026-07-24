@@ -132,30 +132,8 @@ function searchEmployeePos() {
         loader.style.display = "none";
     };
 
-    /* CHANGE: 2026-07-07 — removed duplicate const; cacheKey already declared above */
-    // Check for cached results in sessionStorage with 5-minute TTL
-    const cachedItem = sessionStorage.getItem(cacheKey);
-
-    if (cachedItem) {
-        try {
-            const { data, timestamp } = JSON.parse(cachedItem);
-            const isExpired = !timestamp || (Date.now() - timestamp) > 300000; // 5 minutes (300,000 ms)
-
-            if (!isExpired) {
-                console.log("✅ Using cached results for DEDAMT (cached within 5m):", empNo);
-                displayEmployeeInfoPos(data);
-                displayResultsTablePos(data);
-                updateUISearchComplete();
-                return;
-            } else {
-                console.log("⌛ Cache expired for DEDAMT, fetching fresh data...");
-                sessionStorage.removeItem(cacheKey);
-            }
-        } catch (e) {
-            console.error("Cache parsing error:", e);
-            sessionStorage.removeItem(cacheKey);
-        }
-    }
+    // (2026-07-13) Clear sessionStorage cache on search; prev: 5m cache check
+    sessionStorage.removeItem(cacheKey);
 
     loader.style.display = "block";
 
