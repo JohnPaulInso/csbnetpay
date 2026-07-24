@@ -1445,7 +1445,7 @@
                             AGENT: findCol([/^AGENT$/i])
                         };
 
-                        const getVal = (r, idx) => (idx !== -1 && r[idx] !== undefined && r[idx] !== null) ? String(r[idx]).trim() : "";
+                        const getVal = (r, idx) => (idx !== -1 && r[idx] !== undefined && r[idx] !== null) ? String(r[idx]).replace(/,/g, '').trim() : "";
 
                         let processedRows = rawRows.map((r, rowIndex) => {
                             if (sheetConfig.id === "NETPAY") {
