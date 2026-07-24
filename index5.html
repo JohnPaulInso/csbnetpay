@@ -3410,14 +3410,14 @@
                                      <input type="range" id="loanAmountSlider" min="0" max="100" step="1" value="100" style="position: absolute; top: -7px; left: 0; width: 100%; height: 20px; opacity: 0; cursor: pointer; margin: 0; z-index: 5;" oninput="onLoanSliderInput(this.value)">
                                      <div id="loanSliderThumb" style="position: absolute; top: 50%; left: 100%; transform: translate(-50%, -50%); width: 14px; height: 14px; background: #fbbf24; border: 2px solid #111827; border-radius: 50%; box-shadow: 0 0 8px rgba(245, 158, 11, 0.6); pointer-events: none;"></div>
                                  </div>
-                                 <!-- (2026-07-13) Add 0% label to slider alignment flexbox; prev: 25% start -->
-                                 <div class="d-flex justify-content-between text-muted" style="font-size: 0.65rem; color: rgba(255,255,255,0.4) !important;">
-                                     <span class="pct-btn" onclick="snapSliderToPct(0)" style="cursor: pointer; padding: 1px 4px; border-radius: 3px; background: rgba(255,255,255,0.05);">0%</span>
-                                     <span class="pct-btn" onclick="snapSliderToPct(25)" style="cursor: pointer; padding: 1px 4px; border-radius: 3px; background: rgba(255,255,255,0.05);">25%</span>
-                                     <span class="pct-btn" onclick="snapSliderToPct(50)" style="cursor: pointer; padding: 1px 4px; border-radius: 3px; background: rgba(255,255,255,0.05);">50%</span>
-                                     <span class="pct-btn" onclick="snapSliderToPct(75)" style="cursor: pointer; padding: 1px 4px; border-radius: 3px; background: rgba(255,255,255,0.05);">75%</span>
-                                     <span class="pct-btn" onclick="snapSliderToPct(100)" style="cursor: pointer; padding: 1px 4px; border-radius: 3px; background: rgba(245, 158, 11, 0.15); font-weight: bold; color: #f59e0b;">100%</span>
-                                 </div>
+                                  <!-- (2026-07-13) Use absolute percentage alignment for labels; prev: flex justify-between -->
+                                  <div class="pct-labels-container text-muted" style="position: relative; height: 20px; font-size: 0.65rem; color: rgba(255,255,255,0.4) !important;">
+                                      <span class="pct-btn" onclick="snapSliderToPct(0)" style="position: absolute; left: 0%; transform: translateX(0); cursor: pointer; padding: 1px 4px; border-radius: 3px; background: rgba(255,255,255,0.05);">0%</span>
+                                      <span class="pct-btn" onclick="snapSliderToPct(25)" style="position: absolute; left: 25%; transform: translateX(-50%); cursor: pointer; padding: 1px 4px; border-radius: 3px; background: rgba(255,255,255,0.05);">25%</span>
+                                      <span class="pct-btn" onclick="snapSliderToPct(50)" style="position: absolute; left: 50%; transform: translateX(-50%); cursor: pointer; padding: 1px 4px; border-radius: 3px; background: rgba(255,255,255,0.05);">50%</span>
+                                      <span class="pct-btn" onclick="snapSliderToPct(75)" style="position: absolute; left: 75%; transform: translateX(-50%); cursor: pointer; padding: 1px 4px; border-radius: 3px; background: rgba(255,255,255,0.05);">75%</span>
+                                      <span class="pct-btn" onclick="snapSliderToPct(100)" style="position: absolute; left: 100%; transform: translateX(-100%); cursor: pointer; padding: 1px 4px; border-radius: 3px; background: rgba(245, 158, 11, 0.15); font-weight: bold; color: #f59e0b;">100%</span>
+                                  </div>
                              </div>
                              <!-- (2026-07-13) Stacked readable interest labels more muted; prev: brighter labels -->
                               <div id="lbl-total-interest" class="tabular-nums mt-1" style="font-size: 0.72rem; font-weight: 500; color: rgba(255,255,255,0.35); line-height: 1.35;">
