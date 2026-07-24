@@ -1388,7 +1388,7 @@
                             return s.includes("pli");
                         }
                         if (sheetConfig.id === "POS") {
-                            return (s.includes("positive") || s.includes("pos")) && !s.includes("pli") && !s.includes("onq") && !s.includes("queue");
+                            return (s.includes("positive") || s.includes("pos") || s.includes("0339") || s.includes("339")) && !s.includes("pli") && !s.includes("onq") && !s.includes("queue");
                         }
                         if (sheetConfig.id === "ONQUEUE") {
                             return (s.includes("onqueue") || s.includes("onq") || s.includes("queue") || s.includes("onque")) && !s.includes("pli");
@@ -1414,7 +1414,8 @@
                             sheetMatchesConfig(name, sheetConfig)
                         );
                         let sheet = workbook.Sheets[sheetName];
-                        // (2026-07-13) Dynamic header name column mapper for uploader; prev: splice
+                        // (2026-07-13) Fix rawRows definition & sheet keywords; prev: missing rawRows
+                        let rawRows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false, defval: "" });
                         const headers = (rawRows[0] || []).map(c => String(c || "").trim().toUpperCase());
                         const findCol = (patterns) => headers.findIndex(h => patterns.some(p => p.test(h)));
 
