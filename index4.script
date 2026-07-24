@@ -239,7 +239,8 @@ async function loadMoreMonthsPLI() {
     );
 
     const results = await Promise.all(fetchPromises);
-    const validResults = results.filter(r => r !== null);
+    // (2026-07-13) Sort PLI results newest-first by date; prev: un-sorted async
+    const validResults = results.filter(r => r !== null).sort((a, b) => b.date - a.date);
 
     if (!profileFoundPLI) {
         const foundData = validResults.find(r => r.hasEmployee);

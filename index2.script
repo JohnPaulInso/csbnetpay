@@ -592,10 +592,11 @@ function displayResultsTablePos(allData) {
         if (!map.has(file.monthName)) map.set(file.monthName, []);
     });
 
+    // (2026-07-13) Strip leading zeros when matching POS employee number; prev: strict ===
     allData.forEach(file => {
         file.csvData.forEach((row, i) => {
-            if (i === 0 || row[3] !== empNo) return;
-            if (parseInt(row[7], 10) !== 339) return;
+            if (i === 0 || !row[3] || !empNo || row[3].toString().replace(/^0+/, '') !== empNo.toString().replace(/^0+/, '')) return;
+            if (parseInt(String(row[7]).replace(/^0+/, ''), 10) !== 339) return;
             const amt = parseFloat(String(row[13]).replace(/,/g, '').trim()) || 0;
             map.get(file.monthName).push(amt);
         });
@@ -603,7 +604,7 @@ function displayResultsTablePos(allData) {
 
     // Step 2: only show "no results" if the employee has zero rows across all files
     const employeeFound = allData.some(file =>
-        file.csvData.some((row, i) => i !== 0 && row[3] === empNo)
+        file.csvData.some((row, i) => i !== 0 && row[3] && empNo && row[3].toString().replace(/^0+/, '') === empNo.toString().replace(/^0+/, ''))
     );
     if (!employeeFound) {
         container.innerHTML = `<div class="no-results-card"><i class="bi bi-person-x"></i><span>No records found for employee ${empNo}.</span></div>`;
