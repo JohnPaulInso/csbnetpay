@@ -3410,7 +3410,9 @@
                                      <input type="range" id="loanAmountSlider" min="0" max="100" step="1" value="100" style="position: absolute; top: -7px; left: 0; width: 100%; height: 20px; opacity: 0; cursor: pointer; margin: 0; z-index: 5;" oninput="onLoanSliderInput(this.value)">
                                      <div id="loanSliderThumb" style="position: absolute; top: 50%; left: 100%; transform: translate(-50%, -50%); width: 14px; height: 14px; background: #fbbf24; border: 2px solid #111827; border-radius: 50%; box-shadow: 0 0 8px rgba(245, 158, 11, 0.6); pointer-events: none;"></div>
                                  </div>
+                                 <!-- (2026-07-13) Add 0% label to slider alignment flexbox; prev: 25% start -->
                                  <div class="d-flex justify-content-between text-muted" style="font-size: 0.65rem; color: rgba(255,255,255,0.4) !important;">
+                                     <span class="pct-btn" onclick="snapSliderToPct(0)" style="cursor: pointer; padding: 1px 4px; border-radius: 3px; background: rgba(255,255,255,0.05);">0%</span>
                                      <span class="pct-btn" onclick="snapSliderToPct(25)" style="cursor: pointer; padding: 1px 4px; border-radius: 3px; background: rgba(255,255,255,0.05);">25%</span>
                                      <span class="pct-btn" onclick="snapSliderToPct(50)" style="cursor: pointer; padding: 1px 4px; border-radius: 3px; background: rgba(255,255,255,0.05);">50%</span>
                                      <span class="pct-btn" onclick="snapSliderToPct(75)" style="cursor: pointer; padding: 1px 4px; border-radius: 3px; background: rgba(255,255,255,0.05);">75%</span>
@@ -6283,7 +6285,8 @@
 
         function onLoanSliderInput(val) {
             let pct = parseFloat(val);
-            const snapPoints = [25, 50, 75, 100];
+            // (2026-07-13) Include 0 in slider magnetic snap points; prev: 25..100
+            const snapPoints = [0, 25, 50, 75, 100];
             const threshold = 3.5;
             for (const snap of snapPoints) {
                 if (Math.abs(pct - snap) <= threshold) {
