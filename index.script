@@ -191,6 +191,8 @@
                     latestMonthData: filteredResults[0].csvData,
                     allFilteredResults: filteredResults
                 };
+                // (2026-07-13) Fix cacheKey ReferenceError; prev: missing variable decl
+                const cacheKey = `cache_netpay_${searchInputNetpay}`;
                 sessionStorage.setItem(cacheKey, JSON.stringify({ data: cachePayload, timestamp: Date.now() }));
             } else {
                 showErrorCard(employeeInfoSectionNetpay, 'Employee not found in any available records.');
