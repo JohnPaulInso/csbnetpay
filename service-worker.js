@@ -14,6 +14,8 @@ const ASSETS = [
   "index3.html",
   "index4.html",
   "index5.html",
+  // (2026-07-13) Add index6.html to ASSETS; prev: cached up to index5.html
+  "index6.html",
   "index.css",
   "styles.css",
   "index.script",

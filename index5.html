@@ -3232,6 +3232,8 @@
                     <a class="nav-link px-3" href="index3.html">ONQ</a>
                     <a class="nav-link px-3" href="index4.html">PLI</a>
                     <a class="nav-link px-3 active" href="index5.html">EVALUATION</a>
+                    <!-- (2026-07-13) Add BILLING link; prev: EVALUATION rightmost -->
+                    <a class="nav-link px-3" href="index6.html">BILLING</a>
                 </div>
             </div>
             <!-- (2026-07-13) Sticky navbar active loan indicator; prev: none -->
@@ -3277,12 +3279,14 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-5 mb-2 mb-md-0">
+                <!-- (2026-07-13) Add employee search autocomplete dropdown; prev: none -->
+                <div class="col-lg-4 col-md-5 mb-2 mb-md-0" style="position: relative;">
                     <div class="currency-input-wrapper">
                         <span class="currency-prefix"><i class="bi bi-person-badge text-warning"></i></span>
                         <!-- (2026-07-13) Removed default value; prev: value="4694264" -->
-                        <input type="text" id="employeeNumber" class="form-control bank-input font-weight-bold" placeholder="Search Employee ID..." style="padding-left: 36px !important;">
+                        <input type="text" id="employeeNumber" class="form-control bank-input font-weight-bold" placeholder="Search ID or Name..." style="padding-left: 36px !important;" autocomplete="off" oninput="handleEmpAutocomplete(this.value)">
                     </div>
+                    <div id="empAutocompleteDropdown" class="emp-search-dropdown" style="display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 1050; background: rgba(12, 16, 36, 0.98); border: 1px solid rgba(255, 165, 0, 0.3); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.6); max-height: 260px; overflow-y: auto; margin-top: 4px; padding: 4px 0;"></div>
                 </div>
                 <div class="col-lg-2 col-md-3 mb-0">
                     <!-- Search Button (Polished: Inline background and color styles removed in favor of bank-btn-primary class styles) -->
@@ -4292,6 +4296,11 @@
             <i class="bi bi-calculator-fill"></i>
             <span>EVAL</span>
         </a>
+        <!-- (2026-07-13) Uniform person-vcard icon for BILLING tab; prev: bi-receipt -->
+        <a href="index6.html">
+            <i class="bi bi-person-vcard"></i>
+            <span>BILLING</span>
+        </a>
     </div>
 
     <!-- JavaScript logical matrix code -->
@@ -4633,6 +4642,90 @@
                 </div>
             `;
         }
+
+        // (2026-07-13) Add active hover highlights & nearest match focus; prev: plain
+        function handleEmpAutocomplete(query) {
+            const dropdown = document.getElementById('empAutocompleteDropdown');
+            if (!dropdown) return;
+            const q = query.trim().toUpperCase();
+            if (!q || q.length < 2) {
+                dropdown.style.display = 'none';
+                return;
+            }
+
+            const matches = [];
+            const isNumeric = /^\d+$/.test(q);
+            const tokens = q.split(/[\s,]+/).filter(Boolean);
+
+            for (const [empNumStr, accounts] of lcsEmpMap.entries()) {
+                if (!accounts || accounts.length === 0) continue;
+                const acct = accounts[0];
+                const rawName = (acct.accountName || '').toUpperCase();
+                const cleanName = rawName.replace(/,/g, ' ');
+                const empId = empNumStr.toUpperCase();
+                const branch = acct.branchName || '';
+
+                if (isNumeric) {
+                    if (empId.includes(q)) {
+                        matches.push({ empId, name: rawName, branch });
+                    }
+                } else {
+                    if (tokens.every(tk => cleanName.includes(tk) || empId.includes(tk))) {
+                        matches.push({ empId, name: rawName, branch });
+                    }
+                }
+                if (matches.length >= 15) break;
+            }
+
+            if (matches.length === 0) {
+                dropdown.style.display = 'none';
+                return;
+            }
+
+            dropdown.innerHTML = matches.map((m, idx) => {
+                const isTop = idx === 0;
+                const bg = isTop ? 'rgba(255,165,0,0.22)' : 'transparent';
+                const bLeft = isTop ? '3px solid #FFA500' : '3px solid transparent';
+                return `
+                <div class="emp-autocomplete-item ${isTop ? 'active-top-match' : ''}" data-empid="${m.empId}" onclick="selectEmpAutocomplete('${m.empId}')" style="padding: 8px 12px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); background: ${bg}; border-left: ${bLeft}; transition: all 0.15s ease;" onmouseover="highlightEmpItem(this)" onmouseout="unhighlightEmpItem(this, ${isTop})" ontouchstart="highlightEmpItem(this)">
+                    <div style="font-size: 0.75rem; font-weight: 700; color: #FFFFFF; letter-spacing: 0.02em;">${m.name}</div>
+                    <div style="font-size: 0.62rem; color: rgba(255,255,255,0.5); margin-top: 2px;">
+                        <span style="color: var(--accent-orange, #FFA500); font-weight: 700;">ID: ${m.empId}</span> • Branch: ${m.branch}
+                    </div>
+                </div>
+            `;}).join('');
+            dropdown.style.display = 'block';
+        }
+
+        function highlightEmpItem(el) {
+            document.querySelectorAll('.emp-autocomplete-item').forEach(item => {
+                item.style.background = 'transparent';
+                item.style.borderLeft = '3px solid transparent';
+            });
+            el.style.background = 'rgba(255,165,0,0.25)';
+            el.style.borderLeft = '3px solid #FFA500';
+        }
+
+        function unhighlightEmpItem(el, isTop) {
+            el.style.background = isTop ? 'rgba(255,165,0,0.22)' : 'transparent';
+            el.style.borderLeft = isTop ? '3px solid #FFA500' : '3px solid transparent';
+        }
+
+        function selectEmpAutocomplete(empId) {
+            const input = document.getElementById('employeeNumber');
+            if (input) input.value = empId;
+            const dropdown = document.getElementById('empAutocompleteDropdown');
+            if (dropdown) dropdown.style.display = 'none';
+            performSearch();
+        }
+
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('empAutocompleteDropdown');
+            const input = document.getElementById('employeeNumber');
+            if (dropdown && input && !dropdown.contains(e.target) && !input.contains(e.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
 
         function updateEmployeeDetailsCard(empNum, fname, mi, lname, div, sta) {
             const summaryCard = document.getElementById('empSummaryCard');

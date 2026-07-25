@@ -147,39 +147,22 @@ function searchEmployeePos() {
         }
     }
 
+    function getDateFromCsvPos(file) {
+        const match = file.match(/pos_([a-z]{3})(\d{2})\.csv/i);
+        if (!match) return 0;
+        const monthNames = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+        const mIdx = monthNames.indexOf(match[1].toLowerCase());
+        const year = 2000 + parseInt(match[2], 10);
+        return new Date(year, mIdx, 1).getTime();
+    }
+
+    // (2026-07-13) Sort available POS files by date newest first; prev: alpha sort
     filterExistingFilesPos(files)
-        .then(availableFiles => Promise.all(availableFiles.map(fetchCSVPos)))
-        .then(results => {
-            const valid = results.filter(Boolean);
-            if (!valid.length) {
-                alert("No data found.");
-                return;
-            }
-
-            valid.sort((a, b) => b.date - a.date);
-
-            // (2026-07-13) Retain all available months so missing months render No Record Found; prev: .filter(data => data.csvData.length > 1)
-            const filteredResults = valid.map(data => ({
-                monthName: data.monthName,
-                date: data.date,
-                csvData: data.csvData.filter((row, idx) => idx === 0 || (row[3] && empNo && row[3].toString().replace(/^0+/, '') === empNo.toString().replace(/^0+/, '')))
-            }));
-
-            const hasAnyMatch = filteredResults.some(data => data.csvData.length > 1);
-
-            if (hasAnyMatch) {
-                // Store in cache with 5-minute TTL
-                const cacheData = {
-                    data: filteredResults,
-                    timestamp: Date.now()
-                };
-                sessionStorage.setItem(cacheKey, JSON.stringify(cacheData));
-                
-                displayEmployeeInfoPos(filteredResults);
-                displayResultsTablePos(filteredResults);
-            } else {
-                showErrorCard(employeeInfoSection, 'Employee not found in any available records.');
-            }
+        .then(async availableFiles => {
+            existingFilesPos = availableFiles.sort((a, b) => getDateFromCsvPos(b) - getDateFromCsvPos(a));
+            currentPosFileIndex = 0;
+            filteredResultsPos = [];
+            await loadMoreMonthsPos(6);
         })
         .catch(err => {
             console.error("Search failed:", err);
@@ -188,6 +171,40 @@ function searchEmployeePos() {
         .finally(() => {
             updateUISearchComplete();
         });
+}
+
+let existingFilesPos = [];
+let currentPosFileIndex = 0;
+let filteredResultsPos = [];
+
+async function loadMoreMonthsPos(batchSize = 6) {
+    const filesToFetch = existingFilesPos.slice(currentPosFileIndex, currentPosFileIndex + batchSize);
+    if (filesToFetch.length === 0) return;
+
+    currentPosFileIndex += filesToFetch.length;
+    const empNo = document.getElementById("searchInputPos").value.trim();
+
+    const results = await Promise.all(filesToFetch.map(fetchCSVPos));
+    const valid = results.filter(Boolean);
+
+    valid.forEach(data => {
+        const rows = data.csvData.filter((row, idx) => idx === 0 || (row[3] && empNo && row[3].toString().replace(/^0+/, '') === empNo.toString().replace(/^0+/, '')));
+        filteredResultsPos.push({
+            monthName: data.monthName,
+            date: data.date,
+            csvData: rows,
+            isBlank: rows.length <= 1
+        });
+    });
+
+    filteredResultsPos.sort((a, b) => b.date - a.date);
+    const employeeInfoSection = document.getElementById("employeeInfoPos");
+    if (filteredResultsPos.some(data => data.csvData.length > 1)) {
+        displayEmployeeInfoPos(filteredResultsPos);
+        displayResultsTablePos(filteredResultsPos);
+    } else {
+        if (employeeInfoSection) showErrorCard(employeeInfoSection, 'Employee not found in any available records.');
+    }
 }
 
 /*
@@ -639,8 +656,9 @@ function displayResultsTablePos(allData) {
         allMonths.push({ month, sum, vals });
     });
 
+    // (2026-07-13) Set INITIAL_LIMIT to 6 for initial 6 months view; prev: 12
     let displayedCount = 0;
-    const INITIAL_LIMIT = 12;
+    const INITIAL_LIMIT = 6;
     const LOAD_MORE_STEP = 6;
 
     function appendRows(count) {
@@ -715,15 +733,25 @@ function displayResultsTablePos(allData) {
         loadMoreBtn.style.transform = 'translateY(0)';
     };
 
-    loadMoreBtn.onclick = () => {
-        appendRows(LOAD_MORE_STEP);
+    // (2026-07-13) Fix re-render DOM collision on batch fetch; prev: append after destroy
+    loadMoreBtn.onclick = async () => {
+        loadMoreBtn.disabled = true;
+        loadMoreBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Loading...';
+        if (displayedCount < allMonths.length) {
+            appendRows(LOAD_MORE_STEP);
+            loadMoreBtn.disabled = false;
+        } else if (currentPosFileIndex < existingFilesPos.length) {
+            await loadMoreMonthsPos(6);
+        }
     };
 
     function updateLoadMoreButton() {
-        if (displayedCount < allMonths.length) {
-            const remaining = allMonths.length - displayedCount;
+        const remainingLocal = allMonths.length - displayedCount;
+        const remainingFiles = existingFilesPos.length - currentPosFileIndex;
+        const totalRemaining = remainingLocal + remainingFiles;
+        if (totalRemaining > 0) {
             loadMoreBtn.style.display = 'flex';
-            loadMoreBtn.innerHTML = `<i class="bi bi-chevron-down"></i> Load More<span style="display:inline-block;min-width:2.5rem;text-align:center;margin-left:0.25rem;">(${remaining})</span>`;
+            loadMoreBtn.innerHTML = `<i class="bi bi-chevron-down"></i> Load More Months (${totalRemaining})`;
         } else {
             loadMoreBtn.style.display = 'none';
         }

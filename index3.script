@@ -141,6 +141,7 @@ function searchEmployeeOnq() {
      *          followed by initial chunk load of 3 months.
      */
     getAvailableFilesOnq().then(availableFiles => {
+        // (2026-07-13) Store all available files and fetch 6 months initially; prev: slice(0, 1)
         existingFilesOnq = availableFiles;
         currentOnqFileIndex = 0;
         

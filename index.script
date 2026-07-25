@@ -141,68 +141,62 @@
          *      Older months stream in progressively with a live counter in the loading indicator.
          *      This cuts first-result wait from ~20s down to ~1-2s.
          */
+        // (2026-07-13) Batch fetch 6 months & add Load More button; prev: single batch
+        existingFilesNetpay = availableFiles;
+        currentNetpayFileIndex = 0;
+        filteredResultsNetpay = [];
+
         try {
-            const filteredResults = [];
-            let firstResultShown = false;
-            // Target the dedicated progress text span added to the loading indicator
-            const loadingText = document.getElementById('loadingProgressNetpay');
-
-            for (let i = 0; i < availableFiles.length; i++) {
-                // Show live progress: "Searching... (3/35)"
-                if (loadingText && loadingText.textContent !== undefined) {
-                    loadingText.textContent = `Searching... (${i + 1}/${availableFiles.length})`;
-                }
-
-                const data = await fetchCSVNetpay(availableFiles[i]);
-                if (!data) continue;
-
-                // Filter to just this employee's row(s) immediately
-                const empRows = data.csvData.filter((row, idx) => {
-                    if (idx === 0) return true; // keep header
-                    const empno = row[3];
-                    return empno && searchInputNetpay &&
-                        empno.toString().replace(/^0+/, '') === searchInputNetpay.toString().replace(/^0+/, '');
-                });
-
-                if (empRows.length > 1) { // header + at least 1 data row
-                    filteredResults.push({ monthName: data.monthName, csvData: empRows, date: data.date, isBlank: false });
-                    filteredResults.sort((a, b) => b.date - a.date);
-
-                    // Show first result immediately — don't wait for all files
-                    if (!firstResultShown) {
-                        displayEmployeeInfoNetpay(filteredResults[0].monthName, filteredResults[0].csvData);
-                        firstResultShown = true;
-                    }
-                } else {
-                    // (2026-07-13) Retain missing month with isBlank true; prev: skipped month
-                    filteredResults.push({ monthName: data.monthName, csvData: [data.csvData[0] || []], date: data.date, isBlank: true });
-                }
-            }
-
-            if (filteredResults.length > 0) {
-                // Final display with all results sorted and cache saved
-                filteredResults.sort((a, b) => b.date - a.date);
-                displayEmployeeInfoNetpay(filteredResults[0].monthName, filteredResults[0].csvData);
-                displayResultsTableNetpay(filteredResults);
-
-                // Cache the filtered results (employee-only rows, small size)
-                const cachePayload = {
-                    latestMonthName: filteredResults[0].monthName,
-                    latestMonthData: filteredResults[0].csvData,
-                    allFilteredResults: filteredResults
-                };
-                // (2026-07-13) Fix cacheKey ReferenceError; prev: missing variable decl
-                const cacheKey = `cache_netpay_${searchInputNetpay}`;
-                sessionStorage.setItem(cacheKey, JSON.stringify({ data: cachePayload, timestamp: Date.now() }));
-            } else {
-                showErrorCard(employeeInfoSectionNetpay, 'Employee not found in any available records.');
-                if (resultsSectionNetpay) resultsSectionNetpay.innerHTML = '';
-            }
+            await loadMoreMonthsNetpay(6);
         } catch (error) {
             console.error("Search failed:", error);
             showErrorCard(employeeInfoSectionNetpay, 'An error occurred during search.');
         } finally {
             updateUISearchComplete();
+        }
+    }
+
+    // (2026-07-13) Unified single Load More button for 6 months; prev: duplicate
+    let existingFilesNetpay = [];
+    let currentNetpayFileIndex = 0;
+    let filteredResultsNetpay = [];
+
+    async function loadMoreMonthsNetpay(batchSize = 6) {
+        const filesToFetch = existingFilesNetpay.slice(currentNetpayFileIndex, currentNetpayFileIndex + batchSize);
+        if (filesToFetch.length === 0) return;
+
+        currentNetpayFileIndex += filesToFetch.length;
+        const loadingText = document.getElementById('loadingProgressNetpay');
+        const searchInputNetpayVal = document.getElementById('searchInputNetpay').value.trim();
+
+        for (let i = 0; i < filesToFetch.length; i++) {
+            if (loadingText && loadingText.textContent !== undefined) {
+                loadingText.textContent = `Searching... (${i + 1}/${filesToFetch.length})`;
+            }
+
+            const data = await fetchCSVNetpay(filesToFetch[i]);
+            if (!data) continue;
+
+            const empRows = data.csvData.filter((row, idx) => {
+                if (idx === 0) return true;
+                const empno = row[3];
+                return empno && searchInputNetpayVal &&
+                    empno.toString().replace(/^0+/, '') === searchInputNetpayVal.replace(/^0+/, '');
+            });
+
+            if (empRows.length > 1) {
+                filteredResultsNetpay.push({ monthName: data.monthName, csvData: empRows, date: data.date, isBlank: false });
+            } else {
+                filteredResultsNetpay.push({ monthName: data.monthName, csvData: [data.csvData[0] || []], date: data.date, isBlank: true });
+            }
+        }
+
+        if (filteredResultsNetpay.length > 0) {
+            filteredResultsNetpay.sort((a, b) => b.date - a.date);
+            displayEmployeeInfoNetpay(filteredResultsNetpay[0].monthName, filteredResultsNetpay[0].csvData);
+            displayResultsTableNetpay(filteredResultsNetpay);
+        } else {
+            showErrorCard(document.getElementById('employeeInfoNetpay'), 'Employee not found in any available records.');
         }
     }
 
@@ -671,9 +665,9 @@
             }
         });
 
-        // Pagination setup
+        // (2026-07-13) Set INITIAL_LIMIT to 6 for initial 6 months view; prev: 12
         let displayedCount = 0;
-        const INITIAL_LIMIT = 12;
+        const INITIAL_LIMIT = 6;
         const LOAD_MORE_STEP = 6;
 
         function appendRows(count) {
@@ -735,15 +729,25 @@
             loadMoreBtn.style.transform = 'translateY(0)';
         };
 
-        loadMoreBtn.onclick = () => {
-            appendRows(LOAD_MORE_STEP);
+        // (2026-07-13) Fix re-render DOM collision on batch fetch; prev: append after destroy
+        loadMoreBtn.onclick = async () => {
+            loadMoreBtn.disabled = true;
+            loadMoreBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Loading...';
+            if (displayedCount < allRows.length) {
+                appendRows(LOAD_MORE_STEP);
+                loadMoreBtn.disabled = false;
+            } else if (currentNetpayFileIndex < existingFilesNetpay.length) {
+                await loadMoreMonthsNetpay(6);
+            }
         };
 
         function updateLoadMoreButton() {
-            if (displayedCount < allRows.length) {
-                const remaining = allRows.length - displayedCount;
+            const remainingLocal = allRows.length - displayedCount;
+            const remainingFiles = existingFilesNetpay.length - currentNetpayFileIndex;
+            const totalRemaining = remainingLocal + remainingFiles;
+            if (totalRemaining > 0) {
                 loadMoreBtn.style.display = 'flex';
-                loadMoreBtn.innerHTML = `<i class="bi bi-chevron-down"></i> Load More<span style="display:inline-block;min-width:0rem;text-align:center;margin-left:0.25rem;">(${remaining})</span>`;
+                loadMoreBtn.innerHTML = `<i class="bi bi-chevron-down"></i> Load More Months (${totalRemaining})`;
             } else {
                 loadMoreBtn.style.display = 'none';
             }

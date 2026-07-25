@@ -150,6 +150,8 @@
         <a class="nav-link" href="index3.html">ONQ</a>
         <a class="nav-link active" href="index4.html">PLI</a>
         <a class="nav-link" href="index5.html">LE</a>
+        <!-- (2026-07-13) Add BILLING link; prev: LE was rightmost -->
+        <a class="nav-link" href="index6.html">BILLING</a>
       </div>
       <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button>
     </div>
@@ -190,15 +192,17 @@
     <div class="card">
       <div class="input-group">
         <label class="input-label" for="searchInputPLI">Employee Number</label>
-        <div class="input-wrapper">
+        <div class="input-wrapper" style="position: relative;">
           <div class="input-with-icon">
-            <input type="text" id="searchInputPLI" class="form-input" placeholder="Employee Number..."
-              autocomplete="on" />
+            <input type="text" id="searchInputPLI" class="form-input" placeholder="Search ID or Name..."
+              autocomplete="off" oninput="handleEmpAutocomplete(this.value, 'searchInputPLI')" />
             <button type="button" id="micBtn" class="mic-inside-input">
               <i class="bi bi-mic-fill"></i>
             </button>
           </div>
           <i class="bi bi-search input-icon"></i>
+          <!-- (2026-07-13) Add employee search autocomplete dropdown; prev: none -->
+          <div id="empAutocompleteDropdown" class="emp-search-dropdown" style="display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 1050; background: rgba(12, 16, 36, 0.98); border: 1px solid rgba(255, 165, 0, 0.3); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.6); max-height: 260px; overflow-y: auto; margin-top: 4px; padding: 4px 0;"></div>
         </div>
         <div id="feedback" class="feedback-text"></div>
       </div>
@@ -252,6 +256,11 @@
     <a href="index5.html" class="bottom-nav-link">
       <i class="bi bi-calculator"></i>
       <span>LE</span>
+    </a>
+    <!-- (2026-07-13) Uniform person-vcard icon for BILLING tab; prev: bi-receipt -->
+    <a href="index6.html" class="bottom-nav-link">
+      <i class="bi bi-person-vcard"></i>
+      <span>BILLING</span>
     </a>
   </div>
 
@@ -604,19 +613,97 @@
       }
     }
 
-    async function updateVersionDisplay() {
-      try {
-        const response = await fetch('version.json?t=' + Date.now());
-        const data = await response.json();
-        const versionEl = document.getElementById('appVersion');
-        if (versionEl) {
-          versionEl.textContent = `v${data.version}.${data.build}`;
-        }
-      } catch (err) {
-        console.log("Versioning unavailable");
-      }
+    // (2026-07-13) Pre-load ledger map & enable order-independent name autocomplete search; prev: none
+    const lcsEmpMap = new Map();
+    async function loadLcsDatabase() {
+        try {
+            const response = await fetch('lcslatest.csv');
+            if (!response.ok) return;
+            const text = await response.text();
+            const lines = text.split('\n');
+            if (lines.length < 2) return;
+            const headerRow = parseCsvLine(lines[0]);
+            const colIdxMap = {};
+            headerRow.forEach((col, idx) => { colIdxMap[col.toUpperCase()] = idx; });
+            const idxEmpNum = colIdxMap['EMPLOYEE NUMBER'] ?? 60;
+            const idxBranchName = colIdxMap['BRANCH NAME'] ?? 1;
+            const idxAcctName = colIdxMap['ACCOUNT NAME'] ?? 17;
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                const cleanedRow = parseCsvLine(line);
+                const empNum = cleanedRow[idxEmpNum];
+                if (!empNum) continue;
+                const empNumStr = String(empNum).trim().replace(/^0+/, '');
+                if (!empNumStr || lcsEmpMap.has(empNumStr)) continue;
+                lcsEmpMap.set(empNumStr, { accountName: cleanedRow[idxAcctName] || 'N/A', branchName: cleanedRow[idxBranchName] || 'N/A' });
+            }
+        } catch (e) { console.error(e); }
     }
-    updateVersionDisplay();
+    function parseCsvLine(line) {
+        const row = []; let start = 0; let inQuotes = false;
+        for (let k = 0; k < line.length; k++) {
+            const c = line[k];
+            if (c === '"') inQuotes = !inQuotes;
+            else if (c === ',' && !inQuotes) { row.push(line.slice(start, k)); start = k + 1; }
+        }
+        row.push(line.slice(start));
+        return row.map(cell => cell.replace(/^"|"$/g, '').trim());
+    }
+    function handleEmpAutocomplete(query, inputId) {
+        const dropdown = document.getElementById('empAutocompleteDropdown');
+        if (!dropdown) return;
+        const q = query.trim().toUpperCase();
+        if (!q || q.length < 2) { dropdown.style.display = 'none'; return; }
+        const matches = []; const isNumeric = /^\d+$/.test(q);
+        const tokens = q.split(/[\s,]+/).filter(Boolean);
+        for (const [empNumStr, acct] of lcsEmpMap.entries()) {
+            const rawName = (acct.accountName || '').toUpperCase();
+            const cleanName = rawName.replace(/,/g, ' ');
+            const empId = empNumStr.toUpperCase();
+            const branch = acct.branchName || '';
+            if (isNumeric) { if (empId.includes(q)) matches.push({ empId, name: rawName, branch }); }
+            else { if (tokens.every(tk => cleanName.includes(tk) || empId.includes(tk))) matches.push({ empId, name: rawName, branch }); }
+            if (matches.length >= 15) break;
+        }
+        if (matches.length === 0) { dropdown.style.display = 'none'; return; }
+        dropdown.innerHTML = matches.map((m, idx) => {
+            const isTop = idx === 0;
+            const bg = isTop ? 'rgba(255,165,0,0.22)' : 'transparent';
+            const bLeft = isTop ? '3px solid #FFA500' : '3px solid transparent';
+            return `<div class="emp-autocomplete-item ${isTop ? 'active-top-match' : ''}" onclick="selectEmpAutocomplete('${m.empId}', '${inputId}')" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.05);background:${bg};border-left:${bLeft};transition:all 0.15s ease;" onmouseover="highlightEmpItem(this)" onmouseout="unhighlightEmpItem(this, ${isTop})" ontouchstart="highlightEmpItem(this)">
+                <div style="font-size:0.75rem;font-weight:700;color:#FFFFFF;letter-spacing:0.02em;">${m.name}</div>
+                <div style="font-size:0.62rem;color:rgba(255,255,255,0.5);margin-top:2px;"><span style="color:var(--accent-orange, #FFA500);font-weight:700;">ID: ${m.empId}</span> • Branch: ${m.branch}</div>
+            </div>`;
+        }).join('');
+        dropdown.style.display = 'block';
+    }
+    function highlightEmpItem(el) {
+        document.querySelectorAll('.emp-autocomplete-item').forEach(item => { item.style.background = 'transparent'; item.style.borderLeft = '3px solid transparent'; });
+        el.style.background = 'rgba(255,165,0,0.25)'; el.style.borderLeft = '3px solid #FFA500';
+    }
+    function unhighlightEmpItem(el, isTop) {
+        el.style.background = isTop ? 'rgba(255,165,0,0.22)' : 'transparent';
+        el.style.borderLeft = isTop ? '3px solid #FFA500' : '3px solid transparent';
+    }
+    function selectEmpAutocomplete(empId, inputId) {
+        const input = document.getElementById(inputId);
+        if (input) input.value = empId;
+        const dropdown = document.getElementById('empAutocompleteDropdown');
+        if (dropdown) dropdown.style.display = 'none';
+        const btn = document.querySelector('button.btn-primary') || document.getElementById('searchButtonPLI') || document.querySelector('.btn-warning');
+        if (btn) btn.click();
+    }
+    window.handleEmpAutocomplete = handleEmpAutocomplete;
+    window.selectEmpAutocomplete = selectEmpAutocomplete;
+    window.highlightEmpItem = highlightEmpItem;
+    window.unhighlightEmpItem = unhighlightEmpItem;
+    document.addEventListener('click', (e) => {
+        const dropdown = document.getElementById('empAutocompleteDropdown');
+        const input = document.getElementById('searchInputPLI');
+        if (dropdown && input && !dropdown.contains(e.target) && !input.contains(e.target)) dropdown.style.display = 'none';
+    });
+    document.addEventListener('DOMContentLoaded', loadLcsDatabase);
   </script>
 </body>
 
