@@ -1492,28 +1492,28 @@
                                     "",
                                     getVal(r, colMap.POLICYNO !== -1 ? colMap.POLICYNO : 16)
                                 ];
+                            // (2026-07-13) Fix ONQUEUE schema & emp number formatting; prev: BLANK prepended
                             } else if (sheetConfig.id === "ONQUEUE") {
                                 if (rowIndex === 0) {
-                                    return ["BLANK", "REGCODE", "DIVCODE", "STACODE", "EMPNO", "FNAME", "MI", "LNAME", "DEDCODE", "DEDID", "EFFYY", "EFFMM", "TERYY", "TERMM", "DEDAMT", "", "POLICYNO"];
+                                    return ["REGCODE", "DIVCODE", "STACODE", "EMPNO", "FNAME", "MI", "LNAME", "DEDCODE", "DEDID", "EFFYY", "EFFMM", "TERYY", "TERMM", "DEDAMT", "", "POLICYNO"];
                                 }
                                 return [
-                                    "",
                                     getVal(r, colMap.REGCODE !== -1 ? colMap.REGCODE : 0),
                                     getVal(r, colMap.DIVCODE !== -1 ? colMap.DIVCODE : 1),
                                     getVal(r, colMap.STACODE !== -1 ? colMap.STACODE : 2),
                                     getVal(r, colMap.EMPNO !== -1 ? colMap.EMPNO : 3),
-                                    getVal(r, colMap.FNAME !== -1 ? colMap.FNAME : 5),
-                                    getVal(r, colMap.MI !== -1 ? colMap.MI : 6),
-                                    getVal(r, colMap.LNAME !== -1 ? colMap.LNAME : 7),
-                                    getVal(r, colMap.DEDCODE !== -1 ? colMap.DEDCODE : 9),
-                                    getVal(r, colMap.DEDID !== -1 ? colMap.DEDID : 10),
-                                    getVal(r, colMap.EFFYY !== -1 ? colMap.EFFYY : 11),
-                                    getVal(r, colMap.EFFMM !== -1 ? colMap.EFFMM : 12),
-                                    getVal(r, colMap.TERYY !== -1 ? colMap.TERYY : 13),
-                                    getVal(r, colMap.TERMM !== -1 ? colMap.TERMM : 14),
-                                    getVal(r, colMap.DEDAMT !== -1 ? colMap.DEDAMT : 15),
+                                    getVal(r, colMap.FNAME !== -1 ? colMap.FNAME : 4),
+                                    getVal(r, colMap.MI !== -1 ? colMap.MI : 5),
+                                    getVal(r, colMap.LNAME !== -1 ? colMap.LNAME : 6),
+                                    getVal(r, colMap.DEDCODE !== -1 ? colMap.DEDCODE : 7),
+                                    getVal(r, colMap.DEDID !== -1 ? colMap.DEDID : 8),
+                                    getVal(r, colMap.EFFYY !== -1 ? colMap.EFFYY : 9),
+                                    getVal(r, colMap.EFFMM !== -1 ? colMap.EFFMM : 10),
+                                    getVal(r, colMap.TERYY !== -1 ? colMap.TERYY : 11),
+                                    getVal(r, colMap.TERMM !== -1 ? colMap.TERMM : 12),
+                                    getVal(r, colMap.DEDAMT !== -1 ? colMap.DEDAMT : 13),
                                     "",
-                                    getVal(r, colMap.POLICYNO !== -1 ? colMap.POLICYNO : 16)
+                                    getVal(r, colMap.POLICYNO !== -1 ? colMap.POLICYNO : 15)
                                 ];
                             } else if (sheetConfig.id === "PLI") {
                                 if (rowIndex === 0) {
@@ -1543,14 +1543,17 @@
                             return r;
                         });
 
+                        // (2026-07-13) Format EMPNO as clean int & amounts to 2 decimals; prev: raw decimals
                         for (let r = 1; r < processedRows.length; r++) {
                             for (let c = 0; c < processedRows[r].length; c++) {
                                 let val = processedRows[r][c];
                                 if (val !== "") {
-                                    let cleanVal = val.replace(/,/g, '');
+                                    let cleanVal = String(val).replace(/,/g, '').trim();
                                     let num = parseFloat(cleanVal);
                                     if (!isNaN(num) && /^-?\d+(\.\d+)?$/.test(cleanVal)) {
-                                        if (cleanVal.includes('.') || (sheetConfig.id === 'NETPAY' && c === 7) || (sheetConfig.id !== 'NETPAY' && c >= 12)) {
+                                        if (c === 3) {
+                                            processedRows[r][c] = String(Math.round(num));
+                                        } else if (cleanVal.includes('.') || (sheetConfig.id === 'NETPAY' && c === 7) || (sheetConfig.id !== 'NETPAY' && c >= 12)) {
                                             processedRows[r][c] = num.toFixed(2);
                                         }
                                     }

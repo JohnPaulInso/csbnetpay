@@ -854,11 +854,18 @@ function displayResultsTablePos(fetchedDataPos) {
         const employeeInfoSectionOnq = document.getElementById('employeeInfoOnq');
         let employeeFound = false;
 
+        // (2026-07-13) Match empno using dynamic col map & normEmpNo; prev: row[3]
+        const normEmpNo = s => String(s || '').trim().replace(/^"|"$/g, '').replace(/,/g, '').replace(/\.0+$/, '').replace(/^0+/, '');
+        const onqH = csvData[0] || [];
+        const onqMap = {};
+        onqH.forEach((c, i) => { onqMap[String(c || '').toUpperCase().trim()] = i; });
+        const empNoIdx = onqMap['EMPNO'] ?? (onqH.findIndex(c => String(c).toUpperCase().trim().includes('EMP')) !== -1 ? onqH.findIndex(c => String(c).toUpperCase().trim().includes('EMP')) : 3);
+        const targetEmp = normEmpNo(document.getElementById('searchInputOnq').value);
         for (let i = 1; i < csvData.length; i++) {
             const row = csvData[i];
             if (row.length < 4) continue;
-            const empno = row[3];
-            if (empno === document.getElementById('searchInputOnq').value.trim()) {
+            const empno = row[empNoIdx];
+            if (empno && normEmpNo(empno) === targetEmp) {
                 employeeFound = true;
 
                 const div = row[1];
@@ -896,14 +903,21 @@ function displayResultsTablePos(fetchedDataPos) {
         const tbody = document.createElement('tbody');
         const resultsMap = new Map();
 
+        // (2026-07-13) Filter ONQ table using dynamic col map; prev: row[3]/row[13]
+        const targetEmp = normEmpNo(document.getElementById('searchInputOnq').value);
         fetchedDataOnq.forEach(data => {
+            const oH = data.csvData[0] || [];
+            const oMap = {};
+            oH.forEach((c, i) => { oMap[String(c || '').toUpperCase().trim()] = i; });
+            const eIdx = oMap['EMPNO'] ?? (oH.findIndex(c => String(c).toUpperCase().trim().includes('EMP')) !== -1 ? oH.findIndex(c => String(c).toUpperCase().trim().includes('EMP')) : 3);
+            const dIdx = oMap['DEDAMT'] ?? (oH.findIndex(c => String(c).toUpperCase().trim().includes('DEDAMT')) !== -1 ? oH.findIndex(c => String(c).toUpperCase().trim().includes('DEDAMT')) : 13);
             data.csvData.forEach((row, index) => {
                 if (index === 0) return;
 
-                const empno = row[3];
-                if (empno === document.getElementById('searchInputOnq').value.trim()) {
+                const empno = row[eIdx];
+                if (empno && normEmpNo(empno) === targetEmp) {
                     const monthName = data.monthName;
-                    const dedamt = parseFloat(row[13]);
+                    const dedamt = parseFloat(row[dIdx]);
                     
                     if (!resultsMap.has(monthName)) {
                         resultsMap.set(monthName, { sum: 0, details: [] });

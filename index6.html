@@ -5654,14 +5654,21 @@
             document.getElementById('lbl-netpay').innerHTML = formatPHP(netPayVal);
             document.getElementById('lbl-dedamt').innerHTML = formatPHP(posSum);
 
-            // Fetch OnQueue rows matching employee (index 3 is EMPNO)
+            // (2026-07-13) Match ONQ rows using dynamic col map & normEmpNo; prev: row[3]/row[13]
+            const normEmpNo = s => String(s || '').trim().replace(/^"|"$/g, '').replace(/,/g, '').replace(/\.0+$/, '').replace(/^0+/, '');
             const onqRows = window.currentData.onq;
+            const onqH = onqRows[0] || [];
+            const onqMap = {};
+            onqH.forEach((c, i) => { onqMap[String(c || '').toUpperCase().trim()] = i; });
+            const empNoIdx = onqMap['EMPNO'] ?? (onqH.findIndex(c => String(c).toUpperCase().trim().includes('EMP')) !== -1 ? onqH.findIndex(c => String(c).toUpperCase().trim().includes('EMP')) : 3);
+            const dedAmtIdx = onqMap['DEDAMT'] ?? (onqH.findIndex(c => String(c).toUpperCase().trim().includes('DEDAMT')) !== -1 ? onqH.findIndex(c => String(c).toUpperCase().trim().includes('DEDAMT')) : 13);
+            const targetEmpNum = normEmpNo(empNum);
             const matchingOnq = [];
             let initialOnqSum = 0;
             for (let i = 1; i < onqRows.length; i++) {
-                if (onqRows[i][3] && onqRows[i][3].replace(/^0+/, '') === empNum.replace(/^0+/, '')) {
+                if (onqRows[i][empNoIdx] && normEmpNo(onqRows[i][empNoIdx]) === targetEmpNum) {
                     matchingOnq.push(onqRows[i]);
-                    initialOnqSum += safeFloat(onqRows[i][13]); // Index 13 is DEDAMT
+                    initialOnqSum += safeFloat(onqRows[i][dedAmtIdx]);
                 }
             }
 
@@ -5955,6 +5962,18 @@
                 return;
             }
 
+            // (2026-07-13) Read ONQ table fields with dynamic col map; prev: hardcoded indices
+            const onqH = (window.currentData && window.currentData.onq && window.currentData.onq[0]) ? window.currentData.onq[0] : [];
+            const oMap = {};
+            onqH.forEach((c, i) => { oMap[String(c || '').toUpperCase().trim()] = i; });
+            const dCodeIdx = oMap['DEDCODE'] ?? 7;
+            const effYIdx = oMap['EFFYY'] ?? 9;
+            const effMIdx = oMap['EFFMM'] ?? 10;
+            const terYIdx = oMap['TERYY'] ?? 11;
+            const terMIdx = oMap['TERMM'] ?? 12;
+            const dAmtIdx = oMap['DEDAMT'] ?? (onqH.findIndex(c => String(c).toUpperCase().trim().includes('DEDAMT')) !== -1 ? onqH.findIndex(c => String(c).toUpperCase().trim().includes('DEDAMT')) : 13);
+            const plcNoIdx = oMap['POLICYNO'] ?? 15;
+
             /* [2026-07-13 Fix: Added missing <tr> tag inside <thead> and removed inline font-size to use global CSS table styles] */
             let html = `
                 <table class="bank-table text-white">
@@ -5970,16 +5989,16 @@
                     </thead>
                     <tbody>
                         ${onqRows.map((row, idx) => {
-                            const pliCode = row[7] || '';
+                            const pliCode = row[dCodeIdx] || '';
                             // (2026-07-13) Parse eff/term month/year as int to strip .00 decimals; prev: raw float string
-                            const effMO = String(Math.round(parseFloat(row[10]) || 0)).padStart(2, '0');
-                            const effYR = String(Math.round(parseFloat(row[9]) || 0));
+                            const effMO = String(Math.round(parseFloat(row[effMIdx]) || 0)).padStart(2, '0');
+                            const effYR = String(Math.round(parseFloat(row[effYIdx]) || 0));
                             const eff = (effMO !== '00' && effYR !== '0') ? `${effMO}/${effYR}` : effYR || '-';
-                            const termMO = String(Math.round(parseFloat(row[12]) || 0)).padStart(2, '0');
-                            const termYR = String(Math.round(parseFloat(row[11]) || 0));
+                            const termMO = String(Math.round(parseFloat(row[terMIdx]) || 0)).padStart(2, '0');
+                            const termYR = String(Math.round(parseFloat(row[terYIdx]) || 0));
                             const term = (termMO !== '00' && termYR !== '0') ? `${termMO}/${termYR}` : termYR || '-';
-                            const dedamt = safeFloat(row[13]);
-                            const plcyno = row[15] || '';
+                            const dedamt = safeFloat(row[dAmtIdx]);
+                            const plcyno = row[plcNoIdx] || '';
                             return `
                                 <tr onclick="toggleOnqRow(event, this)" style="cursor: pointer;">
                                     <td data-label="Select" onclick="event.stopPropagation()">

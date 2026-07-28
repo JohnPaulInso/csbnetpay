@@ -34,6 +34,30 @@ function openFullscreen() {
 
 // ======================= ONLY FETCH THE MOST RECENT FILE =======================
 
+// (2026-07-13) Dynamic ONQ column mapping & emp normalizer; prev: row[3]
+const normEmpNo = s => String(s || '').trim().replace(/^"|"$/g, '').replace(/,/g, '').replace(/\.0+$/, '').replace(/^0+/, '');
+function getOnqColIdxs(headerRow) {
+    const map = {};
+    if (headerRow && Array.isArray(headerRow)) {
+        headerRow.forEach((c, i) => { map[String(c || '').toUpperCase().trim()] = i; });
+    }
+    const empIdx = map['EMPNO'] ?? (headerRow ? headerRow.findIndex(c => String(c).toUpperCase().trim().includes('EMP')) : -1);
+    const dedIdx = map['DEDAMT'] ?? (headerRow ? headerRow.findIndex(c => String(c).toUpperCase().trim().includes('DEDAMT')) : -1);
+    return {
+        empNo: empIdx !== -1 ? empIdx : 3,
+        dedCode: map['DEDCODE'] ?? 7,
+        effYr: map['EFFYY'] ?? 9,
+        effMo: map['EFFMM'] ?? 10,
+        terYr: map['TERYY'] ?? 11,
+        terMo: map['TERMM'] ?? 12,
+        dedAmt: dedIdx !== -1 ? dedIdx : 13,
+        policyNo: map['POLICYNO'] ?? 15,
+        fname: map['FNAME'] ?? 4,
+        mi: map['MI'] ?? 5,
+        lname: map['LNAME'] ?? 6
+    };
+}
+
 // List of available CSV files (sorted in descending order for recency)
 function generateCsvFilesOnq() {
     const files = [];
@@ -208,10 +232,13 @@ async function loadMoreMonthsOnq(batchSize = 3) {
         fetchCSVOnq(file)
             .then(data => {
                 if (!data) return null;
+                // (2026-07-13) Filter ONQ rows via dynamic col map & normEmpNo; prev: row[3]
+                const colIdxs = getOnqColIdxs(data.csvData[0]);
+                const targetEmp = normEmpNo(searchInputOnqGlobal);
                 const filteredCsvData = data.csvData.filter((row, idx) => {
                     if (idx === 0) return true;
-                    const empno = row[3];
-                    return empno && searchInputOnqGlobal && empno.toString().replace(/^0+/, '') === searchInputOnqGlobal.toString().replace(/^0+/, '');
+                    const empno = row[colIdxs.empNo];
+                    return empno && targetEmp && normEmpNo(empno) === targetEmp;
                 });
                 return {
                     monthName: data.monthName,
@@ -515,8 +542,10 @@ async function displayEmployeeInfoOnq(monthName, csvData) {
          * Fix: ReferenceError: empno is not defined.
          *      empno must be read from row[3] (Column D = Employee No) of each CSV row.
          */
-        const empno = row[3];   // Column D (index 3) = Employee Number
-        if (empno && searchInputVal && empno.toString().replace(/^0+/, '') === searchInputVal.toString().replace(/^0+/, '')) {
+        // (2026-07-13) Match empno using dynamic col map & normEmpNo; prev: row[3]
+        const colIdxs = getOnqColIdxs(csvData[0]);
+        const empno = row[colIdxs.empNo];
+        if (empno && searchInputVal && normEmpNo(empno) === normEmpNo(searchInputVal)) {
             employeeFound = true;
 
             // Trigger Confetti
@@ -791,15 +820,17 @@ async function displayEmployeeInfoOnq(monthName, csvData) {
 
             // Build detail rows data array
             const resultsMapDetails = [];
+            // (2026-07-13) Read ONQ detail fields with dynamic col map; prev: hardcoded
+            const colIdxs = getOnqColIdxs(data.csvData[0]);
             for (let i = 1; i < data.csvData.length; i++) {
                 const row = data.csvData[i];
-                const dedamt = parseFloat(row[13]) || 0;
-                const dedcode = row[7];
-                const effyy = row[9];
-                const effmm = convertMonth(row[10]);
-                const termyy = row[11] ? Math.floor(parseFloat(row[11])) : '';
-                const termmm = convertMonth(row[12]);
-                const policyno = row[15];
+                const dedamt = parseFloat(row[colIdxs.dedAmt]) || 0;
+                const dedcode = row[colIdxs.dedCode];
+                const effyy = row[colIdxs.effYr];
+                const effmm = convertMonth(row[colIdxs.effMo]);
+                const termyy = row[colIdxs.terYr] ? Math.floor(parseFloat(row[colIdxs.terYr])) : '';
+                const termmm = convertMonth(row[colIdxs.terMo]);
+                const policyno = row[colIdxs.policyNo];
                 resultsMapDetails.push({ dedcode, policyno, effyy, effmm, termyy, termmm, dedamt });
             }
 
