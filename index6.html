@@ -171,6 +171,28 @@
             transform: none !important;
         }
 
+        /* (2026-07-13) CSS landscape view mode for First Billing table; prev: standard */
+        .rotated-landscape-mode {
+            overflow-x: auto !important;
+            white-space: nowrap !important;
+            padding: 20px !important;
+            border-color: #F59E0B !important;
+            box-shadow: 0 0 24px rgba(245, 158, 11, 0.3) !important;
+        }
+        /* (2026-07-13) Sticky table headers for mobile & desktop; prev: normal scroll */
+        .table-responsive {
+            max-height: 75vh !important;
+            overflow-y: auto !important;
+            position: relative !important;
+        }
+        .bank-table thead th {
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 10 !important;
+            background: #0d122b !important;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.6) !important;
+        }
+
         .search-config-card {
             border-top: 2px solid rgba(245, 158, 11, 0.35) !important;
         }
@@ -3258,10 +3280,11 @@
                 <div class="col-lg-4 col-md-12 mb-3 mb-lg-0">
                     <h5 class="mb-0 px-1 py-1 font-weight-bold credit-assessment-title" id="titleCreditAssessment"><i class="bi bi-receipt mr-2"></i>Billing Assessment</h5>
                 </div>
+                <!-- (2026-07-13) Custom bank-select styled dropdowns; prev: native select -->
                 <div class="col-lg-4 col-md-6 mb-3 mb-lg-0">
                     <div class="currency-input-wrapper">
                         <span class="currency-prefix"><i class="bi bi-calendar3 text-warning"></i></span>
-                        <select id="activeMonthSelect" class="form-control font-weight-bold" onchange="if(document.getElementById('branchSelect')?.value) renderFirstBillingBranchTable();" style="padding-left: 38px !important; background: rgba(8,12,28,0.85); color: white; border: 1px solid rgba(255,165,0,0.4); height: 42px; border-radius: 8px; font-size: 0.88rem; cursor: pointer; display: block !important;">
+                        <select id="activeMonthSelect" class="form-control bank-select font-weight-bold" onchange="if(document.getElementById('branchSelect')?.value) renderFirstBillingBranchTable();">
                             <option value="jul26" selected>July 2026</option>
                             <option value="jun26">June 2026</option>
                             <option value="may26">May 2026</option>
@@ -3281,7 +3304,7 @@
                 <div class="col-lg-4 col-md-6 mb-3 mb-lg-0">
                     <div class="currency-input-wrapper">
                         <span class="currency-prefix"><i class="bi bi-buildings text-warning"></i></span>
-                        <select id="branchSelect" class="form-control font-weight-bold" onchange="renderFirstBillingBranchTable()" style="padding-left: 38px !important; background: rgba(8,12,28,0.85); color: white; border: 1px solid rgba(255,165,0,0.4); height: 42px; border-radius: 8px; font-size: 0.88rem; cursor: pointer; display: block !important;">
+                        <select id="branchSelect" class="form-control bank-select font-weight-bold" onchange="renderFirstBillingBranchTable()">
                             <option value="" disabled selected>-- SELECT A BRANCH --</option>
                             <option value="ALL">ALL BRANCHES</option>
                             <option value="BALAMBAN">BALAMBAN</option>
@@ -3308,11 +3331,16 @@
             <div id="loadingIndicator" class="mt-4 d-none" style="display: none !important;"></div>
             <div id="lcsProfileCard" class="mt-3 d-none" style="display: none !important;"></div>
 
-            <!-- (2026-07-13) Add First Billing Summary Table card; prev: none -->
+            <!-- (2026-07-13) Add rotate view toggle button; prev: badge only -->
             <div id="firstBillingSummaryCard" class="bank-card mt-3 mb-3" style="background: rgba(12, 16, 36, 0.95); border: 1px solid rgba(255, 165, 0, 0.3); border-radius: 12px; padding: 16px;">
                 <div class="d-flex justify-content-between align-items-center mb-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 8px;">
-                    <div class="font-weight-bold text-warning" style="font-size: 0.95rem; letter-spacing: 0.03em;">
-                        <i class="bi bi-file-earmark-spreadsheet text-warning mr-2"></i>FIRST BILLING ACCOUNTS
+                    <div class="d-flex align-items-center">
+                        <div class="font-weight-bold text-warning mr-3" style="font-size: 0.95rem; letter-spacing: 0.03em;">
+                            <i class="bi bi-file-earmark-spreadsheet text-warning mr-2"></i>FIRST BILLING ACCOUNTS
+                        </div>
+                        <button id="btnRotateView" class="btn btn-sm btn-outline-warning font-weight-bold" onclick="toggleTableOrientation()" title="Toggle Horizontal Rotate View" style="font-size: 0.72rem; padding: 2px 8px;">
+                            <i class="bi bi-arrow-repeat mr-1"></i>Rotate View
+                        </button>
                     </div>
                     <span class="badge badge-warning" style="font-size: 0.7rem; padding: 4px 8px;">RPSU.575 & XFRRPSU.5Y.7.5.CONS.ANIV</span>
                 </div>
@@ -4063,18 +4091,17 @@
                 const branchSelect = document.getElementById('branchSelect');
                 if (branchSelect) {
                     const uniqueBranches = Array.from(allBranchesSet).filter(Boolean).sort();
-                    const curVal = branchSelect.value;
-                    branchSelect.innerHTML = '<option value="ALL">ALL BRANCHES</option>' + uniqueBranches.map(b => `<option value="${b}">${b}</option>`).join('');
-                    if (curVal && uniqueBranches.includes(curVal)) branchSelect.value = curVal;
+                    // (2026-07-13) Always default branchSelect to blank prompt; prev: default ALL
+                    branchSelect.innerHTML = '<option value="" disabled selected>-- SELECT A BRANCH --</option><option value="ALL">ALL BRANCHES</option>' + uniqueBranches.map(b => `<option value="${b}">${b}</option>`).join('');
+                    branchSelect.value = '';
+                    if (typeof syncAllCustomDropdowns === 'function') syncAllCustomDropdowns();
                     // (2026-07-13) Attach branchSelect listener for auto branch table; prev: none
                     if (!branchSelect.dataset.firstBillingBound) {
                         branchSelect.dataset.firstBillingBound = 'true';
                         branchSelect.addEventListener('change', () => renderFirstBillingBranchTable());
                     }
                 }
-                // (2026-07-13) Auto-render First Billing table on LCS load; prev: callback only
                 lcsDbReady = true;
-                renderFirstBillingBranchTable();
                 lcsDbReadyCallbacks.forEach(cb => cb());
                 lcsDbReadyCallbacks = [];
             } catch (err) {
@@ -4095,13 +4122,52 @@
                 container.innerHTML = `<div class="text-white-50 text-center py-3">Select a branch to view First Billing accounts.</div>`;
                 return;
             }
+            // (2026-07-13) Render skeleton table loader during data load; prev: text spinner
+            const skeletonTableHtml = `
+                <div class="skeleton-table-wrapper py-2">
+                    <div class="d-flex align-items-center justify-content-center text-warning mb-3 small font-weight-bold">
+                        <div class="spinner-border spinner-border-sm text-warning mr-2" role="status"></div>
+                        Processing First Billing records...
+                    </div>
+                    <div class="table-responsive">
+                        <table class="bank-table w-100">
+                            <thead>
+                                <tr>
+                                    <th style="width: 45px; text-align: center;"><div class="skeleton-line" style="width: 20px; margin: auto;"></div></th>
+                                    <th><div class="skeleton-line" style="width: 80px;"></div></th>
+                                    <th style="text-align: right;"><div class="skeleton-line" style="width: 90px; margin-left: auto;"></div></th>
+                                    <th style="text-align: right;"><div class="skeleton-line" style="width: 90px; margin-left: auto;"></div></th>
+                                    <th style="text-align: center;"><div class="skeleton-line" style="width: 70px; margin: auto;"></div></th>
+                                    <th style="text-align: center;"><div class="skeleton-line" style="width: 60px; margin: auto;"></div></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${[1, 2, 3, 4, 5].map(() => `
+                                    <tr>
+                                        <td style="text-align: center;"><div class="skeleton-line" style="width: 15px; margin: auto;"></div></td>
+                                        <td>
+                                            <div class="skeleton-line mb-1" style="width: 140px; height: 12px;"></div>
+                                            <div class="skeleton-line" style="width: 70px; height: 9px;"></div>
+                                        </td>
+                                        <td style="text-align: right;"><div class="skeleton-line" style="width: 80px; margin-left: auto;"></div></td>
+                                        <td style="text-align: right;"><div class="skeleton-line" style="width: 80px; margin-left: auto;"></div></td>
+                                        <td style="text-align: center;"><div class="skeleton-line" style="width: 90px; height: 26px; border-radius: 4px; margin: auto;"></div></td>
+                                        <td style="text-align: center;"><div class="skeleton-line" style="width: 50px; margin: auto;"></div></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
             if (!lcsDbReady || lcsEmpMap.size === 0) {
-                container.innerHTML = `<div class="text-white-50 text-center py-3"><div class="spinner-border spinner-border-sm text-warning mr-2" role="status"></div>Loading LCS database accounts...</div>`;
+                container.innerHTML = skeletonTableHtml;
                 return;
             }
 
             if (!window.currentData || !window.currentData.netpay || !window.currentData.pos || !window.currentData.onq) {
-                container.innerHTML = `<div class="text-white-50 text-center py-3"><div class="spinner-border spinner-border-sm text-warning mr-2" role="status"></div>Loading First Billing datasets...</div>`;
+                container.innerHTML = skeletonTableHtml;
                 if (!window.isIngestingData) {
                     window.isIngestingData = true;
                     performSearch(true).finally(() => { window.isIngestingData = false; });
@@ -4127,9 +4193,61 @@
             const onqAmtIdx = onqMap['DEDAMT'] ?? 13;
             const onqCodeIdx = onqMap['DEDCODE'] ?? 7;
 
+            // (2026-07-13) Robust NetPay column & threshold matching; prev: fixed index 7
+            const netpayEmpMap = new Map();
+            for (let i = 0; i < window.currentData.netpay.length; i++) {
+                const r = window.currentData.netpay[i];
+                if (!r) continue;
+                const emp = normEmp(r[npEmpIdx]) || normEmp(r[3]) || normEmp(r[4]) || normEmp(r[2]) || normEmp(r[1]);
+                if (emp && emp !== 'EMPNO') {
+                    let netVal = 0;
+                    for (let colIdx = 0; colIdx < r.length; colIdx++) {
+                        const val = safeFloat(r[colIdx]);
+                        if (val >= 3000 && val <= 150000) {
+                            netVal = val;
+                            break;
+                        }
+                    }
+                    if (netVal === 0) {
+                        const netCol = r[npNetIdx] !== undefined ? r[npNetIdx] : (r[7] !== undefined ? r[7] : r[8]);
+                        netVal = safeFloat(netCol);
+                    }
+                    netpayEmpMap.set(emp, netVal);
+                }
+            }
+
+            const posEmpMap = new Map();
+            for (let i = 0; i < window.currentData.pos.length; i++) {
+                const r = window.currentData.pos[i];
+                if (!r) continue;
+                const emp = normEmp(r[posEmpIdx]) || normEmp(r[3]) || normEmp(r[4]) || normEmp(r[2]);
+                if (emp && emp !== 'EMPNO') {
+                    const amtCol = r[posAmtIdx] !== undefined ? r[posAmtIdx] : (r[13] !== undefined ? r[13] : (r[14] !== undefined ? r[14] : r[12]));
+                    const amtVal = safeFloat(amtCol);
+                    if (amtVal > 0) {
+                        posEmpMap.set(emp, (posEmpMap.get(emp) || 0) + amtVal);
+                    }
+                }
+            }
+
+            const onqEmpMap = new Map();
+            for (let i = 0; i < window.currentData.onq.length; i++) {
+                const r = window.currentData.onq[i];
+                if (!r) continue;
+                const emp = normEmp(r[onqEmpIdx]) || normEmp(r[3]) || normEmp(r[4]);
+                if (emp && !onqEmpMap.has(emp)) {
+                    const amtCol = r[onqAmtIdx] !== undefined ? r[onqAmtIdx] : (r[13] !== undefined ? r[13] : r[14]);
+                    const codeCol = r[onqCodeIdx] !== undefined ? r[onqCodeIdx] : (r[7] !== undefined ? r[7] : r[8]);
+                    const code = String(codeCol || '').trim();
+                    onqEmpMap.set(emp, {
+                        amt: safeFloat(amtCol),
+                        isCSB: (code === '0339' || code === '339')
+                    });
+                }
+            }
+
             const rowsToRender = [];
 
-            // (2026-07-13) Filter DepEd branch & scheme RPSU.575/XFRRPSU; prev: exact branch
             for (const [empNumStr, accounts] of lcsEmpMap.entries()) {
                 if (!accounts || accounts.length === 0) continue;
                 const matchingAccounts = accounts.filter(acc => {
@@ -4149,52 +4267,31 @@
                 const monthlyAmort = safeFloat(firstAccount.amortization);
                 const transDate = firstAccount.loanDate || 'N/A';
 
-                // (2026-07-13) Robust pos/onq/netpay column lookup; prev: fixed index 3/13
-                let netPayVal = 0;
-                for (let i = 0; i < window.currentData.netpay.length; i++) {
-                    const r = window.currentData.netpay[i];
-                    if (!r) continue;
-                    const empCol = normEmp(r[npEmpIdx]) || normEmp(r[3]) || normEmp(r[4]);
-                    if (empCol && empCol === targetEmp) {
-                        const netCol = r[npNetIdx] !== undefined ? r[npNetIdx] : (r[7] !== undefined ? r[7] : r[8]);
-                        netPayVal = safeFloat(netCol);
-                        break;
-                    }
-                }
+                // (2026-07-13) NetPay map lookup with 5000 DepEd floor fallback; prev: 0 default
+                const netPayVal = netpayEmpMap.get(targetEmp) || netpayEmpMap.get(empNumStr) || 5000;
+                const csbPositive = posEmpMap.get(targetEmp) || 0;
+                const onqObj = onqEmpMap.get(targetEmp) || { amt: 0, isCSB: false };
+                const firstOnqAmt = onqObj.amt;
+                const isFirstRowCSB = onqObj.isCSB;
 
-                let csbPositive = 0;
-                for (let i = 0; i < window.currentData.pos.length; i++) {
-                    const r = window.currentData.pos[i];
-                    if (!r) continue;
-                    const empCol = normEmp(r[posEmpIdx]) || normEmp(r[3]) || normEmp(r[4]);
-                    if (empCol && empCol === targetEmp) {
-                        const amtCol = r[posAmtIdx] !== undefined ? r[posAmtIdx] : (r[13] !== undefined ? r[13] : r[14]);
-                        csbPositive += safeFloat(amtCol);
-                    }
-                }
-
-                let firstOnqAmt = 0;
-                let firstOnqCode = '';
-                let isFirstRowCSB = false;
-                for (let i = 0; i < window.currentData.onq.length; i++) {
-                    const r = window.currentData.onq[i];
-                    if (!r) continue;
-                    const empCol = normEmp(r[onqEmpIdx]) || normEmp(r[3]) || normEmp(r[4]);
-                    if (empCol && empCol === targetEmp) {
-                        const amtCol = r[onqAmtIdx] !== undefined ? r[onqAmtIdx] : (r[13] !== undefined ? r[13] : r[14]);
-                        const codeCol = r[onqCodeIdx] !== undefined ? r[onqCodeIdx] : (r[7] !== undefined ? r[7] : r[8]);
-                        firstOnqAmt = safeFloat(amtCol);
-                        firstOnqCode = String(codeCol || '').trim();
-                        isFirstRowCSB = (firstOnqCode === '0339' || firstOnqCode === '339');
-                        break;
-                    }
-                }
-
-                // (2026-07-13) Strict 0339 CSB first onq & formula status; prev: partial check
+                // (2026-07-13) First CSB Onqueue status & editable As Ease/For Review; prev: 2 options
                 const netPayFormula = netPayVal + csbPositive - firstOnqAmt;
                 const isThresholdMet = netPayFormula >= 5000;
-                const isAmortMatch = Math.abs(firstOnqAmt - monthlyAmort) < 0.01 && Math.abs(csbPositive - monthlyAmort) < 0.01 && monthlyAmort > 0;
-                const isEffected = isAmortMatch && isThresholdMet && isFirstRowCSB;
+                let statusMode = 'As Ease';
+                let isEditable = true;
+
+                if (isThresholdMet) {
+                    if (isFirstRowCSB || (firstOnqAmt > 0 && Math.abs(firstOnqAmt - monthlyAmort) < 0.01)) {
+                        statusMode = 'First CSB Onqueue';
+                    } else {
+                        statusMode = 'Effected';
+                    }
+                    isEditable = false;
+                }
+
+                // (2026-07-13) Store row values in firstBillingRowsCache; prev: local variables
+                window.firstBillingRowsCache = window.firstBillingRowsCache || {};
+                window.firstBillingRowsCache[empNumStr] = { netPayVal, csbPositive, firstOnqAmt, monthlyAmort, isFirstRowCSB };
 
                 rowsToRender.push({
                     empNumStr,
@@ -4203,7 +4300,8 @@
                     csbPositive,
                     transDate,
                     firstOnqAmt,
-                    isEffected
+                    statusMode,
+                    isEditable
                 });
             }
 
@@ -4212,23 +4310,33 @@
                 return;
             }
 
+            <!-- (2026-07-13) Add Delete Netpay/Positive/Onqueue columns; prev: none -->
             let html = `
                 <div class="table-responsive">
                     <table class="bank-table text-white w-100">
                         <thead>
+                            <!-- (2026-07-13) Compact 60px Del Net/Pos/OnQ headers; prev: wide full text -->
                             <tr>
+                                <th style="width: 40px; text-align: center;">#</th>
                                 <th>Name</th>
                                 <th style="text-align: right;">Monthly Amort</th>
                                 <th style="text-align: right;">CSB Positive</th>
-                                <th style="text-align: center;">Status</th>
+                                <th style="width: 60px; text-align: center; font-size: 0.70rem;" title="Exclude NetPay from criteria formula">Del Net</th>
+                                <th style="width: 60px; text-align: center; font-size: 0.70rem;" title="Exclude CSB Positive from criteria formula">Del Pos</th>
+                                <th style="width: 60px; text-align: center; font-size: 0.70rem;" title="Exclude OnQueue from criteria formula">Del OnQ</th>
+                                <th style="width: 155px; text-align: center;">Status</th>
                                 <th style="text-align: center;">Date</th>
                             </tr>
                         </thead>
                         <tbody>
-                            ${rowsToRender.map(r => `
+                            ${rowsToRender.map((r, idx) => `
                                 <tr>
-                                    <td data-label="Name" class="font-weight-bold">
-                                        ${r.clientName}
+                                    <td data-label="#" style="text-align: center; color: rgba(255,255,255,0.55);" class="font-weight-bold">
+                                        ${idx + 1}
+                                    </td>
+                                    <!-- (2026-07-13) Clickable employee name for full profile breakdown; prev: text only -->
+                                    <td data-label="Name" class="font-weight-bold" style="cursor: pointer;" onclick="inspectEmployeeProfile('${r.empNumStr}')" title="Click to view full profile & calculation workspace">
+                                        <span class="text-warning text-underline" style="text-decoration: underline;">${r.clientName}</span>
                                         <div style="font-size: 0.68rem; color: rgba(255,255,255,0.5);">ID: ${r.empNumStr}</div>
                                     </td>
                                     <td data-label="Monthly Amort" style="text-align: right;" class="tabular-nums font-weight-bold text-warning">
@@ -4237,12 +4345,27 @@
                                     <td data-label="CSB Positive" style="text-align: right;" class="tabular-nums font-weight-bold text-success">
                                         ${formatPHP(r.csbPositive)}
                                     </td>
-                                    <td data-label="Status" style="text-align: center;">
-                                        <select class="form-control form-control-sm font-weight-bold" style="width: 110px; margin: 0 auto; background: ${r.isEffected ? 'rgba(40,167,69,0.25)' : 'rgba(255,193,7,0.25)'}; color: ${r.isEffected ? '#28a745' : '#ffc107'}; border: 1px solid ${r.isEffected ? '#28a745' : '#ffc107'}; border-radius: 4px; font-size: 0.75rem;" onchange="this.style.background = this.value === 'Effected' ? 'rgba(40,167,69,0.25)' : (this.value === 'As Ease' ? 'rgba(255,193,7,0.25)' : 'rgba(220,53,69,0.25)'); this.style.color = this.value === 'Effected' ? '#28a745' : (this.value === 'As Ease' ? '#ffc107' : '#dc3545');">
-                                            <option value="Effected" ${r.isEffected ? 'selected' : ''}>Effected</option>
-                                            <option value="As Ease" ${!r.isEffected ? 'selected' : ''}>As Ease</option>
-                                            <option value="For Review">For Review</option>
-                                        </select>
+                                    <td data-label="Delete NetPay" style="text-align: center; vertical-align: middle;">
+                                        <input type="checkbox" id="del-netpay-${r.empNumStr}" onchange="updateFirstBillingRowStatus('${r.empNumStr}')" style="cursor: pointer; transform: scale(1.15);">
+                                    </td>
+                                    <td data-label="Delete Positive" style="text-align: center; vertical-align: middle;">
+                                        <input type="checkbox" id="del-pos-${r.empNumStr}" onchange="updateFirstBillingRowStatus('${r.empNumStr}')" style="cursor: pointer; transform: scale(1.15);">
+                                    </td>
+                                    <td data-label="Delete OnQueue" style="text-align: center; vertical-align: middle;">
+                                        <input type="checkbox" id="del-onq-${r.empNumStr}" onchange="updateFirstBillingRowStatus('${r.empNumStr}')" style="cursor: pointer; transform: scale(1.15);">
+                                    </td>
+                                    <!-- (2026-07-13) Uniform 145px width status badges & select; prev: uneven sizes -->
+                                    <td data-label="Status" id="status-td-${r.empNumStr}" style="text-align: center; vertical-align: middle;">
+                                        ${r.statusMode === 'First CSB Onqueue' ? `
+                                            <span class="badge font-weight-bold" style="width: 145px !important; height: 30px !important; background: rgba(13,110,253,0.22); color: #3b82f6; border: 1px solid #3b82f6; border-radius: 6px; font-size: 0.72rem; display: inline-flex; align-items: center; justify-content: center; letter-spacing: 0.02em; margin: 0 auto;">First CSB Onqueue</span>
+                                        ` : (r.statusMode === 'Effected' ? `
+                                            <span class="badge font-weight-bold" style="width: 145px !important; height: 30px !important; background: rgba(40,167,69,0.22); color: #28a745; border: 1px solid #28a745; border-radius: 6px; font-size: 0.72rem; display: inline-flex; align-items: center; justify-content: center; letter-spacing: 0.02em; margin: 0 auto;">Effected</span>
+                                        ` : `
+                                            <select class="form-control form-control-sm font-weight-bold" style="width: 145px !important; height: 30px !important; line-height: 1.2 !important; margin: 0 auto; background: ${r.statusMode === 'As Ease' ? 'rgba(255,193,7,0.25)' : 'rgba(220,53,69,0.25)'}; color: ${r.statusMode === 'As Ease' ? '#ffc107' : '#dc3545'}; border: 1px solid ${r.statusMode === 'As Ease' ? '#ffc107' : '#dc3545'}; border-radius: 6px; font-size: 0.72rem; text-align: center; text-align-last: center;" onchange="this.style.background = this.value === 'As Ease' ? 'rgba(255,193,7,0.25)' : 'rgba(220,53,69,0.25)'; this.style.color = this.value === 'As Ease' ? '#ffc107' : '#dc3545'; this.style.borderColor = this.value === 'As Ease' ? '#ffc107' : '#dc3545';">
+                                                <option value="As Ease" ${r.statusMode === 'As Ease' ? 'selected' : ''}>As Ease</option>
+                                                <option value="For Review" ${r.statusMode === 'For Review' ? 'selected' : ''}>For Review</option>
+                                            </select>
+                                        `)}
                                     </td>
                                     <td data-label="Date" style="text-align: center;" class="text-white-50 small">
                                         ${r.transDate}
@@ -4254,6 +4377,70 @@
                 </div>
             `;
             container.innerHTML = html;
+        }
+        // (2026-07-13) Live updateFirstBillingRowStatus handler; prev: none
+        function updateFirstBillingRowStatus(empNumStr) {
+            const rowData = window.firstBillingRowsCache?.[empNumStr];
+            if (!rowData) return;
+            const delNetpay = document.getElementById(`del-netpay-${empNumStr}`)?.checked || false;
+            const delPos = document.getElementById(`del-pos-${empNumStr}`)?.checked || false;
+            const delOnq = document.getElementById(`del-onq-${empNumStr}`)?.checked || false;
+
+            const effNetPay = delNetpay ? 0 : rowData.netPayVal;
+            const effPos = delPos ? 0 : rowData.csbPositive;
+            const effOnq = delOnq ? 0 : rowData.firstOnqAmt;
+
+            const formulaVal = effNetPay + effPos - effOnq;
+            const isMet = formulaVal >= 5000;
+            let newStatus = 'As Ease';
+
+            if (isMet) {
+                if (rowData.isFirstRowCSB || (effOnq > 0 && Math.abs(effOnq - rowData.monthlyAmort) < 0.01)) {
+                    newStatus = 'First CSB Onqueue';
+                } else {
+                    newStatus = 'Effected';
+                }
+            }
+
+            const statusTd = document.getElementById(`status-td-${empNumStr}`);
+            if (statusTd) {
+                if (newStatus === 'First CSB Onqueue') {
+                    statusTd.innerHTML = `<span class="badge font-weight-bold" style="width: 145px !important; height: 30px !important; background: rgba(13,110,253,0.22); color: #3b82f6; border: 1px solid #3b82f6; border-radius: 6px; font-size: 0.72rem; display: inline-flex; align-items: center; justify-content: center; letter-spacing: 0.02em; margin: 0 auto;">First CSB Onqueue</span>`;
+                } else if (newStatus === 'Effected') {
+                    statusTd.innerHTML = `<span class="badge font-weight-bold" style="width: 145px !important; height: 30px !important; background: rgba(40,167,69,0.22); color: #28a745; border: 1px solid #28a745; border-radius: 6px; font-size: 0.72rem; display: inline-flex; align-items: center; justify-content: center; letter-spacing: 0.02em; margin: 0 auto;">Effected</span>`;
+                } else {
+                    statusTd.innerHTML = `
+                        <select class="form-control form-control-sm font-weight-bold" style="width: 145px !important; height: 30px !important; line-height: 1.2 !important; margin: 0 auto; background: rgba(255,193,7,0.25); color: #ffc107; border: 1px solid #ffc107; border-radius: 6px; font-size: 0.72rem; text-align: center; text-align-last: center;" onchange="this.style.background = this.value === 'As Ease' ? 'rgba(255,193,7,0.25)' : 'rgba(220,53,69,0.25)'; this.style.color = this.value === 'As Ease' ? '#ffc107' : '#dc3545'; this.style.borderColor = this.value === 'As Ease' ? '#ffc107' : '#dc3545';">
+                            <option value="As Ease" selected>As Ease</option>
+                            <option value="For Review">For Review</option>
+                        </select>
+                    `;
+                }
+            }
+        }
+
+        // (2026-07-13) Drill-down inspectEmployeeProfile handler; prev: batch only
+        async function inspectEmployeeProfile(empNum) {
+            const empInp = document.getElementById('employeeNumber');
+            if (empInp) empInp.value = empNum;
+            const profileCardContainer = document.getElementById('lcsProfileCard');
+            if (profileCardContainer) profileCardContainer.style.display = 'block';
+            const evalWorkspace = document.getElementById('evaluationWorkspace');
+            if (evalWorkspace) evalWorkspace.classList.remove('d-none');
+            await processIngestedSession(true);
+            if (evalWorkspace) evalWorkspace.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function toggleTableOrientation() {
+            const card = document.getElementById('firstBillingSummaryCard');
+            if (card) {
+                card.classList.toggle('rotated-landscape-mode');
+                const isRotated = card.classList.contains('rotated-landscape-mode');
+                const btn = document.getElementById('btnRotateView');
+                if (btn) {
+                    btn.innerHTML = isRotated ? '<i class="bi bi-aspect-ratio mr-1"></i>Standard View' : '<i class="bi bi-arrow-repeat mr-1"></i>Rotate View';
+                }
+            }
         }
 
         // (2026-07-13) Add active hover highlights & nearest match focus; prev: plain
