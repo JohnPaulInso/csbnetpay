@@ -3253,17 +3253,15 @@
         <!-- [2026-07-10 Fix: Added descriptive label class names, IDs, and data-labels per global rules] -->
         <!-- Search & Client Configuration Widget -->
         <div class="bank-card search-config-card" id="searchConfigurationCard" data-label="Search & Client Configuration Card">
-            <!-- [2026-07-13 Fix: Added responsive vertical margins mb-3/mb-2 on intermediate cols when grid stacks on mobile] -->
-            <div class="row align-items-center">
-                <div class="col-lg-3 col-md-12 mb-lg-0">
-                    <!-- (2026-07-13) Update title to Billing Assessment; prev: Credit Assessment -->
-                    <h5 class="mb-lg-0 px-2 py-1 font-weight-bold credit-assessment-title" id="titleCreditAssessment"><i class="bi bi-receipt"></i> Billing Assessment</h5>
+            <!-- (2026-07-13) Clean branch-only header grid; prev: broken HTML tags & overlaps -->
+            <div class="row align-items-center mb-1">
+                <div class="col-lg-4 col-md-12 mb-3 mb-lg-0">
+                    <h5 class="mb-0 px-1 py-1 font-weight-bold credit-assessment-title" id="titleCreditAssessment"><i class="bi bi-receipt mr-2"></i>Billing Assessment</h5>
                 </div>
-                <div class="col-lg-3 col-md-3 mb-2 mb-md-0">
+                <div class="col-lg-4 col-md-6 mb-3 mb-lg-0">
                     <div class="currency-input-wrapper">
                         <span class="currency-prefix"><i class="bi bi-calendar3 text-warning"></i></span>
-                        <!-- (2026-07-13) Add July 2026 option as default; prev: June 2026 default -->
-                        <select id="activeMonthSelect" class="form-control bank-select" style="padding-left: 36px !important;">
+                        <select id="activeMonthSelect" class="form-control font-weight-bold" onchange="if(document.getElementById('branchSelect')?.value) renderFirstBillingBranchTable();" style="padding-left: 38px !important; background: rgba(8,12,28,0.85); color: white; border: 1px solid rgba(255,165,0,0.4); height: 42px; border-radius: 8px; font-size: 0.88rem; cursor: pointer; display: block !important;">
                             <option value="jul26" selected>July 2026</option>
                             <option value="jun26">June 2026</option>
                             <option value="may26">May 2026</option>
@@ -3280,12 +3278,12 @@
                         </select>
                     </div>
                 </div>
-                <!-- (2026-07-13) Pre-populate 13 branch options in HTML; prev: ALL BRANCHES only -->
-                <div class="col-lg-3 col-md-3 mb-2 mb-md-0">
+                <div class="col-lg-4 col-md-6 mb-3 mb-lg-0">
                     <div class="currency-input-wrapper">
                         <span class="currency-prefix"><i class="bi bi-buildings text-warning"></i></span>
-                        <select id="branchSelect" class="form-control bank-select font-weight-bold" style="padding-left: 36px !important; background: rgba(8,12,28,0.7); color: white; border: 1px solid rgba(255,255,255,0.1);">
-                            <option value="ALL" selected>ALL BRANCHES</option>
+                        <select id="branchSelect" class="form-control font-weight-bold" onchange="renderFirstBillingBranchTable()" style="padding-left: 38px !important; background: rgba(8,12,28,0.85); color: white; border: 1px solid rgba(255,165,0,0.4); height: 42px; border-radius: 8px; font-size: 0.88rem; cursor: pointer; display: block !important;">
+                            <option value="" disabled selected>-- SELECT A BRANCH --</option>
+                            <option value="ALL">ALL BRANCHES</option>
                             <option value="BALAMBAN">BALAMBAN</option>
                             <option value="BAYAWAN">BAYAWAN</option>
                             <option value="BOGO">BOGO</option>
@@ -3302,48 +3300,30 @@
                         </select>
                     </div>
                 </div>
-                <!-- (2026-07-13) Add employee search autocomplete dropdown; prev: none -->
-                <div class="col-lg-3 col-md-4 mb-2 mb-md-0" style="position: relative;">
-                    <div class="currency-input-wrapper">
-                        <span class="currency-prefix"><i class="bi bi-person-badge text-warning"></i></span>
-                        <!-- (2026-07-13) Removed default value; prev: value="4694264" -->
-                        <input type="text" id="employeeNumber" class="form-control bank-input font-weight-bold" placeholder="Search ID or Name..." style="padding-left: 36px !important;" autocomplete="off" oninput="handleEmpAutocomplete(this.value)">
-                    </div>
-                    <div id="empAutocompleteDropdown" class="emp-search-dropdown" style="display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 1050; background: rgba(12, 16, 36, 0.98); border: 1px solid rgba(255, 165, 0, 0.3); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.6); max-height: 260px; overflow-y: auto; margin-top: 4px; padding: 4px 0;"></div>
-                </div>
-                <div class="col-lg-3 col-md-2 mb-0">
-                    <!-- Search Button (Polished: Inline background and color styles removed in favor of bank-btn-primary class styles) -->
-                    <button id="searchBtn" class="btn btn-warning bank-btn-primary w-100 font-weight-bold" onclick="performSearch()">
-                        <i class="bi bi-search"></i> Search
-                    </button>
-                </div>
+                <input type="hidden" id="employeeNumber" value="">
+                <button id="searchBtn" style="display:none;" onclick="performSearch()"></button>
             </div>
 
-            <!-- Search Loading Indicator -->
-            <!-- [2026-07-14 Fix: Premium animated skeleton loading states for workspace components; previous: standard Bootstrap spinner-border] -->
-            <div id="loadingIndicator" class="mt-4 d-none">
-                <div class="skeleton-card mb-3 p-3">
-                    <div class="skeleton-line skeleton-title mb-2"></div>
-                    <div class="skeleton-line skeleton-text mb-1" style="width: 80%;"></div>
-                    <div class="skeleton-line skeleton-text" style="width: 60%;"></div>
-                </div>
-                <div class="skeleton-card p-3">
-                    <div class="skeleton-line skeleton-title mb-3"></div>
-                    <div class="d-flex gap-2 mb-2">
-                        <div class="skeleton-line skeleton-block" style="flex: 1; height: 40px; margin-right: 8px;"></div>
-                        <div class="skeleton-line skeleton-block" style="flex: 1; height: 40px;"></div>
+            <!-- (2026-07-13) Permanently hide loading indicator & profile card; prev: visible loaders -->
+            <div id="loadingIndicator" class="mt-4 d-none" style="display: none !important;"></div>
+            <div id="lcsProfileCard" class="mt-3 d-none" style="display: none !important;"></div>
+
+            <!-- (2026-07-13) Add First Billing Summary Table card; prev: none -->
+            <div id="firstBillingSummaryCard" class="bank-card mt-3 mb-3" style="background: rgba(12, 16, 36, 0.95); border: 1px solid rgba(255, 165, 0, 0.3); border-radius: 12px; padding: 16px;">
+                <div class="d-flex justify-content-between align-items-center mb-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 8px;">
+                    <div class="font-weight-bold text-warning" style="font-size: 0.95rem; letter-spacing: 0.03em;">
+                        <i class="bi bi-file-earmark-spreadsheet text-warning mr-2"></i>FIRST BILLING ACCOUNTS
                     </div>
-                    <div class="skeleton-line skeleton-text" style="width: 50%;"></div>
+                    <span class="badge badge-warning" style="font-size: 0.7rem; padding: 4px 8px;">RPSU.575 & XFRRPSU.5Y.7.5.CONS.ANIV</span>
+                </div>
+                <div id="firstBillingTableContainer">
+                    <div class="text-white-50 text-center py-2">Select a branch to load First Billing accounts.</div>
                 </div>
             </div>
-
-            <!-- (2026-07-13) Remove empSummaryCard for BILLING; prev: card present -->
-            <!-- (2026-07-13) Add container for ledger profile card; prev: none -->
-            <div id="lcsProfileCard" class="mt-3" style="display: none;"></div>
         </div>
 
-        <!-- Main Evaluation Workspace -->
-        <div id="evaluationWorkspace" class="d-none">
+        <!-- (2026-07-13) Hide evaluationWorkspace for batch mode; prev: d-none class -->
+        <div id="evaluationWorkspace" class="d-none" style="display: none !important;">
             
             <!-- Matrix Phase Grid Layout -->
             <div class="row matrix-grid-row">
@@ -4086,8 +4066,15 @@
                     const curVal = branchSelect.value;
                     branchSelect.innerHTML = '<option value="ALL">ALL BRANCHES</option>' + uniqueBranches.map(b => `<option value="${b}">${b}</option>`).join('');
                     if (curVal && uniqueBranches.includes(curVal)) branchSelect.value = curVal;
+                    // (2026-07-13) Attach branchSelect listener for auto branch table; prev: none
+                    if (!branchSelect.dataset.firstBillingBound) {
+                        branchSelect.dataset.firstBillingBound = 'true';
+                        branchSelect.addEventListener('change', () => renderFirstBillingBranchTable());
+                    }
                 }
+                // (2026-07-13) Auto-render First Billing table on LCS load; prev: callback only
                 lcsDbReady = true;
+                renderFirstBillingBranchTable();
                 lcsDbReadyCallbacks.forEach(cb => cb());
                 lcsDbReadyCallbacks = [];
             } catch (err) {
@@ -4095,6 +4082,178 @@
                 lcsDbReady = true;
                 lcsDbReadyCallbacks.forEach(cb => cb());
             }
+        }
+
+        // (2026-07-13) Require explicit branch selection before load; prev: default ALL
+        function renderFirstBillingBranchTable() {
+            window.renderFirstBillingBranchTable = renderFirstBillingBranchTable;
+            const container = document.getElementById('firstBillingTableContainer');
+            if (!container) return;
+
+            const selectedBranch = document.getElementById('branchSelect')?.value || '';
+            if (!selectedBranch) {
+                container.innerHTML = `<div class="text-white-50 text-center py-3">Select a branch to view First Billing accounts.</div>`;
+                return;
+            }
+            if (!lcsDbReady || lcsEmpMap.size === 0) {
+                container.innerHTML = `<div class="text-white-50 text-center py-3"><div class="spinner-border spinner-border-sm text-warning mr-2" role="status"></div>Loading LCS database accounts...</div>`;
+                return;
+            }
+
+            if (!window.currentData || !window.currentData.netpay || !window.currentData.pos || !window.currentData.onq) {
+                container.innerHTML = `<div class="text-white-50 text-center py-3"><div class="spinner-border spinner-border-sm text-warning mr-2" role="status"></div>Loading First Billing datasets...</div>`;
+                if (!window.isIngestingData) {
+                    window.isIngestingData = true;
+                    performSearch(true).finally(() => { window.isIngestingData = false; });
+                }
+                return;
+            }
+
+            const normEmp = s => String(s || '').trim().replace(/^"|"$/g, '').replace(/,/g, '').replace(/\.0+$/, '').replace(/^0+/, '');
+
+            const netpayH = window.currentData.netpay[0] || [];
+            const netpayMap = {}; netpayH.forEach((c, i) => netpayMap[String(c || '').toUpperCase().trim()] = i);
+            const npEmpIdx = netpayMap['EMPNO'] ?? 3;
+            const npNetIdx = netpayMap['TAKEHOME'] ?? 7;
+
+            const posH = window.currentData.pos[0] || [];
+            const posMap = {}; posH.forEach((c, i) => posMap[String(c || '').toUpperCase().trim()] = i);
+            const posEmpIdx = posMap['EMPNO'] ?? 3;
+            const posAmtIdx = posMap['DEDAMT'] ?? 13;
+
+            const onqH = window.currentData.onq[0] || [];
+            const onqMap = {}; onqH.forEach((c, i) => onqMap[String(c || '').toUpperCase().trim()] = i);
+            const onqEmpIdx = onqMap['EMPNO'] ?? 3;
+            const onqAmtIdx = onqMap['DEDAMT'] ?? 13;
+            const onqCodeIdx = onqMap['DEDCODE'] ?? 7;
+
+            const rowsToRender = [];
+
+            // (2026-07-13) Filter DepEd branch & scheme RPSU.575/XFRRPSU; prev: exact branch
+            for (const [empNumStr, accounts] of lcsEmpMap.entries()) {
+                if (!accounts || accounts.length === 0) continue;
+                const matchingAccounts = accounts.filter(acc => {
+                    const sc = String(acc.schemeCode || '').trim().toUpperCase();
+                    const b = String(acc.branchName || '').trim().toUpperCase();
+                    const sBranch = String(selectedBranch || '').trim().toUpperCase();
+                    const branchMatch = (sBranch === 'ALL' || b === sBranch || b.includes(sBranch) || sBranch.includes(b));
+                    const schemeMatch = (sc === 'RPSU.575' || sc === 'XFRRPSU.5Y.7.5.CONS.ANIV' || sc.includes('RPSU.575') || sc.includes('XFRRPSU.5Y.7.5'));
+                    return branchMatch && schemeMatch;
+                });
+
+                if (matchingAccounts.length === 0) continue;
+
+                const targetEmp = normEmp(empNumStr);
+                const firstAccount = matchingAccounts[0];
+                const clientName = firstAccount.accountName || 'N/A';
+                const monthlyAmort = safeFloat(firstAccount.amortization);
+                const transDate = firstAccount.loanDate || 'N/A';
+
+                // (2026-07-13) Robust pos/onq/netpay column lookup; prev: fixed index 3/13
+                let netPayVal = 0;
+                for (let i = 0; i < window.currentData.netpay.length; i++) {
+                    const r = window.currentData.netpay[i];
+                    if (!r) continue;
+                    const empCol = normEmp(r[npEmpIdx]) || normEmp(r[3]) || normEmp(r[4]);
+                    if (empCol && empCol === targetEmp) {
+                        const netCol = r[npNetIdx] !== undefined ? r[npNetIdx] : (r[7] !== undefined ? r[7] : r[8]);
+                        netPayVal = safeFloat(netCol);
+                        break;
+                    }
+                }
+
+                let csbPositive = 0;
+                for (let i = 0; i < window.currentData.pos.length; i++) {
+                    const r = window.currentData.pos[i];
+                    if (!r) continue;
+                    const empCol = normEmp(r[posEmpIdx]) || normEmp(r[3]) || normEmp(r[4]);
+                    if (empCol && empCol === targetEmp) {
+                        const amtCol = r[posAmtIdx] !== undefined ? r[posAmtIdx] : (r[13] !== undefined ? r[13] : r[14]);
+                        csbPositive += safeFloat(amtCol);
+                    }
+                }
+
+                let firstOnqAmt = 0;
+                let firstOnqCode = '';
+                let isFirstRowCSB = false;
+                for (let i = 0; i < window.currentData.onq.length; i++) {
+                    const r = window.currentData.onq[i];
+                    if (!r) continue;
+                    const empCol = normEmp(r[onqEmpIdx]) || normEmp(r[3]) || normEmp(r[4]);
+                    if (empCol && empCol === targetEmp) {
+                        const amtCol = r[onqAmtIdx] !== undefined ? r[onqAmtIdx] : (r[13] !== undefined ? r[13] : r[14]);
+                        const codeCol = r[onqCodeIdx] !== undefined ? r[onqCodeIdx] : (r[7] !== undefined ? r[7] : r[8]);
+                        firstOnqAmt = safeFloat(amtCol);
+                        firstOnqCode = String(codeCol || '').trim();
+                        isFirstRowCSB = (firstOnqCode === '0339' || firstOnqCode === '339');
+                        break;
+                    }
+                }
+
+                // (2026-07-13) Strict 0339 CSB first onq & formula status; prev: partial check
+                const netPayFormula = netPayVal + csbPositive - firstOnqAmt;
+                const isThresholdMet = netPayFormula >= 5000;
+                const isAmortMatch = Math.abs(firstOnqAmt - monthlyAmort) < 0.01 && Math.abs(csbPositive - monthlyAmort) < 0.01 && monthlyAmort > 0;
+                const isEffected = isAmortMatch && isThresholdMet && isFirstRowCSB;
+
+                rowsToRender.push({
+                    empNumStr,
+                    clientName,
+                    monthlyAmort,
+                    csbPositive,
+                    transDate,
+                    firstOnqAmt,
+                    isEffected
+                });
+            }
+
+            if (rowsToRender.length === 0) {
+                container.innerHTML = `<div class="text-white-50 text-center py-3">No matching First Billing accounts found for branch ${selectedBranch} (Scheme Code RPSU.575 / XFRRPSU.5Y.7.5.CONS.ANIV).</div>`;
+                return;
+            }
+
+            let html = `
+                <div class="table-responsive">
+                    <table class="bank-table text-white w-100">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th style="text-align: right;">Monthly Amort</th>
+                                <th style="text-align: right;">CSB Positive</th>
+                                <th style="text-align: center;">Status</th>
+                                <th style="text-align: center;">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsToRender.map(r => `
+                                <tr>
+                                    <td data-label="Name" class="font-weight-bold">
+                                        ${r.clientName}
+                                        <div style="font-size: 0.68rem; color: rgba(255,255,255,0.5);">ID: ${r.empNumStr}</div>
+                                    </td>
+                                    <td data-label="Monthly Amort" style="text-align: right;" class="tabular-nums font-weight-bold text-warning">
+                                        ${formatPHP(r.monthlyAmort)}
+                                    </td>
+                                    <td data-label="CSB Positive" style="text-align: right;" class="tabular-nums font-weight-bold text-success">
+                                        ${formatPHP(r.csbPositive)}
+                                    </td>
+                                    <td data-label="Status" style="text-align: center;">
+                                        <select class="form-control form-control-sm font-weight-bold" style="width: 110px; margin: 0 auto; background: ${r.isEffected ? 'rgba(40,167,69,0.25)' : 'rgba(255,193,7,0.25)'}; color: ${r.isEffected ? '#28a745' : '#ffc107'}; border: 1px solid ${r.isEffected ? '#28a745' : '#ffc107'}; border-radius: 4px; font-size: 0.75rem;" onchange="this.style.background = this.value === 'Effected' ? 'rgba(40,167,69,0.25)' : (this.value === 'As Ease' ? 'rgba(255,193,7,0.25)' : 'rgba(220,53,69,0.25)'); this.style.color = this.value === 'Effected' ? '#28a745' : (this.value === 'As Ease' ? '#ffc107' : '#dc3545');">
+                                            <option value="Effected" ${r.isEffected ? 'selected' : ''}>Effected</option>
+                                            <option value="As Ease" ${!r.isEffected ? 'selected' : ''}>As Ease</option>
+                                            <option value="For Review">For Review</option>
+                                        </select>
+                                    </td>
+                                    <td data-label="Date" style="text-align: center;" class="text-white-50 small">
+                                        ${r.transDate}
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            container.innerHTML = html;
         }
 
         // (2026-07-13) Add active hover highlights & nearest match focus; prev: plain
@@ -5367,11 +5526,8 @@
         }
 
         async function performSearch(skipHistoryLog = false) {
-            const empNumInput = document.getElementById('employeeNumber').value.trim();
-            if (!empNumInput) {
-                await showCustomAlert("Please enter a valid Employee Number.");
-                return;
-            }
+            // (2026-07-13) Default empNumInput to BATCH when empty; prev: showCustomAlert
+            const empNumInput = (document.getElementById('employeeNumber')?.value || 'BATCH').trim() || 'BATCH';
 
             resetInputsOnSearch();
 
@@ -5391,18 +5547,10 @@
             if (document.getElementById('empSummaryCard')) document.getElementById('empSummaryCard').classList.add('d-none');
             document.getElementById('evaluationWorkspace').classList.add('d-none');
 
-            // (2026-07-13) Show premium spinner loader inside the profile card during active search; prev: hidden
+            // (2026-07-13) Hide profileCardContainer in batch mode; prev: display block
             const profileCardContainer = document.getElementById('lcsProfileCard');
             if (profileCardContainer) {
-                profileCardContainer.style.display = 'block';
-                profileCardContainer.innerHTML = `
-                    <div class="profile-card d-flex align-items-center justify-content-center" style="min-height: 120px; background: rgba(14, 18, 38, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px;">
-                        <div class="text-center text-white-50">
-                            <div class="spinner-border spinner-border-sm text-warning mb-2" role="status" aria-hidden="true" style="width: 1.5rem; height: 1.5rem;"></div>
-                            <div style="font-size: 0.70rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255,255,255,0.6);">Loading Profile Ledger...</div>
-                        </div>
-                    </div>
-                `;
+                profileCardContainer.style.display = 'none';
             }
 
             // (2026-07-13) Set skeleton rows for items during search; prev: none
@@ -5485,7 +5633,8 @@
                     tranch2027: tranch2027Data
                 };
 
-                await processIngestedSession(skipHistoryLog);
+                // (2026-07-13) Batch branch mode: render branch table only; prev: single session
+                renderFirstBillingBranchTable();
 
             } catch (err) {
                 console.error(err);
@@ -5503,6 +5652,21 @@
 
         async function processIngestedSession(skipHistoryLog) {
             const empNum = window.currentData.empNum;
+            // (2026-07-13) Enforce Scheme Code gate check in processIngestedSession; prev: none
+            const normEmp = s => String(s || '').trim().replace(/^"|"$/g, '').replace(/,/g, '').replace(/\.0+$/, '').replace(/^0+/, '');
+            const targetEmpNum = normEmp(empNum);
+            const lcsAccounts = lcsEmpMap.get(targetEmpNum);
+            if (lcsAccounts && lcsAccounts.length > 0) {
+                const validScheme = lcsAccounts.some(acc => {
+                    const sc = String(acc.schemeCode || '').trim().toUpperCase();
+                    return sc === 'RPSU.575' || sc === 'XFRRPSU.5Y.7.5.CONS.ANIV';
+                });
+                if (!validScheme) {
+                    await showCustomAlert("Search blocked: Employee Scheme Code is not RPSU.575 or XFRRPSU.5Y.7.5.CONS.ANIV.");
+                    return;
+                }
+            }
+
             const netpayRows = window.currentData.netpay;
             
             // Search for NetPay baseline employee row (index 3 is EMPNO)
@@ -5540,9 +5704,9 @@
                 if (document.getElementById('evaluationModeSelect')) {
                     document.getElementById('evaluationModeSelect').value = 'AUTONOMOUS';
                 }
-                // (2026-07-13) Add null check for empSummaryCard; prev: un-guarded
-                if (document.getElementById('empSummaryCard')) document.getElementById('empSummaryCard').classList.remove('d-none');
-                document.getElementById('evaluationWorkspace').classList.remove('d-none');
+                // (2026-07-13) Keep individual workspace hidden for batch mode; prev: remove d-none
+                if (document.getElementById('empSummaryCard')) document.getElementById('empSummaryCard').classList.add('d-none');
+                document.getElementById('evaluationWorkspace').classList.add('d-none');
                 
                 // Clear the manual input values to 0 by default so they can type
                 document.getElementById('input-netpay').value = "0.00";
@@ -5661,12 +5825,12 @@
             const onqMap = {};
             onqH.forEach((c, i) => { onqMap[String(c || '').toUpperCase().trim()] = i; });
             const empNoIdx = onqMap['EMPNO'] ?? (onqH.findIndex(c => String(c).toUpperCase().trim().includes('EMP')) !== -1 ? onqH.findIndex(c => String(c).toUpperCase().trim().includes('EMP')) : 3);
-            const dedAmtIdx = onqMap['DEDAMT'] ?? (onqH.findIndex(c => String(c).toUpperCase().trim().includes('DEDAMT')) !== -1 ? onqH.findIndex(c => String(c).toUpperCase().trim().includes('DEDAMT')) : 13);
-            const targetEmpNum = normEmpNo(empNum);
+            // (2026-07-13) Fix duplicate targetEmpNum identifier syntax error; prev: targetEmpNum
+            const searchEmpNum = normEmpNo(empNum);
             const matchingOnq = [];
             let initialOnqSum = 0;
             for (let i = 1; i < onqRows.length; i++) {
-                if (onqRows[i][empNoIdx] && normEmpNo(onqRows[i][empNoIdx]) === targetEmpNum) {
+                if (onqRows[i][empNoIdx] && normEmpNo(onqRows[i][empNoIdx]) === searchEmpNum) {
                     matchingOnq.push(onqRows[i]);
                     initialOnqSum += safeFloat(onqRows[i][dedAmtIdx]);
                 }
@@ -5753,8 +5917,8 @@
             // Build Phase D OnQueue rows
             renderOnQueueTable(matchingOnq);
 
-            // Make workspace section visible
-            document.getElementById('evaluationWorkspace').classList.remove('d-none');
+            // (2026-07-13) Keep individual workspace hidden for batch mode; prev: remove d-none
+            document.getElementById('evaluationWorkspace').classList.add('d-none');
 
             // Trigger matrix run computations
             runCalculations();
@@ -9178,6 +9342,11 @@
                         }
                     }
                 });
+            }
+            // (2026-07-13) Auto-reingest month datasets on month change; prev: manual button
+            const activeMonthEl = document.getElementById('activeMonthSelect');
+            if (activeMonthEl) {
+                activeMonthEl.addEventListener('change', () => performSearch(true));
             }
             // (2026-07-13) Init custom dropdown selectors; prev: standard HTML selects
             initCustomDropdowns();
