@@ -43,8 +43,11 @@ function getOnqColIdxs(headerRow) {
     }
     const empIdx = map['EMPNO'] ?? (headerRow ? headerRow.findIndex(c => String(c).toUpperCase().trim().includes('EMP')) : -1);
     const dedIdx = map['DEDAMT'] ?? (headerRow ? headerRow.findIndex(c => String(c).toUpperCase().trim().includes('DEDAMT')) : -1);
+    // (2026-07-13) Add divCode/staCode to support dynamic name field resolution; prev: missing
     return {
         empNo: empIdx !== -1 ? empIdx : 3,
+        divCode: map['DIVCODE'] ?? map['DIV'] ?? 1,
+        staCode: map['STACODE'] ?? map['STA'] ?? 2,
         dedCode: map['DEDCODE'] ?? 7,
         effYr: map['EFFYY'] ?? 9,
         effMo: map['EFFMM'] ?? 10,
@@ -557,11 +560,12 @@ async function displayEmployeeInfoOnq(monthName, csvData) {
                 }, 2000);
             }
 
-            const div = row[1];
-            const sta = row[2];
-            const fname = row[4];
-            const mi = row[5];
-            const lname = row[6];
+            // (2026-07-13) Use dynamic colIdxs for name fields; prev: hardcoded row[4]/[5]/[6]
+            const div = row[colIdxs.divCode];
+            const sta = row[colIdxs.staCode];
+            const fname = row[colIdxs.fname];
+            const mi = row[colIdxs.mi];
+            const lname = row[colIdxs.lname];
 
             // Announce name once
             const empNoField = document.getElementById('searchInputOnq').value.trim();

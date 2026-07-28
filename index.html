@@ -1421,19 +1421,22 @@
                         const headers = (rawRows[0] || []).map(c => String(c || "").trim().toUpperCase());
                         const findCol = (patterns) => headers.findIndex(h => patterns.some(p => p.test(h)));
 
+                        // (2026-07-13) Detect BLANK prefix col; prev: no blank detection
+                        const hasBlankPrefix = headers[0] === 'BLANK' || headers[0] === '';
+                        const blankOffset = hasBlankPrefix ? 1 : 0;
                         const colMap = {
                             REGCODE: findCol([/^REG\s*CODE$/i, /^REG$/i]),
                             DIVCODE: findCol([/^DIV\s*CODE$/i, /^DIV$/i]),
                             STACODE: findCol([/^STA\s*CODE$/i, /^STA$/i]),
-                            EMPNO: findCol([/^EMP\s*NO$/i, /^EMPLOYEE\s*NO$/i, /^EMP$/i]),
+                            EMPNO: findCol([/^EMP\s*NO$/i, /^EMPLOYEE\s*NO$/i, /^EMPNO$/i, /^EMP$/i]),
                             FNPRE: findCol([/^FNPRE$/i]),
                             FNAME: findCol([/^FNAME$/i, /^FIRST\s*NAME$/i]),
                             MI: findCol([/^MI$/i, /^MIDDLE\s*INITIAL$/i]),
                             LNAME: findCol([/^LNAME$/i, /^LAST\s*NAME$/i]),
                             APPEL: findCol([/^APPEL$/i]),
                             TAKEHOME: findCol([/TAKE\s*HOME/i, /NTHP/i]),
-                            DEDCODE: findCol([/^DED\s*CODE$/i, /^DED$/i]),
-                            DEDID: findCol([/^DED\s*ID$/i]),
+                            DEDCODE: findCol([/^DED\s*CODE$/i, /^DEDCODE$/i, /^DED$/i]),
+                            DEDID: findCol([/^DED\s*ID$/i, /^DEDID$/i]),
                             EFFYY: findCol([/^EFF\s*YY$/i, /^EFFYY$/i]),
                             EFFMM: findCol([/^EFF\s*MM$/i, /^EFFMM$/i]),
                             TERYY: findCol([/^TER\s*YY$/i, /^TERYY$/i]),
@@ -1492,28 +1495,28 @@
                                     "",
                                     getVal(r, colMap.POLICYNO !== -1 ? colMap.POLICYNO : 16)
                                 ];
-                            // (2026-07-13) Fix ONQUEUE schema & emp number formatting; prev: BLANK prepended
+                            // (2026-07-13) Fix ONQUEUE schema with blankOffset for BLANK-leading src; prev: hardcoded fallbacks
                             } else if (sheetConfig.id === "ONQUEUE") {
                                 if (rowIndex === 0) {
                                     return ["REGCODE", "DIVCODE", "STACODE", "EMPNO", "FNAME", "MI", "LNAME", "DEDCODE", "DEDID", "EFFYY", "EFFMM", "TERYY", "TERMM", "DEDAMT", "", "POLICYNO"];
                                 }
                                 return [
-                                    getVal(r, colMap.REGCODE !== -1 ? colMap.REGCODE : 0),
-                                    getVal(r, colMap.DIVCODE !== -1 ? colMap.DIVCODE : 1),
-                                    getVal(r, colMap.STACODE !== -1 ? colMap.STACODE : 2),
-                                    getVal(r, colMap.EMPNO !== -1 ? colMap.EMPNO : 3),
-                                    getVal(r, colMap.FNAME !== -1 ? colMap.FNAME : 4),
-                                    getVal(r, colMap.MI !== -1 ? colMap.MI : 5),
-                                    getVal(r, colMap.LNAME !== -1 ? colMap.LNAME : 6),
-                                    getVal(r, colMap.DEDCODE !== -1 ? colMap.DEDCODE : 7),
-                                    getVal(r, colMap.DEDID !== -1 ? colMap.DEDID : 8),
-                                    getVal(r, colMap.EFFYY !== -1 ? colMap.EFFYY : 9),
-                                    getVal(r, colMap.EFFMM !== -1 ? colMap.EFFMM : 10),
-                                    getVal(r, colMap.TERYY !== -1 ? colMap.TERYY : 11),
-                                    getVal(r, colMap.TERMM !== -1 ? colMap.TERMM : 12),
-                                    getVal(r, colMap.DEDAMT !== -1 ? colMap.DEDAMT : 13),
+                                    getVal(r, colMap.REGCODE !== -1 ? colMap.REGCODE : blankOffset + 0),
+                                    getVal(r, colMap.DIVCODE !== -1 ? colMap.DIVCODE : blankOffset + 1),
+                                    getVal(r, colMap.STACODE !== -1 ? colMap.STACODE : blankOffset + 2),
+                                    getVal(r, colMap.EMPNO !== -1 ? colMap.EMPNO : blankOffset + 3),
+                                    getVal(r, colMap.FNAME !== -1 ? colMap.FNAME : blankOffset + 4),
+                                    getVal(r, colMap.MI !== -1 ? colMap.MI : blankOffset + 5),
+                                    getVal(r, colMap.LNAME !== -1 ? colMap.LNAME : blankOffset + 6),
+                                    getVal(r, colMap.DEDCODE !== -1 ? colMap.DEDCODE : blankOffset + 7),
+                                    getVal(r, colMap.DEDID !== -1 ? colMap.DEDID : blankOffset + 8),
+                                    getVal(r, colMap.EFFYY !== -1 ? colMap.EFFYY : blankOffset + 9),
+                                    getVal(r, colMap.EFFMM !== -1 ? colMap.EFFMM : blankOffset + 10),
+                                    getVal(r, colMap.TERYY !== -1 ? colMap.TERYY : blankOffset + 11),
+                                    getVal(r, colMap.TERMM !== -1 ? colMap.TERMM : blankOffset + 12),
+                                    getVal(r, colMap.DEDAMT !== -1 ? colMap.DEDAMT : blankOffset + 13),
                                     "",
-                                    getVal(r, colMap.POLICYNO !== -1 ? colMap.POLICYNO : 15)
+                                    getVal(r, colMap.POLICYNO !== -1 ? colMap.POLICYNO : blankOffset + 15)
                                 ];
                             } else if (sheetConfig.id === "PLI") {
                                 if (rowIndex === 0) {
