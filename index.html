@@ -2090,10 +2090,11 @@
             if (lines.length < 2) return;
             const headerRow = parseCsvLine(lines[0]);
             const colIdxMap = {};
-            headerRow.forEach((col, idx) => { colIdxMap[col.toUpperCase()] = idx; });
-            const idxEmpNum = colIdxMap['EMPLOYEE NUMBER'] ?? 60;
-            const idxBranchName = colIdxMap['BRANCH NAME'] ?? 1;
-            const idxAcctName = colIdxMap['ACCOUNT NAME'] ?? 17;
+            headerRow.forEach((col, idx) => { colIdxMap[col.toUpperCase().trim()] = idx; });
+            // (2026-07-13) Multi-variant column key fallback; prev: single key EMPLOYEE NUMBER
+            const idxEmpNum = colIdxMap['EMPNO'] ?? colIdxMap['EMPLOYEE NUMBER'] ?? colIdxMap['EMP NO'] ?? 60;
+            const idxBranchName = colIdxMap['BRANCH NAME'] ?? colIdxMap['BRANCHNAME'] ?? colIdxMap['BRANCH'] ?? 1;
+            const idxAcctName = colIdxMap['ACCOUNT NAME'] ?? colIdxMap['ACCOUNTNAME'] ?? colIdxMap['ACCT NAME'] ?? colIdxMap['NAME'] ?? 17;
             for (let i = 1; i < lines.length; i++) {
                 const line = lines[i].trim();
                 if (!line) continue;
@@ -2116,11 +2117,17 @@
         row.push(line.slice(start));
         return row.map(cell => cell.replace(/^"|"$/g, '').trim());
     }
+    // (2026-07-13) Guard against empty lcsEmpMap before autocomplete; prev: silent fail
     function handleEmpAutocomplete(query, inputId) {
         const dropdown = document.getElementById('empAutocompleteDropdown');
         if (!dropdown) return;
         const q = query.trim().toUpperCase();
         if (!q || q.length < 2) { dropdown.style.display = 'none'; return; }
+        if (lcsEmpMap.size === 0) {
+            dropdown.innerHTML = '<div style="padding:10px 14px;color:rgba(255,255,255,0.45);font-size:0.75rem;">Loading employee list...</div>';
+            dropdown.style.display = 'block';
+            return;
+        }
         const matches = []; const isNumeric = /^\d+$/.test(q);
         const tokens = q.split(/[\s,]+/).filter(Boolean);
         for (const [empNumStr, acct] of lcsEmpMap.entries()) {

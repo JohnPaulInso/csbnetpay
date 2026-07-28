@@ -794,9 +794,11 @@ async function displayEmployeeInfoOnq(monthName, csvData) {
             monthRow.classList.add('accordion-toggle-row');
 
             // Calculate initial sum of DEDAMTs for this month
+            // (2026-07-13) Use dynamic colIdxs.dedAmt instead of hardcoded [13]; prev: data.csvData[i][13]
+            const colIdxsTotal = getOnqColIdxs(data.csvData[0]);
             let initialSum = 0;
             for (let i = 1; i < data.csvData.length; i++) {
-                initialSum += parseFloat(data.csvData[i][13]) || 0;
+                initialSum += parseFloat(data.csvData[i][colIdxsTotal.dedAmt]) || 0;
             }
 
             // FIX 2026-07-10: Arrow starts as chevron-right (collapsed state); becomes chevron-down when expanded

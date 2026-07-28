@@ -4234,14 +4234,17 @@
             for (let i = 0; i < window.currentData.onq.length; i++) {
                 const r = window.currentData.onq[i];
                 if (!r) continue;
-                const emp = normEmp(r[onqEmpIdx]) || normEmp(r[3]) || normEmp(r[4]);
-                if (emp && !onqEmpMap.has(emp)) {
-                    const amtCol = r[onqAmtIdx] !== undefined ? r[onqAmtIdx] : (r[13] !== undefined ? r[13] : r[14]);
-                    const codeCol = r[onqCodeIdx] !== undefined ? r[onqCodeIdx] : (r[7] !== undefined ? r[7] : r[8]);
+                const emp = normEmp(r[onqEmpIdx]) || normEmp(r[4]) || normEmp(r[3]);
+                if (emp && emp !== 'EMPNO') {
+                    const amtCol = r[onqAmtIdx] !== undefined ? r[onqAmtIdx] : (r[14] !== undefined ? r[14] : r[13]);
+                    const codeCol = r[onqCodeIdx] !== undefined ? r[onqCodeIdx] : (r[8] !== undefined ? r[8] : r[7]);
                     const code = String(codeCol || '').trim();
+                    const amtVal = safeFloat(amtCol);
+                    // (2026-07-13) Sum all ONQ rows per emp instead of first-only; prev: !has(emp) guard
+                    const prev = onqEmpMap.get(emp) || { amt: 0, isCSB: false };
                     onqEmpMap.set(emp, {
-                        amt: safeFloat(amtCol),
-                        isCSB: (code === '0339' || code === '339')
+                        amt: prev.amt + amtVal,
+                        isCSB: prev.isCSB || (code === '0339' || code === '339')
                     });
                 }
             }
@@ -4310,9 +4313,14 @@
                 return;
             }
 
-            <!-- (2026-07-13) Add Delete Netpay/Positive/Onqueue columns; prev: none -->
+            window.currentBranchRowsToRender = rowsToRender;
+            window.currentBranchRenderIndex = 50;
+
+            const initialChunk = rowsToRender.slice(0, 50);
+
+            // (2026-07-13) Incremental 50-row chunk rendering with scroll load; prev: all rows
             let html = `
-                <div class="table-responsive">
+                <div class="table-responsive" id="firstBillingScrollBox">
                     <table class="bank-table text-white w-100">
                         <thead>
                             <!-- (2026-07-13) Compact 60px Del Net/Pos/OnQ headers; prev: wide full text -->
@@ -4328,55 +4336,81 @@
                                 <th style="text-align: center;">Date</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            ${rowsToRender.map((r, idx) => `
-                                <tr>
-                                    <td data-label="#" style="text-align: center; color: rgba(255,255,255,0.55);" class="font-weight-bold">
-                                        ${idx + 1}
-                                    </td>
-                                    <!-- (2026-07-13) Clickable employee name for full profile breakdown; prev: text only -->
-                                    <td data-label="Name" class="font-weight-bold" style="cursor: pointer;" onclick="inspectEmployeeProfile('${r.empNumStr}')" title="Click to view full profile & calculation workspace">
-                                        <span class="text-warning text-underline" style="text-decoration: underline;">${r.clientName}</span>
-                                        <div style="font-size: 0.68rem; color: rgba(255,255,255,0.5);">ID: ${r.empNumStr}</div>
-                                    </td>
-                                    <td data-label="Monthly Amort" style="text-align: right;" class="tabular-nums font-weight-bold text-warning">
-                                        ${formatPHP(r.monthlyAmort)}
-                                    </td>
-                                    <td data-label="CSB Positive" style="text-align: right;" class="tabular-nums font-weight-bold text-success">
-                                        ${formatPHP(r.csbPositive)}
-                                    </td>
-                                    <td data-label="Delete NetPay" style="text-align: center; vertical-align: middle;">
-                                        <input type="checkbox" id="del-netpay-${r.empNumStr}" onchange="updateFirstBillingRowStatus('${r.empNumStr}')" style="cursor: pointer; transform: scale(1.15);">
-                                    </td>
-                                    <td data-label="Delete Positive" style="text-align: center; vertical-align: middle;">
-                                        <input type="checkbox" id="del-pos-${r.empNumStr}" onchange="updateFirstBillingRowStatus('${r.empNumStr}')" style="cursor: pointer; transform: scale(1.15);">
-                                    </td>
-                                    <td data-label="Delete OnQueue" style="text-align: center; vertical-align: middle;">
-                                        <input type="checkbox" id="del-onq-${r.empNumStr}" onchange="updateFirstBillingRowStatus('${r.empNumStr}')" style="cursor: pointer; transform: scale(1.15);">
-                                    </td>
-                                    <!-- (2026-07-13) Uniform 145px width status badges & select; prev: uneven sizes -->
-                                    <td data-label="Status" id="status-td-${r.empNumStr}" style="text-align: center; vertical-align: middle;">
-                                        ${r.statusMode === 'First CSB Onqueue' ? `
-                                            <span class="badge font-weight-bold" style="width: 145px !important; height: 30px !important; background: rgba(13,110,253,0.22); color: #3b82f6; border: 1px solid #3b82f6; border-radius: 6px; font-size: 0.72rem; display: inline-flex; align-items: center; justify-content: center; letter-spacing: 0.02em; margin: 0 auto;">First CSB Onqueue</span>
-                                        ` : (r.statusMode === 'Effected' ? `
-                                            <span class="badge font-weight-bold" style="width: 145px !important; height: 30px !important; background: rgba(40,167,69,0.22); color: #28a745; border: 1px solid #28a745; border-radius: 6px; font-size: 0.72rem; display: inline-flex; align-items: center; justify-content: center; letter-spacing: 0.02em; margin: 0 auto;">Effected</span>
-                                        ` : `
-                                            <select class="form-control form-control-sm font-weight-bold" style="width: 145px !important; height: 30px !important; line-height: 1.2 !important; margin: 0 auto; background: ${r.statusMode === 'As Ease' ? 'rgba(255,193,7,0.25)' : 'rgba(220,53,69,0.25)'}; color: ${r.statusMode === 'As Ease' ? '#ffc107' : '#dc3545'}; border: 1px solid ${r.statusMode === 'As Ease' ? '#ffc107' : '#dc3545'}; border-radius: 6px; font-size: 0.72rem; text-align: center; text-align-last: center;" onchange="this.style.background = this.value === 'As Ease' ? 'rgba(255,193,7,0.25)' : 'rgba(220,53,69,0.25)'; this.style.color = this.value === 'As Ease' ? '#ffc107' : '#dc3545'; this.style.borderColor = this.value === 'As Ease' ? '#ffc107' : '#dc3545';">
-                                                <option value="As Ease" ${r.statusMode === 'As Ease' ? 'selected' : ''}>As Ease</option>
-                                                <option value="For Review" ${r.statusMode === 'For Review' ? 'selected' : ''}>For Review</option>
-                                            </select>
-                                        `)}
-                                    </td>
-                                    <td data-label="Date" style="text-align: center;" class="text-white-50 small">
-                                        ${r.transDate}
-                                    </td>
-                                </tr>
-                            `).join('')}
+                        <tbody id="firstBillingTbody">
+                            ${initialChunk.map((r, idx) => generateBranchRowHtml(r, idx)).join('')}
                         </tbody>
                     </table>
                 </div>
             `;
             container.innerHTML = html;
+
+            const scrollBox = document.getElementById('firstBillingScrollBox');
+            if (scrollBox) {
+                scrollBox.addEventListener('scroll', function() {
+                    if (scrollBox.scrollTop + scrollBox.clientHeight >= scrollBox.scrollHeight - 200) {
+                        loadNextBranchRowChunk();
+                    }
+                });
+            }
+        }
+
+        function generateBranchRowHtml(r, idx) {
+            return `
+                <tr>
+                    <td data-label="#" style="text-align: center; color: rgba(255,255,255,0.55);" class="font-weight-bold">
+                        ${idx + 1}
+                    </td>
+                    <!-- (2026-07-13) Clickable employee name for full profile breakdown; prev: text only -->
+                    <td data-label="Name" class="font-weight-bold" style="cursor: pointer;" onclick="inspectEmployeeProfile('${r.empNumStr}')" title="Click to view full profile & calculation workspace">
+                        <span class="text-warning text-underline" style="text-decoration: underline;">${r.clientName}</span>
+                        <div style="font-size: 0.68rem; color: rgba(255,255,255,0.5);">ID: ${r.empNumStr}</div>
+                    </td>
+                    <td data-label="Monthly Amort" style="text-align: right;" class="tabular-nums font-weight-bold text-warning">
+                        ${formatPHP(r.monthlyAmort)}
+                    </td>
+                    <td data-label="CSB Positive" style="text-align: right;" class="tabular-nums font-weight-bold text-success">
+                        ${formatPHP(r.csbPositive)}
+                    </td>
+                    <td data-label="Delete NetPay" style="text-align: center; vertical-align: middle;">
+                        <input type="checkbox" id="del-netpay-${r.empNumStr}" onchange="updateFirstBillingRowStatus('${r.empNumStr}')" style="cursor: pointer; transform: scale(1.15);">
+                    </td>
+                    <td data-label="Delete Positive" style="text-align: center; vertical-align: middle;">
+                        <input type="checkbox" id="del-pos-${r.empNumStr}" onchange="updateFirstBillingRowStatus('${r.empNumStr}')" style="cursor: pointer; transform: scale(1.15);">
+                    </td>
+                    <td data-label="Delete OnQueue" style="text-align: center; vertical-align: middle;">
+                        <input type="checkbox" id="del-onq-${r.empNumStr}" onchange="updateFirstBillingRowStatus('${r.empNumStr}')" style="cursor: pointer; transform: scale(1.15);">
+                    </td>
+                    <!-- (2026-07-13) Uniform 145px width status badges & select; prev: uneven sizes -->
+                    <td data-label="Status" id="status-td-${r.empNumStr}" style="text-align: center; vertical-align: middle;">
+                        ${r.statusMode === 'First CSB Onqueue' ? `
+                            <span class="badge font-weight-bold" style="width: 145px !important; height: 30px !important; background: rgba(13,110,253,0.22); color: #3b82f6; border: 1px solid #3b82f6; border-radius: 6px; font-size: 0.72rem; display: inline-flex; align-items: center; justify-content: center; letter-spacing: 0.02em; margin: 0 auto;">First CSB Onqueue</span>
+                        ` : (r.statusMode === 'Effected' ? `
+                            <span class="badge font-weight-bold" style="width: 145px !important; height: 30px !important; background: rgba(40,167,69,0.22); color: #28a745; border: 1px solid #28a745; border-radius: 6px; font-size: 0.72rem; display: inline-flex; align-items: center; justify-content: center; letter-spacing: 0.02em; margin: 0 auto;">Effected</span>
+                        ` : `
+                            <select class="form-control form-control-sm font-weight-bold" style="width: 145px !important; height: 30px !important; line-height: 1.2 !important; margin: 0 auto; background: ${r.statusMode === 'As Ease' ? 'rgba(255,193,7,0.25)' : 'rgba(220,53,69,0.25)'}; color: ${r.statusMode === 'As Ease' ? '#ffc107' : '#dc3545'}; border: 1px solid ${r.statusMode === 'As Ease' ? '#ffc107' : '#dc3545'}; border-radius: 6px; font-size: 0.72rem; text-align: center; text-align-last: center;" onchange="this.style.background = this.value === 'As Ease' ? 'rgba(255,193,7,0.25)' : 'rgba(220,53,69,0.25)'; this.style.color = this.value === 'As Ease' ? '#ffc107' : '#dc3545'; this.style.borderColor = this.value === 'As Ease' ? '#ffc107' : '#dc3545';">
+                                <option value="As Ease" ${r.statusMode === 'As Ease' ? 'selected' : ''}>As Ease</option>
+                                <option value="For Review" ${r.statusMode === 'For Review' ? 'selected' : ''}>For Review</option>
+                            </select>
+                        `)}
+                    </td>
+                    <td data-label="Date" style="text-align: center;" class="text-white-50 small">
+                        ${r.transDate}
+                    </td>
+                </tr>
+            `;
+        }
+
+        function loadNextBranchRowChunk() {
+            if (!window.currentBranchRowsToRender) return;
+            const tbody = document.getElementById('firstBillingTbody');
+            if (!tbody) return;
+            const start = window.currentBranchRenderIndex || 0;
+            if (start >= window.currentBranchRowsToRender.length) return;
+            const end = start + 50;
+            const chunk = window.currentBranchRowsToRender.slice(start, end);
+            window.currentBranchRenderIndex = end;
+            const html = chunk.map((r, idx) => generateBranchRowHtml(r, start + idx)).join('');
+            tbody.insertAdjacentHTML('beforeend', html);
         }
         // (2026-07-13) Live updateFirstBillingRowStatus handler; prev: none
         function updateFirstBillingRowStatus(empNumStr) {
@@ -5558,25 +5592,36 @@
             }
         }
 
-        // Unified multi-file asynchronous data ingestion pipeline
+        // (2026-07-13) In-memory caching for CSV text & parsed rows; prev: no caching
+        window.csvTextCache = window.csvTextCache || new Map();
+        window.csvParsedCache = window.csvParsedCache || new Map();
+
         async function fetchCSVText(filename) {
+            if (window.csvTextCache.has(filename)) {
+                return window.csvTextCache.get(filename);
+            }
             const response = await fetch(filename);
             if (!response.ok) throw new Error(`HTTP Error: Could not read ${filename}`);
-            return await response.text();
+            const text = await response.text();
+            window.csvTextCache.set(filename, text);
+            return text;
         }
 
         // Parse standard CSV columns
         function parseCSV(text) {
+            if (window.csvParsedCache.has(text)) {
+                return window.csvParsedCache.get(text);
+            }
             const lines = text.split('\n');
             const result = [];
-            for (let line of lines) {
-                line = line.trim();
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i].trim();
                 if (!line) continue;
                 const row = [];
                 let inQuotes = false;
                 let current = '';
-                for (let i = 0; i < line.length; i++) {
-                    const char = line[i];
+                for (let j = 0; j < line.length; j++) {
+                    const char = line[j];
                     if (char === '"') {
                         inQuotes = !inQuotes;
                     } else if (char === ',' && !inQuotes) {
@@ -5589,6 +5634,7 @@
                 row.push(current.trim());
                 result.push(row.map(cell => cell.replace(/^"|"$/g, '').trim()));
             }
+            window.csvParsedCache.set(text, result);
             return result;
         }
         /* (2026-07-13) Reset inputs on new search to clear old values; prev: none */
@@ -6012,6 +6058,8 @@
             const onqMap = {};
             onqH.forEach((c, i) => { onqMap[String(c || '').toUpperCase().trim()] = i; });
             const empNoIdx = onqMap['EMPNO'] ?? (onqH.findIndex(c => String(c).toUpperCase().trim().includes('EMP')) !== -1 ? onqH.findIndex(c => String(c).toUpperCase().trim().includes('EMP')) : 3);
+            // (2026-07-13) Add missing dedAmtIdx from onqMap; prev: undefined variable causing 0 total
+            const dedAmtIdx = onqMap['DEDAMT'] ?? (onqH.findIndex(c => String(c).toUpperCase().trim() === 'DEDAMT') !== -1 ? onqH.findIndex(c => String(c).toUpperCase().trim() === 'DEDAMT') : 14);
             // (2026-07-13) Fix duplicate targetEmpNum identifier syntax error; prev: targetEmpNum
             const searchEmpNum = normEmpNo(empNum);
             const matchingOnq = [];
@@ -9607,12 +9655,15 @@
                 if (opt.selected) optDiv.classList.add('selected');
                 optDiv.textContent = opt.textContent;
                 optDiv.setAttribute('data-value', opt.value);
+                // (2026-07-13) Close custom select menu before async change dispatch; prev: sync
                 optDiv.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    select.value = opt.value;
-                    select.dispatchEvent(new Event('change'));
                     wrapper.classList.remove('open');
+                    select.value = opt.value;
                     syncSelectOptions(select, wrapper);
+                    setTimeout(() => {
+                        select.dispatchEvent(new Event('change'));
+                    }, 15);
                 });
                 optionsContainer.appendChild(optDiv);
             });
