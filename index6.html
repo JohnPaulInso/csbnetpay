@@ -3389,6 +3389,10 @@
                         <button id="btnRotateView" class="btn btn-sm btn-outline-warning font-weight-bold" onclick="toggleTableOrientation()" title="Toggle Horizontal Rotate View" style="font-size: 0.72rem; padding: 2px 8px;">
                             <i class="bi bi-arrow-repeat mr-1"></i>Rotate View
                         </button>
+                        <!-- (2026-07-30) Export tagged rows button; prev: none -->
+                        <button id="btnExportTagged" class="btn btn-sm font-weight-bold ml-2" onclick="exportTaggedRows()" title="Export checked rows to text file" style="font-size: 0.72rem; padding: 2px 10px; background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid #34d399; border-radius: 6px;">
+                            <i class="bi bi-download mr-1"></i>Export Tagged
+                        </button>
                     </div>
                     <span class="badge badge-warning" style="font-size: 0.7rem; padding: 4px 8px;">RPSU.575 & XFRRPSU.5Y.7.5.CONS.ANIV</span>
                 </div>
@@ -4402,6 +4406,8 @@
                                 <th style="width: 60px; text-align: center; font-size: 0.70rem;" title="Exclude OnQueue from criteria formula">Del OnQ</th>
                                 <th style="width: 155px; text-align: center;">Status</th>
                                 <th style="text-align: center;">Date</th>
+                                <!-- (2026-07-30) Tag column header for persistent checkbox; prev: none -->
+                                <th style="width: 50px; text-align: center; font-size: 0.70rem; color: #34d399;" title="Tag this row for export">Tag</th>
                             </tr>
                         </thead>
                         <tbody id="firstBillingTbody">
@@ -4423,15 +4429,20 @@
         }
 
         function generateBranchRowHtml(r, idx) {
+            // (2026-07-30) Green tint if row is tagged; prev: no tint
+            const isTagged = (()=>{ try{ const t=JSON.parse(localStorage.getItem('billing_tags')||'{}'); return !!t[r.empNumStr]; }catch(e){return false;} })();
             return `
-                <tr>
+                <tr id="billing-row-${r.empNumStr}" style="transition: background 0.2s ease; ${isTagged ? 'background: rgba(52,211,153,0.08);' : ''}">
                     <td data-label="#" style="text-align: center; color: rgba(255,255,255,0.55);" class="font-weight-bold">
                         ${idx + 1}
                     </td>
-                    <!-- (2026-07-13) Clickable employee name for full profile breakdown; prev: text only -->
-                    <td data-label="Name" class="font-weight-bold" style="cursor: pointer;" onclick="inspectEmployeeProfile('${r.empNumStr}')" title="Click to view full profile & calculation workspace">
-                        <span class="text-warning text-underline" style="text-decoration: underline;">${r.clientName}</span>
-                        <div style="font-size: 0.68rem; color: rgba(255,255,255,0.5);">ID: ${r.empNumStr}</div>
+                    <!-- (2026-07-30) Only name span clickable, no underline; ID has copy icon; prev: whole cell clickable with underline -->
+                    <td data-label="Name" class="font-weight-bold" style="cursor: default;">
+                        <span class="text-warning" style="cursor: pointer;" onclick="inspectEmployeeProfile('${r.empNumStr}')" title="Click to view full profile &amp; calculation workspace">${r.clientName}</span>
+                        <div style="font-size: 0.68rem; color: rgba(255,255,255,0.5); display: flex; align-items: center; gap: 5px; cursor: pointer;" onclick="navigator.clipboard.writeText('${r.empNumStr}')" title="Click to copy ID">
+                            ID: ${r.empNumStr}
+                            <i class="bi bi-copy" style="font-size: 0.62rem; color: rgba(255,255,255,0.35); pointer-events: none;"></i>
+                        </div>
                     </td>
                     <td data-label="Monthly Amort" style="text-align: right;" class="tabular-nums font-weight-bold text-warning">
                         ${formatPHP(r.monthlyAmort)}
@@ -4463,6 +4474,13 @@
                     </td>
                     <td data-label="Date" style="text-align: center;" class="text-white-50 small">
                         ${r.transDate}
+                    </td>
+                    <!-- (2026-07-30) Persistent tag checkbox column; prev: none -->
+                    <td data-label="Tag" style="text-align: center; vertical-align: middle;">
+                        <input type="checkbox" id="tag-row-${r.empNumStr}"
+                            ${(()=>{ try{ const t=JSON.parse(localStorage.getItem('billing_tags')||'{}'); return t[r.empNumStr] ? 'checked' : ''; }catch(e){return '';} })()}
+                            onchange="toggleBillingTag('${r.empNumStr}', this.checked)"
+                            style="cursor: pointer; transform: scale(1.3); accent-color: #34d399;">
                     </td>
                 </tr>
             `;
@@ -4519,6 +4537,59 @@
                     `;
                 }
             }
+        }
+
+        // (2026-07-30) Save/clear tag checkbox state to localStorage; prev: none
+        function toggleBillingTag(empNumStr, isChecked) {
+            try {
+                const tags = JSON.parse(localStorage.getItem('billing_tags') || '{}');
+                if (isChecked) {
+                    tags[empNumStr] = true;
+                } else {
+                    delete tags[empNumStr];
+                }
+                localStorage.setItem('billing_tags', JSON.stringify(tags));
+                // (2026-07-30) Apply/remove green tint on row live; prev: no visual feedback
+                const row = document.getElementById(`billing-row-${empNumStr}`);
+                if (row) row.style.background = isChecked ? 'rgba(52,211,153,0.08)' : '';
+            } catch(e) { console.warn('toggleBillingTag error', e); }
+        }
+
+        // (2026-07-30) Export tagged rows to a plain-text notepad file; prev: none
+        function exportTaggedRows() {
+            try {
+                const tags = JSON.parse(localStorage.getItem('billing_tags') || '{}');
+                const taggedIds = Object.keys(tags).filter(k => tags[k]);
+                if (taggedIds.length === 0) {
+                    alert('No rows are tagged. Check the Tag column checkboxes first.');
+                    return;
+                }
+                const rows = window.currentBranchRowsToRender || [];
+                // (2026-07-30) Single-line per row format; prev: multi-line block per row
+                const header = `ID\tName\tMonthly Amort\tCSB Positive\tDel Net\tDate`;
+                const lines = [`TAGGED BILLING ROWS EXPORT — ${new Date().toLocaleString()}`, '='.repeat(80), header];
+                let found = 0;
+                taggedIds.forEach(empId => {
+                    const r = rows.find(x => x.empNumStr === empId);
+                    if (!r) return;
+                    found++;
+                    const delNet = document.getElementById(`del-netpay-${empId}`)?.checked ? 'YES' : 'NO';
+                    lines.push(`${empId}\t${r.clientName}\t${r.monthlyAmort.toFixed(2)}\t${r.csbPositive.toFixed(2)}\t${delNet}\t${r.transDate}`);
+                });
+                if (found === 0) {
+                    alert('Tagged IDs not found in current loaded rows. Load the branch table first.');
+                    return;
+                }
+                lines.push('='.repeat(80));
+                lines.push(`Total Tagged: ${found}`);
+                const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `tagged_billing_${new Date().toISOString().slice(0,10)}.txt`;
+                a.click();
+                URL.revokeObjectURL(url);
+            } catch(e) { console.error('exportTaggedRows error', e); alert('Export failed: ' + e.message); }
         }
 
         // (2026-07-13) Drill-down inspectEmployeeProfile handler; prev: batch only
