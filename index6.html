@@ -2210,7 +2210,8 @@
             /* [2026-07-13 Fix: Reduced bottom nav blur from 18px to 10px normal glass blur to resolve mobile scrolling/render lag] */
             backdrop-filter: blur(10px) !important;
             -webkit-backdrop-filter: blur(10px) !important;
-            display: none !important; /* Hide on desktop */
+            /* (2026-07-30) Show bottom-nav on tablet+mobile (≤1024px); prev: hide on desktop only */
+            display: none !important; /* Hidden by default; shown via media query */
             justify-content: space-around !important;
             padding: 10px 0 !important;
             border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
@@ -2249,6 +2250,7 @@
             text-shadow: 0 0 10px rgba(245, 158, 11, 0.3) !important;
         }
 
+        /* (2026-07-30) Tablet layout: show bottom-nav, adjust body/nav/container; prev: no tablet block */
         @media (max-width: 1024px) {
             .col-lg-6 {
                 width: 100% !important;
@@ -2259,12 +2261,58 @@
                 overflow-x: auto !important;
                 -webkit-overflow-scrolling: touch;
             }
+            /* Show bottom-nav on tablets (800px–1024px) */
+            .bottom-nav {
+                display: flex !important;
+            }
+            /* Add padding for fixed mobile header + bottom-nav on tablet */
+            body {
+                padding-top: 56px !important;
+                padding-bottom: 80px !important;
+            }
+            /* Show mobile header on tablet, hide desktop nav */
+            .mobile-header {
+                display: flex !important;
+                background-color: rgba(15, 23, 42, 0.9) !important;
+                backdrop-filter: blur(12px) !important;
+                -webkit-backdrop-filter: blur(12px) !important;
+                padding: 12px 24px !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                height: 56px !important;
+                z-index: 1001 !important;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+            }
+            /* Hide desktop nav on tablet */
+            nav {
+                display: none !important;
+            }
+            /* Tablet container padding */
+            .container, .container-xl {
+                padding-left: 20px !important;
+                padding-right: 20px !important;
+            }
+            /* Comfortable card spacing on tablet */
+            .card, .bank-card, .phase-block {
+                margin-bottom: 16px !important;
+            }
+            /* Tablet summary card grid: 2 columns side-by-side */
+            .semitotal-summary-wrapper,
+            .incoming-adjustment-wrapper,
+            .amortization-summary-wrapper,
+            .newnetpay-summary-wrapper {
+                flex: 0 0 50% !important;
+                max-width: 50% !important;
+            }
         }
 
         @media (max-width: 768px) {
-            .bottom-nav {
-                display: flex !important; /* Show bottom-nav on mobile only */
-            }
+            /* (2026-07-30) Mobile-only overrides; bottom-nav already shown via ≤1024px block */
 
             /* [2026-07-11 Old:
             .bank-table, .bank-table thead, .bank-table tbody, .bank-table th, .bank-table td, .bank-table tr {
@@ -3849,12 +3897,7 @@
                 </button>
             </div>
 
-            <!-- (2026-07-13) Replaced clear cache with delete cookies & site data reload button; prev: clear cache -->
-            <div class="d-flex justify-content-center" style="margin-top: 60px; margin-bottom: 24px;">
-                <button type="button" class="btn font-weight-bold" id="btn-clear-cache" onclick="clearAllDataAndReload();" style="border: 1px solid rgba(239, 68, 68, 0.5); color: #FCA5A5; background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.3)); padding: 10px 24px; border-radius: 8px; font-size: 0.82rem; letter-spacing: 0.05em; transition: all 0.25s ease; box-shadow: 0 4px 14px rgba(220,38,38,0.25);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 18px rgba(220,38,38,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 14px rgba(220,38,38,0.25)';">
-                    <i class="bi bi-trash3-fill mr-2"></i>DELETE COOKIES &amp; SITE DATA &amp; RELOAD
-                </button>
-            </div>
+
 
             <!-- Full-width Bottom Panel: Computation State History Logger -->
             <div class="bottom-history-panel" id="historyLogPanel">
@@ -3959,6 +4002,31 @@
             <i class="bi bi-person-vcard-fill"></i>
             <span>BILLING</span>
         </a>
+    </div>
+
+    <!-- (2026-07-30) Improved bottom clear cache button at very end of page; prev: mid-page placement -->
+    <div style="padding: 2rem 1rem 3rem; text-align: center;">
+        <button id="btn-clear-cache" onclick="clearAllDataAndReload()" style="
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            color: #FCA5A5;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.3));
+            padding: 12px 28px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 14px rgba(220,38,38,0.25);
+            transition: all 0.25s ease;
+        " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 18px rgba(220,38,38,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 14px rgba(220,38,38,0.25)';">
+            <i class="bi bi-trash3-fill mr-2"></i>DELETE COOKIES &amp; SITE DATA &amp; RELOAD
+        </button>
+        <div style="margin-top: 0.5rem; font-size: 0.75rem; color: #6c757d;">
+            Clears all cookies, local data, service worker cache, and reloads page
+        </div>
     </div>
 
     <!-- JavaScript logical matrix code -->
