@@ -3379,15 +3379,15 @@
             <div id="loadingIndicator" class="mt-4 d-none" style="display: none !important;"></div>
             <div id="lcsProfileCard" class="mt-3 d-none" style="display: none !important;"></div>
 
-            <!-- (2026-07-13) Add rotate view toggle button; prev: badge only -->
-            <div id="firstBillingSummaryCard" class="bank-card mt-3 mb-3" style="background: rgba(12, 16, 36, 0.95); border: 1px solid rgba(255, 165, 0, 0.3); border-radius: 12px; padding: 16px;">
+            <!-- (2026-07-13) Default card to horizontal landscape mode; prev: standard mode -->
+            <div id="firstBillingSummaryCard" class="bank-card mt-3 mb-3 rotated-landscape-mode" style="background: rgba(12, 16, 36, 0.95); border: 1px solid rgba(255, 165, 0, 0.3); border-radius: 12px; padding: 16px;">
                 <div class="d-flex justify-content-between align-items-center mb-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 8px;">
                     <div class="d-flex align-items-center">
                         <div class="font-weight-bold text-warning mr-3" style="font-size: 0.95rem; letter-spacing: 0.03em;">
                             <i class="bi bi-file-earmark-spreadsheet text-warning mr-2"></i>FIRST BILLING ACCOUNTS
                         </div>
                         <button id="btnRotateView" class="btn btn-sm btn-outline-warning font-weight-bold" onclick="toggleTableOrientation()" title="Toggle Horizontal Rotate View" style="font-size: 0.72rem; padding: 2px 8px;">
-                            <i class="bi bi-arrow-repeat mr-1"></i>Rotate View
+                            <i class="bi bi-aspect-ratio mr-1"></i>Standard View
                         </button>
                         <!-- (2026-07-30) Export tagged rows button; prev: none -->
                         <button id="btnExportTagged" class="btn btn-sm font-weight-bold ml-2" onclick="exportTaggedRows()" title="Export checked rows to text file" style="font-size: 0.72rem; padding: 2px 10px; background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid #34d399; border-radius: 6px;">
@@ -4604,6 +4604,7 @@
             if (evalWorkspace) evalWorkspace.scrollIntoView({ behavior: 'smooth' });
         }
 
+        // (2026-07-13) Toggle rotation mode defaulted to horizontal; prev: standard default
         function toggleTableOrientation() {
             const card = document.getElementById('firstBillingSummaryCard');
             if (card) {

@@ -3439,7 +3439,8 @@
                                             Amortization period from 6 to 84 months.
                                         </span>
                                     </div>
-                                    <select id="loanTerm" class="form-control bank-select tabular-nums" onchange="runCalculations()">
+                                    <!-- (2026-07-13) Trigger term rate auto-select & save default 60m; prev: runCalculations only -->
+                                    <select id="loanTerm" class="form-control bank-select tabular-nums" onchange="onLoanTermChange(); runCalculations();">
                                     </select>
                                 </div>
                                 <div class="col-6 px-2">
@@ -3450,9 +3451,10 @@
                                             Lending rate. Defaults to 7.5%.
                                         </span>
                                     </div>
-                                    <!-- [2026-07-11 New: Dropdown selector for interest rate (7.5%, 9%, 9.66%, 12%, and Custom)] -->
+                                    <!-- (2026-07-13) Add 8.5% interest option; prev: 7.5%, 9%, 9.66%, 12% options -->
                                     <select id="interestRateSelect" class="form-control bank-select tabular-nums font-weight-bold text-white" onchange="onInterestRateSelectChange(); runCalculations();">
                                         <option value="7.5" selected>7.5%</option>
+                                        <option value="8.5">8.5%</option>
                                         <option value="9">9%</option>
                                         <option value="9.66">9.66%</option>
                                         <option value="12">12%</option>
@@ -5282,6 +5284,8 @@
         /* [2026-07-11 Fix: buildLoanTermOptions extends select list up to 84 months, defaulting to 60 months selected] */
         function buildLoanTermOptions() {
             const termSelect = document.getElementById('loanTerm');
+            if (!termSelect) return;
+            const currentVal = termSelect.value;
             termSelect.innerHTML = '';
             for (let t = 6; t <= 84; t++) {
                 const opt = document.createElement('option');
@@ -5290,6 +5294,8 @@
                 if (t === 60) opt.selected = true;
                 termSelect.appendChild(opt);
             }
+            // (2026-07-13) Preserve value or default explicitly to 60m; prev: fallback to index 0 (6m)
+            termSelect.value = (currentVal && currentVal !== '0') ? currentVal : "60";
             if (typeof syncAllCustomDropdowns === 'function') {
                 syncAllCustomDropdowns();
             }
@@ -5539,6 +5545,10 @@
                 delete loanAmtEl.dataset.manualOverride;
                 loanAmtEl.value = "0";
             }
+
+            // (2026-07-13) Reset loanTerm default value to 60; prev: omitted
+            const loanTermResetEl = document.getElementById('loanTerm');
+            if (loanTermResetEl) loanTermResetEl.value = "60";
 
             const toggleMaster = document.getElementById('toggleMasterPli');
             if (toggleMaster) {
@@ -6459,7 +6469,10 @@
 
             // (2026-07-13) Use let so suggestion can update it before PMT; prev: const
             let loanAmount = safeFloat(document.getElementById('loanAmount').value.replace(/,/g,''));
-            const loanTerm = safeInt(document.getElementById('loanTerm').value);
+            // (2026-07-13) Ensure default 60 months term fallback; prev: un-guarded safeInt
+            const loanTermEl = document.getElementById('loanTerm');
+            let loanTerm = safeInt(loanTermEl ? loanTermEl.value : 60);
+            if (!loanTerm || loanTerm <= 0) { loanTerm = 60; if (loanTermEl) loanTermEl.value = "60"; }
             const interestRate = getInterestRateValue();
 
             // Toggle autonomous input wrapper visibility
@@ -7803,6 +7816,34 @@
             calculateNetProceeds();
         }
 
+        // (2026-07-13) Auto-set interest rate based on loan term range; prev: manual interest select
+        function onLoanTermChange() {
+            const termEl = document.getElementById('loanTerm');
+            if (!termEl) return;
+            let term = safeInt(termEl.value);
+            if (!term || term <= 0) {
+                term = 60;
+                termEl.value = '60';
+            }
+            const selectRateEl = document.getElementById('interestRateSelect');
+            const customWrapper = document.getElementById('customInterestRateWrapper');
+            if (selectRateEl) {
+                if (term >= 73 && term <= 84) {
+                    selectRateEl.value = "9.66";
+                    if (customWrapper) customWrapper.classList.add('d-none');
+                } else if (term >= 61 && term <= 72) {
+                    selectRateEl.value = "8.5";
+                    if (customWrapper) customWrapper.classList.add('d-none');
+                } else if (term <= 60) {
+                    selectRateEl.value = "7.5";
+                    if (customWrapper) customWrapper.classList.add('d-none');
+                }
+            }
+            if (typeof syncAllCustomDropdowns === 'function') {
+                syncAllCustomDropdowns();
+            }
+        }
+
         // [2026-07-11 New: Toggles visibility of the custom interest rate input based on selected dropdown option]
         function onInterestRateSelectChange() {
             const selectEl = document.getElementById('interestRateSelect');
@@ -8002,6 +8043,19 @@
             const isAfterRedemptionNegative = afterRedemptionVal.includes('-');
             const isNewNetPayNegative = newNetPay.includes('-');
 
+            /* (2026-07-13) Include redemption, anticipated, promo in email summary; prev: omitted */
+            const isAutonomous = (evalMode === 'AUTONOMOUS');
+            const redemptionVal = isAutonomous 
+                ? formatPHP(safeFloat(document.getElementById('input-redemption')?.value)) 
+                : (document.getElementById('val-baseline-papsubtotal')?.innerText || '₱0.00');
+            const anticipatedVal = isAutonomous 
+                ? formatPHP(safeFloat(document.getElementById('input-anticipated')?.value)) 
+                : (document.getElementById('val-anticipated-receipt')?.innerText || document.getElementById('val-anticipated')?.innerText || '₱0.00');
+            const promotionVal = isAutonomous 
+                ? formatPHP(safeFloat(document.getElementById('input-promotion')?.value)) 
+                : (document.getElementById('val-promotion-receipt')?.innerText || '₱0.00');
+            const subtotalAfterRedemption = document.getElementById('val-subtotal-after-redemption')?.innerText || '₱0.00';
+
             const plainText = [
                 'CSB LOAN EVALUATION SUMMARY',
                 'Employee No: ' + empNum,
@@ -8024,6 +8078,10 @@
                 'Current Net Pay: ' + currentNetPay,
                 'CSB Deductions: ' + csbDeductions,
                 'Subtotal: ' + subtotal,
+                'Redemption: ' + redemptionVal,
+                'Anticipated: ' + anticipatedVal,
+                'Promotion: ' + promotionVal,
+                'Subtotal After Redemption: ' + subtotalAfterRedemption,
                 'Less OnQueue: ' + lessOnQueue,
                 'Less Incoming: ' + lessIncoming,
                 'Total Subtotal: ' + totalSubtotal,
@@ -8126,6 +8184,10 @@
                 '          <tr><td style="color:#1F2937 !important; border-bottom:1px solid #E5E7EB;" bgcolor="#F9FAFB"><font color="#1F2937"><b style="color:#1F2937 !important; -webkit-text-fill-color:#1F2937 !important;">Current Net Pay</b></font></td><td align="right" style="color:#1F2937 !important; font-weight:800; font-family:\'Montserrat\',sans-serif; border-bottom:1px solid #E5E7EB;" bgcolor="#F9FAFB"><font color="#1F2937"><b style="color:#1F2937 !important; -webkit-text-fill-color:#1F2937 !important;">' + currentNetPay + '</b></font></td></tr>',
                 '          <tr><td style="color:#1F2937 !important; border-bottom:1px solid #E5E7EB;" bgcolor="#F9FAFB"><font color="#1F2937"><b style="color:#1F2937 !important; -webkit-text-fill-color:#1F2937 !important;">CSB Deductions</b></font></td><td align="right" style="color:#1F2937 !important; font-weight:800; font-family:\'Montserrat\',sans-serif; border-bottom:1px solid #E5E7EB;" bgcolor="#F9FAFB"><font color="#1F2937"><b style="color:#1F2937 !important; -webkit-text-fill-color:#1F2937 !important;">' + csbDeductions + '</b></font></td></tr>',
                 '          <tr style="background-color:#FEF3C7;" bgcolor="#FEF3C7"><td style="color:#D97706 !important; font-weight:800; background-color:#FEF3C7;" bgcolor="#FEF3C7"><font color="#D97706"><b style="color:#D97706 !important; -webkit-text-fill-color:#D97706 !important;">SUBTOTAL</b></font></td><td align="right" style="color:#D97706 !important; font-weight:800; font-size:12px; font-family:\'Montserrat\',sans-serif; background-color:#FEF3C7;" bgcolor="#FEF3C7"><font color="#D97706"><b style="color:#D97706 !important; -webkit-text-fill-color:#D97706 !important;">' + subtotal + '</b></font></td></tr>',
+                '          <tr><td style="color:#1F2937 !important; border-bottom:1px solid #E5E7EB;" bgcolor="#F9FAFB"><font color="#1F2937"><b style="color:#1F2937 !important; -webkit-text-fill-color:#1F2937 !important;">Redemption</b></font></td><td align="right" style="color:#1F2937 !important; font-weight:800; font-family:\'Montserrat\',sans-serif; border-bottom:1px solid #E5E7EB;" bgcolor="#F9FAFB"><font color="#1F2937"><b style="color:#1F2937 !important; -webkit-text-fill-color:#1F2937 !important;">' + redemptionVal + '</b></font></td></tr>',
+                '          <tr><td style="color:#1F2937 !important; border-bottom:1px solid #E5E7EB;" bgcolor="#F9FAFB"><font color="#1F2937"><b style="color:#1F2937 !important; -webkit-text-fill-color:#1F2937 !important;">Anticipated</b></font></td><td align="right" style="color:#1F2937 !important; font-weight:800; font-family:\'Montserrat\',sans-serif; border-bottom:1px solid #E5E7EB;" bgcolor="#F9FAFB"><font color="#1F2937"><b style="color:#1F2937 !important; -webkit-text-fill-color:#1F2937 !important;">' + anticipatedVal + '</b></font></td></tr>',
+                '          <tr><td style="color:#1F2937 !important; border-bottom:1px solid #E5E7EB;" bgcolor="#F9FAFB"><font color="#1F2937"><b style="color:#1F2937 !important; -webkit-text-fill-color:#1F2937 !important;">Promotion</b></font></td><td align="right" style="color:#1F2937 !important; font-weight:800; font-family:\'Montserrat\',sans-serif; border-bottom:1px solid #E5E7EB;" bgcolor="#F9FAFB"><font color="#1F2937"><b style="color:#1F2937 !important; -webkit-text-fill-color:#1F2937 !important;">' + promotionVal + '</b></font></td></tr>',
+                '          <tr style="background-color:#FEF3C7;" bgcolor="#FEF3C7"><td style="color:#D97706 !important; font-weight:800; background-color:#FEF3C7;" bgcolor="#FEF3C7"><font color="#D97706"><b style="color:#D97706 !important; -webkit-text-fill-color:#D97706 !important;">SUBTOTAL AFTER REDEMPTION</b></font></td><td align="right" style="color:#D97706 !important; font-weight:800; font-size:12px; font-family:\'Montserrat\',sans-serif; background-color:#FEF3C7;" bgcolor="#FEF3C7"><font color="#D97706"><b style="color:#D97706 !important; -webkit-text-fill-color:#D97706 !important;">' + subtotalAfterRedemption + '</b></font></td></tr>',
                 '          <tr><td style="color:#1F2937 !important; border-bottom:1px solid #E5E7EB;" bgcolor="#F9FAFB"><font color="#1F2937"><b style="color:#1F2937 !important; -webkit-text-fill-color:#1F2937 !important;">Less OnQueue</b></font></td><td align="right" style="color:#1F2937 !important; font-weight:800; font-family:\'Montserrat\',sans-serif; border-bottom:1px solid #E5E7EB;" bgcolor="#F9FAFB"><font color="#1F2937"><b style="color:#1F2937 !important; -webkit-text-fill-color:#1F2937 !important;">' + lessOnQueue + '</b></font></td></tr>',
                 '          <tr><td style="color:#1F2937 !important; border-bottom:1px solid #E5E7EB;" bgcolor="#F9FAFB"><font color="#1F2937"><b style="color:#1F2937 !important; -webkit-text-fill-color:#1F2937 !important;">Less Incoming</b></font></td><td align="right" style="color:#1F2937 !important; font-weight:800; font-family:\'Montserrat\',sans-serif; border-bottom:1px solid #E5E7EB;" bgcolor="#F9FAFB"><font color="#1F2937"><b style="color:#1F2937 !important; -webkit-text-fill-color:#1F2937 !important;">' + lessIncoming + '</b></font></td></tr>',
                 '          <tr style="background-color:#FEF3C7;" bgcolor="#FEF3C7"><td style="color:#D97706 !important; font-weight:800; background-color:#FEF3C7;" bgcolor="#FEF3C7"><font color="#D97706"><b style="color:#D97706 !important; -webkit-text-fill-color:#D97706 !important;">TOTAL SUBTOTAL</b></font></td><td align="right" style="color:#D97706 !important; font-weight:800; font-size:12px; font-family:\'Montserrat\',sans-serif; background-color:#FEF3C7;" bgcolor="#FEF3C7"><font color="#D97706"><b style="color:#D97706 !important; -webkit-text-fill-color:#D97706 !important;">' + totalSubtotal + '</b></font></td></tr>',
@@ -8803,11 +8865,12 @@
             const loanTermEl = document.getElementById('loanTerm');
             if (loanTermEl) loanTermEl.value = state.loanTerm;
             // Restore interest rate select/custom values
+            // (2026-07-13) Include 8.5 in preset rates array; prev: 7.5, 9, 9.66, 12
             const selectEl = document.getElementById('interestRateSelect');
             const customInput = document.getElementById('interestRateCustom');
             const wrapper = document.getElementById('customInterestRateWrapper');
             if (selectEl) {
-                const presetRates = [7.5, 9, 9.66, 12];
+                const presetRates = [7.5, 8.5, 9, 9.66, 12];
                 if (presetRates.includes(state.interestRate)) {
                     selectEl.value = state.interestRate.toString();
                     if (wrapper) wrapper.classList.add('d-none');
