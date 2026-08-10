@@ -4339,17 +4339,96 @@
             return '₱' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
+        // (2026-07-13) Dynamic latest LCS file lookup; prev: static SUNLINE LCS.csv
+        function parseLcsFileDate(filename) {
+            const fn = filename.toLowerCase();
+            const months = { jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11 };
+            const m1 = fn.match(/lcs_([a-z]{3})(\d{2})(\d{4})\.csv$/);
+            if (m1 && months[m1[1]] !== undefined) {
+                return new Date(parseInt(m1[3], 10), months[m1[1]], parseInt(m1[2], 10)).getTime();
+            }
+            const m2 = fn.match(/lcs_([a-z]{3})(\d{2})\.csv$/);
+            if (m2 && months[m2[1]] !== undefined) {
+                return new Date(2000 + parseInt(m2[2], 10), months[m2[1]], 1).getTime();
+            }
+            if (fn.includes("lcslatest")) return new Date(2000, 0, 2).getTime();
+            if (fn.includes("sunline")) return new Date(2000, 0, 1).getTime();
+            return 0;
+        }
+
+        async function findLatestLcsFile() {
+            try {
+                const res = await fetch('available_files.json?_=' + Date.now());
+                if (res.ok) {
+                    const files = await res.json();
+                    const lcsFiles = files.filter(f => {
+                        const fn = f.toLowerCase();
+                        return fn.startsWith("lcs") || fn.includes("sunline");
+                    });
+                    if (lcsFiles.length > 0) {
+                        lcsFiles.sort((a, b) => parseLcsFileDate(b) - parseLcsFileDate(a));
+                        return lcsFiles[0];
+                    }
+                }
+            } catch (e) {
+                console.warn("Error checking available_files.json for LCS files:", e);
+            }
+            return 'SUNLINE LCS.csv';
+        }
+
+        // (2026-07-13) Format dynamic LCS as-of label; prev: no as-of date tag
+        function formatLcsAsOfLabel(filename) {
+            if (!filename) return '';
+            const fn = String(filename).toLowerCase();
+            const monthNames = { jan: 'Jan', feb: 'Feb', mar: 'Mar', apr: 'Apr', may: 'May', jun: 'Jun', jul: 'Jul', aug: 'Aug', sep: 'Sep', oct: 'Oct', nov: 'Nov', dec: 'Dec' };
+            const m1 = fn.match(/lcs_([a-z]{3})(\d{1,2})(\d{4})\.csv$/);
+            if (m1 && monthNames[m1[1]]) {
+                return `(As of ${monthNames[m1[1]]} ${m1[2]}, ${m1[3]})`;
+            }
+            const m2 = fn.match(/lcs_([a-z]{3})(\d{2})\.csv$/);
+            if (m2 && monthNames[m2[1]]) {
+                return `(As of ${monthNames[m2[1]]} 20${m2[2]})`;
+            }
+            return `(As of ${filename.replace(/\.csv$/i, '')})`;
+        }
+
         // (2026-07-13) Parse CSV in non-blocking chunks; prev: synchronous XLSX read
         async function loadLcsDatabase() {
             try {
-                console.log("Fetching SUNLINE LCS.csv...");
-                const response = await fetch('SUNLINE LCS.csv');
-                if (!response.ok) throw new Error("SUNLINE LCS.csv not found");
+                const targetLcsFile = await findLatestLcsFile();
+                window.currentLcsFileName = targetLcsFile;
+                console.log(`Fetching latest LCS file: ${targetLcsFile}...`);
+                let response = await fetch(targetLcsFile);
+                if (!response.ok && targetLcsFile !== 'SUNLINE LCS.csv') {
+                    console.warn(`${targetLcsFile} not found, falling back to SUNLINE LCS.csv`);
+                    response = await fetch('SUNLINE LCS.csv');
+                }
+                if (!response.ok) throw new Error("Ledger database CSV file not found");
                 const text = await response.text();
-                console.log("SUNLINE LCS.csv fetched, parsing in chunks...");
+                console.log(`${targetLcsFile} fetched, parsing in chunks...`);
                 
                 const lines = text.split('\n');
                 lcsEmpMap.clear();
+                
+                // (2026-07-13) Dynamic header column index mapping; prev: hardcoded array offsets
+                const headerLine = lines[0] || '';
+                const headerCols = headerLine.split(',').map(h => h.replace(/^"|"$/g, '').trim().toUpperCase());
+                const findCol = (name, fallback) => {
+                    const idx = headerCols.indexOf(name);
+                    return idx !== -1 ? idx : fallback;
+                };
+                const colEmpNum = findCol('EMPLOYEE NUMBER', 60);
+                const colAccountNum = findCol('ACCOUNT NUMBER', 9);
+                const colBranchName = findCol('BRANCH NAME', 1);
+                const colAccountName = findCol('ACCOUNT NAME', 17);
+                const colLoanDate = findCol('DATE GRANTED', 18);
+                const colOutstandingBal = findCol('OUTSTANDING BALANCE', 24);
+                const colAmortization = findCol('AMORTIZATION', 33);
+                const colContactNum = findCol('CONTACT NUMBER', 59);
+                const colGroupName = findCol('GROUP NAME', 64);
+                const colLoanAmount = findCol('LOAN AMOUNT', 23);
+                const colLoanTerm = findCol('TERM IN DAYS', 21);
+                const colNplBucket = findCol('NPL BUCKET', 50);
                 
                 const chunkSize = 10000;
                 for (let i = 1; i < lines.length; i += chunkSize) {
@@ -4374,24 +4453,23 @@
                         row.push(line.slice(start));
                         const cleanedRow = row.map(cell => cell.replace(/^"|"$/g, '').trim());
                         
-                        const empNum = cleanedRow[61]; // BJ
+                        const empNum = cleanedRow[colEmpNum];
                         if (!empNum) continue;
                         
                         const empNumStr = String(empNum).trim().replace(/^0+/, '');
                         if (!empNumStr) continue;
                         
-                        const accountNum = cleanedRow[9];  // J
-                        const branchName = cleanedRow[1];  // B
-                        const accountName = cleanedRow[17]; // R
-                        const loanDate = cleanedRow[18];    // S (2026-07-13: Add loan date; prev: none)
-                        const outstandingBalance = safeFloat(cleanedRow[25]); // Z
-                        const amortization = safeFloat(cleanedRow[34]); // AI
-                        const contactNum = cleanedRow[60];  // BI
-                        const groupName = cleanedRow[65];   // BN
-                        // (2026-07-13) Add loan amount col Y (idx 24) and term col V (idx 21); prev: none
-                        const loanAmount = safeFloat(cleanedRow[24]); // Y
-                        const loanTerm = cleanedRow[21] ? String(cleanedRow[21]).trim() : ''; // V
-                        const nplBucket = cleanedRow[51] ? String(cleanedRow[51]).trim() : ''; // AZ (2026-07-13: Fetch NPL bucket column)
+                        const accountNum = cleanedRow[colAccountNum];
+                        const branchName = cleanedRow[colBranchName];
+                        const accountName = cleanedRow[colAccountName];
+                        const loanDate = cleanedRow[colLoanDate];
+                        const outstandingBalance = safeFloat(cleanedRow[colOutstandingBal]);
+                        const amortization = safeFloat(cleanedRow[colAmortization]);
+                        const contactNum = cleanedRow[colContactNum];
+                        const groupName = cleanedRow[colGroupName];
+                        const loanAmount = safeFloat(cleanedRow[colLoanAmount]);
+                        const loanTerm = cleanedRow[colLoanTerm] ? String(cleanedRow[colLoanTerm]).trim() : '';
+                        const nplBucket = cleanedRow[colNplBucket] ? String(cleanedRow[colNplBucket]).trim() : '';
                         
                         const accountObj = {
                             accountNum: accountNum ? String(accountNum).trim() : 'N/A',
@@ -4901,10 +4979,10 @@
                                 </div>
                             </div>
 
-                            <!-- (2026-07-13) Accounts accordion table; prev: no fixed layout, tiny fonts -->
+                            <!-- (2026-07-13) Add dynamic LCS as-of date label; prev: plain title -->
                             <div style="margin-top:10px;">
                                 <button type="button" onclick="toggleLcsAcctAccordion()" style="width:100%;background:rgba(255,165,0,0.08);border:1px solid rgba(255,165,0,0.22);border-radius:8px;color:rgba(255,255,255,0.92);font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;outline:none;" id="btn-lcs-acct-accordion">
-                                    <span><i class="bi bi-wallet2" style="color:var(--accent-orange);margin-right:8px;"></i>Loan Accounts (${lcsRowsNow.length})</span>
+                                    <span><i class="bi bi-wallet2" style="color:var(--accent-orange);margin-right:8px;"></i>Loan Accounts (${lcsRowsNow.length}) <span id="lbl-lcs-as-of" style="color:rgba(255,255,255,0.45);font-size:0.65rem;font-weight:500;text-transform:none;letter-spacing:normal;margin-left:4px;">${formatLcsAsOfLabel(window.currentLcsFileName)}</span></span>
                                     <i class="bi bi-chevron-down" id="lcs-acct-chevron" style="font-size:0.68rem;transition:transform 0.25s ease;"></i>
                                 </button>
                                 <div id="lcs-acct-accordion-body" style="display:block;margin-top:6px;border-radius:8px;overflow:hidden;">

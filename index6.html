@@ -4065,17 +4065,55 @@
             return row.map(cell => cell.replace(/^"|"$/g, '').trim());
         }
 
+        // (2026-07-13) Dynamic latest LCS file lookup; prev: static lcslatest.csv / SUNLINE LCS.csv
+        function parseLcsFileDate(filename) {
+            const fn = filename.toLowerCase();
+            const months = { jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11 };
+            const m1 = fn.match(/lcs_([a-z]{3})(\d{2})(\d{4})\.csv$/);
+            if (m1 && months[m1[1]] !== undefined) {
+                return new Date(parseInt(m1[3], 10), months[m1[1]], parseInt(m1[2], 10)).getTime();
+            }
+            const m2 = fn.match(/lcs_([a-z]{3})(\d{2})\.csv$/);
+            if (m2 && months[m2[1]] !== undefined) {
+                return new Date(2000 + parseInt(m2[2], 10), months[m2[1]], 1).getTime();
+            }
+            if (fn.includes("lcslatest")) return new Date(2000, 0, 2).getTime();
+            if (fn.includes("sunline")) return new Date(2000, 0, 1).getTime();
+            return 0;
+        }
+
+        async function findLatestLcsFile() {
+            try {
+                const res = await fetch('available_files.json?_=' + Date.now());
+                if (res.ok) {
+                    const files = await res.json();
+                    const lcsFiles = files.filter(f => {
+                        const fn = f.toLowerCase();
+                        return fn.startsWith("lcs") || fn.includes("sunline");
+                    });
+                    if (lcsFiles.length > 0) {
+                        lcsFiles.sort((a, b) => parseLcsFileDate(b) - parseLcsFileDate(a));
+                        return lcsFiles[0];
+                    }
+                }
+            } catch (e) {
+                console.warn("Error checking available_files.json for LCS files:", e);
+            }
+            return 'lcslatest.csv';
+        }
+
         async function loadLcsDatabase() {
             try {
-                console.log("Fetching lcslatest.csv...");
-                let response = await fetch('lcslatest.csv');
-                if (!response.ok) {
-                    console.warn("lcslatest.csv not found, falling back to SUNLINE LCS.csv");
+                const targetLcsFile = await findLatestLcsFile();
+                console.log(`Fetching latest LCS file: ${targetLcsFile}...`);
+                let response = await fetch(targetLcsFile);
+                if (!response.ok && targetLcsFile !== 'SUNLINE LCS.csv') {
+                    console.warn(`${targetLcsFile} not found, falling back to SUNLINE LCS.csv`);
                     response = await fetch('SUNLINE LCS.csv');
                 }
                 if (!response.ok) throw new Error("Ledger database CSV file not found");
                 const text = await response.text();
-                console.log("Ledger CSV fetched, parsing in chunks...");
+                console.log(`${targetLcsFile} fetched, parsing in chunks...`);
                 
                 const lines = text.split('\n');
                 lcsEmpMap.clear();

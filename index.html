@@ -387,6 +387,50 @@
                 </div>
             </div>
         </div>
+
+        <!-- (2026-07-13) Add dedicated Sunline LCS card; prev: single uploader card -->
+        <div class="admin-card" style="margin-top: 1.5rem;">
+            <div class="admin-card__header">
+                <div>
+                    <div class="admin-card__eyebrow">Admin · Sunline LCS Uploader</div>
+                    <p>Upload a 1-sheet LCS Excel file (.xlsx or .xlsm) and select the date to generate lcs_mmmddyyyy.csv format.</p>
+                </div>
+                <div class="summary-chip" style="background: #4F2683;">LCS Database</div>
+            </div>
+
+            <div class="admin-card__body">
+                <div class="form-row">
+                    <div class="form-group" style="max-width: 300px;">
+                        <label class="input-label">LCS File Date</label>
+                        <input type="date" id="lcsDateInput" class="form-select">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0.5rem;">
+                    <div class="file-upload-wrapper drop-zone">
+                        <label for="lcsFileInput" class="file-upload-label">Choose LCS .xlsx or .xlsm File</label>
+                        <input type="file" id="lcsFileInput" class="file-input" accept=".xlsx,.xlsm" onchange="updateLcsFileName()">
+                        <small id="lcsFileName" class="file-name">No file chosen</small>
+                        <div class="file-hint">Drag & drop or click to select your Sunline LCS file.</div>
+                    </div>
+                </div>
+
+                <div class="convert-actions">
+                    <button id="lcsConvertButton" class="btn btn-primary" onclick="convertLcsExcelToCSV()">
+                        <span id="lcsButtonText">CONVERT LCS FILE</span>
+                    </button>
+                </div>
+
+                <div id="lcsProgressContainer" class="progress-container" style="display:none; margin-top:1rem;">
+                    <div class="progress">
+                        <div id="lcsProgressBar" class="progress-bar">0%</div>
+                    </div>
+                    <small id="lcsProgressText" class="progress-text">Processing LCS sheet...</small>
+                </div>
+
+                <div id="lcsDownloadButtons" class="download-buttons" style="margin-top:1rem;"></div>
+            </div>
+        </div>
     </div>
 
     <!-- =====================================================
@@ -1257,11 +1301,96 @@
             return { short: monthsShort[previousMonthIndex], full: monthsFull[previousMonthIndex] };
         }
 
+        // (2026-07-13) Add updateLcsFileName & convertLcsExcelToCSV; prev: missing JS handlers
+        function updateLcsFileName() {
+            const fileInput = document.getElementById("lcsFileInput");
+            const fileName = document.getElementById("lcsFileName");
+            if (fileInput && fileName) {
+                fileName.textContent = fileInput.files.length
+                    ? `Selected file: ${fileInput.files[0].name}`
+                    : "No file chosen";
+            }
+        }
+
+        async function convertLcsExcelToCSV() {
+            const dateInput = document.getElementById("lcsDateInput");
+            const fileInput = document.getElementById("lcsFileInput");
+            const convertBtn = document.getElementById("lcsConvertButton");
+            const progressContainer = document.getElementById("lcsProgressContainer");
+            const progressBar = document.getElementById("lcsProgressBar");
+            const progressText = document.getElementById("lcsProgressText");
+            const downloadContainer = document.getElementById("lcsDownloadButtons");
+
+            if (!fileInput || !fileInput.files.length) {
+                alert("Please select an LCS .xlsx or .xlsm file.");
+                return;
+            }
+
+            let selectedDate = new Date();
+            if (dateInput && dateInput.value) {
+                selectedDate = new Date(dateInput.value + 'T00:00:00');
+            }
+            const monthsCap = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const mmm = monthsCap[selectedDate.getMonth()];
+            const dd = String(selectedDate.getDate()).padStart(2, '0');
+            const yyyy = selectedDate.getFullYear();
+            const outputFilename = `lcs_${mmm}${dd}${yyyy}.csv`;
+
+            if (convertBtn) convertBtn.disabled = true;
+            if (progressContainer) progressContainer.style.display = "block";
+            if (progressBar) { progressBar.style.width = "50%"; progressBar.textContent = "50%"; }
+            if (progressText) progressText.textContent = "Reading LCS sheet...";
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = async function (e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: "array" });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const sheet = workbook.Sheets[firstSheetName];
+                    const csvText = XLSX.utils.sheet_to_csv(sheet, { FS: ",", RS: "\r\n", blankrows: false });
+
+                    const blob = new Blob([csvText], { type: 'text/csv;charset=utf-8;' });
+                    if (progressBar) { progressBar.style.width = "100%"; progressBar.textContent = "100%"; }
+                    if (progressText) progressText.textContent = `Conversion complete! Generated: ${outputFilename}`;
+
+                    if (downloadContainer) {
+                        downloadContainer.style.display = "block";
+                        downloadContainer.innerHTML = "";
+                        const downloadBtn = document.createElement("button");
+                        downloadBtn.className = "btn btn-success";
+                        downloadBtn.style.padding = "10px 20px";
+                        downloadBtn.style.fontSize = "15px";
+                        downloadBtn.textContent = `Download ${outputFilename}`;
+                        downloadBtn.onclick = () => {
+                            const link = document.createElement('a');
+                            link.href = URL.createObjectURL(blob);
+                            link.download = outputFilename;
+                            link.click();
+                        };
+                        downloadContainer.appendChild(downloadBtn);
+                    }
+                } catch (err) {
+                    alert("Error converting LCS file: " + err.message);
+                    if (progressText) progressText.textContent = "Failed to convert file.";
+                } finally {
+                    if (convertBtn) convertBtn.disabled = false;
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
         // Initialize admin sections when DOM is ready
         document.addEventListener("DOMContentLoaded", function () {
             // Populate dropdowns
             populateMonthDropdown();
             populateYearDropdown();
+
+            const lcsDateInput = document.getElementById("lcsDateInput");
+            if (lcsDateInput && !lcsDateInput.value) {
+                lcsDateInput.value = new Date().toISOString().slice(0, 10);
+            }
 
             // Dynamic Year for Example File
             const exampleFileEl = document.getElementById("example-file");
@@ -1357,7 +1486,18 @@
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: "array" });
 
-                    // (2026-07-13) Keyword sheet detect & auto column delete; prev: exact match
+                    // (2026-07-13) Support LCS 1-sheet converter to lcs_mmmddyyyy.csv; prev: 4 sheets only
+                    const monthsCap = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                    const monthsLower = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+                    let lcsMonth = monthsCap[new Date().getMonth()];
+                    if (monthSelect && monthSelect.value) {
+                        const idx = monthsLower.indexOf(monthSelect.value.toLowerCase());
+                        if (idx !== -1) lcsMonth = monthsCap[idx];
+                    }
+                    const lcsDay = String(new Date().getDate()).padStart(2, '0');
+                    const lcsYear = yearSelect && yearSelect.value ? yearSelect.value : String(new Date().getFullYear());
+                    const lcsOutput = `lcs_${lcsMonth}${lcsDay}${lcsYear}.csv`;
+
                     const sheetsToProcess = [
                         {
                             id: "NETPAY",
@@ -1378,10 +1518,14 @@
                             id: "PLI",
                             keywords: ["pli", "plis"],
                             output: `pli_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`
+                        },
+                        {
+                            id: "LCS",
+                            keywords: ["lcs", "sunline", "ledger"],
+                            output: lcsOutput
                         }
                     ];
 
-                    // (2026-07-13) Fix PLI/POS sheet keyword matching; prev: regex test
                     const sheetMatchesConfig = (sheetName, sheetConfig) => {
                         const s = sheetName.toLowerCase().trim();
                         if (sheetConfig.id === "PLI") {
@@ -1396,21 +1540,34 @@
                         if (sheetConfig.id === "NETPAY") {
                             return s.includes("netpay") || s.includes("net pay") || s.includes("nthp") || s === "net";
                         }
+                        if (sheetConfig.id === "LCS") {
+                            return s.includes("lcs") || s.includes("sunline") || s.includes("ledger");
+                        }
                         return false;
                     };
 
-                    const presentSheets = sheetsToProcess.filter(sheetConfig =>
+                    let presentSheets = sheetsToProcess.filter(sheetConfig =>
                         Object.keys(workbook.Sheets).some(name => sheetMatchesConfig(name, sheetConfig))
                     );
 
                     if (presentSheets.length === 0) {
-                        alert('No matching sheets found in the Excel file.');
-                        resetUI();
-                        return;
+                        if (Object.keys(workbook.Sheets).length === 1) {
+                            const singleConfig = {
+                                id: "LCS",
+                                keywords: [],
+                                output: lcsOutput,
+                                forceSheetName: Object.keys(workbook.Sheets)[0]
+                            };
+                            presentSheets = [singleConfig];
+                        } else {
+                            alert('No matching sheets found in the Excel file.');
+                            resetUI();
+                            return;
+                        }
                     }
 
                     for (const sheetConfig of presentSheets) {
-                        const sheetName = Object.keys(workbook.Sheets).find(name =>
+                        const sheetName = sheetConfig.forceSheetName || Object.keys(workbook.Sheets).find(name =>
                             sheetMatchesConfig(name, sheetConfig)
                         );
                         let sheet = workbook.Sheets[sheetName];
