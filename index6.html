@@ -7442,9 +7442,10 @@
 
             // (2026-07-13) Compute suggestion BEFORE PMT so amortization uses correct loan using exact limit solver; prev: cap/20.01 approximation
             {
-                let capacityLimit = 5300.00;
+                // (2026-07-13) Set 5300 min limit for 9.66% (>5yrs); prev: 5000
+                let capacityLimit = 5000.00;
                 if (interestRate === 9.66) {
-                    capacityLimit = 5000.00;
+                    capacityLimit = 5300.00;
                 }
                 const requiredAmort = Math.round((revisedBaseline - capacityLimit) * 100) / 100;
                 
@@ -7469,9 +7470,9 @@
                     if (_suggested < 0) _suggested = 0;
                 }
 
-                // (2026-07-13) Fallback estimated loan suggestion using first formula if requiredAmort <= 0; prev: 0
+                // (2026-07-13) Fallback to 5300 floor for 9.66%; prev: 5000
                 if (_suggested <= 0 && revisedBaseline > 0) {
-                    const fallbackCap = Math.max(0, revisedBaseline - (interestRate === 9.66 ? 5000 : 5300));
+                    const fallbackCap = Math.max(0, revisedBaseline - (interestRate === 9.66 ? 5300 : 5000));
                     _suggested = Math.floor((fallbackCap > 0 ? fallbackCap : revisedBaseline) / 20.01) * 1000;
                 }
 
@@ -7524,8 +7525,8 @@
             const netPayElement = document.getElementById('val-newnetpay');
             netPayElement.innerHTML = formatPHP(newNetPay);
 
-            // (2026-07-13) Validate limit instead of clamping; prev: clamped input
-            const minLimit = (interestRate === 9.66) ? 5000.00 : 5300.00;
+            // (2026-07-13) Set 5300 min limit for 9.66% rate; prev: 5000
+            const minLimit = (interestRate === 9.66) ? 5300.00 : 5000.00;
             let thresholdLimit = minLimit;
             const warningMsg = `<i class="bi bi-exclamation-triangle-fill"></i> Cannot be accommodated`;
 
@@ -7976,10 +7977,9 @@
             if (!window.activeSession) return;
             const modeSelect = document.getElementById('evaluationModeSelect');
             const mode = modeSelect ? modeSelect.value : 'DEPED';
-            const isAutonomous = (mode === 'AUTONOMOUS');
-            
+            // (2026-07-13) Set 5300 min limit for 9.66% rate; prev: 5000
             const interestRate = getInterestRateValue();
-            const minLimit = (interestRate === 9.66) ? 5000.00 : 5300.00;
+            const minLimit = (interestRate === 9.66) ? 5300.00 : 5000.00;
             const limitInput = document.getElementById('input-target-limit');
             let thresholdLimit = minLimit;
             if (limitInput && limitInput.value.trim() !== '') {
@@ -8928,12 +8928,10 @@
             }
 
             const startIndex = (window.historyCurrentPage - 1) * limit;
-            const endIndex = startIndex + limit;
-            const paginatedItems = history.slice(startIndex, endIndex);
-
             list.innerHTML = paginatedItems.map((item, localIndex) => {
                 const index = startIndex + localIndex;
-                const threshold = (item.interestRate === 9.66) ? 5000.00 : 5300.00;
+                // (2026-07-13) Set 5300 threshold for 9.66% rate; prev: 5000
+                const threshold = (item.interestRate === 9.66) ? 5300.00 : 5000.00;
                 const isSafe = item.newNetPay >= threshold;
                 
                 // Parse date with backward compatibility
