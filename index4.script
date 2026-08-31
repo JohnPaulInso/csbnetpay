@@ -180,7 +180,8 @@ async function getAvailableFilesPLI() {
      * Fix/Feature: Reverted fallback checks to check raw CSV files directly via HEAD.
      */
     try {
-        const res = await fetch('available_files.json');
+        // (2026-07-13) Add timestamp & no-cache to prevent stale manifest; prev: fetch('available_files.json')
+        const res = await fetch('available_files.json?_=' + Date.now(), { cache: 'no-cache' });
         if (res.ok) {
             const files = await res.json();
             return csvFilesPLI.filter(f => files.includes(f));

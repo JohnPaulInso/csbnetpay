@@ -5,8 +5,8 @@
  * Fix: Bumped cache version to v18.
  *      Forces browsers to reload updated script files reverting fetch requests to raw CSV files directly.
  */
-/* (2026-07-13) Bump cache version to v59; prev: v58 */
-const CACHE_NAME = "csb-search-v59";
+/* (2026-07-13) Bump cache version to v60; prev: v59 */
+const CACHE_NAME = "csb-search-v60";
 const ASSETS = [
   "./",
   "index.html",
@@ -22,7 +22,6 @@ const ASSETS = [
   "index2.script",
   "index3.script",
   "index4.script",
-  "available_files.json",
   "manifest.json",
   "version.json",
   "citysavings_logo.png",
@@ -64,6 +63,16 @@ self.addEventListener("fetch", e => {
   if (e.request.method === 'HEAD') {
     return;
   }
+
+  const url = e.request.url;
+  // (2026-07-13) Network-first for manifest & CSV files to prevent stale caching; prev: cache-first
+  if (url.includes('available_files.json') || url.endsWith('.csv')) {
+    e.respondWith(
+      fetch(e.request).catch(() => caches.match(e.request))
+    );
+    return;
+  }
+
   e.respondWith(
     caches.match(e.request).then(response => {
       return response || fetch(e.request);

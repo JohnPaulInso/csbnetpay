@@ -208,7 +208,8 @@
      */
     async function filterExistingFiles(fileList) {
         try {
-            const res = await fetch('available_files.json');
+            // (2026-07-13) Add timestamp & no-cache to prevent stale manifest; prev: fetch('available_files.json')
+            const res = await fetch('available_files.json?_=' + Date.now(), { cache: 'no-cache' });
             if (res.ok) {
                 const files = await res.json();
                 return fileList.filter(f => files.includes(f));
