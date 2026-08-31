@@ -400,7 +400,8 @@
                     <span style="font-size:14px;"><i class="bi bi-file-earmark-spreadsheet-fill" style="color:#4F2683; margin-right:6px;"></i>Conversion Progress (4 Sheets)</span>
                     <span id="abstractOverallStatus" class="badge" style="background:#dbeafe; color:#1e40af; padding:5px 12px; border-radius:6px; font-size:12px; font-weight:700;">Converting...</span>
                 </div>
-                <div class="sheet-cards-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 1rem;">
+                <!-- (2026-07-13) 2-column grid for the 4 abstract conversion cards; prev: auto-fit 4-col -->
+                <div class="sheet-cards-grid" style="display:grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 1rem;">
                     <div id="card-sheet-NETPAY" class="sheet-status-card" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:14px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <span style="font-weight:700; font-size:13px; color:#1e293b;">NETPAY</span>
