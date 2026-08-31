@@ -794,11 +794,8 @@
 
             const repo = "csbnetpay";
             const owner = "JohnPaulInso";
-
-            // Split Token (Bypassing GitHub Detection)
-            const part1 = "ghp_";
-            const part2 = "vnpu7K5e3lNEsKwMczRGTgPA35ER5R2odvye";
-            const token = part1 + part2;
+            // (2026-07-13) Get token from localStorage only; prev: hardcoded string
+            const token = localStorage.getItem('csb_gh_token') || '';
 
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();

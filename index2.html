@@ -663,7 +663,8 @@
 
             const repo = "csbnetpay";
             const owner = "JohnPaulInso";
-            const token = "ghp_" + "vnpu7K5e3lNEsKwMczRGTgPA35ER5R2odvye";
+            // (2026-07-13) Get token from localStorage only; prev: hardcoded string
+            const token = localStorage.getItem('csb_gh_token') || '';
 
             const uploadPromises = Array.from(files).map(async (file) => {
                 return new Promise((resolve, reject) => {
