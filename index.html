@@ -1436,7 +1436,9 @@
             const currentMonth = currentDate.getMonth();
             const previousMonthIndex = (currentMonth - 1 + 12) % 12;
             return { short: monthsShort[previousMonthIndex], full: monthsFull[previousMonthIndex] };
-              // (2026-07-13) Auto-detect LCS file date from filename; prev: manual date picker only
+        }
+
+        // (2026-07-13) Auto-detect LCS file date from filename; prev: manual date picker only
         function updateLcsFileName() {
             const fileInput = document.getElementById("lcsFileInput");
             const fileName = document.getElementById("lcsFileName");
@@ -2128,7 +2130,7 @@
             if (abstractInput) abstractInput.addEventListener("change", refreshUploadCart);
 
             refreshUploadCart();
-        });    }
+        });
 
         function logout() {
             console.log("Logging out...");
@@ -2573,6 +2575,8 @@
             });
             observer.observe(coverageSec, { attributes: true, attributeFilter: ['style'] });
         }
+    });
+
     // (2026-07-13) Pre-load ledger map & enable order-independent name autocomplete search; prev: none
     const lcsEmpMap = new Map();
     // (2026-07-13) Dynamic latest LCS file loader; prev: static lcslatest.csv fetch
