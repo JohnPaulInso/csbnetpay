@@ -1262,14 +1262,8 @@
             }
         });
 
-        // Excel Upload Functions
+        // (2026-07-13) Order monthSelect starting with the most recent month first; prev: oldest month first
         function populateMonthDropdown() {
-            /* 
-             * CHANGE DETAILS:
-             * Element: monthSelect (id="monthSelect")
-             * Date: 2026-07-07
-             * Fix: Extended loop limit to show the past 12 months instead of the past 3 months.
-             */
             const months = ["January", "February", "March", "April", "May", "June",
                 "July", "August", "September", "October", "November", "December"];
             const currentDate = new Date();
@@ -1277,19 +1271,20 @@
             const monthSelect = document.getElementById("monthSelect");
             if (!monthSelect) return;
 
-            // Clear existing options except the first one
-            while (monthSelect.children.length > 1) {
-                monthSelect.removeChild(monthSelect.lastChild);
-            }
+            monthSelect.innerHTML = '<option value="" disabled>Select Month</option>';
 
-            // Loop changed from (let i = 2; i >= 0; i--) to (let i = 11; i >= 0; i--)
-            for (let i = 11; i >= 0; i--) {
+            // List starting from most recent month downwards (most recent at top)
+            for (let i = 0; i < 12; i++) {
                 const monthIndex = (currentMonth - i + 12) % 12;
                 const option = document.createElement("option");
                 option.value = months[monthIndex].substring(0, 3).toLowerCase();
                 option.text = months[monthIndex];
+                if (i === 0) {
+                    option.selected = true;
+                }
                 monthSelect.appendChild(option);
             }
+            if (typeof refreshUploadCart === "function") refreshUploadCart();
         }
 
         function populateYearDropdown() {
