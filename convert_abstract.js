@@ -147,15 +147,32 @@ function sheetMatchesConfig(sheetName, sheetConfig) {
     return false;
 }
 
+// (2026-07-13) Vibrant ANSI terminal colors; prev: uncolored text
+const c = {
+    reset: "\x1b[0m",
+    bold: "\x1b[1m",
+    dim: "\x1b[2m",
+    red: "\x1b[31m",
+    green: "\x1b[32m",
+    yellow: "\x1b[33m",
+    blue: "\x1b[34m",
+    magenta: "\x1b[35m",
+    cyan: "\x1b[36m",
+    white: "\x1b[37m",
+    gray: "\x1b[90m",
+    bgBlue: "\x1b[44m\x1b[37m",
+    bgCyan: "\x1b[46m\x1b[30m"
+};
+
 // (2026-07-13) Support forceReconvert parameter; prev: 3 arguments only
 function convertFile(filePath, customMonth, customYear, forceReconvert = false) {
-    console.log(`\n============================================`);
-    console.log(` CSB NetPay - Fast Abstract Converter`);
-    console.log(`============================================`);
-    console.log(`Reading: ${filePath}`);
+    console.log(`\n${c.bold}${c.cyan}============================================${c.reset}`);
+    console.log(`${c.bold}${c.white} CSB NetPay - Fast Abstract Converter${c.reset}`);
+    console.log(`${c.bold}${c.cyan}============================================${c.reset}`);
+    console.log(`${c.gray}Reading:${c.reset} ${c.yellow}${filePath}${c.reset}`);
 
     const { month, year, yy } = parseMonthYear(filePath, customMonth, customYear);
-    console.log(`Detected Month: ${MONTH_NAMES[month]} (${month}), Year: ${year} (${yy})`);
+    console.log(`${c.gray}Detected Month:${c.reset} ${c.bold}${c.green}${MONTH_NAMES[month]} (${month})${c.reset}${c.gray}, Year:${c.reset} ${c.bold}${c.yellow}${year} (${yy})${c.reset}`);
 
     const monthsCap = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const monthsLower = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
@@ -172,9 +189,11 @@ function convertFile(filePath, customMonth, customYear, forceReconvert = false) 
         { id: "LCS", output: lcsOutput }
     ];
 
-    console.time('Read Workbook');
+    const startTime = Date.now();
+    process.stdout.write(`${c.gray}Loading Excel workbook into memory...${c.reset}`);
     const workbook = XLSX.readFile(filePath, { dense: true, cellFormula: false, cellHTML: false, cellText: false });
-    console.timeEnd('Read Workbook');
+    const loadSec = ((Date.now() - startTime) / 1000).toFixed(1);
+    process.stdout.write(`\r${c.green}✔ Workbook loaded in ${loadSec}s${c.reset}\n`);
 
     let presentSheets = sheetsToProcess.filter(sheetConfig =>
         Object.keys(workbook.Sheets).some(name => sheetMatchesConfig(name, sheetConfig))
@@ -184,19 +203,21 @@ function convertFile(filePath, customMonth, customYear, forceReconvert = false) 
         if (Object.keys(workbook.Sheets).length === 1) {
             presentSheets = [{ id: "LCS", output: lcsOutput, forceSheetName: Object.keys(workbook.Sheets)[0] }];
         } else {
-            console.error('ERROR: No matching sheets found in workbook:', Object.keys(workbook.Sheets));
+            console.error(`${c.red}ERROR: No matching sheets found in workbook:${c.reset}`, Object.keys(workbook.Sheets));
             process.exit(1);
         }
     }
 
-    // (2026-07-13) CLI progress bar renderer; prev: basic console logs
+    // (2026-07-13) Colored CLI progress bar renderer; prev: basic progress bar
     function renderProgressBar(current, total, label, width = 25) {
         const percent = total > 0 ? Math.min(100, Math.max(0, Math.floor((current / total) * 100))) : 100;
         const filled = Math.floor((width * percent) / 100);
-        const bar = '█'.repeat(filled) + '░'.repeat(width - filled);
+        const bar = `${c.cyan}${'█'.repeat(filled)}${c.gray}${'░'.repeat(width - filled)}${c.reset}`;
         const curStr = Number(current).toLocaleString();
         const totStr = Number(total).toLocaleString();
-        process.stdout.write(`\r[${bar}] ${percent.toString().padStart(3)}% | ${curStr}/${totStr} rows | ${label}   `);
+        const pctStr = `${c.bold}${c.green}${percent.toString().padStart(3)}%${c.reset}`;
+        const countStr = `${c.yellow}${curStr}${c.gray}/${c.yellow}${totStr}${c.reset} rows`;
+        process.stdout.write(`\r[${bar}] ${pctStr} | ${countStr} | ${c.white}${label}${c.reset}   `);
     }
 
     const generatedFiles = [];
@@ -213,13 +234,13 @@ function convertFile(filePath, customMonth, customYear, forceReconvert = false) 
         if (!forceReconvert && fs.existsSync(outPath)) {
             const targetStat = fs.statSync(outPath);
             if (targetStat.size > 0 && sourceStat && targetStat.mtimeMs >= sourceStat.mtimeMs) {
-                console.log(`\n[${sheetIndex}/${totalSheets}] Sheet [${sheetName}] -> ${sheetConfig.output} already converted recently (skipped).`);
+                console.log(`\n${c.bold}${c.blue}[${sheetIndex}/${totalSheets}]${c.reset} Sheet ${c.magenta}[${sheetName}]${c.reset} -> ${c.cyan}${sheetConfig.output}${c.reset} ${c.gray}(already converted, skipped)${c.reset}`);
                 generatedFiles.push(sheetConfig.output);
                 continue;
             }
         }
 
-        console.log(`\n[${sheetIndex}/${totalSheets}] Converting Sheet [${sheetName}] -> ${sheetConfig.output}`);
+        console.log(`\n${c.bold}${c.cyan}[${sheetIndex}/${totalSheets}]${c.reset} Converting Sheet ${c.bold}${c.magenta}[${sheetName}]${c.reset} -> ${c.bold}${c.yellow}${sheetConfig.output}${c.reset}`);
 
         const sheet = workbook.Sheets[sheetName];
         // (2026-07-13) Direct row reading & fast CSV serializer; prev: slow aoa_to_sheet
@@ -268,83 +289,136 @@ function convertFile(filePath, customMonth, customYear, forceReconvert = false) 
             AGENT: findCol([/^AGENT$/i])
         };
 
+        // (2026-07-13) Auto-detect column layout from sample data; prev: header-only detection
+        const sampleRow = rawRows.slice(1, 10).find(r => r && r.length > 5 && /^\d{5,8}$/.test(String(r[3] || '').trim())) || rawRows[1] || [];
+
+        if (sheetConfig.id === "POS") {
+            const posDedIdx = sampleRow.findIndex((v, i) => i >= 6 && i <= 10 && (/^0?339$/i.test(String(v).trim()) || /^\d{4}$/.test(String(v).trim())));
+            if (posDedIdx === 8) {
+                colMap.REGCODE = 0; colMap.DIVCODE = 1; colMap.STACODE = 2; colMap.EMPNO = 3;
+                colMap.FNAME = 4; colMap.MI = 5; colMap.LNAME = 6;
+                colMap.DEDCODE = 8; colMap.DEDID = 9; colMap.EFFYY = 10; colMap.EFFMM = 11;
+                colMap.TERYY = 12; colMap.TERMM = 13; colMap.DEDAMT = 14; colMap.POLICYNO = 15;
+            } else if (posDedIdx === 9) {
+                colMap.REGCODE = 0; colMap.DIVCODE = 1; colMap.STACODE = 2; colMap.EMPNO = 3;
+                colMap.FNAME = 5; colMap.MI = 6; colMap.LNAME = 7;
+                colMap.DEDCODE = 9; colMap.DEDID = 10; colMap.EFFYY = 11; colMap.EFFMM = 12;
+                colMap.TERYY = 13; colMap.TERMM = 14; colMap.DEDAMT = 15; colMap.POLICYNO = 16;
+            } else if (posDedIdx === 7) {
+                colMap.REGCODE = 0; colMap.DIVCODE = 1; colMap.STACODE = 2; colMap.EMPNO = 3;
+                colMap.FNAME = 4; colMap.MI = 5; colMap.LNAME = 6;
+                colMap.DEDCODE = 7; colMap.DEDID = 8; colMap.EFFYY = 9; colMap.EFFMM = 10;
+                colMap.TERYY = 11; colMap.TERMM = 12; colMap.DEDAMT = 13; colMap.POLICYNO = 15;
+            }
+        } else if (sheetConfig.id === "ONQUEUE") {
+            const onqDedIdx = sampleRow.findIndex((v, i) => i >= 6 && i <= 10 && /^\d{4}$/.test(String(v).trim()));
+            if (onqDedIdx === 7) {
+                colMap.REGCODE = 0; colMap.DIVCODE = 1; colMap.STACODE = 2; colMap.EMPNO = 3;
+                colMap.FNAME = 4; colMap.MI = 5; colMap.LNAME = 6;
+                colMap.DEDCODE = 7; colMap.DEDID = 8; colMap.EFFYY = 9; colMap.EFFMM = 10;
+                colMap.TERYY = 11; colMap.TERMM = 12; colMap.DEDAMT = 13; colMap.POLICYNO = 15;
+            } else if (onqDedIdx === 8) {
+                colMap.REGCODE = 0; colMap.DIVCODE = 1; colMap.STACODE = 2; colMap.EMPNO = 3;
+                colMap.FNAME = 4; colMap.MI = 5; colMap.LNAME = 6;
+                colMap.DEDCODE = 8; colMap.DEDID = 9; colMap.EFFYY = 10; colMap.EFFMM = 11;
+                colMap.TERYY = 12; colMap.TERMM = 13; colMap.DEDAMT = 14; colMap.POLICYNO = 15;
+            } else if (onqDedIdx === 9) {
+                colMap.REGCODE = 1; colMap.DIVCODE = 2; colMap.STACODE = 3; colMap.EMPNO = 4;
+                colMap.FNAME = 5; colMap.MI = 6; colMap.LNAME = 7;
+                colMap.DEDCODE = 9; colMap.DEDID = 10; colMap.EFFYY = 11; colMap.EFFMM = 12;
+                colMap.TERYY = 13; colMap.TERMM = 14; colMap.DEDAMT = 15; colMap.POLICYNO = 16;
+            }
+        } else if (sheetConfig.id === "NETPAY") {
+            const nthpIdx = sampleRow.findIndex((v, i) => i >= 6 && i <= 10 && /^-?\d+(\.\d+)?$/.test(String(v).replace(/,/g, '').trim()) && parseFloat(String(v).replace(/,/g, '').trim()) > 500);
+            if (nthpIdx === 7) {
+                colMap.REGCODE = 0; colMap.DIVCODE = 1; colMap.STACODE = 2; colMap.EMPNO = 3;
+                colMap.FNAME = 4; colMap.MI = 5; colMap.LNAME = 6;
+                colMap.TAKEHOME = 7; colMap.GRADE = 9; colMap.STEP = 10; colMap.TAXCODE = 11; colMap.ACCOUNT = 13;
+            }
+        }
+
         const getVal = (r, idx) => (idx !== -1 && r[idx] !== undefined && r[idx] !== null) ? String(r[idx]).replace(/,/g, '').trim() : "";
 
-        const processedRows = new Array(totalRows);
+        const processedRows = [];
         for (let rowIndex = 0; rowIndex < totalRows; rowIndex++) {
             const r = rawRows[rowIndex];
+            if (rowIndex > 0) {
+                const emp = getVal(r, colMap.EMPNO !== -1 ? colMap.EMPNO : 3);
+                if (!/^\d{4,8}$/.test(emp)) continue; // skip secondary duplicate header rows or empty rows
+            }
+
             if (sheetConfig.id === "NETPAY") {
                 if (rowIndex === 0) {
-                    processedRows[rowIndex] = ["REGCODE", "DIVCODE", "STACODE", "EMPNO", "FNAME", "MI", "LNAME", "TAKEHOME", "", "GRADE", "STEP", "TAXCODE", "", "ACCOUNT"];
+                    processedRows.push(["REGCODE", "DIVCODE", "STACODE", "EMPNO", "FNAME", "MI", "LNAME", "TAKEHOME", "", "GRADE", "STEP", "TAXCODE", "", "ACCOUNT"]);
                 } else {
-                    processedRows[rowIndex] = [
+                    processedRows.push([
                         getVal(r, colMap.REGCODE !== -1 ? colMap.REGCODE : 0),
                         getVal(r, colMap.DIVCODE !== -1 ? colMap.DIVCODE : 1),
                         getVal(r, colMap.STACODE !== -1 ? colMap.STACODE : 2),
                         getVal(r, colMap.EMPNO !== -1 ? colMap.EMPNO : 3),
-                        getVal(r, colMap.FNAME !== -1 ? colMap.FNAME : 5),
-                        getVal(r, colMap.MI !== -1 ? colMap.MI : 6),
-                        getVal(r, colMap.LNAME !== -1 ? colMap.LNAME : 7),
-                        getVal(r, colMap.TAKEHOME !== -1 ? colMap.TAKEHOME : 25),
+                        getVal(r, colMap.FNAME !== -1 ? colMap.FNAME : 4),
+                        getVal(r, colMap.MI !== -1 ? colMap.MI : 5),
+                        getVal(r, colMap.LNAME !== -1 ? colMap.LNAME : 6),
+                        getVal(r, colMap.TAKEHOME !== -1 ? colMap.TAKEHOME : 7),
                         "",
-                        getVal(r, colMap.GRADE !== -1 ? colMap.GRADE : 18),
-                        getVal(r, colMap.STEP !== -1 ? colMap.STEP : 19),
-                        getVal(r, colMap.TAXCODE !== -1 ? colMap.TAXCODE : 20),
+                        getVal(r, colMap.GRADE !== -1 ? colMap.GRADE : 9),
+                        getVal(r, colMap.STEP !== -1 ? colMap.STEP : 10),
+                        getVal(r, colMap.TAXCODE !== -1 ? colMap.TAXCODE : 11),
                         "",
-                        getVal(r, colMap.ACCOUNT !== -1 ? colMap.ACCOUNT : 26)
-                    ];
+                        getVal(r, colMap.ACCOUNT !== -1 ? colMap.ACCOUNT : 13)
+                    ]);
                 }
             } else if (sheetConfig.id === "POS") {
                 if (rowIndex === 0) {
-                    processedRows[rowIndex] = ["REGCODE", "DIVCODE", "STACODE", "EMPNO", "FNAME", "MI", "LNAME", "DEDCODE", "DEDID", "EFFYY", "EFFMM", "TERYY", "TERMM", "DEDAMT", "", "POLICYNO"];
+                    processedRows.push(["REGCODE", "DIVCODE", "STACODE", "EMPNO", "FNAME", "MI", "LNAME", "DEDCODE", "DEDID", "EFFYY", "EFFMM", "TERYY", "TERMM", "DEDAMT", "", "POLICYNO"]);
                 } else {
-                    processedRows[rowIndex] = [
+                    processedRows.push([
                         getVal(r, colMap.REGCODE !== -1 ? colMap.REGCODE : 0),
                         getVal(r, colMap.DIVCODE !== -1 ? colMap.DIVCODE : 1),
                         getVal(r, colMap.STACODE !== -1 ? colMap.STACODE : 2),
                         getVal(r, colMap.EMPNO !== -1 ? colMap.EMPNO : 3),
-                        getVal(r, colMap.FNAME !== -1 ? colMap.FNAME : 5),
-                        getVal(r, colMap.MI !== -1 ? colMap.MI : 6),
-                        getVal(r, colMap.LNAME !== -1 ? colMap.LNAME : 7),
-                        getVal(r, colMap.DEDCODE !== -1 ? colMap.DEDCODE : 9),
-                        getVal(r, colMap.DEDID !== -1 ? colMap.DEDID : 10),
-                        getVal(r, colMap.EFFYY !== -1 ? colMap.EFFYY : 11),
-                        getVal(r, colMap.EFFMM !== -1 ? colMap.EFFMM : 12),
-                        getVal(r, colMap.TERYY !== -1 ? colMap.TERYY : 13),
-                        getVal(r, colMap.TERMM !== -1 ? colMap.TERMM : 14),
-                        getVal(r, colMap.DEDAMT !== -1 ? colMap.DEDAMT : 15),
+                        getVal(r, colMap.FNAME !== -1 ? colMap.FNAME : 4),
+                        getVal(r, colMap.MI !== -1 ? colMap.MI : 5),
+                        getVal(r, colMap.LNAME !== -1 ? colMap.LNAME : 6),
+                        getVal(r, colMap.DEDCODE !== -1 ? colMap.DEDCODE : 8),
+                        getVal(r, colMap.DEDID !== -1 ? colMap.DEDID : 9),
+                        getVal(r, colMap.EFFYY !== -1 ? colMap.EFFYY : 10),
+                        getVal(r, colMap.EFFMM !== -1 ? colMap.EFFMM : 11),
+                        getVal(r, colMap.TERYY !== -1 ? colMap.TERYY : 12),
+                        getVal(r, colMap.TERMM !== -1 ? colMap.TERMM : 13),
+                        getVal(r, colMap.DEDAMT !== -1 ? colMap.DEDAMT : 14),
                         "",
-                        getVal(r, colMap.POLICYNO !== -1 ? colMap.POLICYNO : 16)
-                    ];
+                        getVal(r, colMap.POLICYNO !== -1 ? colMap.POLICYNO : 15)
+                    ]);
                 }
             } else if (sheetConfig.id === "ONQUEUE") {
                 if (rowIndex === 0) {
-                    processedRows[rowIndex] = ["REGCODE", "DIVCODE", "STACODE", "EMPNO", "FNAME", "MI", "LNAME", "DEDCODE", "DEDID", "EFFYY", "EFFMM", "TERYY", "TERMM", "DEDAMT", "", "POLICYNO"];
+                    processedRows.push(["REGCODE", "DIVCODE", "STACODE", "EMPNO", "FNAME", "MI", "LNAME", "DEDCODE", "DEDID", "EFFYY", "EFFMM", "TERYY", "TERMM", "DEDAMT", "", "POLICYNO"]);
                 } else {
-                    processedRows[rowIndex] = [
-                        getVal(r, colMap.REGCODE !== -1 ? colMap.REGCODE : blankOffset + 0),
-                        getVal(r, colMap.DIVCODE !== -1 ? colMap.DIVCODE : blankOffset + 1),
-                        getVal(r, colMap.STACODE !== -1 ? colMap.STACODE : blankOffset + 2),
-                        getVal(r, colMap.EMPNO !== -1 ? colMap.EMPNO : blankOffset + 3),
-                        getVal(r, colMap.FNAME !== -1 ? colMap.FNAME : blankOffset + 4),
-                        getVal(r, colMap.MI !== -1 ? colMap.MI : blankOffset + 5),
-                        getVal(r, colMap.LNAME !== -1 ? colMap.LNAME : blankOffset + 6),
-                        getVal(r, colMap.DEDCODE !== -1 ? colMap.DEDCODE : blankOffset + 7),
-                        getVal(r, colMap.DEDID !== -1 ? colMap.DEDID : blankOffset + 8),
-                        getVal(r, colMap.EFFYY !== -1 ? colMap.EFFYY : blankOffset + 9),
-                        getVal(r, colMap.EFFMM !== -1 ? colMap.EFFMM : blankOffset + 10),
-                        getVal(r, colMap.TERYY !== -1 ? colMap.TERYY : blankOffset + 11),
-                        getVal(r, colMap.TERMM !== -1 ? colMap.TERMM : blankOffset + 12),
-                        getVal(r, colMap.DEDAMT !== -1 ? colMap.DEDAMT : blankOffset + 13),
+                    processedRows.push([
+                        getVal(r, colMap.REGCODE !== -1 ? colMap.REGCODE : 0),
+                        getVal(r, colMap.DIVCODE !== -1 ? colMap.DIVCODE : 1),
+                        getVal(r, colMap.STACODE !== -1 ? colMap.STACODE : 2),
+                        getVal(r, colMap.EMPNO !== -1 ? colMap.EMPNO : 3),
+                        getVal(r, colMap.FNAME !== -1 ? colMap.FNAME : 4),
+                        getVal(r, colMap.MI !== -1 ? colMap.MI : 5),
+                        getVal(r, colMap.LNAME !== -1 ? colMap.LNAME : 6),
+                        getVal(r, colMap.DEDCODE !== -1 ? colMap.DEDCODE : 7),
+                        getVal(r, colMap.DEDID !== -1 ? colMap.DEDID : 8),
+                        getVal(r, colMap.EFFYY !== -1 ? colMap.EFFYY : 9),
+                        getVal(r, colMap.EFFMM !== -1 ? colMap.EFFMM : 10),
+                        getVal(r, colMap.TERYY !== -1 ? colMap.TERYY : 11),
+                        getVal(r, colMap.TERMM !== -1 ? colMap.TERMM : 12),
+                        getVal(r, colMap.DEDAMT !== -1 ? colMap.DEDAMT : 13),
                         "",
-                        getVal(r, colMap.POLICYNO !== -1 ? colMap.POLICYNO : blankOffset + 15)
-                    ];
+                        getVal(r, colMap.POLICYNO !== -1 ? colMap.POLICYNO : 15)
+                    ]);
                 }
             } else if (sheetConfig.id === "PLI") {
                 if (rowIndex === 0) {
-                    processedRows[rowIndex] = ["BLANK", "DIVCODE", "STACODE", "EMPNO", "FNPRE", "FNAME", "MI", "LNAME", "APPEL", "DEDCODE", "DEDID", "EFFYY", "EFFMM", "TERYY", "TERMM", "DEDAMT", "POLICYNO", "AGENT"];
+                    processedRows.push(["BLANK", "DIVCODE", "STACODE", "EMPNO", "FNPRE", "FNAME", "MI", "LNAME", "APPEL", "DEDCODE", "DEDID", "EFFYY", "EFFMM", "TERYY", "TERMM", "DEDAMT", "POLICYNO", "AGENT"]);
                 } else {
-                    processedRows[rowIndex] = [
+                    processedRows.push([
                         "",
                         getVal(r, colMap.DIVCODE !== -1 ? colMap.DIVCODE : 1),
                         getVal(r, colMap.STACODE !== -1 ? colMap.STACODE : 2),
@@ -363,10 +437,10 @@ function convertFile(filePath, customMonth, customYear, forceReconvert = false) 
                         getVal(r, colMap.DEDAMT !== -1 ? colMap.DEDAMT : 15),
                         getVal(r, colMap.POLICYNO !== -1 ? colMap.POLICYNO : 16),
                         getVal(r, colMap.AGENT !== -1 ? colMap.AGENT : 17)
-                    ];
+                    ]);
                 }
             } else {
-                processedRows[rowIndex] = r;
+                processedRows.push(r);
             }
 
             if (rowIndex % 10000 === 0 || rowIndex === totalRows - 1) {
@@ -392,12 +466,13 @@ function convertFile(filePath, customMonth, customYear, forceReconvert = false) 
             }
         }
 
-        renderProgressBar(totalRows, totalRows, `Writing ${sheetConfig.output}`);
+        const validRowsCount = processedRows.length;
+        renderProgressBar(validRowsCount, validRowsCount, `Writing ${sheetConfig.output}`);
         
         // Fast direct CSV generation without XLSX.utils.aoa_to_sheet memory overhead
         let csvContent = "";
-        const rowStrings = new Array(totalRows);
-        for (let i = 0; i < totalRows; i++) {
+        const rowStrings = new Array(validRowsCount);
+        for (let i = 0; i < validRowsCount; i++) {
             const row = processedRows[i];
             let rowStr = "";
             for (let j = 0; j < row.length; j++) {
@@ -411,40 +486,43 @@ function convertFile(filePath, customMonth, customYear, forceReconvert = false) 
         }
         csvContent = rowStrings.join("\r\n");
         fs.writeFileSync(outPath, csvContent, 'utf8');
-        process.stdout.write(`\r✔ [█████████████████████████] 100% | ${totalRows.toLocaleString()} rows | Saved ${sheetConfig.output} (${(csvContent.length / 1024 / 1024).toFixed(2)} MB)\n`);
+        const doneBar = `${c.green}${'█'.repeat(25)}${c.reset}`;
+        process.stdout.write(`\r${c.bold}${c.green}✔${c.reset} [${doneBar}] ${c.bold}${c.green}100%${c.reset} | ${c.yellow}${validRowsCount.toLocaleString()}${c.reset} rows | Saved ${c.bold}${c.cyan}${sheetConfig.output}${c.reset} ${c.gray}(${(csvContent.length / 1024 / 1024).toFixed(2)} MB)${c.reset}\n`);
         generatedFiles.push(sheetConfig.output);
     }
 
     // Update available_files.json manifest
-    console.log(`\nUpdating available_files.json manifest...`);
+    console.log(`\n${c.gray}Updating available_files.json manifest...${c.reset}`);
     const allCsvs = fs.readdirSync(ROOT_DIR).filter(f => f.endsWith('.csv')).sort();
     fs.writeFileSync(path.resolve(ROOT_DIR, 'available_files.json'), JSON.stringify(allCsvs, null, 2), 'utf8');
-    console.log(`✔ Manifest updated (${allCsvs.length} files total).`);
+    console.log(`${c.bold}${c.green}✔ Manifest updated${c.reset} ${c.gray}(${allCsvs.length} files total)${c.reset}`);
 
     return { generatedFiles, monthName: MONTH_NAMES[month], year };
 }
 
 function pushToGithub(monthName, year) {
-    console.log(`\n============================================`);
-    console.log(` Pushing to GitHub Main Branch`);
-    console.log(`============================================`);
+    console.log(`\n${c.bold}${c.magenta}============================================${c.reset}`);
+    console.log(`${c.bold}${c.white} Pushing to GitHub Main Branch${c.reset}`);
+    console.log(`${c.bold}${c.magenta}============================================${c.reset}`);
     try {
         const commitMsg = `Update: Add converted ${monthName} ${year} abstract CSVs`;
-        console.log(`[1/3] Staging files: git add .`);
+        console.log(`${c.bold}${c.cyan}[1/3]${c.reset} ${c.gray}Staging files:${c.reset} ${c.yellow}git add .${c.reset}`);
         execSync('git add .', { cwd: ROOT_DIR, stdio: 'inherit' });
 
-        console.log(`[2/3] Committing: ${commitMsg}`);
+        console.log(`${c.bold}${c.cyan}[2/3]${c.reset} ${c.gray}Committing:${c.reset} ${c.green}"${commitMsg}"${c.reset}`);
         try {
             execSync(`git commit -m "${commitMsg}"`, { cwd: ROOT_DIR, stdio: 'inherit' });
         } catch(e) {
-            console.log('No new changes to commit or working tree clean.');
+            console.log(`${c.gray}Working tree clean or nothing new to commit.${c.reset}`);
         }
 
-        console.log(`[3/3] Pushing: git push -u origin main`);
+        console.log(`${c.bold}${c.cyan}[3/3]${c.reset} ${c.gray}Pushing:${c.reset} ${c.yellow}git push -u origin main${c.reset}`);
         execSync('git push -u origin main', { cwd: ROOT_DIR, stdio: 'inherit' });
-        console.log(`\nSUCCESS: All files converted and published to GitHub!`);
+        console.log(`\n${c.bold}${c.green}============================================${c.reset}`);
+        console.log(`${c.bold}${c.green} SUCCESS: All files converted & published!${c.reset}`);
+        console.log(`${c.bold}${c.green}============================================${c.reset}`);
     } catch (err) {
-        console.error('Git push error:', err.message);
+        console.error(`${c.red}Git push error:${c.reset}`, err.message);
     }
 }
 
