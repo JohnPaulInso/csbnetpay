@@ -320,24 +320,7 @@
             <span>BILLING</span>
         </a>
     </div>
-    <!-- Admin Section -->
-    <div class="admin-section container-admin" style="display: none;">
-        <div class="admin-card">
-            <h5>Already have the Positive for <span style="color: #00c12d;" id="month-name"></span>?</h5>
-            <p>Please double check the month and year and make sure it's a CSV File. Example: <u
-                    id="example-file">pos_feb26.csv</u></p>
-
-            <div class="form-group">
-                <div class="file-upload-wrapper">
-                    <label for="fileInput" class="file-upload-label">Choose File</label>
-                    <input type="file" id="fileInput" class="file-input" onchange="updateFileName()">
-                    <small id="fileName" class="file-name">No file chosen</small>
-                </div>
-            </div>
-
-            <button onclick="uploadFiles()" class="btn btn-success">Upload</button>
-        </div>
-    </div>
+    <!-- (2026-07-13) Removed legacy single-CSV upload card; prev: already have positive card -->
 
     <!-- (2026-07-30) Improved bottom clear cache button; prev: outdated light bg section -->
     <div style="padding: 2rem 1rem 3rem; text-align: center;">
