@@ -895,6 +895,23 @@ body[style*="--theme-color: #003d6b"] .loading-indicator {
     /* tighten space between stacked admin blocks */
 }
 
+/* (2026-07-13) Glowing animation for GitHub Token required state; prev: none */
+@keyframes purpleTokenPulse {
+    0%, 100% {
+        box-shadow: 0 0 15px rgba(79, 38, 131, 0.25), 0 0 0 2px rgba(124, 58, 237, 0.35);
+        border-color: #a78bfa;
+    }
+    50% {
+        box-shadow: 0 0 28px rgba(124, 58, 237, 0.5), 0 0 0 3px rgba(124, 58, 237, 0.65);
+        border-color: #7c3aed;
+    }
+}
+
+.token-card-glow {
+    animation: purpleTokenPulse 2.2s infinite ease-in-out !important;
+    border-color: #a78bfa !important;
+}
+
 /* (2026-07-13) Compact card padding and margins; prev: huge 2.75rem dead space */
 .admin-card {
     background: #fdfdff;

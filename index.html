@@ -285,8 +285,8 @@
     <!-- Admin Section (Upload) -->
     <div class="admin-section container-admin" style="display: none;">
 
-        <!-- (2026-07-13) Dedicated GitHub Live Token Card on top of Admin section; prev: bottom of LCS card -->
-        <div class="admin-card" style="margin-bottom: 1rem; padding: 1.25rem 1.5rem;">
+        <!-- (2026-07-13) Dedicated GitHub Live Token Card with animated purple glow when empty; prev: static card -->
+        <div id="ghTokenCard" class="admin-card token-card-glow" style="margin-bottom: 1rem; padding: 1.25rem 1.5rem; transition: all 0.3s ease;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
                 <div>
                     <div class="admin-card__eyebrow" style="margin-bottom: 2px;">Configuration · Live Publishing Key</div>
@@ -294,11 +294,11 @@
                 </div>
                 <span id="ghTokenStatusBadge" class="badge" style="font-size:11.5px; padding:4px 10px; border-radius:6px; background:#fee2e2; color:#b91c1c; font-weight:700;">Token Required</span>
             </div>
-            <p style="font-size: 12.5px; color: #64748b; margin-bottom: 10px;">Enter your GitHub Personal Access Token below. It is stored privately in your browser and enables 1-click live publishing directly to GitHub without USB transfers.</p>
-            <div style="display:flex; gap:8px; align-items:center;">
-                <input type="password" id="ghTokenInput" class="form-select" placeholder="Paste your GitHub Token (ghp_...)" style="flex:1; height:40px; font-size:13.5px; padding:0 12px; border-radius:8px;" oninput="onGhTokenInputChange()">
-                <button type="button" class="btn btn-secondary" onclick="toggleTokenVisibility()" style="height:40px; width:40px; padding:0; display:inline-flex; align-items:center; justify-content:center; font-size:15px; border-radius:8px; border:1px solid #cbd5e1; background:#ffffff; color:#475569;" title="Show/Hide Token"><i class="bi bi-eye" id="ghTokenEyeIcon"></i></button>
-                <button type="button" class="btn btn-primary" onclick="saveGithubTokenFromInput()" style="height:40px; padding:0 20px; font-size:13.5px; font-weight:700; border-radius:8px; white-space:nowrap;">Save Token</button>
+            <p style="font-size: 12.5px; color: #64748b; margin-bottom: 12px;">Enter your GitHub Personal Access Token below. It is stored privately in your browser and enables 1-click live publishing directly to GitHub without USB transfers.</p>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <input type="password" id="ghTokenInput" class="form-select" placeholder="Paste your GitHub Token (ghp_...)" style="flex:1; height:48px; font-size:15px; font-family:monospace; padding:0 14px; border-radius:8px; border:2px solid #cbd5e1;" oninput="onGhTokenInputChange()">
+                <button type="button" class="btn btn-secondary" onclick="toggleTokenVisibility()" style="height:48px; width:48px; padding:0; display:inline-flex; align-items:center; justify-content:center; font-size:1.15rem; border-radius:8px; border:1px solid #cbd5e1; background:#ffffff; color:#475569;" title="Show/Hide Token"><i class="bi bi-eye" id="ghTokenEyeIcon"></i></button>
+                <button type="button" class="btn btn-primary" onclick="saveGithubTokenFromInput()" style="height:48px; padding:0 24px; font-size:14.5px; font-weight:700; border-radius:8px; white-space:nowrap;">Save Token</button>
             </div>
         </div>
 
@@ -1664,6 +1664,7 @@
         function updateTokenStatusBadge() {
             const badge = document.getElementById("ghTokenStatusBadge");
             const input = document.getElementById("ghTokenInput");
+            const card = document.getElementById("ghTokenCard");
             if (window.CSB_GITHUB) {
                 const token = window.CSB_GITHUB.getToken();
                 if (input && !input.value && token) {
@@ -1674,10 +1675,12 @@
                         badge.textContent = "Token Saved & Ready";
                         badge.style.background = "#dcfce7";
                         badge.style.color = "#15803d";
+                        if (card) card.classList.remove("token-card-glow");
                     } else {
                         badge.textContent = "Token Required";
                         badge.style.background = "#fee2e2";
                         badge.style.color = "#b91c1c";
+                        if (card) card.classList.add("token-card-glow");
                     }
                 }
             }
