@@ -1481,6 +1481,11 @@
                     if (cartYear) cartYear.textContent = yrMatch[0];
                 }
 
+                // (2026-07-13) Pre-warn if user picks an LCS file in Abstract uploader; prev: none
+                if (/^lcs/i.test(name)) {
+                    alert("Notice: You selected an LCS file in the Abstract Uploader.\n\nAbstract files must contain NETPAY, POS, ONQUEUE, and PLI sheets.\nSunline LCS files should be uploaded in the 'Sunline LCS Uploader' card below.");
+                }
+
                 if (convertActions) convertActions.style.display = "block";
                 if (multiProgress) multiProgress.style.display = "none";
                 if (actionButtons) actionButtons.style.display = "none";
@@ -1860,25 +1865,41 @@
                         { id: "PLI", label: "PLI", output: `pli_${mVal}${yyVal}.csv` }
                     ];
 
-                    let allSuccessful = true;
+                    let successCount = 0;
                     for (const s of sheets) {
                         const ok = await processSingleSheet(s);
-                        if (!ok) allSuccessful = false;
+                        if (ok) successCount++;
                         await new Promise(r => setTimeout(r, 60));
                     }
 
+                    const convertActions = document.getElementById("abstractConvertActions");
                     if (overallStatus) {
-                        overallStatus.textContent = allSuccessful ? "Ready to Upload Live" : "Action Required";
-                        overallStatus.style.background = allSuccessful ? "#dcfce7" : "#fee2e2";
-                        overallStatus.style.color = allSuccessful ? "#15803d" : "#b91c1c";
+                        if (successCount === 4) {
+                            overallStatus.textContent = "Ready to Upload Live";
+                            overallStatus.style.background = "#dcfce7";
+                            overallStatus.style.color = "#15803d";
+                        } else if (successCount === 0) {
+                            overallStatus.textContent = "Abstract File Undetected";
+                            overallStatus.style.background = "#fee2e2";
+                            overallStatus.style.color = "#b91c1c";
+                        } else {
+                            overallStatus.textContent = `Partially Ready (${successCount}/4)`;
+                            overallStatus.style.background = "#fef3c7";
+                            overallStatus.style.color = "#b45309";
+                        }
                     }
 
-                    const convertActions = document.getElementById("abstractConvertActions");
-                    if (convertActions) convertActions.style.display = "none";
-                    if (actionButtons) actionButtons.style.display = "flex";
-                    try {
-                        localStorage.setItem('csb_abstract_live_session', JSON.stringify(window.activeAbstractSession));
-                    } catch(err) {}
+                    if (successCount === 0) {
+                        if (convertActions) convertActions.style.display = "block";
+                        if (actionButtons) actionButtons.style.display = "none";
+                        alert("Abstract File Undetected:\n\nThis file contains no NETPAY, POS, ONQUEUE, or PLI sheets.\nIf you selected a Sunline LCS file, please upload it in the 'Sunline LCS Uploader' card below.");
+                    } else {
+                        if (convertActions) convertActions.style.display = "none";
+                        if (actionButtons) actionButtons.style.display = "flex";
+                        try {
+                            localStorage.setItem('csb_abstract_live_session', JSON.stringify(window.activeAbstractSession));
+                        } catch(err) {}
+                    }
                 } catch (err) {
                     alert("Error reading Excel workbook: " + err.message);
                 } finally {
@@ -1919,8 +1940,16 @@
 
             const sheetName = Object.keys(currentWorkbook.Sheets).find(n => sheetMatches(n, sheetConfig.id));
             if (!sheetName) {
-                if (statusEl) { statusEl.textContent = "Sheet missing"; statusEl.style.color = "#e53e3e"; }
-                if (pbarEl) { pbarEl.style.width = "100%"; pbarEl.style.background = "#e53e3e"; }
+                if (statusEl) {
+                    statusEl.textContent = "Sheet missing";
+                    statusEl.style.color = "#b91c1c";
+                    statusEl.style.background = "#fee2e2";
+                }
+                if (pbarEl) {
+                    pbarEl.style.width = "100%";
+                    pbarEl.style.background = "#ef4444";
+                }
+                if (rowsEl) rowsEl.textContent = "Sheet not found";
                 if (retryBtn) retryBtn.style.display = "inline";
                 return false;
             }
