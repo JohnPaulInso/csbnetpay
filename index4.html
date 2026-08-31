@@ -639,19 +639,42 @@
 
     // (2026-07-13) Pre-load ledger map & enable order-independent name autocomplete search; prev: none
     const lcsEmpMap = new Map();
+    // (2026-07-13) Dynamic latest LCS file loader; prev: static lcslatest.csv fetch
     async function loadLcsDatabase() {
         try {
-            const response = await fetch('lcslatest.csv');
+            let targetFile = 'lcslatest.csv';
+            try {
+                const res = await fetch('available_files.json?_=' + Date.now(), { cache: 'no-cache' });
+                if (res.ok) {
+                    const files = await res.json();
+                    const months = { jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11 };
+                    const parseDate = fn => {
+                        const m1 = fn.toLowerCase().match(/lcs_([a-z]{3})(\d{2})(\d{4})\.csv$/);
+                        if (m1 && months[m1[1]] !== undefined) return new Date(parseInt(m1[3], 10), months[m1[1]], parseInt(m1[2], 10)).getTime();
+                        const m2 = fn.toLowerCase().match(/lcs_([a-z]{3})(\d{2})\.csv$/);
+                        if (m2 && months[m2[1]] !== undefined) return new Date(2000 + parseInt(m2[2], 10), months[m2[1]], 1).getTime();
+                        if (fn.includes("lcslatest")) return new Date(2000, 0, 2).getTime();
+                        if (fn.includes("sunline")) return new Date(2000, 0, 1).getTime();
+                        return 0;
+                    };
+                    const lcsFiles = files.filter(f => f.toLowerCase().startsWith('lcs') || f.toLowerCase().includes('sunline'));
+                    if (lcsFiles.length > 0) {
+                        lcsFiles.sort((a, b) => parseDate(b) - parseDate(a));
+                        targetFile = lcsFiles[0];
+                    }
+                }
+            } catch (err) {}
+            const response = await fetch(targetFile + '?_=' + Date.now(), { cache: 'no-cache' });
             if (!response.ok) return;
             const text = await response.text();
             const lines = text.split('\n');
             if (lines.length < 2) return;
             const headerRow = parseCsvLine(lines[0]);
             const colIdxMap = {};
-            headerRow.forEach((col, idx) => { colIdxMap[col.toUpperCase()] = idx; });
-            const idxEmpNum = colIdxMap['EMPLOYEE NUMBER'] ?? 60;
-            const idxBranchName = colIdxMap['BRANCH NAME'] ?? 1;
-            const idxAcctName = colIdxMap['ACCOUNT NAME'] ?? 17;
+            headerRow.forEach((col, idx) => { colIdxMap[col.toUpperCase().trim()] = idx; });
+            const idxEmpNum = colIdxMap['EMPNO'] ?? colIdxMap['EMPLOYEE NUMBER'] ?? colIdxMap['EMP NO'] ?? 60;
+            const idxBranchName = colIdxMap['BRANCH NAME'] ?? colIdxMap['BRANCHNAME'] ?? colIdxMap['BRANCH'] ?? 1;
+            const idxAcctName = colIdxMap['ACCOUNT NAME'] ?? colIdxMap['ACCOUNTNAME'] ?? colIdxMap['ACCT NAME'] ?? colIdxMap['NAME'] ?? 17;
             for (let i = 1; i < lines.length; i++) {
                 const line = lines[i].trim();
                 if (!line) continue;
