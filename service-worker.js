@@ -5,8 +5,8 @@
  * Fix: Bumped cache version to v18.
  *      Forces browsers to reload updated script files reverting fetch requests to raw CSV files directly.
  */
-/* (2026-07-13) Bump cache version to v60; prev: v59 */
-const CACHE_NAME = "csb-search-v60";
+/* (2026-07-13) Bump cache version to v61 & add github_uploader.js; prev: v60 */
+const CACHE_NAME = "csb-search-v61";
 const ASSETS = [
   "./",
   "index.html",
@@ -18,6 +18,7 @@ const ASSETS = [
   "index6.html",
   "index.css",
   "styles.css",
+  "github_uploader.js",
   "index.script",
   "index2.script",
   "index3.script",

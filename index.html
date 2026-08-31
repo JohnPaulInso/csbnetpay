@@ -338,14 +338,81 @@
 
                     <small id="pliWarning" class="warning-text">Take note: Recheck the PLI file exceeding 25 MB</small>
 
-                    <div id="progressContainer" class="progress-container">
-                        <div class="progress">
-                            <div id="progressBar" class="progress-bar">0%</div>
+                    <!-- (2026-07-13) Multi-sheet progress cards & UPLOAD LIVE container; prev: simple progress bar -->
+                    <div id="abstractMultiProgress" class="abstract-multi-progress" style="display:none; margin-top:1.25rem;">
+                        <div style="font-weight:600; margin-bottom:0.75rem; color:#4F2683; display:flex; justify-content:space-between; align-items:center;">
+                            <span>Conversion Progress (4 Sheets)</span>
+                            <span id="abstractOverallStatus" class="badge" style="background:#e0d4f7; color:#4F2683; padding:4px 8px; border-radius:6px; font-size:12px;">Ready</span>
                         </div>
-                        <small id="progressText" class="progress-text">Processing...</small>
+                        <div class="sheet-cards-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 1rem;">
+                            <div id="card-sheet-NETPAY" class="sheet-status-card" style="background:#f8f9fa; border:1px solid #e2e8f0; border-radius:8px; padding:10px;">
+                                <div style="display:flex; justify-content:space-between; font-weight:600; font-size:13px;">
+                                    <span>NETPAY</span>
+                                    <span id="status-sheet-NETPAY" style="color:#718096; font-size:11px;">Waiting...</span>
+                                </div>
+                                <div class="progress" style="height:6px; margin:6px 0; background:#e2e8f0; border-radius:3px; overflow:hidden;">
+                                    <div id="pbar-sheet-NETPAY" style="width:0%; height:100%; background:#4F2683; transition:width 0.2s;"></div>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; font-size:11px; color:#718096;">
+                                    <span id="rows-sheet-NETPAY">0 rows</span>
+                                    <button type="button" onclick="retrySingleSheet('NETPAY')" class="btn-retry-sheet" id="retry-sheet-NETPAY" style="display:none; border:none; background:none; color:#e53e3e; cursor:pointer; font-weight:600; padding:0;">Retry</button>
+                                </div>
+                            </div>
+                            <div id="card-sheet-POS" class="sheet-status-card" style="background:#f8f9fa; border:1px solid #e2e8f0; border-radius:8px; padding:10px;">
+                                <div style="display:flex; justify-content:space-between; font-weight:600; font-size:13px;">
+                                    <span>POS (DedAmt)</span>
+                                    <span id="status-sheet-POS" style="color:#718096; font-size:11px;">Waiting...</span>
+                                </div>
+                                <div class="progress" style="height:6px; margin:6px 0; background:#e2e8f0; border-radius:3px; overflow:hidden;">
+                                    <div id="pbar-sheet-POS" style="width:0%; height:100%; background:#4F2683; transition:width 0.2s;"></div>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; font-size:11px; color:#718096;">
+                                    <span id="rows-sheet-POS">0 rows</span>
+                                    <button type="button" onclick="retrySingleSheet('POS')" class="btn-retry-sheet" id="retry-sheet-POS" style="display:none; border:none; background:none; color:#e53e3e; cursor:pointer; font-weight:600; padding:0;">Retry</button>
+                                </div>
+                            </div>
+                            <div id="card-sheet-ONQUEUE" class="sheet-status-card" style="background:#f8f9fa; border:1px solid #e2e8f0; border-radius:8px; padding:10px;">
+                                <div style="display:flex; justify-content:space-between; font-weight:600; font-size:13px;">
+                                    <span>ONQUEUE</span>
+                                    <span id="status-sheet-ONQUEUE" style="color:#718096; font-size:11px;">Waiting...</span>
+                                </div>
+                                <div class="progress" style="height:6px; margin:6px 0; background:#e2e8f0; border-radius:3px; overflow:hidden;">
+                                    <div id="pbar-sheet-ONQUEUE" style="width:0%; height:100%; background:#4F2683; transition:width 0.2s;"></div>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; font-size:11px; color:#718096;">
+                                    <span id="rows-sheet-ONQUEUE">0 rows</span>
+                                    <button type="button" onclick="retrySingleSheet('ONQUEUE')" class="btn-retry-sheet" id="retry-sheet-ONQUEUE" style="display:none; border:none; background:none; color:#e53e3e; cursor:pointer; font-weight:600; padding:0;">Retry</button>
+                                </div>
+                            </div>
+                            <div id="card-sheet-PLI" class="sheet-status-card" style="background:#f8f9fa; border:1px solid #e2e8f0; border-radius:8px; padding:10px;">
+                                <div style="display:flex; justify-content:space-between; font-weight:600; font-size:13px;">
+                                    <span>PLI</span>
+                                    <span id="status-sheet-PLI" style="color:#718096; font-size:11px;">Waiting...</span>
+                                </div>
+                                <div class="progress" style="height:6px; margin:6px 0; background:#e2e8f0; border-radius:3px; overflow:hidden;">
+                                    <div id="pbar-sheet-PLI" style="width:0%; height:100%; background:#4F2683; transition:width 0.2s;"></div>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; font-size:11px; color:#718096;">
+                                    <span id="rows-sheet-PLI">0 rows</span>
+                                    <button type="button" onclick="retrySingleSheet('PLI')" class="btn-retry-sheet" id="retry-sheet-PLI" style="display:none; border:none; background:none; color:#e53e3e; cursor:pointer; font-weight:600; padding:0;">Retry</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action buttons -->
+                        <div id="abstractActionButtons" style="display:none; gap:10px; flex-wrap:wrap; margin-top:1rem;">
+                            <button id="btnUploadLiveAbstract" class="btn" onclick="publishAbstractLiveToGithub()" style="background: linear-gradient(135deg, #10b981, #059669); color:white; font-weight:700; padding:10px 22px; border:none; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow: 0 4px 12px rgba(16,185,129,0.25);">
+                                <i class="bi bi-cloud-arrow-up-fill" style="font-size:1.1rem;"></i>
+                                <span>UPLOAD LIVE</span>
+                            </button>
+                            <button id="btnDownloadAllAbstract" class="btn btn-secondary" onclick="downloadAllConvertedAbstract()" style="padding:10px 18px; font-weight:600; border-radius:8px;">
+                                <i class="bi bi-download"></i> Download All CSVs
+                            </button>
+                        </div>
+                        <div id="abstractLiveUploadStatus" style="display:none; margin-top:10px; padding:10px 14px; border-radius:8px; background:#eff6ff; border:1px solid #bfdbfe; font-size:13px; color:#1e40af;"></div>
                     </div>
 
-                    <div id="downloadButtons" class="download-buttons"></div>
+                    <div id="downloadButtons" class="download-buttons" style="display:none;"></div>
                 </div>
 
                 <div class="upload-summary-card">
@@ -428,7 +495,25 @@
                     <small id="lcsProgressText" class="progress-text">Processing LCS sheet...</small>
                 </div>
 
-                <div id="lcsDownloadButtons" class="download-buttons" style="margin-top:1rem;"></div>
+                <div id="lcsDownloadButtons" class="download-buttons" style="margin-top:1rem; display:none; gap:10px; flex-wrap:wrap;"></div>
+
+                <!-- (2026-07-13) LCS UPLOAD LIVE actions and status container; prev: download only -->
+                <div id="lcsActionButtons" style="display:none; gap:10px; flex-wrap:wrap; margin-top:1rem;">
+                    <button id="btnUploadLiveLcs" class="btn" onclick="publishLcsLiveToGithub()" style="background: linear-gradient(135deg, #10b981, #059669); color:white; font-weight:700; padding:10px 22px; border:none; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow: 0 4px 12px rgba(16,185,129,0.25);">
+                        <i class="bi bi-cloud-arrow-up-fill" style="font-size:1.1rem;"></i>
+                        <span>UPLOAD LIVE</span>
+                    </button>
+                    <button id="btnDownloadLcs" class="btn btn-secondary" onclick="downloadConvertedLcs()" style="padding:10px 18px; font-weight:600; border-radius:8px;">
+                        <i class="bi bi-download"></i> Download CSV
+                    </button>
+                </div>
+                <div id="lcsLiveUploadStatus" style="display:none; margin-top:10px; padding:10px 14px; border-radius:8px; background:#eff6ff; border:1px solid #bfdbfe; font-size:13px; color:#1e40af;"></div>
+
+                <!-- (2026-07-13) GitHub Live Token setting bar; prev: none -->
+                <div style="margin-top:1.5rem; padding:10px 14px; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:8px; display:flex; justify-content:space-between; align-items:center; font-size:12px;">
+                    <span style="color:#475569;"><i class="bi bi-shield-lock-fill" style="color:#4F2683; margin-right:4px;"></i> GitHub Live Publishing: <strong id="ghTokenStatus" style="color:#10b981;">Ready</strong></span>
+                    <button type="button" onclick="configureGithubToken()" class="btn btn-sm" style="background:#e2e8f0; color:#334155; font-size:11px; padding:4px 10px; border-radius:4px; border:none; cursor:pointer; font-weight:600;">Configure Token</button>
+                </div>
             </div>
         </div>
     </div>
@@ -1351,19 +1436,67 @@
             const currentMonth = currentDate.getMonth();
             const previousMonthIndex = (currentMonth - 1 + 12) % 12;
             return { short: monthsShort[previousMonthIndex], full: monthsFull[previousMonthIndex] };
-        }
-
-        // (2026-07-13) Add updateLcsFileName & convertLcsExcelToCSV; prev: missing JS handlers
+              // (2026-07-13) Auto-detect LCS file date from filename; prev: manual date picker only
         function updateLcsFileName() {
             const fileInput = document.getElementById("lcsFileInput");
             const fileName = document.getElementById("lcsFileName");
-            if (fileInput && fileName) {
-                fileName.textContent = fileInput.files.length
-                    ? `Selected file: ${fileInput.files[0].name}`
-                    : "No file chosen";
+            const dateInput = document.getElementById("lcsDateInput");
+            if (fileInput && fileInput.files.length) {
+                const name = fileInput.files[0].name;
+                if (fileName) fileName.textContent = `Selected file: ${name}`;
+
+                const monthMap = {
+                    '01': '01', '1': '01', 'jan': '01', 'january': '01',
+                    '02': '02', '2': '02', 'feb': '02', 'february': '02',
+                    '03': '03', '3': '03', 'mar': '03', 'march': '03',
+                    '04': '04', '4': '04', 'apr': '04', 'april': '04',
+                    '05': '05', '5': '05', 'may': '05',
+                    '06': '06', '6': '06', 'jun': '06', 'june': '06',
+                    '07': '07', '7': '07', 'jul': '07', 'july': '07',
+                    '08': '08', '8': '08', 'aug': '08', 'august': '08',
+                    '09': '09', '9': '09', 'sep': '09', 'september': '09',
+                    '10': '10', 'oct': '10', 'october': '10',
+                    '11': '11', 'nov': '11', 'november': '11',
+                    '12': '12', 'dec': '12', 'december': '12'
+                };
+
+                const mDate = name.match(/(\d{1,2})[-_\s.]+(\d{1,2})[-_\s.]+(\d{4})/);
+                const mWord = name.match(/(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)[-_\s.]+(\d{1,2})[-_\s.]+(\d{4})/i);
+
+                let dMonth, dDay, dYear;
+                if (mDate) {
+                    let p1 = parseInt(mDate[1], 10);
+                    let p2 = parseInt(mDate[2], 10);
+                    dYear = mDate[3];
+                    if (p1 <= 12 && p2 > 12) {
+                        dMonth = String(p1).padStart(2, '0');
+                        dDay = String(p2).padStart(2, '0');
+                    } else if (p2 <= 12 && p1 > 12) {
+                        dDay = String(p1).padStart(2, '0');
+                        dMonth = String(p2).padStart(2, '0');
+                    } else {
+                        dMonth = String(p1).padStart(2, '0');
+                        dDay = String(p2).padStart(2, '0');
+                    }
+                } else if (mWord) {
+                    dMonth = monthMap[mWord[1].toLowerCase()];
+                    dDay = String(parseInt(mWord[2], 10)).padStart(2, '0');
+                    dYear = mWord[3];
+                }
+
+                if (dMonth && dDay && dYear && dateInput) {
+                    dateInput.value = `${dYear}-${dMonth}-${dDay}`;
+                }
+            } else if (fileName) {
+                fileName.textContent = "No file chosen";
             }
         }
 
+        // Global in-memory conversion session stores
+        window.activeAbstractSession = null;
+        window.activeLcsSession = null;
+
+        // (2026-07-13) LCS conversion with confirmation dialog and live state; prev: static download
         async function convertLcsExcelToCSV() {
             const dateInput = document.getElementById("lcsDateInput");
             const fileInput = document.getElementById("lcsFileInput");
@@ -1371,7 +1504,7 @@
             const progressContainer = document.getElementById("lcsProgressContainer");
             const progressBar = document.getElementById("lcsProgressBar");
             const progressText = document.getElementById("lcsProgressText");
-            const downloadContainer = document.getElementById("lcsDownloadButtons");
+            const actionButtons = document.getElementById("lcsActionButtons");
 
             if (!fileInput || !fileInput.files.length) {
                 alert("Please select an LCS .xlsx or .xlsm file.");
@@ -1388,41 +1521,38 @@
             const yyyy = selectedDate.getFullYear();
             const outputFilename = `lcs_${mmm}${dd}${yyyy}.csv`;
 
+            const confirmMsg = `Double check LCS Date:\n\nDate: ${mmm} ${dd}, ${yyyy}\nOutput File: ${outputFilename}\n\nClick OK to proceed with conversion.`;
+            if (!confirm(confirmMsg)) return;
+
             if (convertBtn) convertBtn.disabled = true;
             if (progressContainer) progressContainer.style.display = "block";
-            if (progressBar) { progressBar.style.width = "50%"; progressBar.textContent = "50%"; }
-            if (progressText) progressText.textContent = "Reading LCS sheet...";
+            if (progressBar) { progressBar.style.width = "40%"; progressBar.textContent = "40%"; }
+            if (progressText) progressText.textContent = "Parsing LCS sheet...";
 
             const file = fileInput.files[0];
             const reader = new FileReader();
             reader.onload = async function (e) {
                 try {
                     const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: "array" });
+                    const workbook = XLSX.read(data, { type: "array", dense: true });
                     const firstSheetName = workbook.SheetNames[0];
                     const sheet = workbook.Sheets[firstSheetName];
                     const csvText = XLSX.utils.sheet_to_csv(sheet, { FS: ",", RS: "\r\n", blankrows: false });
 
-                    const blob = new Blob([csvText], { type: 'text/csv;charset=utf-8;' });
                     if (progressBar) { progressBar.style.width = "100%"; progressBar.textContent = "100%"; }
-                    if (progressText) progressText.textContent = `Conversion complete! Generated: ${outputFilename}`;
+                    if (progressText) progressText.textContent = `Converted: ${outputFilename} (${(csvText.length / 1024 / 1024).toFixed(2)} MB)`;
 
-                    if (downloadContainer) {
-                        downloadContainer.style.display = "block";
-                        downloadContainer.innerHTML = "";
-                        const downloadBtn = document.createElement("button");
-                        downloadBtn.className = "btn btn-success";
-                        downloadBtn.style.padding = "10px 20px";
-                        downloadBtn.style.fontSize = "15px";
-                        downloadBtn.textContent = `Download ${outputFilename}`;
-                        downloadBtn.onclick = () => {
-                            const link = document.createElement('a');
-                            link.href = URL.createObjectURL(blob);
-                            link.download = outputFilename;
-                            link.click();
-                        };
-                        downloadContainer.appendChild(downloadBtn);
-                    }
+                    window.activeLcsSession = {
+                        filename: outputFilename,
+                        csvText: csvText,
+                        dateStr: `${mmm} ${dd}, ${yyyy}`,
+                        timestamp: Date.now()
+                    };
+                    try {
+                        localStorage.setItem('csb_lcs_live_session', JSON.stringify(window.activeLcsSession));
+                    } catch(err) {}
+
+                    if (actionButtons) actionButtons.style.display = "flex";
                 } catch (err) {
                     alert("Error converting LCS file: " + err.message);
                     if (progressText) progressText.textContent = "Failed to convert file.";
@@ -1433,11 +1563,535 @@
             reader.readAsArrayBuffer(file);
         }
 
+        function downloadConvertedLcs() {
+            if (!window.activeLcsSession || !window.activeLcsSession.csvText) {
+                return alert("No converted LCS file available.");
+            }
+            const blob = new Blob([window.activeLcsSession.csvText], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = window.activeLcsSession.filename;
+            link.click();
+            setTimeout(() => URL.revokeObjectURL(link.href), 2000);
+        }
+
+        async function publishLcsLiveToGithub() {
+            if (!window.activeLcsSession || !window.activeLcsSession.csvText) {
+                return alert("Please convert the LCS file first before uploading live.");
+            }
+            const btn = document.getElementById("btnUploadLiveLcs");
+            const statusEl = document.getElementById("lcsLiveUploadStatus");
+            const filename = window.activeLcsSession.filename;
+
+            if (!confirm(`Are you ready to publish ${filename} LIVE to GitHub?\n\nThis will update available_files.json and make the new LCS ledger immediately available to all users without a reload.`)) {
+                return;
+            }
+
+            if (btn) btn.disabled = true;
+            if (statusEl) {
+                statusEl.style.display = "block";
+                statusEl.innerHTML = `<i class="bi bi-hourglass-split"></i> Uploading ${filename} to GitHub...`;
+            }
+
+            try {
+                const files = [{ path: filename, content: window.activeLcsSession.csvText }];
+                await window.CSB_GITHUB.uploadFiles(files, `Update: Add converted ${filename} live`, (progress) => {
+                    if (statusEl) statusEl.innerHTML = `<i class="bi bi-cloud-arrow-up"></i> [${progress.percent}%] ${progress.message}`;
+                });
+                if (statusEl) {
+                    statusEl.style.background = "#dcfce7";
+                    statusEl.style.color = "#15803d";
+                    statusEl.style.borderColor = "#86efac";
+                    statusEl.innerHTML = `<i class="bi bi-check-circle-fill"></i> <strong>SUCCESS:</strong> ${filename} is now LIVE on GitHub!`;
+                }
+                if (typeof initCoverageTable === "function") initCoverageTable();
+            } catch (err) {
+                if (statusEl) {
+                    statusEl.style.background = "#fee2e2";
+                    statusEl.style.color = "#b91c1c";
+                    statusEl.style.borderColor = "#fca5a5";
+                    statusEl.innerHTML = `<i class="bi bi-exclamation-triangle-fill"></i> <strong>Upload Failed:</strong> ${err.message}`;
+                }
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        // Configure GitHub token dialog
+        function configureGithubToken() {
+            const current = window.CSB_GITHUB ? window.CSB_GITHUB.getToken() : '';
+            const token = prompt("Enter your GitHub Personal Access Token (with repo / contents write permission):", current);
+            if (token !== null && window.CSB_GITHUB) {
+                window.CSB_GITHUB.setToken(token.trim());
+                updateTokenStatusBadge();
+                alert(token.trim() ? "GitHub Token saved successfully!" : "GitHub Token cleared.");
+            }
+        }
+
+        function updateTokenStatusBadge() {
+            const badge = document.getElementById("ghTokenStatus");
+            if (badge && window.CSB_GITHUB) {
+                const hasToken = !!window.CSB_GITHUB.getToken();
+                badge.textContent = hasToken ? "Configured" : "Not Set";
+                badge.style.color = hasToken ? "#10b981" : "#e53e3e";
+            }
+        }
+
+        // (2026-07-13) Multi-sheet Abstract conversion with individual cards, progress bars & state restore
+        let currentWorkbook = null;
+        let currentMonthConfig = null;
+
+        async function convertExcelToCSV() {
+            const monthSelect = document.getElementById("monthSelect");
+            const yearSelect = document.getElementById("yearSelect");
+            const fileInput = document.getElementById("abstractFileInput");
+            const multiProgress = document.getElementById("abstractMultiProgress");
+            const overallStatus = document.getElementById("abstractOverallStatus");
+            const convertButton = document.getElementById("convertButton");
+            const buttonText = document.getElementById("buttonText");
+            const buttonSpinner = document.getElementById("buttonSpinner");
+            const actionButtons = document.getElementById("abstractActionButtons");
+
+            if (!monthSelect.value || !yearSelect.value) return alert("Please select both month and year.");
+            if (!fileInput.files.length) return alert("Please select an .xlsx or .xlsm file.");
+
+            if (convertButton) convertButton.disabled = true;
+            if (buttonText) buttonText.style.display = 'none';
+            if (buttonSpinner) buttonSpinner.style.display = 'inline-block';
+            if (multiProgress) multiProgress.style.display = "block";
+            if (actionButtons) actionButtons.style.display = "none";
+            if (overallStatus) { overallStatus.textContent = "Converting..."; overallStatus.style.background = "#e0d4f7"; }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = async function (e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    currentWorkbook = XLSX.read(data, { type: "array", dense: true, cellFormula: false, cellHTML: false, cellText: false });
+                    const mVal = monthSelect.value.toLowerCase();
+                    const yVal = yearSelect.value;
+                    const yyVal = yVal.slice(-2);
+                    currentMonthConfig = { month: mVal, year: yVal, yy: yyVal };
+
+                    window.activeAbstractSession = {
+                        month: mVal,
+                        year: yVal,
+                        yy: yyVal,
+                        files: {},
+                        timestamp: Date.now()
+                    };
+
+                    const sheets = [
+                        { id: "NETPAY", label: "NETPAY", output: `${mVal}${yyVal}.csv` },
+                        { id: "POS", label: "POS (DedAmt)", output: `pos_${mVal}${yyVal}.csv` },
+                        { id: "ONQUEUE", label: "ONQUEUE", output: `onq_${mVal}${yyVal}.csv` },
+                        { id: "PLI", label: "PLI", output: `pli_${mVal}${yyVal}.csv` }
+                    ];
+
+                    let allSuccessful = true;
+                    for (const s of sheets) {
+                        const ok = await processSingleSheet(s);
+                        if (!ok) allSuccessful = false;
+                        await new Promise(r => setTimeout(r, 50));
+                    }
+
+                    if (overallStatus) {
+                        overallStatus.textContent = allSuccessful ? "Ready to Upload Live" : "Action Required";
+                        overallStatus.style.background = allSuccessful ? "#dcfce7" : "#fee2e2";
+                        overallStatus.style.color = allSuccessful ? "#15803d" : "#b91c1c";
+                    }
+
+                    if (actionButtons) actionButtons.style.display = "flex";
+                    try {
+                        localStorage.setItem('csb_abstract_live_session', JSON.stringify(window.activeAbstractSession));
+                    } catch(err) {}
+                } catch (err) {
+                    alert("Error reading Excel workbook: " + err.message);
+                } finally {
+                    if (buttonText) buttonText.style.display = 'inline';
+                    if (buttonSpinner) buttonSpinner.style.display = 'none';
+                    if (convertButton) convertButton.disabled = false;
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        async function processSingleSheet(sheetConfig) {
+            const statusEl = document.getElementById(`status-sheet-${sheetConfig.id}`);
+            const pbarEl = document.getElementById(`pbar-sheet-${sheetConfig.id}`);
+            const rowsEl = document.getElementById(`rows-sheet-${sheetConfig.id}`);
+            const retryBtn = document.getElementById(`retry-sheet-${sheetConfig.id}`);
+
+            if (statusEl) { statusEl.textContent = "Converting..."; statusEl.style.color = "#4F2683"; }
+            if (pbarEl) pbarEl.style.width = "30%";
+            if (retryBtn) retryBtn.style.display = "none";
+
+            const sheetMatches = (name, id) => {
+                const s = name.toLowerCase().trim();
+                if (id === "PLI") return s.includes("pli");
+                if (id === "POS") return (s.includes("positive") || s.includes("pos") || s.includes("0339") || s.includes("339")) && !s.includes("pli") && !s.includes("onq") && !s.includes("queue");
+                if (id === "ONQUEUE") return (s.includes("onqueue") || s.includes("onq") || s.includes("queue") || s.includes("onque")) && !s.includes("pli");
+                if (id === "NETPAY") return s.includes("netpay") || s.includes("net pay") || s.includes("nthp") || s === "net";
+                return false;
+            };
+
+            const sheetName = Object.keys(currentWorkbook.Sheets).find(n => sheetMatches(n, sheetConfig.id));
+            if (!sheetName) {
+                if (statusEl) { statusEl.textContent = "Sheet missing"; statusEl.style.color = "#e53e3e"; }
+                if (pbarEl) { pbarEl.style.width = "100%"; pbarEl.style.background = "#e53e3e"; }
+                if (retryBtn) retryBtn.style.display = "inline";
+                return false;
+            }
+
+            try {
+                const sheet = currentWorkbook.Sheets[sheetName];
+                let rawRows;
+                if (sheet['!data'] && Array.isArray(sheet['!data'])) {
+                    rawRows = sheet['!data'].map(row => (row || []).map(cell => (cell && cell.v !== undefined ? cell.v : "")));
+                } else {
+                    rawRows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false, defval: "" });
+                }
+
+                if (!rawRows || rawRows.length === 0) throw new Error("Empty sheet");
+
+                const totalRows = rawRows.length;
+                const headers = (rawRows[0] || []).map(c => String(c || "").trim().toUpperCase());
+                const findCol = (patterns) => headers.findIndex(h => patterns.some(p => p.test(h)));
+
+                const colMap = {
+                    REGCODE: findCol([/^REG\s*CODE$/i, /^REG$/i]),
+                    DIVCODE: findCol([/^DIV\s*CODE$/i, /^DIV$/i]),
+                    STACODE: findCol([/^STA\s*CODE$/i, /^STA$/i]),
+                    EMPNO: findCol([/^EMP\s*NO$/i, /^EMPLOYEE\s*NO$/i, /^EMPNO$/i, /^EMP$/i]),
+                    FNPRE: findCol([/^FNPRE$/i]),
+                    FNAME: findCol([/^FNAME$/i, /^FIRST\s*NAME$/i]),
+                    MI: findCol([/^MI$/i, /^MIDDLE\s*INITIAL$/i]),
+                    LNAME: findCol([/^LNAME$/i, /^LAST\s*NAME$/i]),
+                    APPEL: findCol([/^APPEL$/i]),
+                    TAKEHOME: findCol([/TAKE\s*HOME/i, /NTHP/i]),
+                    DEDCODE: findCol([/^DED\s*CODE$/i, /^DEDCODE$/i, /^DED$/i]),
+                    DEDID: findCol([/^DED\s*ID$/i, /^DEDID$/i]),
+                    EFFYY: findCol([/^EFF\s*YY$/i, /^EFFYY$/i]),
+                    EFFMM: findCol([/^EFF\s*MM$/i, /^EFFMM$/i]),
+                    TERYY: findCol([/^TER\s*YY$/i, /^TERYY$/i]),
+                    TERMM: findCol([/^TER\s*MM$/i, /^TERMM$/i]),
+                    DEDAMT: findCol([/^DED\s*AMT$/i, /^DEDAMT$/i, /^AMOUNT$/i]),
+                    POLICYNO: findCol([/^POLICY\s*NO$/i, /^POLICYNO$/i]),
+                    ACCOUNT: findCol([/^ACCOUNT$/i, /^BANK\s*ACCOUNT$/i]),
+                    GRADE: findCol([/^GRADE$/i]),
+                    STEP: findCol([/^STEP$/i]),
+                    TAXCODE: findCol([/^TAX\s*CODE$/i, /^TAXCODE$/i]),
+                    AGENT: findCol([/^AGENT$/i])
+                };
+
+                const sampleRow = rawRows.slice(1, 10).find(r => r && r.length > 5 && /^\d{5,8}$/.test(String(r[3] || '').trim())) || rawRows[1] || [];
+
+                if (sheetConfig.id === "POS") {
+                    const posDedIdx = sampleRow.findIndex((v, i) => i >= 6 && i <= 10 && (/^0?339$/i.test(String(v).trim()) || /^\d{4}$/.test(String(v).trim())));
+                    if (posDedIdx === 8) {
+                        colMap.REGCODE = 0; colMap.DIVCODE = 1; colMap.STACODE = 2; colMap.EMPNO = 3;
+                        colMap.FNAME = 4; colMap.MI = 5; colMap.LNAME = 6;
+                        colMap.DEDCODE = 8; colMap.DEDID = 9; colMap.EFFYY = 10; colMap.EFFMM = 11;
+                        colMap.TERYY = 12; colMap.TERMM = 13; colMap.DEDAMT = 14; colMap.POLICYNO = 15;
+                    } else if (posDedIdx === 9) {
+                        colMap.REGCODE = 0; colMap.DIVCODE = 1; colMap.STACODE = 2; colMap.EMPNO = 3;
+                        colMap.FNAME = 5; colMap.MI = 6; colMap.LNAME = 7;
+                        colMap.DEDCODE = 9; colMap.DEDID = 10; colMap.EFFYY = 11; colMap.EFFMM = 12;
+                        colMap.TERYY = 13; colMap.TERMM = 14; colMap.DEDAMT = 15; colMap.POLICYNO = 16;
+                    }
+                } else if (sheetConfig.id === "ONQUEUE") {
+                    const onqDedIdx = sampleRow.findIndex((v, i) => i >= 6 && i <= 10 && /^\d{4}$/.test(String(v).trim()));
+                    if (onqDedIdx === 7) {
+                        colMap.REGCODE = 0; colMap.DIVCODE = 1; colMap.STACODE = 2; colMap.EMPNO = 3;
+                        colMap.FNAME = 4; colMap.MI = 5; colMap.LNAME = 6;
+                        colMap.DEDCODE = 7; colMap.DEDID = 8; colMap.EFFYY = 9; colMap.EFFMM = 10;
+                        colMap.TERYY = 11; colMap.TERMM = 12; colMap.DEDAMT = 13; colMap.POLICYNO = 15;
+                    } else if (onqDedIdx === 8) {
+                        colMap.REGCODE = 0; colMap.DIVCODE = 1; colMap.STACODE = 2; colMap.EMPNO = 3;
+                        colMap.FNAME = 4; colMap.MI = 5; colMap.LNAME = 6;
+                        colMap.DEDCODE = 8; colMap.DEDID = 9; colMap.EFFYY = 10; colMap.EFFMM = 11;
+                        colMap.TERYY = 12; colMap.TERMM = 13; colMap.DEDAMT = 14; colMap.POLICYNO = 15;
+                    }
+                } else if (sheetConfig.id === "NETPAY") {
+                    const nthpIdx = sampleRow.findIndex((v, i) => i >= 6 && i <= 10 && /^-?\d+(\.\d+)?$/.test(String(v).replace(/,/g, '').trim()) && parseFloat(String(v).replace(/,/g, '').trim()) > 500);
+                    if (nthpIdx === 7) {
+                        colMap.REGCODE = 0; colMap.DIVCODE = 1; colMap.STACODE = 2; colMap.EMPNO = 3;
+                        colMap.FNAME = 4; colMap.MI = 5; colMap.LNAME = 6;
+                        colMap.TAKEHOME = 7; colMap.GRADE = 9; colMap.STEP = 10; colMap.TAXCODE = 11; colMap.ACCOUNT = 13;
+                    }
+                }
+
+                const getVal = (r, idx) => (idx !== -1 && r[idx] !== undefined && r[idx] !== null) ? String(r[idx]).replace(/,/g, '').trim() : "";
+                const processedRows = [];
+
+                for (let rIdx = 0; rIdx < totalRows; rIdx++) {
+                    const r = rawRows[rIdx];
+                    if (rIdx > 0) {
+                        const emp = getVal(r, colMap.EMPNO !== -1 ? colMap.EMPNO : 3);
+                        if (!/^\d{4,8}$/.test(emp)) continue;
+                    }
+
+                    if (sheetConfig.id === "NETPAY") {
+                        processedRows.push(rIdx === 0 ? ["REGCODE", "DIVCODE", "STACODE", "EMPNO", "FNAME", "MI", "LNAME", "TAKEHOME", "", "GRADE", "STEP", "TAXCODE", "", "ACCOUNT"] : [
+                            getVal(r, colMap.REGCODE !== -1 ? colMap.REGCODE : 0),
+                            getVal(r, colMap.DIVCODE !== -1 ? colMap.DIVCODE : 1),
+                            getVal(r, colMap.STACODE !== -1 ? colMap.STACODE : 2),
+                            getVal(r, colMap.EMPNO !== -1 ? colMap.EMPNO : 3),
+                            getVal(r, colMap.FNAME !== -1 ? colMap.FNAME : 4),
+                            getVal(r, colMap.MI !== -1 ? colMap.MI : 5),
+                            getVal(r, colMap.LNAME !== -1 ? colMap.LNAME : 6),
+                            getVal(r, colMap.TAKEHOME !== -1 ? colMap.TAKEHOME : 7),
+                            "",
+                            getVal(r, colMap.GRADE !== -1 ? colMap.GRADE : 9),
+                            getVal(r, colMap.STEP !== -1 ? colMap.STEP : 10),
+                            getVal(r, colMap.TAXCODE !== -1 ? colMap.TAXCODE : 11),
+                            "",
+                            getVal(r, colMap.ACCOUNT !== -1 ? colMap.ACCOUNT : 13)
+                        ]);
+                    } else if (sheetConfig.id === "POS") {
+                        processedRows.push(rIdx === 0 ? ["REGCODE", "DIVCODE", "STACODE", "EMPNO", "FNAME", "MI", "LNAME", "DEDCODE", "DEDID", "EFFYY", "EFFMM", "TERYY", "TERMM", "DEDAMT", "", "POLICYNO"] : [
+                            getVal(r, colMap.REGCODE !== -1 ? colMap.REGCODE : 0),
+                            getVal(r, colMap.DIVCODE !== -1 ? colMap.DIVCODE : 1),
+                            getVal(r, colMap.STACODE !== -1 ? colMap.STACODE : 2),
+                            getVal(r, colMap.EMPNO !== -1 ? colMap.EMPNO : 3),
+                            getVal(r, colMap.FNAME !== -1 ? colMap.FNAME : 4),
+                            getVal(r, colMap.MI !== -1 ? colMap.MI : 5),
+                            getVal(r, colMap.LNAME !== -1 ? colMap.LNAME : 6),
+                            getVal(r, colMap.DEDCODE !== -1 ? colMap.DEDCODE : 8),
+                            getVal(r, colMap.DEDID !== -1 ? colMap.DEDID : 9),
+                            getVal(r, colMap.EFFYY !== -1 ? colMap.EFFYY : 10),
+                            getVal(r, colMap.EFFMM !== -1 ? colMap.EFFMM : 11),
+                            getVal(r, colMap.TERYY !== -1 ? colMap.TERYY : 12),
+                            getVal(r, colMap.TERMM !== -1 ? colMap.TERMM : 13),
+                            getVal(r, colMap.DEDAMT !== -1 ? colMap.DEDAMT : 14),
+                            "",
+                            getVal(r, colMap.POLICYNO !== -1 ? colMap.POLICYNO : 15)
+                        ]);
+                    } else if (sheetConfig.id === "ONQUEUE") {
+                        processedRows.push(rIdx === 0 ? ["REGCODE", "DIVCODE", "STACODE", "EMPNO", "FNAME", "MI", "LNAME", "DEDCODE", "DEDID", "EFFYY", "EFFMM", "TERYY", "TERMM", "DEDAMT", "", "POLICYNO"] : [
+                            getVal(r, colMap.REGCODE !== -1 ? colMap.REGCODE : 0),
+                            getVal(r, colMap.DIVCODE !== -1 ? colMap.DIVCODE : 1),
+                            getVal(r, colMap.STACODE !== -1 ? colMap.STACODE : 2),
+                            getVal(r, colMap.EMPNO !== -1 ? colMap.EMPNO : 3),
+                            getVal(r, colMap.FNAME !== -1 ? colMap.FNAME : 4),
+                            getVal(r, colMap.MI !== -1 ? colMap.MI : 5),
+                            getVal(r, colMap.LNAME !== -1 ? colMap.LNAME : 6),
+                            getVal(r, colMap.DEDCODE !== -1 ? colMap.DEDCODE : 7),
+                            getVal(r, colMap.DEDID !== -1 ? colMap.DEDID : 8),
+                            getVal(r, colMap.EFFYY !== -1 ? colMap.EFFYY : 9),
+                            getVal(r, colMap.EFFMM !== -1 ? colMap.EFFMM : 10),
+                            getVal(r, colMap.TERYY !== -1 ? colMap.TERYY : 11),
+                            getVal(r, colMap.TERMM !== -1 ? colMap.TERMM : 12),
+                            getVal(r, colMap.DEDAMT !== -1 ? colMap.DEDAMT : 13),
+                            "",
+                            getVal(r, colMap.POLICYNO !== -1 ? colMap.POLICYNO : 15)
+                        ]);
+                    } else if (sheetConfig.id === "PLI") {
+                        processedRows.push(rIdx === 0 ? ["BLANK", "DIVCODE", "STACODE", "EMPNO", "FNPRE", "FNAME", "MI", "LNAME", "APPEL", "DEDCODE", "DEDID", "EFFYY", "EFFMM", "TERYY", "TERMM", "DEDAMT", "POLICYNO", "AGENT"] : [
+                            "",
+                            getVal(r, colMap.DIVCODE !== -1 ? colMap.DIVCODE : 1),
+                            getVal(r, colMap.STACODE !== -1 ? colMap.STACODE : 2),
+                            getVal(r, colMap.EMPNO !== -1 ? colMap.EMPNO : 3),
+                            getVal(r, colMap.FNPRE !== -1 ? colMap.FNPRE : 4),
+                            getVal(r, colMap.FNAME !== -1 ? colMap.FNAME : 5),
+                            getVal(r, colMap.MI !== -1 ? colMap.MI : 6),
+                            getVal(r, colMap.LNAME !== -1 ? colMap.LNAME : 7),
+                            getVal(r, colMap.APPEL !== -1 ? colMap.APPEL : 8),
+                            getVal(r, colMap.DEDCODE !== -1 ? colMap.DEDCODE : 9),
+                            getVal(r, colMap.DEDID !== -1 ? colMap.DEDID : 10),
+                            getVal(r, colMap.EFFYY !== -1 ? colMap.EFFYY : 11),
+                            getVal(r, colMap.EFFMM !== -1 ? colMap.EFFMM : 12),
+                            getVal(r, colMap.TERYY !== -1 ? colMap.TERYY : 13),
+                            getVal(r, colMap.TERMM !== -1 ? colMap.TERMM : 14),
+                            getVal(r, colMap.DEDAMT !== -1 ? colMap.DEDAMT : 15),
+                            getVal(r, colMap.POLICYNO !== -1 ? colMap.POLICYNO : 16),
+                            getVal(r, colMap.AGENT !== -1 ? colMap.AGENT : 17)
+                        ]);
+                    }
+                }
+
+                // Numeric clean
+                for (let r = 1; r < processedRows.length; r++) {
+                    for (let c = 0; c < processedRows[r].length; c++) {
+                        let val = processedRows[r][c];
+                        if (val !== "") {
+                            let cleanVal = String(val).replace(/,/g, '').trim();
+                            let num = parseFloat(cleanVal);
+                            if (!isNaN(num) && /^-?\d+(\.\d+)?$/.test(cleanVal)) {
+                                if (c === 3) processedRows[r][c] = String(Math.round(num));
+                                else if (cleanVal.includes('.') || (sheetConfig.id === 'NETPAY' && c === 7) || (sheetConfig.id !== 'NETPAY' && c >= 12)) processedRows[r][c] = num.toFixed(2);
+                            }
+                        }
+                    }
+                }
+
+                // Direct CSV line builder
+                const validCount = processedRows.length;
+                const rowStrs = new Array(validCount);
+                for (let i = 0; i < validCount; i++) {
+                    const row = processedRows[i];
+                    let s = "";
+                    for (let j = 0; j < row.length; j++) {
+                        let v = row[j] !== undefined && row[j] !== null ? String(row[j]) : "";
+                        if (v.includes(',') || v.includes('"') || v.includes('\n') || v.includes('\r')) v = '"' + v.replace(/"/g, '""') + '"';
+                        s += (j > 0 ? "," : "") + v;
+                    }
+                    rowStrs[i] = s;
+                }
+                const csvContent = rowStrs.join("\r\n");
+
+                if (statusEl) { statusEl.textContent = "Done"; statusEl.style.color = "#10b981"; }
+                if (pbarEl) { pbarEl.style.width = "100%"; pbarEl.style.background = "#10b981"; }
+                if (rowsEl) rowsEl.textContent = `${validCount.toLocaleString()} rows`;
+
+                window.activeAbstractSession.files[sheetConfig.id] = {
+                    filename: sheetConfig.output,
+                    content: csvContent,
+                    rows: validCount
+                };
+                return true;
+            } catch (err) {
+                if (statusEl) { statusEl.textContent = "Failed: " + err.message; statusEl.style.color = "#e53e3e"; }
+                if (pbarEl) { pbarEl.style.width = "100%"; pbarEl.style.background = "#e53e3e"; }
+                if (retryBtn) retryBtn.style.display = "inline";
+                return false;
+            }
+        }
+
+        async function retrySingleSheet(sheetId) {
+            if (!currentWorkbook) return alert("Workbook is not loaded. Please select the file again.");
+            const mVal = currentMonthConfig ? currentMonthConfig.month : 'aug';
+            const yyVal = currentMonthConfig ? currentMonthConfig.yy : '26';
+            const sheetMap = {
+                NETPAY: { id: "NETPAY", label: "NETPAY", output: `${mVal}${yyVal}.csv` },
+                POS: { id: "POS", label: "POS (DedAmt)", output: `pos_${mVal}${yyVal}.csv` },
+                ONQUEUE: { id: "ONQUEUE", label: "ONQUEUE", output: `onq_${mVal}${yyVal}.csv` },
+                PLI: { id: "PLI", label: "PLI", output: `pli_${mVal}${yyVal}.csv` }
+            };
+            await processSingleSheet(sheetMap[sheetId]);
+        }
+
+        function downloadAllConvertedAbstract() {
+            if (!window.activeAbstractSession || !window.activeAbstractSession.files) return alert("No converted abstract files available.");
+            const fileEntries = Object.values(window.activeAbstractSession.files);
+            if (fileEntries.length === 0) return alert("No files ready for download.");
+
+            fileEntries.forEach((f, idx) => {
+                setTimeout(() => {
+                    const blob = new Blob([f.content], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = f.filename;
+                    link.click();
+                    setTimeout(() => URL.revokeObjectURL(link.href), 2000);
+                }, idx * 600);
+            });
+        }
+
+        async function publishAbstractLiveToGithub() {
+            if (!window.activeAbstractSession || !window.activeAbstractSession.files) return alert("No converted files found.");
+            const fileEntries = Object.values(window.activeAbstractSession.files);
+            if (fileEntries.length === 0) return alert("No converted files ready to publish.");
+
+            const mName = currentMonthConfig ? currentMonthConfig.month.toUpperCase() : 'ABSTRACT';
+            const yName = currentMonthConfig ? currentMonthConfig.year : '2026';
+            const fileNamesList = fileEntries.map(f => f.filename).join(', ');
+
+            if (!confirm(`Are you ready to publish ${fileEntries.length} files LIVE to GitHub?\n\nFiles: ${fileNamesList}\n\nThis will publish the files immediately to GitHub without needing USB transfers.`)) {
+                return;
+            }
+
+            const btn = document.getElementById("btnUploadLiveAbstract");
+            const statusEl = document.getElementById("abstractLiveUploadStatus");
+
+            if (btn) btn.disabled = true;
+            if (statusEl) {
+                statusEl.style.display = "block";
+                statusEl.style.background = "#eff6ff";
+                statusEl.style.color = "#1e40af";
+                statusEl.style.borderColor = "#bfdbfe";
+                statusEl.innerHTML = `<i class="bi bi-hourglass-split"></i> Preparing files for GitHub upload...`;
+            }
+
+            try {
+                const uploadBatch = fileEntries.map(f => ({ path: f.filename, content: f.content }));
+                await window.CSB_GITHUB.uploadFiles(uploadBatch, `Update: Add converted ${mName} ${yName} abstract CSVs live`, (progress) => {
+                    if (statusEl) statusEl.innerHTML = `<i class="bi bi-cloud-arrow-up"></i> [${progress.percent}%] ${progress.message}`;
+                });
+
+                if (statusEl) {
+                    statusEl.style.background = "#dcfce7";
+                    statusEl.style.color = "#15803d";
+                    statusEl.style.borderColor = "#86efac";
+                    statusEl.innerHTML = `<i class="bi bi-check-circle-fill"></i> <strong>SUCCESS:</strong> All ${fileEntries.length} files are now LIVE on GitHub!`;
+                }
+                if (typeof initCoverageTable === "function") initCoverageTable();
+            } catch (err) {
+                if (statusEl) {
+                    statusEl.style.background = "#fee2e2";
+                    statusEl.style.color = "#b91c1c";
+                    statusEl.style.borderColor = "#fca5a5";
+                    statusEl.innerHTML = `<i class="bi bi-exclamation-triangle-fill"></i> <strong>Upload Failed:</strong> ${err.message}`;
+                }
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        // (2026-07-13) Restore previous conversion session from localStorage on reload
+        function restoreConversionSessions() {
+            updateTokenStatusBadge();
+            try {
+                const absSession = localStorage.getItem('csb_abstract_live_session');
+                if (absSession) {
+                    const parsed = JSON.parse(absSession);
+                    if (parsed && parsed.files && Object.keys(parsed.files).length > 0) {
+                        window.activeAbstractSession = parsed;
+                        currentMonthConfig = { month: parsed.month, year: parsed.year, yy: parsed.yy };
+                        const multiProgress = document.getElementById("abstractMultiProgress");
+                        const actionButtons = document.getElementById("abstractActionButtons");
+                        const overallStatus = document.getElementById("abstractOverallStatus");
+                        if (multiProgress) multiProgress.style.display = "block";
+                        if (actionButtons) actionButtons.style.display = "flex";
+                        if (overallStatus) { overallStatus.textContent = "Saved & Ready"; overallStatus.style.background = "#dcfce7"; overallStatus.style.color = "#15803d"; }
+
+                        Object.keys(parsed.files).forEach(sheetId => {
+                            const f = parsed.files[sheetId];
+                            const statusEl = document.getElementById(`status-sheet-${sheetId}`);
+                            const pbarEl = document.getElementById(`pbar-sheet-${sheetId}`);
+                            const rowsEl = document.getElementById(`rows-sheet-${sheetId}`);
+                            if (statusEl) { statusEl.textContent = "Ready"; statusEl.style.color = "#10b981"; }
+                            if (pbarEl) { pbarEl.style.width = "100%"; pbarEl.style.background = "#10b981"; }
+                            if (rowsEl) rowsEl.textContent = `${(f.rows || 0).toLocaleString()} rows`;
+                        });
+                    }
+                }
+
+                const lcsSession = localStorage.getItem('csb_lcs_live_session');
+                if (lcsSession) {
+                    const parsed = JSON.parse(lcsSession);
+                    if (parsed && parsed.csvText) {
+                        window.activeLcsSession = parsed;
+                        const actionButtons = document.getElementById("lcsActionButtons");
+                        const progressContainer = document.getElementById("lcsProgressContainer");
+                        const progressBar = document.getElementById("lcsProgressBar");
+                        const progressText = document.getElementById("lcsProgressText");
+                        if (progressContainer) progressContainer.style.display = "block";
+                        if (progressBar) { progressBar.style.width = "100%"; progressBar.textContent = "100%"; }
+                        if (progressText) progressText.textContent = `Ready: ${parsed.filename}`;
+                        if (actionButtons) actionButtons.style.display = "flex";
+                    }
+                }
+            } catch(e) {}
+        }
+
         // Initialize admin sections when DOM is ready
         document.addEventListener("DOMContentLoaded", function () {
             // Populate dropdowns
             populateMonthDropdown();
             populateYearDropdown();
+            restoreConversionSessions();
 
             const lcsDateInput = document.getElementById("lcsDateInput");
             if (lcsDateInput && !lcsDateInput.value) {
@@ -1474,379 +2128,7 @@
             if (abstractInput) abstractInput.addEventListener("change", refreshUploadCart);
 
             refreshUploadCart();
-        });
-
-        async function convertExcelToCSV() {
-            const monthSelect = document.getElementById("monthSelect");
-            const yearSelect = document.getElementById("yearSelect");
-            const fileInput = document.getElementById("abstractFileInput");
-            const progressContainer = document.getElementById("progressContainer");
-            const progressBar = document.getElementById("progressBar");
-            const progressText = document.getElementById("progressText");
-            const convertButton = document.getElementById("convertButton");
-            const buttonText = document.getElementById("buttonText");
-            const buttonSpinner = document.getElementById("buttonSpinner");
-            const pliWarning = document.getElementById("pliWarning");
-            const downloadButtonsContainer = document.getElementById("downloadButtons");
-
-            if (!monthSelect.value || !yearSelect.value) return alert("Please select both month and year.");
-            /* 
-             * CHANGE DETAILS:
-             * Element: file validation check
-             * Date: 2026-07-07
-             * Fix: Support either .xlsx or .xlsm file extension for uploader validation.
-             */
-            if (!fileInput.files.length) return alert("Please select an .xlsx or .xlsm file.");
-
-            if (convertButton) convertButton.disabled = true;
-            if (buttonText) buttonText.style.display = 'none';
-            if (buttonSpinner) buttonSpinner.style.display = 'inline-block';
-            if (progressContainer) progressContainer.style.display = "block";
-            if (progressBar) {
-                progressBar.style.width = "0%";
-                progressBar.textContent = "0%";
-            }
-            if (progressText) progressText.textContent = "Initializing...";
-            if (pliWarning) pliWarning.style.display = "none";
-            if (downloadButtonsContainer) {
-                downloadButtonsContainer.style.display = "none";
-                downloadButtonsContainer.innerHTML = "";
-            }
-
-            const file = fileInput.files[0];
-            const reader = new FileReader();
-            const filesToDownload = [];
-
-            const timeout50 = setTimeout(() => {
-                if (progressBar) {
-                    progressBar.style.width = "50%";
-                    progressBar.textContent = "50%";
-                }
-                if (progressText) progressText.textContent = "Working on it (50%)...";
-            }, 5000);
-
-            const timeout80 = setTimeout(() => {
-                if (progressBar) {
-                    progressBar.style.width = "80%";
-                    progressBar.textContent = "80%";
-                }
-                if (progressText) progressText.textContent = "Still processing (80%)...";
-            }, 20000);
-
-            reader.onload = async function (e) {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: "array" });
-
-                    // (2026-07-13) Support LCS 1-sheet converter to lcs_mmmddyyyy.csv; prev: 4 sheets only
-                    const monthsCap = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-                    const monthsLower = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
-                    let lcsMonth = monthsCap[new Date().getMonth()];
-                    if (monthSelect && monthSelect.value) {
-                        const idx = monthsLower.indexOf(monthSelect.value.toLowerCase());
-                        if (idx !== -1) lcsMonth = monthsCap[idx];
-                    }
-                    const lcsDay = String(new Date().getDate()).padStart(2, '0');
-                    const lcsYear = yearSelect && yearSelect.value ? yearSelect.value : String(new Date().getFullYear());
-                    const lcsOutput = `lcs_${lcsMonth}${lcsDay}${lcsYear}.csv`;
-
-                    const sheetsToProcess = [
-                        {
-                            id: "NETPAY",
-                            keywords: ["netpay", "net pay", "nthp", "net"],
-                            output: `${monthSelect.value}${yearSelect.value.slice(-2)}.csv`
-                        },
-                        {
-                            id: "POS",
-                            keywords: ["pos", "positive", "dedamt", "csb"],
-                            output: `pos_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`
-                        },
-                        {
-                            id: "ONQUEUE",
-                            keywords: ["onqueue", "onq", "queue", "queque", "onque"],
-                            output: `onq_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`
-                        },
-                        {
-                            id: "PLI",
-                            keywords: ["pli", "plis"],
-                            output: `pli_${monthSelect.value}${yearSelect.value.slice(-2)}.csv`
-                        },
-                        {
-                            id: "LCS",
-                            keywords: ["lcs", "sunline", "ledger"],
-                            output: lcsOutput
-                        }
-                    ];
-
-                    const sheetMatchesConfig = (sheetName, sheetConfig) => {
-                        const s = sheetName.toLowerCase().trim();
-                        if (sheetConfig.id === "PLI") {
-                            return s.includes("pli");
-                        }
-                        if (sheetConfig.id === "POS") {
-                            return (s.includes("positive") || s.includes("pos") || s.includes("0339") || s.includes("339")) && !s.includes("pli") && !s.includes("onq") && !s.includes("queue");
-                        }
-                        if (sheetConfig.id === "ONQUEUE") {
-                            return (s.includes("onqueue") || s.includes("onq") || s.includes("queue") || s.includes("onque")) && !s.includes("pli");
-                        }
-                        if (sheetConfig.id === "NETPAY") {
-                            return s.includes("netpay") || s.includes("net pay") || s.includes("nthp") || s === "net";
-                        }
-                        if (sheetConfig.id === "LCS") {
-                            return s.includes("lcs") || s.includes("sunline") || s.includes("ledger");
-                        }
-                        return false;
-                    };
-
-                    let presentSheets = sheetsToProcess.filter(sheetConfig =>
-                        Object.keys(workbook.Sheets).some(name => sheetMatchesConfig(name, sheetConfig))
-                    );
-
-                    if (presentSheets.length === 0) {
-                        if (Object.keys(workbook.Sheets).length === 1) {
-                            const singleConfig = {
-                                id: "LCS",
-                                keywords: [],
-                                output: lcsOutput,
-                                forceSheetName: Object.keys(workbook.Sheets)[0]
-                            };
-                            presentSheets = [singleConfig];
-                        } else {
-                            alert('No matching sheets found in the Excel file.');
-                            resetUI();
-                            return;
-                        }
-                    }
-
-                    for (const sheetConfig of presentSheets) {
-                        const sheetName = sheetConfig.forceSheetName || Object.keys(workbook.Sheets).find(name =>
-                            sheetMatchesConfig(name, sheetConfig)
-                        );
-                        let sheet = workbook.Sheets[sheetName];
-                        // (2026-07-13) Fix rawRows definition & sheet keywords; prev: missing rawRows
-                        let rawRows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false, defval: "" });
-                        const headers = (rawRows[0] || []).map(c => String(c || "").trim().toUpperCase());
-                        const findCol = (patterns) => headers.findIndex(h => patterns.some(p => p.test(h)));
-
-                        // (2026-07-13) Detect BLANK prefix col; prev: no blank detection
-                        const hasBlankPrefix = headers[0] === 'BLANK' || headers[0] === '';
-                        const blankOffset = hasBlankPrefix ? 1 : 0;
-                        const colMap = {
-                            REGCODE: findCol([/^REG\s*CODE$/i, /^REG$/i]),
-                            DIVCODE: findCol([/^DIV\s*CODE$/i, /^DIV$/i]),
-                            STACODE: findCol([/^STA\s*CODE$/i, /^STA$/i]),
-                            EMPNO: findCol([/^EMP\s*NO$/i, /^EMPLOYEE\s*NO$/i, /^EMPNO$/i, /^EMP$/i]),
-                            FNPRE: findCol([/^FNPRE$/i]),
-                            FNAME: findCol([/^FNAME$/i, /^FIRST\s*NAME$/i]),
-                            MI: findCol([/^MI$/i, /^MIDDLE\s*INITIAL$/i]),
-                            LNAME: findCol([/^LNAME$/i, /^LAST\s*NAME$/i]),
-                            APPEL: findCol([/^APPEL$/i]),
-                            TAKEHOME: findCol([/TAKE\s*HOME/i, /NTHP/i]),
-                            DEDCODE: findCol([/^DED\s*CODE$/i, /^DEDCODE$/i, /^DED$/i]),
-                            DEDID: findCol([/^DED\s*ID$/i, /^DEDID$/i]),
-                            EFFYY: findCol([/^EFF\s*YY$/i, /^EFFYY$/i]),
-                            EFFMM: findCol([/^EFF\s*MM$/i, /^EFFMM$/i]),
-                            TERYY: findCol([/^TER\s*YY$/i, /^TERYY$/i]),
-                            TERMM: findCol([/^TER\s*MM$/i, /^TERMM$/i]),
-                            DEDAMT: findCol([/^DED\s*AMT$/i, /^DEDAMT$/i, /^AMOUNT$/i]),
-                            POLICYNO: findCol([/^POLICY\s*NO$/i, /^POLICYNO$/i]),
-                            ACCOUNT: findCol([/^ACCOUNT$/i, /^BANK\s*ACCOUNT$/i]),
-                            GRADE: findCol([/^GRADE$/i]),
-                            STEP: findCol([/^STEP$/i]),
-                            TAXCODE: findCol([/^TAX\s*CODE$/i, /^TAXCODE$/i]),
-                            AGENT: findCol([/^AGENT$/i])
-                        };
-
-                        const getVal = (r, idx) => (idx !== -1 && r[idx] !== undefined && r[idx] !== null) ? String(r[idx]).replace(/,/g, '').trim() : "";
-
-                        let processedRows = rawRows.map((r, rowIndex) => {
-                            if (sheetConfig.id === "NETPAY") {
-                                if (rowIndex === 0) {
-                                    return ["REGCODE", "DIVCODE", "STACODE", "EMPNO", "FNAME", "MI", "LNAME", "TAKEHOME", "", "GRADE", "STEP", "TAXCODE", "", "ACCOUNT"];
-                                }
-                                return [
-                                    getVal(r, colMap.REGCODE !== -1 ? colMap.REGCODE : 0),
-                                    getVal(r, colMap.DIVCODE !== -1 ? colMap.DIVCODE : 1),
-                                    getVal(r, colMap.STACODE !== -1 ? colMap.STACODE : 2),
-                                    getVal(r, colMap.EMPNO !== -1 ? colMap.EMPNO : 3),
-                                    getVal(r, colMap.FNAME !== -1 ? colMap.FNAME : 5),
-                                    getVal(r, colMap.MI !== -1 ? colMap.MI : 6),
-                                    getVal(r, colMap.LNAME !== -1 ? colMap.LNAME : 7),
-                                    getVal(r, colMap.TAKEHOME !== -1 ? colMap.TAKEHOME : 25),
-                                    "",
-                                    getVal(r, colMap.GRADE !== -1 ? colMap.GRADE : 18),
-                                    getVal(r, colMap.STEP !== -1 ? colMap.STEP : 19),
-                                    getVal(r, colMap.TAXCODE !== -1 ? colMap.TAXCODE : 20),
-                                    "",
-                                    getVal(r, colMap.ACCOUNT !== -1 ? colMap.ACCOUNT : 26)
-                                ];
-                            } else if (sheetConfig.id === "POS") {
-                                if (rowIndex === 0) {
-                                    return ["REGCODE", "DIVCODE", "STACODE", "EMPNO", "FNAME", "MI", "LNAME", "DEDCODE", "DEDID", "EFFYY", "EFFMM", "TERYY", "TERMM", "DEDAMT", "", "POLICYNO"];
-                                }
-                                return [
-                                    getVal(r, colMap.REGCODE !== -1 ? colMap.REGCODE : 0),
-                                    getVal(r, colMap.DIVCODE !== -1 ? colMap.DIVCODE : 1),
-                                    getVal(r, colMap.STACODE !== -1 ? colMap.STACODE : 2),
-                                    getVal(r, colMap.EMPNO !== -1 ? colMap.EMPNO : 3),
-                                    getVal(r, colMap.FNAME !== -1 ? colMap.FNAME : 5),
-                                    getVal(r, colMap.MI !== -1 ? colMap.MI : 6),
-                                    getVal(r, colMap.LNAME !== -1 ? colMap.LNAME : 7),
-                                    getVal(r, colMap.DEDCODE !== -1 ? colMap.DEDCODE : 9),
-                                    getVal(r, colMap.DEDID !== -1 ? colMap.DEDID : 10),
-                                    getVal(r, colMap.EFFYY !== -1 ? colMap.EFFYY : 11),
-                                    getVal(r, colMap.EFFMM !== -1 ? colMap.EFFMM : 12),
-                                    getVal(r, colMap.TERYY !== -1 ? colMap.TERYY : 13),
-                                    getVal(r, colMap.TERMM !== -1 ? colMap.TERMM : 14),
-                                    getVal(r, colMap.DEDAMT !== -1 ? colMap.DEDAMT : 15),
-                                    "",
-                                    getVal(r, colMap.POLICYNO !== -1 ? colMap.POLICYNO : 16)
-                                ];
-                            // (2026-07-13) Fix ONQUEUE schema with blankOffset for BLANK-leading src; prev: hardcoded fallbacks
-                            } else if (sheetConfig.id === "ONQUEUE") {
-                                if (rowIndex === 0) {
-                                    return ["REGCODE", "DIVCODE", "STACODE", "EMPNO", "FNAME", "MI", "LNAME", "DEDCODE", "DEDID", "EFFYY", "EFFMM", "TERYY", "TERMM", "DEDAMT", "", "POLICYNO"];
-                                }
-                                return [
-                                    getVal(r, colMap.REGCODE !== -1 ? colMap.REGCODE : blankOffset + 0),
-                                    getVal(r, colMap.DIVCODE !== -1 ? colMap.DIVCODE : blankOffset + 1),
-                                    getVal(r, colMap.STACODE !== -1 ? colMap.STACODE : blankOffset + 2),
-                                    getVal(r, colMap.EMPNO !== -1 ? colMap.EMPNO : blankOffset + 3),
-                                    getVal(r, colMap.FNAME !== -1 ? colMap.FNAME : blankOffset + 4),
-                                    getVal(r, colMap.MI !== -1 ? colMap.MI : blankOffset + 5),
-                                    getVal(r, colMap.LNAME !== -1 ? colMap.LNAME : blankOffset + 6),
-                                    getVal(r, colMap.DEDCODE !== -1 ? colMap.DEDCODE : blankOffset + 7),
-                                    getVal(r, colMap.DEDID !== -1 ? colMap.DEDID : blankOffset + 8),
-                                    getVal(r, colMap.EFFYY !== -1 ? colMap.EFFYY : blankOffset + 9),
-                                    getVal(r, colMap.EFFMM !== -1 ? colMap.EFFMM : blankOffset + 10),
-                                    getVal(r, colMap.TERYY !== -1 ? colMap.TERYY : blankOffset + 11),
-                                    getVal(r, colMap.TERMM !== -1 ? colMap.TERMM : blankOffset + 12),
-                                    getVal(r, colMap.DEDAMT !== -1 ? colMap.DEDAMT : blankOffset + 13),
-                                    "",
-                                    getVal(r, colMap.POLICYNO !== -1 ? colMap.POLICYNO : blankOffset + 15)
-                                ];
-                            } else if (sheetConfig.id === "PLI") {
-                                if (rowIndex === 0) {
-                                    return ["BLANK", "DIVCODE", "STACODE", "EMPNO", "FNPRE", "FNAME", "MI", "LNAME", "APPEL", "DEDCODE", "DEDID", "EFFYY", "EFFMM", "TERYY", "TERMM", "DEDAMT", "POLICYNO", "AGENT"];
-                                }
-                                return [
-                                    "",
-                                    getVal(r, colMap.DIVCODE !== -1 ? colMap.DIVCODE : 1),
-                                    getVal(r, colMap.STACODE !== -1 ? colMap.STACODE : 2),
-                                    getVal(r, colMap.EMPNO !== -1 ? colMap.EMPNO : 3),
-                                    getVal(r, colMap.FNPRE !== -1 ? colMap.FNPRE : 4),
-                                    getVal(r, colMap.FNAME !== -1 ? colMap.FNAME : 5),
-                                    getVal(r, colMap.MI !== -1 ? colMap.MI : 6),
-                                    getVal(r, colMap.LNAME !== -1 ? colMap.LNAME : 7),
-                                    getVal(r, colMap.APPEL !== -1 ? colMap.APPEL : 8),
-                                    getVal(r, colMap.DEDCODE !== -1 ? colMap.DEDCODE : 9),
-                                    getVal(r, colMap.DEDID !== -1 ? colMap.DEDID : 10),
-                                    getVal(r, colMap.EFFYY !== -1 ? colMap.EFFYY : 11),
-                                    getVal(r, colMap.EFFMM !== -1 ? colMap.EFFMM : 12),
-                                    getVal(r, colMap.TERYY !== -1 ? colMap.TERYY : 13),
-                                    getVal(r, colMap.TERMM !== -1 ? colMap.TERMM : 14),
-                                    getVal(r, colMap.DEDAMT !== -1 ? colMap.DEDAMT : 15),
-                                    getVal(r, colMap.POLICYNO !== -1 ? colMap.POLICYNO : 16),
-                                    getVal(r, colMap.AGENT !== -1 ? colMap.AGENT : 17)
-                                ];
-                            }
-                            return r;
-                        });
-
-                        // (2026-07-13) Format EMPNO as clean int & amounts to 2 decimals; prev: raw decimals
-                        for (let r = 1; r < processedRows.length; r++) {
-                            for (let c = 0; c < processedRows[r].length; c++) {
-                                let val = processedRows[r][c];
-                                if (val !== "") {
-                                    let cleanVal = String(val).replace(/,/g, '').trim();
-                                    let num = parseFloat(cleanVal);
-                                    if (!isNaN(num) && /^-?\d+(\.\d+)?$/.test(cleanVal)) {
-                                        if (c === 3) {
-                                            processedRows[r][c] = String(Math.round(num));
-                                        } else if (cleanVal.includes('.') || (sheetConfig.id === 'NETPAY' && c === 7) || (sheetConfig.id !== 'NETPAY' && c >= 12)) {
-                                            processedRows[r][c] = num.toFixed(2);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        const newSheet = XLSX.utils.aoa_to_sheet(processedRows);
-                        const csv = XLSX.utils.sheet_to_csv(newSheet, {
-                            FS: ",",
-                            RS: "\r\n",
-                            blankrows: false
-                        });
-
-                        /*
-                         * CHANGE DETAILS:
-                         * Element: convertExcelToCSV
-                         * Date: 2026-07-08
-                         * Fix: Reverted to saving plain CSV files directly without gzip compression to restore raw CSV usage.
-                         */
-                        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-
-                        if (sheetConfig.output.startsWith('pli_') && csv.length > 25 * 1024 * 1024) {
-                            if (pliWarning) pliWarning.style.display = "block";
-                        }
-
-                        filesToDownload.push({
-                            filename: sheetConfig.output,
-                            blob: blob
-                        });
-
-                        if (progressText) progressText.textContent = `Prepared ${sheetConfig.output}`;
-                    }
-
-                    clearTimeout(timeout50);
-                    clearTimeout(timeout80);
-
-                    if (progressBar) {
-                        progressBar.style.width = "100%";
-                        progressBar.textContent = "100%";
-                    }
-                    if (progressText) progressText.textContent = "Conversion complete!";
-                    try { sessionStorage.clear(); } catch(e) {}
-
-                    // (2026-07-13) Stagger multiple file downloads & fix keyword match; prev: loop click
-                    const downloadBtn = document.createElement("button");
-                    downloadBtn.className = "btn btn-success";
-                    downloadBtn.textContent = "Download All Files";
-                    downloadBtn.onclick = () => {
-                        filesToDownload.forEach((file, index) => {
-                            setTimeout(() => {
-                                const link = document.createElement('a');
-                                link.href = URL.createObjectURL(file.blob);
-                                link.download = file.filename;
-                                link.style.display = "none";
-                                document.body.appendChild(link);
-                                link.click();
-                                document.body.removeChild(link);
-                                setTimeout(() => URL.revokeObjectURL(link.href), 2000);
-                            }, index * 600);
-                        });
-                    };
-                    if (downloadButtonsContainer) {
-                        downloadButtonsContainer.appendChild(downloadBtn);
-                        downloadButtonsContainer.style.display = "block";
-                    }
-
-                    resetUI();
-                } catch (error) {
-                    alert('Error processing the Excel file: ' + error.message);
-                    resetUI();
-                }
-            };
-
-            reader.readAsArrayBuffer(file);
-
-            function resetUI() {
-                if (buttonText) buttonText.style.display = 'inline';
-                if (buttonSpinner) buttonSpinner.style.display = 'none';
-                if (convertButton) convertButton.disabled = false;
-                if (progressContainer) setTimeout(() => progressContainer.style.display = 'none', 2000);
-            }
-        }
+        });    }
 
         function logout() {
             console.log("Logging out...");
@@ -2093,6 +2375,8 @@
         }
     </script>
 
+    <!-- (2026-07-13) In-browser GitHub live uploader; prev: local git only -->
+    <script src="github_uploader.js"></script>
     <script src="index.script"></script>
     <footer class="app-footer">
         Developed by John Paul Inso | <span id="appVersion">v1.0.0</span>
