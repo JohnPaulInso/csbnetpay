@@ -1438,7 +1438,7 @@
             return { short: monthsShort[previousMonthIndex], full: monthsFull[previousMonthIndex] };
         }
 
-        // (2026-07-13) Auto-detect LCS file date from filename; prev: manual date picker only
+        // (2026-07-13) Auto-detect LCS file date (LCS082626, 08-26-2026, aug262026); prev: required hyphens
         function updateLcsFileName() {
             const fileInput = document.getElementById("lcsFileInput");
             const fileName = document.getElementById("lcsFileName");
@@ -1462,14 +1462,25 @@
                     '12': '12', 'dec': '12', 'december': '12'
                 };
 
-                const mDate = name.match(/(\d{1,2})[-_\s.]+(\d{1,2})[-_\s.]+(\d{4})/);
-                const mWord = name.match(/(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)[-_\s.]+(\d{1,2})[-_\s.]+(\d{4})/i);
-
                 let dMonth, dDay, dYear;
-                if (mDate) {
-                    let p1 = parseInt(mDate[1], 10);
-                    let p2 = parseInt(mDate[2], 10);
-                    dYear = mDate[3];
+                const mCompact6 = name.match(/(?:lcs)?\s*(\d{2})(\d{2})(\d{2})(?:\.xlsx|\.xlsm|\.csv|$)/i);
+                const mCompact8 = name.match(/(?:lcs)?\s*(\d{2})(\d{2})(\d{4})(?:\.xlsx|\.xlsm|\.csv|$)/i);
+                const mDelim = name.match(/(\d{1,2})[-_\s.]+(\d{1,2})[-_\s.]+(\d{2,4})/);
+                const mWord = name.match(/(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)[-_\s.]*(\d{1,2})[-_\s.]*(\d{2,4})/i);
+
+                if (mCompact8) {
+                    dMonth = mCompact8[1];
+                    dDay = mCompact8[2];
+                    dYear = mCompact8[3];
+                } else if (mCompact6) {
+                    dMonth = mCompact6[1];
+                    dDay = mCompact6[2];
+                    dYear = '20' + mCompact6[3];
+                } else if (mDelim) {
+                    let p1 = parseInt(mDelim[1], 10);
+                    let p2 = parseInt(mDelim[2], 10);
+                    let y = mDelim[3];
+                    dYear = y.length === 2 ? '20' + y : y;
                     if (p1 <= 12 && p2 > 12) {
                         dMonth = String(p1).padStart(2, '0');
                         dDay = String(p2).padStart(2, '0');
@@ -1483,7 +1494,8 @@
                 } else if (mWord) {
                     dMonth = monthMap[mWord[1].toLowerCase()];
                     dDay = String(parseInt(mWord[2], 10)).padStart(2, '0');
-                    dYear = mWord[3];
+                    let y = mWord[3];
+                    dYear = y.length === 2 ? '20' + y : y;
                 }
 
                 if (dMonth && dDay && dYear && dateInput) {
