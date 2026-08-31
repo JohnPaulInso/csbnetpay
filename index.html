@@ -286,19 +286,19 @@
     <div class="admin-section container-admin" style="display: none;">
 
         <!-- (2026-07-13) Dedicated GitHub Live Token Card on top of Admin section; prev: bottom of LCS card -->
-        <div class="admin-card" style="margin-bottom: 1.5rem; padding: 1.5rem 2rem;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+        <div class="admin-card" style="margin-bottom: 1rem; padding: 1.25rem 1.5rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
                 <div>
                     <div class="admin-card__eyebrow" style="margin-bottom: 2px;">Configuration · Live Publishing Key</div>
-                    <h5 style="margin: 0; font-weight: 700; color: #1e293b; font-size: 1.1rem;"><i class="bi bi-key-fill" style="color:#4F2683; margin-right:6px;"></i>GitHub Live Upload Token</h5>
+                    <h5 style="margin: 0; font-weight: 700; color: #1e293b; font-size: 1.05rem;"><i class="bi bi-key-fill" style="color:#4F2683; margin-right:6px;"></i>GitHub Live Upload Token</h5>
                 </div>
-                <span id="ghTokenStatusBadge" class="badge" style="font-size:12px; padding:6px 12px; border-radius:6px; background:#fee2e2; color:#b91c1c; font-weight:700;">Token Required</span>
+                <span id="ghTokenStatusBadge" class="badge" style="font-size:11.5px; padding:4px 10px; border-radius:6px; background:#fee2e2; color:#b91c1c; font-weight:700;">Token Required</span>
             </div>
-            <p style="font-size: 13px; color: #64748b; margin-bottom: 14px;">Enter your GitHub Personal Access Token below. It is stored privately in your browser and enables 1-click live publishing directly to GitHub without USB transfers.</p>
-            <div style="display:flex; gap:10px; align-items:center;">
-                <input type="password" id="ghTokenInput" class="form-select" placeholder="Paste your GitHub Token (ghp_...)" style="flex:1; height:46px; font-size:14px; padding:0 14px; border-radius:8px;" oninput="onGhTokenInputChange()">
-                <button type="button" class="btn btn-secondary" onclick="toggleTokenVisibility()" style="height:46px; width:46px; padding:0; display:inline-flex; align-items:center; justify-content:center; font-size:16px; border-radius:8px; border:1px solid #cbd5e1; background:#ffffff; color:#475569;" title="Show/Hide Token"><i class="bi bi-eye" id="ghTokenEyeIcon"></i></button>
-                <button type="button" class="btn btn-primary" onclick="saveGithubTokenFromInput()" style="height:46px; padding:0 24px; font-size:14px; font-weight:700; border-radius:8px; white-space:nowrap;">Save Token</button>
+            <p style="font-size: 12.5px; color: #64748b; margin-bottom: 10px;">Enter your GitHub Personal Access Token below. It is stored privately in your browser and enables 1-click live publishing directly to GitHub without USB transfers.</p>
+            <div style="display:flex; gap:8px; align-items:center;">
+                <input type="password" id="ghTokenInput" class="form-select" placeholder="Paste your GitHub Token (ghp_...)" style="flex:1; height:40px; font-size:13.5px; padding:0 12px; border-radius:8px;" oninput="onGhTokenInputChange()">
+                <button type="button" class="btn btn-secondary" onclick="toggleTokenVisibility()" style="height:40px; width:40px; padding:0; display:inline-flex; align-items:center; justify-content:center; font-size:15px; border-radius:8px; border:1px solid #cbd5e1; background:#ffffff; color:#475569;" title="Show/Hide Token"><i class="bi bi-eye" id="ghTokenEyeIcon"></i></button>
+                <button type="button" class="btn btn-primary" onclick="saveGithubTokenFromInput()" style="height:40px; padding:0 20px; font-size:13.5px; font-weight:700; border-radius:8px; white-space:nowrap;">Save Token</button>
             </div>
         </div>
 
@@ -471,58 +471,58 @@
         </div>
 
         <!-- (2026-07-13) Add dedicated Sunline LCS card; prev: single uploader card -->
-        <div class="admin-card" style="margin-top: 1.5rem;">
-            <div class="admin-card__header">
+        <div class="admin-card" style="margin-top: 1rem;">
+            <div class="admin-card__header" style="margin-bottom: 0.5rem;">
                 <div>
                     <div class="admin-card__eyebrow">Admin · Sunline LCS Uploader</div>
-                    <p>Upload a 1-sheet LCS Excel file (.xlsx or .xlsm) and select the date to generate lcs_mmmddyyyy.csv format.</p>
+                    <p style="margin-bottom: 0.25rem; font-size: 13px;">Upload a 1-sheet LCS Excel file (.xlsx or .xlsm) and select the date to generate lcs_mmmddyyyy.csv format.</p>
                 </div>
                 <div class="summary-chip" style="background: #4F2683;">LCS Database</div>
             </div>
 
-            <div class="admin-card__body">
-                <div class="form-row">
-                    <div class="form-group" style="max-width: 300px;">
-                        <label class="input-label">LCS File Date</label>
-                        <input type="date" id="lcsDateInput" class="form-select" style="height:42px; font-size:14px;">
+            <div class="admin-card__body" style="gap: 0.5rem;">
+                <div class="form-row" style="margin-bottom: 0.25rem;">
+                    <div class="form-group" style="max-width: 260px;">
+                        <label class="input-label" style="margin-bottom: 3px; font-size: 12.5px;">LCS File Date</label>
+                        <input type="date" id="lcsDateInput" class="form-select" style="height:38px; font-size:13.5px; padding: 4px 10px;">
                     </div>
                 </div>
 
-                <div class="form-group" style="margin-bottom: 0.75rem;">
-                    <div class="file-upload-wrapper drop-zone">
-                        <label for="lcsFileInput" class="file-upload-label" style="height:46px; display:flex; align-items:center; justify-content:center; font-size:14px;">Choose LCS .xlsx or .xlsm File</label>
+                <div class="form-group" style="margin-bottom: 0.25rem;">
+                    <div class="file-upload-wrapper drop-zone" style="padding: 0.65rem 1rem;">
+                        <label for="lcsFileInput" class="file-upload-label" style="height:38px; display:flex; align-items:center; justify-content:center; font-size:13.5px; padding:0 1rem;">Choose LCS .xlsx or .xlsm File</label>
                         <input type="file" id="lcsFileInput" class="file-input" accept=".xlsx,.xlsm" onchange="updateLcsFileName()">
-                        <small id="lcsFileName" class="file-name">No file chosen</small>
-                        <div class="file-hint">Drag & drop or click to select your Sunline LCS file.</div>
+                        <small id="lcsFileName" class="file-name" style="margin-top: 3px; font-size: 12px;">No file chosen</small>
+                        <div class="file-hint" style="margin-top: 2px; font-size: 12px;">Drag & drop or click to select your Sunline LCS file.</div>
                     </div>
                 </div>
 
-                <div class="convert-actions" id="lcsConvertActions">
-                    <button id="lcsConvertButton" class="btn btn-primary" onclick="convertLcsExcelToCSV()" style="height:44px; font-size:14px; font-weight:700;">
+                <div class="convert-actions" id="lcsConvertActions" style="margin-top: 0.25rem;">
+                    <button id="lcsConvertButton" class="btn btn-primary" onclick="convertLcsExcelToCSV()" style="height:40px; font-size:13.5px; font-weight:700;">
                         <span id="lcsButtonText">CONVERT LCS FILE</span>
                     </button>
                 </div>
 
-                <div id="lcsProgressContainer" class="progress-container" style="display:none; margin-top:1rem;">
-                    <div class="progress" style="height:10px; border-radius:5px;">
-                        <div id="lcsProgressBar" class="progress-bar" style="font-size:10px; line-height:10px;">0%</div>
+                <div id="lcsProgressContainer" class="progress-container" style="display:none; margin-top:0.75rem;">
+                    <div class="progress" style="height:8px; border-radius:4px;">
+                        <div id="lcsProgressBar" class="progress-bar" style="font-size:10px; line-height:8px;">0%</div>
                     </div>
-                    <small id="lcsProgressText" class="progress-text" style="font-size:12px; margin-top:4px;">Processing LCS sheet...</small>
+                    <small id="lcsProgressText" class="progress-text" style="font-size:11.5px; margin-top:3px;">Processing LCS sheet...</small>
                 </div>
 
                 <div id="lcsDownloadButtons" class="download-buttons" style="display:none;"></div>
 
                 <!-- (2026-07-13) LCS Minimalist action strip: prominent UPLOAD LIVE + right icon download; prev: huge stacked buttons -->
-                <div id="lcsActionButtons" style="display:none; align-items:center; gap:8px; margin-top:1rem;">
-                    <button id="btnUploadLiveLcs" class="btn" onclick="publishLcsLiveToGithub()" style="flex:1; height:44px; background: linear-gradient(135deg, #10b981, #059669); color:white; font-weight:700; font-size:14px; border:none; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; box-shadow: 0 4px 12px rgba(16,185,129,0.25);">
+                <div id="lcsActionButtons" style="display:none; align-items:center; gap:8px; margin-top:0.75rem;">
+                    <button id="btnUploadLiveLcs" class="btn" onclick="publishLcsLiveToGithub()" style="flex:1; height:40px; background: linear-gradient(135deg, #10b981, #059669); color:white; font-weight:700; font-size:13.5px; border:none; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; box-shadow: 0 4px 12px rgba(16,185,129,0.25);">
                         <i class="bi bi-cloud-arrow-up-fill" style="font-size:1.1rem;"></i>
                         <span>UPLOAD LIVE</span>
                     </button>
-                    <button id="btnDownloadLcs" class="btn btn-secondary" onclick="downloadConvertedLcs()" style="height:44px; width:44px; padding:0; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; font-size:1.1rem; border:1px solid #cbd5e1; background:#ffffff; color:#475569;" title="Download Converted CSV">
+                    <button id="btnDownloadLcs" class="btn btn-secondary" onclick="downloadConvertedLcs()" style="height:40px; width:40px; padding:0; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; font-size:1.1rem; border:1px solid #cbd5e1; background:#ffffff; color:#475569;" title="Download Converted CSV">
                         <i class="bi bi-download"></i>
                     </button>
                 </div>
-                <div id="lcsLiveUploadStatus" style="display:none; margin-top:10px; padding:10px 14px; border-radius:8px; background:#eff6ff; border:1px solid #bfdbfe; font-size:13px; color:#1e40af;"></div>
+                <div id="lcsLiveUploadStatus" style="display:none; margin-top:8px; padding:8px 12px; border-radius:8px; background:#eff6ff; border:1px solid #bfdbfe; font-size:12.5px; color:#1e40af;"></div>
             </div>
         </div>
     </div>
