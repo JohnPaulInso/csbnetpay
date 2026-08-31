@@ -509,10 +509,18 @@
                 </div>
                 <div id="lcsLiveUploadStatus" style="display:none; margin-top:10px; padding:10px 14px; border-radius:8px; background:#eff6ff; border:1px solid #bfdbfe; font-size:13px; color:#1e40af;"></div>
 
-                <!-- (2026-07-13) GitHub Live Token setting bar; prev: none -->
-                <div style="margin-top:1.5rem; padding:10px 14px; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:8px; display:flex; justify-content:space-between; align-items:center; font-size:12px;">
-                    <span style="color:#475569;"><i class="bi bi-shield-lock-fill" style="color:#4F2683; margin-right:4px;"></i> GitHub Live Publishing: <strong id="ghTokenStatus" style="color:#10b981;">Ready</strong></span>
-                    <button type="button" onclick="configureGithubToken()" class="btn btn-sm" style="background:#e2e8f0; color:#334155; font-size:11px; padding:4px 10px; border-radius:4px; border:none; cursor:pointer; font-weight:600;">Configure Token</button>
+                <!-- (2026-07-13) GitHub Live Token required input field & validator; prev: dialog only -->
+                <div class="form-group" style="margin-top:1.5rem; padding:14px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px;">
+                    <label class="input-label" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                        <span><i class="bi bi-key-fill" style="color:#4F2683;"></i> GitHub Live Upload Token (Required for Live Upload)</span>
+                        <span id="ghTokenStatusBadge" class="badge" style="font-size:11px; padding:3px 8px; border-radius:4px; background:#fee2e2; color:#b91c1c; font-weight:700;">Token Required</span>
+                    </label>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <input type="password" id="ghTokenInput" class="form-select" placeholder="Paste your GitHub Token (ghp_...)" style="flex:1;" oninput="onGhTokenInputChange()">
+                        <button type="button" class="btn btn-secondary" onclick="toggleTokenVisibility()" style="padding:8px 12px; font-size:13px;" title="Show/Hide Token"><i class="bi bi-eye" id="ghTokenEyeIcon"></i></button>
+                        <button type="button" class="btn btn-primary" onclick="saveGithubTokenFromInput()" style="padding:8px 16px; font-size:13px; font-weight:600;">Save Token</button>
+                    </div>
+                    <small id="ghTokenHint" style="display:block; margin-top:6px; font-size:11px; color:#64748b;">Save once. It stays stored in your browser so you or your dad can upload live anytime.</small>
                 </div>
             </div>
         </div>
@@ -1589,7 +1597,91 @@
             setTimeout(() => URL.revokeObjectURL(link.href), 2000);
         }
 
+        // (2026-07-13) Validate and manage GitHub token UI input field; prev: prompt only
+        function ensureGithubToken() {
+            const input = document.getElementById("ghTokenInput");
+            let token = window.CSB_GITHUB ? window.CSB_GITHUB.getToken() : '';
+            if (!token && input && input.value.trim()) {
+                token = input.value.trim();
+                window.CSB_GITHUB.setToken(token);
+            }
+            if (!token) {
+                if (input) {
+                    input.focus();
+                    input.style.borderColor = "#ef4444";
+                    input.style.boxShadow = "0 0 0 3px rgba(239, 68, 68, 0.25)";
+                    setTimeout(() => {
+                        input.style.borderColor = "";
+                        input.style.boxShadow = "";
+                    }, 4000);
+                }
+                alert("GitHub Token Required:\n\nPlease paste your GitHub Personal Access Token in the 'GitHub Live Upload Token' field below and click 'Save Token' before publishing live.");
+                return null;
+            }
+            return token;
+        }
+
+        function saveGithubTokenFromInput() {
+            const input = document.getElementById("ghTokenInput");
+            if (!input || !window.CSB_GITHUB) return;
+            const val = input.value.trim();
+            if (!val) {
+                window.CSB_GITHUB.setToken('');
+                updateTokenStatusBadge();
+                alert("GitHub Token cleared.");
+                return;
+            }
+            window.CSB_GITHUB.setToken(val);
+            updateTokenStatusBadge();
+            alert("GitHub Token saved successfully in your browser!");
+        }
+
+        function toggleTokenVisibility() {
+            const input = document.getElementById("ghTokenInput");
+            const icon = document.getElementById("ghTokenEyeIcon");
+            if (input) {
+                const isPassword = input.type === "password";
+                input.type = isPassword ? "text" : "password";
+                if (icon) icon.className = isPassword ? "bi bi-eye-slash" : "bi bi-eye";
+            }
+        }
+
+        function onGhTokenInputChange() {
+            const input = document.getElementById("ghTokenInput");
+            const badge = document.getElementById("ghTokenStatusBadge");
+            if (input && badge) {
+                if (input.value.trim()) {
+                    badge.textContent = "Unsaved Changes";
+                    badge.style.background = "#fef3c7";
+                    badge.style.color = "#b45309";
+                }
+            }
+        }
+
+        function updateTokenStatusBadge() {
+            const badge = document.getElementById("ghTokenStatusBadge");
+            const input = document.getElementById("ghTokenInput");
+            if (window.CSB_GITHUB) {
+                const token = window.CSB_GITHUB.getToken();
+                if (input && !input.value && token) {
+                    input.value = token;
+                }
+                if (badge) {
+                    if (token) {
+                        badge.textContent = "Token Saved & Ready";
+                        badge.style.background = "#dcfce7";
+                        badge.style.color = "#15803d";
+                    } else {
+                        badge.textContent = "Token Required";
+                        badge.style.background = "#fee2e2";
+                        badge.style.color = "#b91c1c";
+                    }
+                }
+            }
+        }
+
         async function publishLcsLiveToGithub() {
+            if (!ensureGithubToken()) return;
             if (!window.activeLcsSession || !window.activeLcsSession.csvText) {
                 return alert("Please convert the LCS file first before uploading live.");
             }
@@ -1604,6 +1696,9 @@
             if (btn) btn.disabled = true;
             if (statusEl) {
                 statusEl.style.display = "block";
+                statusEl.style.background = "#eff6ff";
+                statusEl.style.color = "#1e40af";
+                statusEl.style.borderColor = "#bfdbfe";
                 statusEl.innerHTML = `<i class="bi bi-hourglass-split"></i> Uploading ${filename} to GitHub...`;
             }
 
@@ -1626,28 +1721,9 @@
                     statusEl.style.borderColor = "#fca5a5";
                     statusEl.innerHTML = `<i class="bi bi-exclamation-triangle-fill"></i> <strong>Upload Failed:</strong> ${err.message}`;
                 }
+                updateTokenStatusBadge();
             } finally {
                 if (btn) btn.disabled = false;
-            }
-        }
-
-        // Configure GitHub token dialog
-        function configureGithubToken() {
-            const current = window.CSB_GITHUB ? window.CSB_GITHUB.getToken() : '';
-            const token = prompt("Enter your GitHub Personal Access Token (with repo / contents write permission):", current);
-            if (token !== null && window.CSB_GITHUB) {
-                window.CSB_GITHUB.setToken(token.trim());
-                updateTokenStatusBadge();
-                alert(token.trim() ? "GitHub Token saved successfully!" : "GitHub Token cleared.");
-            }
-        }
-
-        function updateTokenStatusBadge() {
-            const badge = document.getElementById("ghTokenStatus");
-            if (badge && window.CSB_GITHUB) {
-                const hasToken = !!window.CSB_GITHUB.getToken();
-                badge.textContent = hasToken ? "Configured" : "Not Set";
-                badge.style.color = hasToken ? "#10b981" : "#e53e3e";
             }
         }
 
@@ -2004,6 +2080,7 @@
         }
 
         async function publishAbstractLiveToGithub() {
+            if (!ensureGithubToken()) return;
             if (!window.activeAbstractSession || !window.activeAbstractSession.files) return alert("No converted files found.");
             const fileEntries = Object.values(window.activeAbstractSession.files);
             if (fileEntries.length === 0) return alert("No converted files ready to publish.");
