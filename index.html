@@ -345,89 +345,14 @@
                         </div>
                     </div>
 
-                    <div class="convert-actions" id="abstractConvertActions">
-                        <button id="convertButton" class="btn btn-primary" onclick="convertExcelToCSV()" style="height:44px; font-size:14px; font-weight:700;">
+                    <div class="convert-actions" id="abstractConvertActions" style="margin-top: 1rem;">
+                        <button id="convertButton" class="btn btn-primary" onclick="convertExcelToCSV()" style="width:100%; height:46px; font-size:14px; font-weight:700; border-radius:8px; box-shadow: 0 4px 12px rgba(79, 38, 131, 0.2);">
                             <span id="buttonText">CONVERT ABSTRACT FILE</span>
                             <span id="buttonSpinner" class="spinner"></span>
                         </button>
                     </div>
 
                     <small id="pliWarning" class="warning-text" style="display:none;">Take note: Recheck the PLI file exceeding 25 MB</small>
-
-                    <!-- (2026-07-13) Multi-sheet progress cards & UPLOAD LIVE container; prev: simple progress bar -->
-                    <div id="abstractMultiProgress" class="abstract-multi-progress" style="display:none; margin-top:1.25rem;">
-                        <div style="font-weight:700; margin-bottom:0.75rem; color:#1e293b; display:flex; justify-content:space-between; align-items:center;">
-                            <span style="font-size:13px;"><i class="bi bi-file-earmark-spreadsheet-fill" style="color:#4F2683; margin-right:5px;"></i>Conversion Progress (4 Sheets)</span>
-                            <span id="abstractOverallStatus" class="badge" style="background:#dcfce7; color:#15803d; padding:4px 10px; border-radius:6px; font-size:11px; font-weight:700;">Ready</span>
-                        </div>
-                        <div class="sheet-cards-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-bottom: 1rem;">
-                            <div id="card-sheet-NETPAY" class="sheet-status-card" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:12px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <span style="font-weight:700; font-size:13px; color:#1e293b;">NETPAY</span>
-                                    <span id="status-sheet-NETPAY" style="font-size:11px; font-weight:700; color:#10b981; background:#dcfce7; padding:2px 8px; border-radius:12px;">Ready</span>
-                                </div>
-                                <div class="progress" style="height:5px; margin:8px 0 6px 0; background:#f1f5f9; border-radius:4px; overflow:hidden;">
-                                    <div id="pbar-sheet-NETPAY" style="width:100%; height:100%; background:#10b981; transition:width 0.2s;"></div>
-                                </div>
-                                <div style="display:flex; justify-content:space-between; font-size:11px; color:#64748b; font-weight:600;">
-                                    <span id="rows-sheet-NETPAY">0 rows</span>
-                                    <button type="button" onclick="retrySingleSheet('NETPAY')" class="btn-retry-sheet" id="retry-sheet-NETPAY" style="display:none; border:none; background:none; color:#e53e3e; cursor:pointer; font-weight:700; padding:0;">Retry</button>
-                                </div>
-                            </div>
-                            <div id="card-sheet-POS" class="sheet-status-card" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:12px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <span style="font-weight:700; font-size:13px; color:#1e293b;">POS (DedAmt)</span>
-                                    <span id="status-sheet-POS" style="font-size:11px; font-weight:700; color:#10b981; background:#dcfce7; padding:2px 8px; border-radius:12px;">Ready</span>
-                                </div>
-                                <div class="progress" style="height:5px; margin:8px 0 6px 0; background:#f1f5f9; border-radius:4px; overflow:hidden;">
-                                    <div id="pbar-sheet-POS" style="width:100%; height:100%; background:#10b981; transition:width 0.2s;"></div>
-                                </div>
-                                <div style="display:flex; justify-content:space-between; font-size:11px; color:#64748b; font-weight:600;">
-                                    <span id="rows-sheet-POS">0 rows</span>
-                                    <button type="button" onclick="retrySingleSheet('POS')" class="btn-retry-sheet" id="retry-sheet-POS" style="display:none; border:none; background:none; color:#e53e3e; cursor:pointer; font-weight:700; padding:0;">Retry</button>
-                                </div>
-                            </div>
-                            <div id="card-sheet-ONQUEUE" class="sheet-status-card" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:12px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <span style="font-weight:700; font-size:13px; color:#1e293b;">ONQUEUE</span>
-                                    <span id="status-sheet-ONQUEUE" style="font-size:11px; font-weight:700; color:#10b981; background:#dcfce7; padding:2px 8px; border-radius:12px;">Ready</span>
-                                </div>
-                                <div class="progress" style="height:5px; margin:8px 0 6px 0; background:#f1f5f9; border-radius:4px; overflow:hidden;">
-                                    <div id="pbar-sheet-ONQUEUE" style="width:100%; height:100%; background:#10b981; transition:width 0.2s;"></div>
-                                </div>
-                                <div style="display:flex; justify-content:space-between; font-size:11px; color:#64748b; font-weight:600;">
-                                    <span id="rows-sheet-ONQUEUE">0 rows</span>
-                                    <button type="button" onclick="retrySingleSheet('ONQUEUE')" class="btn-retry-sheet" id="retry-sheet-ONQUEUE" style="display:none; border:none; background:none; color:#e53e3e; cursor:pointer; font-weight:700; padding:0;">Retry</button>
-                                </div>
-                            </div>
-                            <div id="card-sheet-PLI" class="sheet-status-card" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:12px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <span style="font-weight:700; font-size:13px; color:#1e293b;">PLI</span>
-                                    <span id="status-sheet-PLI" style="font-size:11px; font-weight:700; color:#10b981; background:#dcfce7; padding:2px 8px; border-radius:12px;">Ready</span>
-                                </div>
-                                <div class="progress" style="height:5px; margin:8px 0 6px 0; background:#f1f5f9; border-radius:4px; overflow:hidden;">
-                                    <div id="pbar-sheet-PLI" style="width:100%; height:100%; background:#10b981; transition:width 0.2s;"></div>
-                                </div>
-                                <div style="display:flex; justify-content:space-between; font-size:11px; color:#64748b; font-weight:600;">
-                                    <span id="rows-sheet-PLI">0 rows</span>
-                                    <button type="button" onclick="retrySingleSheet('PLI')" class="btn-retry-sheet" id="retry-sheet-PLI" style="display:none; border:none; background:none; color:#e53e3e; cursor:pointer; font-weight:700; padding:0;">Retry</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- (2026-07-13) Streamlined minimalist action strip; prev: stacked huge buttons -->
-                        <div id="abstractActionButtons" style="display:none; align-items:center; gap:8px; margin-top:1rem;">
-                            <button id="btnUploadLiveAbstract" class="btn" onclick="publishAbstractLiveToGithub()" style="flex:1; height:44px; background: linear-gradient(135deg, #10b981, #059669); color:white; font-weight:700; font-size:14px; border:none; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; box-shadow: 0 4px 12px rgba(16,185,129,0.25);">
-                                <i class="bi bi-cloud-arrow-up-fill" style="font-size:1.1rem;"></i>
-                                <span>UPLOAD LIVE</span>
-                            </button>
-                            <button id="btnDownloadAllAbstract" class="btn btn-secondary" onclick="downloadAllConvertedAbstract()" style="height:44px; width:44px; padding:0; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; font-size:1.1rem; border:1px solid #cbd5e1; background:#ffffff; color:#475569;" title="Download All CSV Files">
-                                <i class="bi bi-download"></i>
-                            </button>
-                        </div>
-                        <div id="abstractLiveUploadStatus" style="display:none; margin-top:10px; padding:10px 14px; border-radius:8px; background:#eff6ff; border:1px solid #bfdbfe; font-size:13px; color:#1e40af;"></div>
-                    </div>
-
                     <div id="downloadButtons" class="download-buttons" style="display:none;"></div>
                 </div>
 
@@ -435,7 +360,7 @@
                     <div class="summary-header">
                         <div>
                             <div class="summary-eyebrow">Upload cart</div>
-                            <h6 style="margin: 0;">What you'll process</h6>
+                            <h6 style="margin: 0; font-weight:700;">What you'll process</h6>
                         </div>
                         <div class="summary-chip">Live</div>
                     </div>
@@ -463,11 +388,84 @@
                         </div>
                     </div>
                     <div class="summary-footer">
-                        <span
-                            style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#4F2683;"></span>
-                        <span>Keep this purple by picking month, year, and file.</span>
+                        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#4F2683;"></span>
+                        <span>Auto-syncs when you pick month, year, or file.</span>
                     </div>
                 </div>
+            </div>
+
+            <!-- (2026-07-13) Full-width multi-sheet progress & UPLOAD LIVE container; prev: squished in left grid -->
+            <div id="abstractMultiProgress" class="abstract-multi-progress" style="display:none; margin-top:1.5rem; padding-top:1.25rem; border-top:1px solid #e2e8f0;">
+                <div style="font-weight:700; margin-bottom:1rem; color:#1e293b; display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:14px;"><i class="bi bi-file-earmark-spreadsheet-fill" style="color:#4F2683; margin-right:6px;"></i>Conversion Progress (4 Sheets)</span>
+                    <span id="abstractOverallStatus" class="badge" style="background:#dbeafe; color:#1e40af; padding:5px 12px; border-radius:6px; font-size:12px; font-weight:700;">Converting...</span>
+                </div>
+                <div class="sheet-cards-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 1rem;">
+                    <div id="card-sheet-NETPAY" class="sheet-status-card" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:14px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-weight:700; font-size:13px; color:#1e293b;">NETPAY</span>
+                            <span id="status-sheet-NETPAY" style="font-size:11px; font-weight:700; color:#64748b; background:#f1f5f9; padding:3px 10px; border-radius:12px;">Pending</span>
+                        </div>
+                        <div class="progress" style="height:6px; margin:10px 0 8px 0; background:#f1f5f9; border-radius:4px; overflow:hidden;">
+                            <div id="pbar-sheet-NETPAY" style="width:0%; height:100%; background:#3b82f6; transition:width 0.3s ease;"></div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; font-size:12px; color:#64748b; font-weight:600;">
+                            <span id="rows-sheet-NETPAY">Waiting...</span>
+                            <button type="button" onclick="retrySingleSheet('NETPAY')" class="btn-retry-sheet" id="retry-sheet-NETPAY" style="display:none; border:none; background:none; color:#e53e3e; cursor:pointer; font-weight:700; padding:0;">Retry</button>
+                        </div>
+                    </div>
+                    <div id="card-sheet-POS" class="sheet-status-card" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:14px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-weight:700; font-size:13px; color:#1e293b;">POS (DedAmt)</span>
+                            <span id="status-sheet-POS" style="font-size:11px; font-weight:700; color:#64748b; background:#f1f5f9; padding:3px 10px; border-radius:12px;">Pending</span>
+                        </div>
+                        <div class="progress" style="height:6px; margin:10px 0 8px 0; background:#f1f5f9; border-radius:4px; overflow:hidden;">
+                            <div id="pbar-sheet-POS" style="width:0%; height:100%; background:#3b82f6; transition:width 0.3s ease;"></div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; font-size:12px; color:#64748b; font-weight:600;">
+                            <span id="rows-sheet-POS">Waiting...</span>
+                            <button type="button" onclick="retrySingleSheet('POS')" class="btn-retry-sheet" id="retry-sheet-POS" style="display:none; border:none; background:none; color:#e53e3e; cursor:pointer; font-weight:700; padding:0;">Retry</button>
+                        </div>
+                    </div>
+                    <div id="card-sheet-ONQUEUE" class="sheet-status-card" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:14px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-weight:700; font-size:13px; color:#1e293b;">ONQUEUE</span>
+                            <span id="status-sheet-ONQUEUE" style="font-size:11px; font-weight:700; color:#64748b; background:#f1f5f9; padding:3px 10px; border-radius:12px;">Pending</span>
+                        </div>
+                        <div class="progress" style="height:6px; margin:10px 0 8px 0; background:#f1f5f9; border-radius:4px; overflow:hidden;">
+                            <div id="pbar-sheet-ONQUEUE" style="width:0%; height:100%; background:#3b82f6; transition:width 0.3s ease;"></div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; font-size:12px; color:#64748b; font-weight:600;">
+                            <span id="rows-sheet-ONQUEUE">Waiting...</span>
+                            <button type="button" onclick="retrySingleSheet('ONQUEUE')" class="btn-retry-sheet" id="retry-sheet-ONQUEUE" style="display:none; border:none; background:none; color:#e53e3e; cursor:pointer; font-weight:700; padding:0;">Retry</button>
+                        </div>
+                    </div>
+                    <div id="card-sheet-PLI" class="sheet-status-card" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:14px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-weight:700; font-size:13px; color:#1e293b;">PLI</span>
+                            <span id="status-sheet-PLI" style="font-size:11px; font-weight:700; color:#64748b; background:#f1f5f9; padding:3px 10px; border-radius:12px;">Pending</span>
+                        </div>
+                        <div class="progress" style="height:6px; margin:10px 0 8px 0; background:#f1f5f9; border-radius:4px; overflow:hidden;">
+                            <div id="pbar-sheet-PLI" style="width:0%; height:100%; background:#3b82f6; transition:width 0.3s ease;"></div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; font-size:12px; color:#64748b; font-weight:600;">
+                            <span id="rows-sheet-PLI">Waiting...</span>
+                            <button type="button" onclick="retrySingleSheet('PLI')" class="btn-retry-sheet" id="retry-sheet-PLI" style="display:none; border:none; background:none; color:#e53e3e; cursor:pointer; font-weight:700; padding:0;">Retry</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- (2026-07-13) Streamlined minimalist action strip; prev: stacked huge buttons -->
+                <div id="abstractActionButtons" style="display:none; align-items:center; gap:8px; margin-top:1rem;">
+                    <button id="btnUploadLiveAbstract" class="btn" onclick="publishAbstractLiveToGithub()" style="flex:1; height:44px; background: linear-gradient(135deg, #10b981, #059669); color:white; font-weight:700; font-size:14px; border:none; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; box-shadow: 0 4px 12px rgba(16,185,129,0.25);">
+                        <i class="bi bi-cloud-arrow-up-fill" style="font-size:1.1rem;"></i>
+                        <span>UPLOAD LIVE</span>
+                    </button>
+                    <button id="btnDownloadAllAbstract" class="btn btn-secondary" onclick="downloadAllConvertedAbstract()" style="height:44px; width:44px; padding:0; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; font-size:1.1rem; border:1px solid #cbd5e1; background:#ffffff; color:#475569;" title="Download All CSV Files">
+                        <i class="bi bi-download"></i>
+                    </button>
+                </div>
+                <div id="abstractLiveUploadStatus" style="display:none; margin-top:10px; padding:10px 14px; border-radius:8px; background:#eff6ff; border:1px solid #bfdbfe; font-size:13px; color:#1e40af;"></div>
             </div>
         </div>
 
@@ -1810,7 +1808,30 @@
             if (buttonSpinner) buttonSpinner.style.display = 'inline-block';
             if (multiProgress) multiProgress.style.display = "block";
             if (actionButtons) actionButtons.style.display = "none";
-            if (overallStatus) { overallStatus.textContent = "Converting..."; overallStatus.style.background = "#e0d4f7"; }
+            if (overallStatus) {
+                overallStatus.textContent = "Converting...";
+                overallStatus.style.background = "#dbeafe";
+                overallStatus.style.color = "#1e40af";
+            }
+
+            // Reset all 4 sheet progress cards to initial pending state
+            ['NETPAY', 'POS', 'ONQUEUE', 'PLI'].forEach(sheetId => {
+                const statusEl = document.getElementById(`status-sheet-${sheetId}`);
+                const pbarEl = document.getElementById(`pbar-sheet-${sheetId}`);
+                const rowsEl = document.getElementById(`rows-sheet-${sheetId}`);
+                const retryBtn = document.getElementById(`retry-sheet-${sheetId}`);
+                if (statusEl) {
+                    statusEl.textContent = "Pending";
+                    statusEl.style.color = "#64748b";
+                    statusEl.style.background = "#f1f5f9";
+                }
+                if (pbarEl) {
+                    pbarEl.style.width = "0%";
+                    pbarEl.style.background = "#3b82f6";
+                }
+                if (rowsEl) rowsEl.textContent = "Waiting...";
+                if (retryBtn) retryBtn.style.display = "none";
+            });
 
             const file = fileInput.files[0];
             const reader = new FileReader();
@@ -1843,7 +1864,7 @@
                     for (const s of sheets) {
                         const ok = await processSingleSheet(s);
                         if (!ok) allSuccessful = false;
-                        await new Promise(r => setTimeout(r, 50));
+                        await new Promise(r => setTimeout(r, 60));
                     }
 
                     if (overallStatus) {
@@ -1875,8 +1896,16 @@
             const rowsEl = document.getElementById(`rows-sheet-${sheetConfig.id}`);
             const retryBtn = document.getElementById(`retry-sheet-${sheetConfig.id}`);
 
-            if (statusEl) { statusEl.textContent = "Converting..."; statusEl.style.color = "#4F2683"; }
-            if (pbarEl) pbarEl.style.width = "30%";
+            if (statusEl) {
+                statusEl.textContent = "Converting...";
+                statusEl.style.color = "#1e40af";
+                statusEl.style.background = "#dbeafe";
+            }
+            if (pbarEl) {
+                pbarEl.style.width = "45%";
+                pbarEl.style.background = "#3b82f6";
+            }
+            if (rowsEl) rowsEl.textContent = "Reading rows...";
             if (retryBtn) retryBtn.style.display = "none";
 
             const sheetMatches = (name, id) => {
@@ -2093,8 +2122,15 @@
                 }
                 const csvContent = rowStrs.join("\r\n");
 
-                if (statusEl) { statusEl.textContent = "Done"; statusEl.style.color = "#10b981"; }
-                if (pbarEl) { pbarEl.style.width = "100%"; pbarEl.style.background = "#10b981"; }
+                if (statusEl) {
+                    statusEl.textContent = "Done";
+                    statusEl.style.color = "#15803d";
+                    statusEl.style.background = "#dcfce7";
+                }
+                if (pbarEl) {
+                    pbarEl.style.width = "100%";
+                    pbarEl.style.background = "#10b981";
+                }
                 if (rowsEl) rowsEl.textContent = `${validCount.toLocaleString()} rows`;
 
                 window.activeAbstractSession.files[sheetConfig.id] = {
@@ -2104,8 +2140,16 @@
                 };
                 return true;
             } catch (err) {
-                if (statusEl) { statusEl.textContent = "Failed: " + err.message; statusEl.style.color = "#e53e3e"; }
-                if (pbarEl) { pbarEl.style.width = "100%"; pbarEl.style.background = "#e53e3e"; }
+                if (statusEl) {
+                    statusEl.textContent = "Failed";
+                    statusEl.style.color = "#b91c1c";
+                    statusEl.style.background = "#fee2e2";
+                }
+                if (pbarEl) {
+                    pbarEl.style.width = "100%";
+                    pbarEl.style.background = "#ef4444";
+                }
+                if (rowsEl) rowsEl.textContent = "Error converting";
                 if (retryBtn) retryBtn.style.display = "inline";
                 return false;
             }
@@ -2216,8 +2260,15 @@
                             const statusEl = document.getElementById(`status-sheet-${sheetId}`);
                             const pbarEl = document.getElementById(`pbar-sheet-${sheetId}`);
                             const rowsEl = document.getElementById(`rows-sheet-${sheetId}`);
-                            if (statusEl) { statusEl.textContent = "Ready"; statusEl.style.color = "#10b981"; }
-                            if (pbarEl) { pbarEl.style.width = "100%"; pbarEl.style.background = "#10b981"; }
+                            if (statusEl) {
+                                statusEl.textContent = "Done";
+                                statusEl.style.color = "#15803d";
+                                statusEl.style.background = "#dcfce7";
+                            }
+                            if (pbarEl) {
+                                pbarEl.style.width = "100%";
+                                pbarEl.style.background = "#10b981";
+                            }
                             if (rowsEl) rowsEl.textContent = `${(f.rows || 0).toLocaleString()} rows`;
                         });
                     }
