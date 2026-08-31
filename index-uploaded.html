@@ -952,12 +952,66 @@ setTimeout(() => {
             }
         }
 
+        // (2026-07-13) Auto-detect month and year from chosen filename; prev: manual selection only
         function updateAbstractFileName() {
             const fileInput = document.getElementById("abstractFileInput");
             const fileName = document.getElementById("abstractFileName");
-            fileName.textContent = fileInput.files.length
-                ? `Selected file: ${fileInput.files[0].name}`
-                : "No file chosen";
+            const monthSelect = document.getElementById("monthSelect");
+            const yearSelect = document.getElementById("yearSelect");
+
+            if (fileInput && fileInput.files.length) {
+                const name = fileInput.files[0].name;
+                if (fileName) fileName.textContent = `Selected file: ${name}`;
+
+                const monthMap = {
+                    '1': 'jan', '01': 'jan', 'jan': 'jan', 'january': 'jan',
+                    '2': 'feb', '02': 'feb', 'feb': 'feb', 'february': 'feb',
+                    '3': 'mar', '03': 'mar', 'mar': 'mar', 'march': 'mar',
+                    '4': 'apr', '04': 'apr', 'apr': 'apr', 'april': 'apr',
+                    '5': 'may', '05': 'may', 'may': 'may',
+                    '6': 'jun', '06': 'jun', 'jun': 'jun', 'june': 'jun',
+                    '7': 'jul', '07': 'jul', 'jul': 'jul', 'july': 'jul',
+                    '8': 'aug', '08': 'aug', 'aug': 'aug', 'august': 'aug',
+                    '9': 'sep', '09': 'sep', 'sep': 'sep', 'september': 'sep',
+                    '10': 'oct', 'oct': 'oct', 'october': 'oct',
+                    '11': 'nov', 'nov': 'nov', 'november': 'nov',
+                    '12': 'dec', 'dec': 'dec', 'december': 'dec'
+                };
+
+                let detectedMonth = null;
+                let detectedYear = null;
+
+                const m1 = name.match(/(?:abstract[-_\s]*|)(\d{1,2})[-_\s]+(\d{4})/i);
+                const m2 = name.match(/(\d{4})[-_\s]+(?:abstract[-_\s]*|)(\d{1,2})/i);
+                const m3 = name.match(/(?:abstract[-_\s]+|abstract-)(\d{1,2})\b/i);
+                const mMonth = name.match(/(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)/i);
+
+                if (m1) {
+                    detectedMonth = monthMap[m1[1]];
+                    detectedYear = m1[2];
+                } else if (m2) {
+                    detectedYear = m2[1];
+                    detectedMonth = monthMap[m2[2]];
+                } else if (m3) {
+                    detectedMonth = monthMap[m3[1]];
+                } else if (mMonth) {
+                    detectedMonth = monthMap[mMonth[1].toLowerCase()];
+                }
+
+                if (!detectedYear) {
+                    const yMatch = name.match(/202[0-9]/);
+                    if (yMatch) detectedYear = yMatch[0];
+                }
+
+                if (detectedMonth && monthSelect) {
+                    monthSelect.value = detectedMonth;
+                }
+                if (detectedYear && yearSelect) {
+                    yearSelect.value = detectedYear;
+                }
+            } else if (fileName) {
+                fileName.textContent = "No file chosen";
+            }
             refreshUploadCart();
         }
 
