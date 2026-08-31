@@ -375,12 +375,14 @@ let customerDataPromise = fetchCustomerData();
 document.addEventListener("DOMContentLoaded", function() {
     // Initial fetch started at top level
     
-    // Sync TTS switch with localStorage
+    // (2026-07-13) TTS defaults OFF on page load; prev: restored localStorage
     const ttsSwitch = document.getElementById('ttsSwitch');
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
     if (ttsSwitch) {
-        const savedState = localStorage.getItem('ttsEnabled');
-        if (savedState !== null) {
-            ttsSwitch.checked = (savedState === 'true');
+        ttsSwitch.checked = false;
+        const icon = ttsSwitch.nextElementSibling ? ttsSwitch.nextElementSibling.querySelector('.icon') : null;
+        if (icon) {
+            icon.className = "bi bi-volume-mute-fill icon";
         }
         
         ttsSwitch.addEventListener('change', () => {
@@ -392,7 +394,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 icon.className = isEnabled ? "bi bi-volume-up-fill icon" : "bi bi-volume-mute-fill icon";
             }
 
-            if (!isEnabled) {
+            if (!isEnabled && window.speechSynthesis) {
                 window.speechSynthesis.cancel();
             }
         });

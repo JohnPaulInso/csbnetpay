@@ -1053,9 +1053,11 @@
 
     <script>
         let currentUtterance = null;
-        let autoReadDisabled = false; // gate to stop auto TTS when user interacts
-        // (2026-07-13) TTS defaults OFF; prev: default ON (true)
-        let ttsEnabled = localStorage.getItem("ttsEnabled") === "true" ? true : false; // default OFF
+        // (2026-07-13) TTS strictly defaults OFF across pages; prev: restored state
+        let ttsEnabled = false; // default OFF
+        if (typeof window !== "undefined" && window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+        }
 
         function disableAutoRead() {
             autoReadDisabled = true;
