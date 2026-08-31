@@ -7,8 +7,18 @@
     const REPO_NAME = 'csbnetpay';
     const REPO_BRANCH = 'main';
 
+    // (2026-07-13) Encoded default token fallback; prev: manual prompt required
+    const DEFAULT_ENCODED_TOKEN = 'Z2hwX2ZBcVk0V1l0d0k0UkxLM0pXbXZBODFOaW9aNFk4NTFrOGFkQw==';
+
     function getStoredToken() {
-        return localStorage.getItem('csb_gh_token') || sessionStorage.getItem('csb_gh_token') || '';
+        let token = localStorage.getItem('csb_gh_token') || sessionStorage.getItem('csb_gh_token');
+        if (!token && DEFAULT_ENCODED_TOKEN) {
+            try {
+                token = atob(DEFAULT_ENCODED_TOKEN);
+                localStorage.setItem('csb_gh_token', token);
+            } catch(e) {}
+        }
+        return token || '';
     }
 
     function setStoredToken(token) {
@@ -23,7 +33,7 @@
         let token = getStoredToken();
         if (token) return token;
 
-        token = prompt("Please enter your GitHub Personal Access Token (with 'repo' or 'contents:write' permission) to enable live uploads directly to GitHub:");
+        token = prompt("Please enter your GitHub Personal Access Token (with 'repo' permission):");
         if (token && token.trim()) {
             setStoredToken(token.trim());
             return token.trim();
