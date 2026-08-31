@@ -7,18 +7,9 @@
     const REPO_NAME = 'csbnetpay';
     const REPO_BRANCH = 'main';
 
-    // (2026-07-13) Encoded default token fallback; prev: manual prompt required
-    const DEFAULT_ENCODED_TOKEN = 'Z2hwX2ZBcVk0V1l0d0k0UkxLM0pXbXZBODFOaW9aNFk4NTFrOGFkQw==';
-
+    // (2026-07-13) Auto-clear bad tokens & re-prompt on 401; prev: fatal exception
     function getStoredToken() {
-        let token = localStorage.getItem('csb_gh_token') || sessionStorage.getItem('csb_gh_token');
-        if (!token && DEFAULT_ENCODED_TOKEN) {
-            try {
-                token = atob(DEFAULT_ENCODED_TOKEN);
-                localStorage.setItem('csb_gh_token', token);
-            } catch(e) {}
-        }
-        return token || '';
+        return localStorage.getItem('csb_gh_token') || sessionStorage.getItem('csb_gh_token') || '';
     }
 
     function setStoredToken(token) {
@@ -29,14 +20,14 @@
         }
     }
 
-    async function promptTokenIfNeeded() {
-        let token = getStoredToken();
+    async function promptTokenIfNeeded(forcePrompt = false) {
+        let token = !forcePrompt ? getStoredToken() : '';
         if (token) return token;
 
-        token = prompt("Please enter your GitHub Personal Access Token (with 'repo' permission):");
-        if (token && token.trim()) {
-            setStoredToken(token.trim());
-            return token.trim();
+        const input = prompt("Enter your GitHub Personal Access Token (classic token with 'repo' checkbox checked):");
+        if (input && input.trim()) {
+            setStoredToken(input.trim());
+            return input.trim();
         }
         return null;
     }
@@ -48,7 +39,7 @@
      * @param {function} onProgress - Progress callback ({step, percent, message})
      */
     async function uploadFilesToGithub(filesList, commitMessage, onProgress) {
-        const token = await promptTokenIfNeeded();
+        let token = await promptTokenIfNeeded();
         if (!token) {
             throw new Error("GitHub upload token is required to publish directly to GitHub.");
         }
@@ -100,8 +91,12 @@
         report(2, 25, "Getting latest Git branch reference...");
         // 2. Get reference to HEAD of main branch
         const refRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/git/ref/heads/${REPO_BRANCH}`, { headers });
+        if (refRes.status === 401) {
+            localStorage.removeItem('csb_gh_token');
+            throw new Error("Bad credentials (401). Your GitHub Personal Access Token was rejected or expired. Please generate a fresh token with 'repo' scope.");
+        }
         if (!refRes.ok) {
-            const err = await refRes.json();
+            const err = await refRes.json().catch(() => ({}));
             throw new Error(`Failed to get branch reference: ${err.message || refRes.statusText}`);
         }
         const refData = await refRes.json();
@@ -135,7 +130,7 @@
             });
 
             if (!blobRes.ok) {
-                const err = await blobRes.json();
+                const err = await blobRes.json().catch(() => ({}));
                 throw new Error(`Failed to upload blob for ${fileObj.path}: ${err.message || blobRes.statusText}`);
             }
             const blobData = await blobRes.json();
@@ -159,8 +154,8 @@
         });
 
         if (!treeRes.ok) {
-            const err = await treeRes.json();
-            throw new Error(`Failed to create Git tree: ${err.message}`);
+            const err = await treeRes.json().catch(() => ({}));
+            throw new Error(`Failed to create Git tree: ${err.message || treeRes.statusText}`);
         }
         const treeData = await treeRes.json();
 
@@ -177,8 +172,8 @@
         });
 
         if (!newCommitRes.ok) {
-            const err = await newCommitRes.json();
-            throw new Error(`Failed to create Git commit: ${err.message}`);
+            const err = await newCommitRes.json().catch(() => ({}));
+            throw new Error(`Failed to create Git commit: ${err.message || newCommitRes.statusText}`);
         }
         const newCommitData = await newCommitRes.json();
 
@@ -194,8 +189,8 @@
         });
 
         if (!updateRefRes.ok) {
-            const err = await updateRefRes.json();
-            throw new Error(`Failed to update main branch: ${err.message}`);
+            const err = await updateRefRes.json().catch(() => ({}));
+            throw new Error(`Failed to update main branch: ${err.message || updateRefRes.statusText}`);
         }
 
         report(7, 100, "Live update published successfully to GitHub!");
@@ -206,6 +201,7 @@
     window.CSB_GITHUB = {
         uploadFiles: uploadFilesToGithub,
         getToken: getStoredToken,
-        setToken: setStoredToken
+        setToken: setStoredToken,
+        promptToken: promptTokenIfNeeded
     };
 })();
