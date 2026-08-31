@@ -399,14 +399,14 @@
                             </div>
                         </div>
 
-                        <!-- Action buttons -->
-                        <div id="abstractActionButtons" style="display:none; gap:10px; flex-wrap:wrap; margin-top:1rem;">
-                            <button id="btnUploadLiveAbstract" class="btn" onclick="publishAbstractLiveToGithub()" style="background: linear-gradient(135deg, #10b981, #059669); color:white; font-weight:700; padding:10px 22px; border:none; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow: 0 4px 12px rgba(16,185,129,0.25);">
+                        <!-- (2026-07-13) Streamlined minimalist action strip; prev: stacked huge buttons -->
+                        <div id="abstractActionButtons" style="display:none; align-items:center; gap:8px; margin-top:1rem;">
+                            <button id="btnUploadLiveAbstract" class="btn" onclick="publishAbstractLiveToGithub()" style="flex:1; height:44px; background: linear-gradient(135deg, #10b981, #059669); color:white; font-weight:700; font-size:14px; border:none; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; box-shadow: 0 4px 12px rgba(16,185,129,0.25);">
                                 <i class="bi bi-cloud-arrow-up-fill" style="font-size:1.1rem;"></i>
                                 <span>UPLOAD LIVE</span>
                             </button>
-                            <button id="btnDownloadAllAbstract" class="btn btn-secondary" onclick="downloadAllConvertedAbstract()" style="padding:10px 18px; font-weight:600; border-radius:8px;">
-                                <i class="bi bi-download"></i> Download All CSVs
+                            <button id="btnDownloadAllAbstract" class="btn btn-secondary" onclick="downloadAllConvertedAbstract()" style="height:44px; width:44px; padding:0; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; font-size:1.1rem; border:1px solid #cbd5e1; background:#ffffff; color:#475569;" title="Download All CSV Files">
+                                <i class="bi bi-download"></i>
                             </button>
                         </div>
                         <div id="abstractLiveUploadStatus" style="display:none; margin-top:10px; padding:10px 14px; border-radius:8px; background:#eff6ff; border:1px solid #bfdbfe; font-size:13px; color:#1e40af;"></div>
@@ -469,58 +469,58 @@
                 <div class="form-row">
                     <div class="form-group" style="max-width: 300px;">
                         <label class="input-label">LCS File Date</label>
-                        <input type="date" id="lcsDateInput" class="form-select">
+                        <input type="date" id="lcsDateInput" class="form-select" style="height:42px; font-size:14px;">
                     </div>
                 </div>
 
-                <div class="form-group" style="margin-bottom: 0.5rem;">
+                <div class="form-group" style="margin-bottom: 0.75rem;">
                     <div class="file-upload-wrapper drop-zone">
-                        <label for="lcsFileInput" class="file-upload-label">Choose LCS .xlsx or .xlsm File</label>
+                        <label for="lcsFileInput" class="file-upload-label" style="height:46px; display:flex; align-items:center; justify-content:center; font-size:14px;">Choose LCS .xlsx or .xlsm File</label>
                         <input type="file" id="lcsFileInput" class="file-input" accept=".xlsx,.xlsm" onchange="updateLcsFileName()">
                         <small id="lcsFileName" class="file-name">No file chosen</small>
                         <div class="file-hint">Drag & drop or click to select your Sunline LCS file.</div>
                     </div>
                 </div>
 
-                <div class="convert-actions">
-                    <button id="lcsConvertButton" class="btn btn-primary" onclick="convertLcsExcelToCSV()">
+                <div class="convert-actions" id="lcsConvertActions">
+                    <button id="lcsConvertButton" class="btn btn-primary" onclick="convertLcsExcelToCSV()" style="height:44px; font-size:14px; font-weight:700;">
                         <span id="lcsButtonText">CONVERT LCS FILE</span>
                     </button>
                 </div>
 
                 <div id="lcsProgressContainer" class="progress-container" style="display:none; margin-top:1rem;">
-                    <div class="progress">
-                        <div id="lcsProgressBar" class="progress-bar">0%</div>
+                    <div class="progress" style="height:10px; border-radius:5px;">
+                        <div id="lcsProgressBar" class="progress-bar" style="font-size:10px; line-height:10px;">0%</div>
                     </div>
-                    <small id="lcsProgressText" class="progress-text">Processing LCS sheet...</small>
+                    <small id="lcsProgressText" class="progress-text" style="font-size:12px; margin-top:4px;">Processing LCS sheet...</small>
                 </div>
 
-                <div id="lcsDownloadButtons" class="download-buttons" style="margin-top:1rem; display:none; gap:10px; flex-wrap:wrap;"></div>
+                <div id="lcsDownloadButtons" class="download-buttons" style="display:none;"></div>
 
-                <!-- (2026-07-13) LCS UPLOAD LIVE actions and status container; prev: download only -->
-                <div id="lcsActionButtons" style="display:none; gap:10px; flex-wrap:wrap; margin-top:1rem;">
-                    <button id="btnUploadLiveLcs" class="btn" onclick="publishLcsLiveToGithub()" style="background: linear-gradient(135deg, #10b981, #059669); color:white; font-weight:700; padding:10px 22px; border:none; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow: 0 4px 12px rgba(16,185,129,0.25);">
+                <!-- (2026-07-13) LCS Minimalist action strip: prominent UPLOAD LIVE + right icon download; prev: huge stacked buttons -->
+                <div id="lcsActionButtons" style="display:none; align-items:center; gap:8px; margin-top:1rem;">
+                    <button id="btnUploadLiveLcs" class="btn" onclick="publishLcsLiveToGithub()" style="flex:1; height:44px; background: linear-gradient(135deg, #10b981, #059669); color:white; font-weight:700; font-size:14px; border:none; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; box-shadow: 0 4px 12px rgba(16,185,129,0.25);">
                         <i class="bi bi-cloud-arrow-up-fill" style="font-size:1.1rem;"></i>
                         <span>UPLOAD LIVE</span>
                     </button>
-                    <button id="btnDownloadLcs" class="btn btn-secondary" onclick="downloadConvertedLcs()" style="padding:10px 18px; font-weight:600; border-radius:8px;">
-                        <i class="bi bi-download"></i> Download CSV
+                    <button id="btnDownloadLcs" class="btn btn-secondary" onclick="downloadConvertedLcs()" style="height:44px; width:44px; padding:0; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; font-size:1.1rem; border:1px solid #cbd5e1; background:#ffffff; color:#475569;" title="Download Converted CSV">
+                        <i class="bi bi-download"></i>
                     </button>
                 </div>
                 <div id="lcsLiveUploadStatus" style="display:none; margin-top:10px; padding:10px 14px; border-radius:8px; background:#eff6ff; border:1px solid #bfdbfe; font-size:13px; color:#1e40af;"></div>
 
-                <!-- (2026-07-13) GitHub Live Token required input field & validator; prev: dialog only -->
-                <div class="form-group" style="margin-top:1.5rem; padding:14px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px;">
-                    <label class="input-label" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                        <span><i class="bi bi-key-fill" style="color:#4F2683;"></i> GitHub Live Upload Token (Required for Live Upload)</span>
-                        <span id="ghTokenStatusBadge" class="badge" style="font-size:11px; padding:3px 8px; border-radius:4px; background:#fee2e2; color:#b91c1c; font-weight:700;">Token Required</span>
+                <!-- (2026-07-13) GitHub Live Token roomy input field & button sizing; prev: cramped controls -->
+                <div class="form-group" style="margin-top:1.75rem; padding:16px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px;">
+                    <label class="input-label" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:13px; font-weight:600;">
+                        <span><i class="bi bi-key-fill" style="color:#4F2683; margin-right:4px;"></i> GitHub Live Upload Token</span>
+                        <span id="ghTokenStatusBadge" class="badge" style="font-size:11px; padding:4px 10px; border-radius:6px; background:#fee2e2; color:#b91c1c; font-weight:700;">Token Required</span>
                     </label>
                     <div style="display:flex; gap:8px; align-items:center;">
-                        <input type="password" id="ghTokenInput" class="form-select" placeholder="Paste your GitHub Token (ghp_...)" style="flex:1;" oninput="onGhTokenInputChange()">
-                        <button type="button" class="btn btn-secondary" onclick="toggleTokenVisibility()" style="padding:8px 12px; font-size:13px;" title="Show/Hide Token"><i class="bi bi-eye" id="ghTokenEyeIcon"></i></button>
-                        <button type="button" class="btn btn-primary" onclick="saveGithubTokenFromInput()" style="padding:8px 16px; font-size:13px; font-weight:600;">Save Token</button>
+                        <input type="password" id="ghTokenInput" class="form-select" placeholder="Paste your GitHub Token (ghp_...)" style="flex:1; height:44px; font-size:14px; padding:0 14px; border-radius:8px;" oninput="onGhTokenInputChange()">
+                        <button type="button" class="btn btn-secondary" onclick="toggleTokenVisibility()" style="height:44px; width:44px; padding:0; display:inline-flex; align-items:center; justify-content:center; font-size:15px; border-radius:8px; border:1px solid #cbd5e1; background:#ffffff; color:#475569;" title="Show/Hide Token"><i class="bi bi-eye" id="ghTokenEyeIcon"></i></button>
+                        <button type="button" class="btn btn-primary" onclick="saveGithubTokenFromInput()" style="height:44px; padding:0 22px; font-size:14px; font-weight:700; border-radius:8px; white-space:nowrap;">Save Token</button>
                     </div>
-                    <small id="ghTokenHint" style="display:block; margin-top:6px; font-size:11px; color:#64748b;">Save once. It stays stored in your browser so you or your dad can upload live anytime.</small>
+                    <small id="ghTokenHint" style="display:block; margin-top:6px; font-size:11px; color:#64748b;">Saved in your browser once. Enables 1-click live publishing directly to GitHub.</small>
                 </div>
             </div>
         </div>
@@ -1509,6 +1509,16 @@
                 if (dMonth && dDay && dYear && dateInput) {
                     dateInput.value = `${dYear}-${dMonth}-${dDay}`;
                 }
+
+                // Reset action strip when a new file is selected
+                const convertActions = document.getElementById("lcsConvertActions");
+                const actionButtons = document.getElementById("lcsActionButtons");
+                const progressContainer = document.getElementById("lcsProgressContainer");
+                const statusEl = document.getElementById("lcsLiveUploadStatus");
+                if (convertActions) convertActions.style.display = "block";
+                if (actionButtons) actionButtons.style.display = "none";
+                if (progressContainer) progressContainer.style.display = "none";
+                if (statusEl) statusEl.style.display = "none";
             } else if (fileName) {
                 fileName.textContent = "No file chosen";
             }
@@ -1523,6 +1533,7 @@
             const dateInput = document.getElementById("lcsDateInput");
             const fileInput = document.getElementById("lcsFileInput");
             const convertBtn = document.getElementById("lcsConvertButton");
+            const convertActions = document.getElementById("lcsConvertActions");
             const progressContainer = document.getElementById("lcsProgressContainer");
             const progressBar = document.getElementById("lcsProgressBar");
             const progressText = document.getElementById("lcsProgressText");
@@ -1574,6 +1585,7 @@
                         localStorage.setItem('csb_lcs_live_session', JSON.stringify(window.activeLcsSession));
                     } catch(err) {}
 
+                    if (convertActions) convertActions.style.display = "none";
                     if (actionButtons) actionButtons.style.display = "flex";
                 } catch (err) {
                     alert("Error converting LCS file: " + err.message);
@@ -2164,10 +2176,12 @@
                     const parsed = JSON.parse(lcsSession);
                     if (parsed && parsed.csvText) {
                         window.activeLcsSession = parsed;
+                        const convertActions = document.getElementById("lcsConvertActions");
                         const actionButtons = document.getElementById("lcsActionButtons");
                         const progressContainer = document.getElementById("lcsProgressContainer");
                         const progressBar = document.getElementById("lcsProgressBar");
                         const progressText = document.getElementById("lcsProgressText");
+                        if (convertActions) convertActions.style.display = "none";
                         if (progressContainer) progressContainer.style.display = "block";
                         if (progressBar) { progressBar.style.width = "100%"; progressBar.textContent = "100%"; }
                         if (progressText) progressText.textContent = `Ready: ${parsed.filename}`;
