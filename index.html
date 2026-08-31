@@ -470,14 +470,14 @@
             </div>
         </div>
 
-        <!-- (2026-07-13) Add dedicated Sunline LCS card; prev: single uploader card -->
+        <!-- (2026-07-13) Improve Sunline LCS card header, badge, and description; prev: awkwardly wrapped pill -->
         <div class="admin-card" style="margin-top: 1rem;">
-            <div class="admin-card__header" style="margin-bottom: 0.5rem;">
+            <div class="admin-card__header" style="margin-bottom: 0.5rem; align-items: center;">
                 <div>
                     <div class="admin-card__eyebrow">Admin · Sunline LCS Uploader</div>
-                    <p style="margin-bottom: 0.25rem; font-size: 13px;">Upload a 1-sheet LCS Excel file (.xlsx or .xlsm) and select the date to generate lcs_mmmddyyyy.csv format.</p>
+                    <p style="margin-bottom: 0.25rem; font-size: 13px;">Upload a Sunline LCS Excel file (.xlsx or .xlsm). The date will be auto-detected and converted for live publishing.</p>
                 </div>
-                <div class="summary-chip" style="background: #4F2683;">LCS Database</div>
+                <span class="badge" style="background: #ede9fe; color: #6b21a8; padding: 6px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;"><i class="bi bi-database-fill"></i> Sunline LCS</span>
             </div>
 
             <div class="admin-card__body" style="gap: 0.5rem;">
@@ -1511,8 +1511,8 @@
 
                 // (2026-07-13) Auto-trigger LCS conversion upon file selection; prev: required manual click
                 setTimeout(() => {
-                    convertLcsToCSV();
-                }, 120);
+                    convertLcsExcelToCSV();
+                }, 100);
             } else if (fileName) {
                 fileName.textContent = "No file chosen";
             }
@@ -1522,7 +1522,7 @@
         window.activeAbstractSession = null;
         window.activeLcsSession = null;
 
-        // (2026-07-13) LCS conversion with confirmation dialog and live state; prev: static download
+        // (2026-07-13) LCS conversion with live state; prev: static download and blocking popup
         async function convertLcsExcelToCSV() {
             const dateInput = document.getElementById("lcsDateInput");
             const fileInput = document.getElementById("lcsFileInput");
@@ -1547,9 +1547,6 @@
             const dd = String(selectedDate.getDate()).padStart(2, '0');
             const yyyy = selectedDate.getFullYear();
             const outputFilename = `lcs_${mmm}${dd}${yyyy}.csv`;
-
-            const confirmMsg = `Double check LCS Date:\n\nDate: ${mmm} ${dd}, ${yyyy}\nOutput File: ${outputFilename}\n\nClick OK to proceed with conversion.`;
-            if (!confirm(confirmMsg)) return;
 
             if (convertBtn) convertBtn.disabled = true;
             if (progressContainer) progressContainer.style.display = "block";
