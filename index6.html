@@ -3331,9 +3331,10 @@
                 <!-- (2026-07-13) Custom bank-select styled dropdowns; prev: native select -->
                 <div class="col-lg-4 col-md-6 mb-3 mb-lg-0">
                     <div class="currency-input-wrapper">
-                        <span class="currency-prefix"><i class="bi bi-calendar3 text-warning"></i></span>
+                        <!-- (2026-07-13) Add August 2026 as default month; prev: July 2026 default -->
                         <select id="activeMonthSelect" class="form-control bank-select font-weight-bold" onchange="if(document.getElementById('branchSelect')?.value) renderFirstBillingBranchTable();">
-                            <option value="jul26" selected>July 2026</option>
+                            <option value="aug26" selected>August 2026</option>
+                            <option value="jul26">July 2026</option>
                             <option value="jun26">June 2026</option>
                             <option value="may26">May 2026</option>
                             <option value="apr26">April 2026</option>
