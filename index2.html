@@ -638,8 +638,8 @@
             const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             const currentDate = new Date();
             const currentMonth = currentDate.getMonth();
-            const previousMonthIndex = (currentMonth - 1 + 12) % 12;
-            return months[previousMonthIndex];
+            // Return current month instead of previous
+            return months[currentMonth];
         }
 
         function updateFileName() {
@@ -705,14 +705,14 @@
             const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
             const currentDate = new Date();
             const currentMonth = currentDate.getMonth();
-            const previousMonthIndex = (currentMonth - 1 + 12) % 12;
-            const previousMonth = months[previousMonthIndex];
+            // Use current month instead of previous
+            const currentMonthName = months[currentMonth];
             const currentYrSuffix = currentDate.getFullYear().toString().slice(-2);
-            const previousMonthText = "pos_" + previousMonth.toLowerCase() + currentYrSuffix + '.csv';
+            const currentMonthText = "pos_" + currentMonthName.toLowerCase() + currentYrSuffix + '.csv';
             const monthNameEl = document.getElementById("month-name");
             const exampleFileEl = document.getElementById("example-file");
             if (monthNameEl) monthNameEl.textContent = getPreviousMonthName();
-            if (exampleFileEl) exampleFileEl.textContent = previousMonthText;
+            if (exampleFileEl) exampleFileEl.textContent = currentMonthText;
         }
 
         function logout() {
