@@ -293,7 +293,7 @@
     </div>
 
     <!-- Bottom Navigation -->
-    <div class="bottom-nav" style="--theme-color: #6b4600; --theme-rgb: 107, 70, 0;">
+    <div class="bottom-nav" style="--theme-color: #6b4600; --theme-rgb: 107, 70, 0; display: flex !important;">
         <a href="index.html" class="bottom-nav-link">
             <i class="bi bi-wallet"></i>
             <span>NETPAY</span>
@@ -638,7 +638,11 @@
             const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             const currentDate = new Date();
             const currentMonth = currentDate.getMonth();
+<<<<<<< Updated upstream
             // Return current month instead of previous
+=======
+            // Changed to use current month instead of previous month
+>>>>>>> Stashed changes
             return months[currentMonth];
         }
 
@@ -705,7 +709,11 @@
             const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
             const currentDate = new Date();
             const currentMonth = currentDate.getMonth();
+<<<<<<< Updated upstream
             // Use current month instead of previous
+=======
+            // Changed to use current month instead of previous month
+>>>>>>> Stashed changes
             const currentMonthName = months[currentMonth];
             const currentYrSuffix = currentDate.getFullYear().toString().slice(-2);
             const currentMonthText = "pos_" + currentMonthName.toLowerCase() + currentYrSuffix + '.csv';

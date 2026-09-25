@@ -635,7 +635,7 @@
     </div>
 
     <!-- Bottom Navigation -->
-    <div class="bottom-nav" style="--theme-color: #4F2683; --theme-rgb: 79, 38, 131;">
+    <div class="bottom-nav" style="--theme-color: #4F2683; --theme-rgb: 79, 38, 131; display: flex !important;">
         <a href="index.html" class="bottom-nav-link active">
             <i class="bi bi-wallet-fill"></i>
             <span>NETPAY</span>
@@ -1790,7 +1790,15 @@
             reader.onload = async function (e) {
                 try {
                     const data = new Uint8Array(e.target.result);
-                    currentWorkbook = XLSX.read(data, { type: "array", dense: true, cellFormula: false, cellHTML: false, cellText: false });
+                    currentWorkbook = XLSX.read(data, { 
+                        type: "array", 
+                        dense: true, 
+                        cellFormula: false, 
+                        cellHTML: false, 
+                        cellText: false,
+                        cellDates: false,  // Don't convert to JS Date objects
+                        raw: true          // Get raw values without formatting
+                    });
                     const mVal = monthSelect.value.toLowerCase();
                     const yVal = yearSelect.value;
                     const yyVal = yVal.slice(-2);
@@ -1904,9 +1912,22 @@
                 const sheet = currentWorkbook.Sheets[sheetName];
                 let rawRows;
                 if (sheet['!data'] && Array.isArray(sheet['!data'])) {
-                    rawRows = sheet['!data'].map(row => (row || []).map(cell => (cell && cell.v !== undefined ? cell.v : "")));
+                    // Dense format - extract values, handling empty cells properly
+                    rawRows = sheet['!data'].map(row => 
+                        (row || []).map(cell => {
+                            if (!cell || cell.v === undefined || cell.v === null) return "";
+                            // Return the raw value (v property)
+                            return cell.v;
+                        })
+                    );
                 } else {
-                    rawRows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false, defval: "" });
+                    // Fallback to sheet_to_json with raw values
+                    rawRows = XLSX.utils.sheet_to_json(sheet, { 
+                        header: 1, 
+                        raw: true,      // Don't apply number formatting
+                        defval: "",     // Default empty cells to ""
+                        blankrows: true // Include blank rows
+                    });
                 }
 
                 if (!rawRows || rawRows.length === 0) throw new Error("Empty sheet");
@@ -1944,6 +1965,7 @@
                 const sampleRow = rawRows.slice(1, 10).find(r => r && r.length > 5 && /^\d{5,8}$/.test(String(r[3] || '').trim())) || rawRows[1] || [];
 
                 if (sheetConfig.id === "POS") {
+<<<<<<< Updated upstream
                     const posDedIdx = sampleRow.findIndex((v, i) => i >= 5 && i <= 10 && (/^0?339$/i.test(String(v).trim()) || /^\d{4}$/.test(String(v).trim())));
                     if (posDedIdx === 6) {
                         colMap.REGCODE = 0; colMap.DIVCODE = 1; colMap.STACODE = 2; colMap.EMPNO = 3;
@@ -1951,6 +1973,10 @@
                         colMap.DEDCODE = 6; colMap.DEDID = 7; colMap.EFFYY = 8; colMap.EFFMM = 9;
                         colMap.TERYY = 10; colMap.TERMM = 11; colMap.DEDAMT = 12; colMap.POLICYNO = 14;
                     } else if (posDedIdx === 7) {
+=======
+                    const posDedIdx = sampleRow.findIndex((v, i) => i >= 6 && i <= 10 && (/^0?339$/i.test(String(v).trim()) || /^\d{4}$/.test(String(v).trim())));
+                    if (posDedIdx === 7) {
+>>>>>>> Stashed changes
                         colMap.REGCODE = 0; colMap.DIVCODE = 1; colMap.STACODE = 2; colMap.EMPNO = 3;
                         colMap.FNAME = 4; colMap.MI = 5; colMap.LNAME = 6;
                         colMap.DEDCODE = 7; colMap.DEDID = 8; colMap.EFFYY = 9; colMap.EFFMM = 10;
@@ -1988,7 +2014,21 @@
                     }
                 }
 
-                const getVal = (r, idx) => (idx !== -1 && r[idx] !== undefined && r[idx] !== null) ? String(r[idx]).replace(/,/g, '').trim() : "";
+                const getVal = (r, idx) => {
+                    if (idx === -1 || r[idx] === undefined || r[idx] === null || r[idx] === '') return "";
+                    const val = r[idx];
+                    // Handle numbers - preserve precision
+                    if (typeof val === 'number') {
+                        // Check if it's a date (Excel dates are numbers > 40000)
+                        if (val > 40000 && val < 60000) {
+                            return String(Math.floor(val));
+                        }
+                        // For regular numbers, use toFixed to preserve decimals
+                        return val % 1 === 0 ? String(val) : val.toFixed(2);
+                    }
+                    // Handle strings - remove commas and trim
+                    return String(val).replace(/,/g, '').trim();
+                };
                 const processedRows = [];
 
                 for (let rIdx = 0; rIdx < totalRows; rIdx++) {
