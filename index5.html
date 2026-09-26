@@ -3261,9 +3261,10 @@
                 <div class="col-lg-3 col-md-4 mb-2 mb-md-0">
                     <div class="currency-input-wrapper">
                         <span class="currency-prefix"><i class="bi bi-calendar3 text-warning"></i></span>
-                        <!-- (2026-07-13) Add August 2026 as default month; prev: July 2026 default -->
+                        <!-- (2026-07-13) Add Sep 2026 to month select; prev: Aug 2026 default -->
                         <select id="activeMonthSelect" class="form-control bank-select" style="padding-left: 36px !important;">
-                            <option value="aug26" selected>August 2026</option>
+                            <option value="sep26" selected>September 2026</option>
+                            <option value="aug26">August 2026</option>
                             <option value="jul26">July 2026</option>
                             <option value="jun26">June 2026</option>
                             <option value="may26">May 2026</option>
@@ -4341,12 +4342,13 @@
         }
 
         // (2026-07-13) Dynamic latest LCS file lookup; prev: static SUNLINE LCS.csv
+        // (2026-07-13) Support 1-2 digit days in parseLcsFileDate; prev: 2-digit only
         function parseLcsFileDate(filename) {
             const fn = filename.toLowerCase();
             const months = { jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11 };
-            const m1 = fn.match(/lcs_([a-z]{3})(\d{2})(\d{4})\.csv$/);
-            if (m1 && months[m1[1]] !== undefined) {
-                return new Date(parseInt(m1[3], 10), months[m1[1]], parseInt(m1[2], 10)).getTime();
+            const m1 = fn.match(/^lcs_([a-z]{3})(\d{1,2})(\d{4})\.csv$/i);
+            if (m1 && months[m1[1].toLowerCase()] !== undefined) {
+                return new Date(parseInt(m1[3], 10), months[m1[1].toLowerCase()], parseInt(m1[2], 10)).getTime();
             }
             const m2 = fn.match(/lcs_([a-z]{3})(\d{2})\.csv$/);
             if (m2 && months[m2[1]] !== undefined) {
@@ -4391,6 +4393,48 @@
                 return `(As of ${monthNames[m2[1]]} 20${m2[2]})`;
             }
             return `(As of ${filename.replace(/\.csv$/i, '')})`;
+        }
+
+        // (2026-07-13) Auto-detect latest months from manifest; prev: hardcoded options
+        async function initDynamicMonthOptions() {
+            try {
+                const res = await fetch('available_files.json?_=' + Date.now());
+                if (!res.ok) return;
+                const files = await res.json();
+                const monthNames = { jan: 'January', feb: 'February', mar: 'March', apr: 'April', may: 'May', jun: 'June', jul: 'July', aug: 'August', sep: 'September', oct: 'October', nov: 'November', dec: 'December' };
+                const monthIdx = { jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11 };
+                const months = [];
+                const seen = new Set();
+                files.forEach(f => {
+                    const m = f.toLowerCase().match(/^([a-z]{3})(\d{2})\.csv$/);
+                    if (m && monthIdx[m[1]] !== undefined) {
+                        const key = m[1] + m[2];
+                        if (!seen.has(key)) {
+                            seen.add(key);
+                            const yr = 2000 + parseInt(m[2], 10);
+                            months.push({ key, label: `${monthNames[m[1]]} ${yr}`, score: yr * 12 + monthIdx[m[1]] });
+                        }
+                    }
+                });
+                if (months.length > 0) {
+                    months.sort((a, b) => b.score - a.score);
+                    const sel = document.getElementById('activeMonthSelect');
+                    if (sel) {
+                        const prevVal = sel.value;
+                        sel.innerHTML = months.map((m, idx) => `<option value="${m.key}"${idx === 0 ? ' selected' : ''}>${m.label}</option>`).join('');
+                        if (prevVal && months.some(m => m.key === prevVal)) {
+                            sel.value = prevVal;
+                        } else {
+                            sel.value = months[0].key;
+                        }
+                        if (typeof syncSelectOptions === 'function') {
+                            syncSelectOptions(sel);
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn('Could not auto-detect months:', e);
+            }
         }
 
         // (2026-07-13) Parse CSV in non-blocking chunks; prev: synchronous XLSX read
@@ -5110,6 +5154,9 @@
 
             // Load Excel Database
             loadLcsDatabase();
+
+            // (2026-07-13) Auto-populate month dropdown from manifest; prev: hardcoded
+            initDynamicMonthOptions();
 
             // [2026-07-12 New: Initialize Details button state based on localStorage preference, default hidden]
             const antiHide = localStorage.getItem('le_anti_hide_breakdown');
