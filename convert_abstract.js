@@ -292,23 +292,32 @@ function convertFile(filePath, customMonth, customYear, forceReconvert = false) 
         // (2026-07-13) Auto-detect column layout from sample data; prev: header-only detection
         const sampleRow = rawRows.slice(1, 10).find(r => r && r.length > 5 && /^\d{5,8}$/.test(String(r[3] || '').trim())) || rawRows[1] || [];
 
+        // (2026-07-13) Fix POS colMap to blank DEDID; prev: shifted columns
         if (sheetConfig.id === "POS") {
             const posDedIdx = sampleRow.findIndex((v, i) => i >= 6 && i <= 10 && (/^0?339$/i.test(String(v).trim()) || /^\d{4}$/.test(String(v).trim())));
-            if (posDedIdx === 8) {
+            const nextVal = String(sampleRow[posDedIdx + 1] || '').trim();
+            const isNextYear = /^(?:19|20)\d{2}$/.test(nextVal);
+            if (posDedIdx === 7) {
                 colMap.REGCODE = 0; colMap.DIVCODE = 1; colMap.STACODE = 2; colMap.EMPNO = 3;
                 colMap.FNAME = 4; colMap.MI = 5; colMap.LNAME = 6;
-                colMap.DEDCODE = 8; colMap.DEDID = 9; colMap.EFFYY = 10; colMap.EFFMM = 11;
+                colMap.DEDCODE = 7; colMap.DEDID = -1;
+                if (isNextYear) {
+                    colMap.EFFYY = 8; colMap.EFFMM = 9; colMap.TERYY = 10; colMap.TERMM = 11;
+                    colMap.DEDAMT = 12; colMap.POLICYNO = (sampleRow.length > 15 && sampleRow[15] ? 15 : 14);
+                } else {
+                    colMap.EFFYY = 9; colMap.EFFMM = 10; colMap.TERYY = 11; colMap.TERMM = 12;
+                    colMap.DEDAMT = 13; colMap.POLICYNO = 15;
+                }
+            } else if (posDedIdx === 8) {
+                colMap.REGCODE = 0; colMap.DIVCODE = 1; colMap.STACODE = 2; colMap.EMPNO = 3;
+                colMap.FNAME = 4; colMap.MI = 5; colMap.LNAME = 6;
+                colMap.DEDCODE = 8; colMap.DEDID = -1; colMap.EFFYY = 10; colMap.EFFMM = 11;
                 colMap.TERYY = 12; colMap.TERMM = 13; colMap.DEDAMT = 14; colMap.POLICYNO = 15;
             } else if (posDedIdx === 9) {
                 colMap.REGCODE = 0; colMap.DIVCODE = 1; colMap.STACODE = 2; colMap.EMPNO = 3;
                 colMap.FNAME = 5; colMap.MI = 6; colMap.LNAME = 7;
-                colMap.DEDCODE = 9; colMap.DEDID = 10; colMap.EFFYY = 11; colMap.EFFMM = 12;
+                colMap.DEDCODE = 9; colMap.DEDID = -1; colMap.EFFYY = 11; colMap.EFFMM = 12;
                 colMap.TERYY = 13; colMap.TERMM = 14; colMap.DEDAMT = 15; colMap.POLICYNO = 16;
-            } else if (posDedIdx === 7) {
-                colMap.REGCODE = 0; colMap.DIVCODE = 1; colMap.STACODE = 2; colMap.EMPNO = 3;
-                colMap.FNAME = 4; colMap.MI = 5; colMap.LNAME = 6;
-                colMap.DEDCODE = 7; colMap.DEDID = 8; colMap.EFFYY = 9; colMap.EFFMM = 10;
-                colMap.TERYY = 11; colMap.TERMM = 12; colMap.DEDAMT = 13; colMap.POLICYNO = 15;
             }
         } else if (sheetConfig.id === "ONQUEUE") {
             const onqDedIdx = sampleRow.findIndex((v, i) => i >= 6 && i <= 10 && /^\d{4}$/.test(String(v).trim()));
@@ -380,13 +389,14 @@ function convertFile(filePath, customMonth, customYear, forceReconvert = false) 
                         getVal(r, colMap.FNAME !== -1 ? colMap.FNAME : 4),
                         getVal(r, colMap.MI !== -1 ? colMap.MI : 5),
                         getVal(r, colMap.LNAME !== -1 ? colMap.LNAME : 6),
-                        getVal(r, colMap.DEDCODE !== -1 ? colMap.DEDCODE : 8),
-                        getVal(r, colMap.DEDID !== -1 ? colMap.DEDID : 9),
-                        getVal(r, colMap.EFFYY !== -1 ? colMap.EFFYY : 10),
-                        getVal(r, colMap.EFFMM !== -1 ? colMap.EFFMM : 11),
-                        getVal(r, colMap.TERYY !== -1 ? colMap.TERYY : 12),
-                        getVal(r, colMap.TERMM !== -1 ? colMap.TERMM : 13),
-                        getVal(r, colMap.DEDAMT !== -1 ? colMap.DEDAMT : 14),
+                        // (2026-07-13) Output blank DEDID for POS export; prev: misaligned
+                        getVal(r, colMap.DEDCODE !== -1 ? colMap.DEDCODE : 7),
+                        (colMap.DEDID !== -1 ? getVal(r, colMap.DEDID) : ""),
+                        getVal(r, colMap.EFFYY !== -1 ? colMap.EFFYY : 9),
+                        getVal(r, colMap.EFFMM !== -1 ? colMap.EFFMM : 10),
+                        getVal(r, colMap.TERYY !== -1 ? colMap.TERYY : 11),
+                        getVal(r, colMap.TERMM !== -1 ? colMap.TERMM : 12),
+                        getVal(r, colMap.DEDAMT !== -1 ? colMap.DEDAMT : 13),
                         "",
                         getVal(r, colMap.POLICYNO !== -1 ? colMap.POLICYNO : 15)
                     ]);
