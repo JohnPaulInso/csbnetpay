@@ -4595,7 +4595,8 @@
             const keys = Object.keys(monthCounts).sort().reverse();
             let activeKey = targetKey;
             if (!activeKey || (!keys.includes(activeKey) && activeKey !== 'all')) {
-                activeKey = keys[0] || 'all';
+                // (2026-09-28) Default to 'all' months so no accounts are hidden; prev: defaulted to most recent month
+                activeKey = 'all';
             }
             window.selectedLoanReleaseMonth = activeKey;
 
@@ -4917,26 +4918,75 @@
             const effectivePos = (posObj.loans || []).reduce((s, l) => s + ((posHasCurrentMonth ? (_isAll || _matchEff(l.eff)) : true) ? (l.dedamt || 0) : 0), 0);
             const effectiveOnq = (onqObj.loans || []).reduce((s, l) => s + ((onqHasCurrentMonth ? (_isAll || _matchEff(l.eff)) : true) ? (l.dedamt || 0) : 0), 0);
 
+            // DEBUG: Log when effectivePos is 0 but csbPositive > 0 (likely a month filter issue)
+            if (effectivePos === 0 && posObj.loans && posObj.loans.length > 0) {
+                console.warn('[STATUS DEBUG] effectivePos=0 but has POS loans:', {
+                    empNum: empNumStr, name: clientName,
+                    _curMonStr, _isAll, posHasCurrentMonth,
+                    posLoansEff: posObj.loans.map(l => l.eff),
+                    csbPositive: posObj.amt
+                });
+            }
+
+            // ==================================================================================
+            // STATUS CALCULATION LOGIC - CRITICAL PRIORITY ORDER
+            // ==================================================================================
             // (2026-07-13) Status based on effective (checked) amounts; prev: all-loans total
+            // (2026-09-28) FIXED: Check OVERDED/UNDERDED BEFORE ONQ; prev: ONQ checked first
+            //
+            // PRIORITY ORDER (DO NOT CHANGE):
+            //   1. NO BILLING - No POS deductions (effectivePos === 0)
+            //   2. OVERDEDUCTED - POS > Monthly Amort + 1.0 tolerance
+            //   3. UNDERDEDUCTED - POS < Monthly Amort - 1.0 tolerance
+            //   4. AS EASE / FIRST CSB ONQ - Has ONQ + Net Total < ₱5,000 (protected status)
+            //   5. FIRST CSB ONQUEUE - Has ONQ + Net Total ≥ ₱5,000
+            //   6. EFFECTED - POS matches amort within ±1.0 tolerance
+            //
+            // WHY THIS ORDER MATTERS:
+            // - OVERDED/UNDERDED must be checked FIRST because an account can have ONQUEUE
+            //   but still be overdeducted/underdeducted. The ONQ doesn't negate the error.
+            // - AS EASE is a special protected status for low-balance accounts with ONQ
+            // - EFFECTED is the default "correct" status when everything matches
+            //
+            // THESE STATUS VALUES MUST MATCH STATUS_SORT_CYCLE array for filtering to work!
+            // ==================================================================================
             let statusMode = 'NO BILLING';
             let mismatchReasons = [];
 
-            // (2026-09-28) Calculate net total for AS EASE check; prev: no net total check
-            const netTotal = netPayVal + effectivePos - effectiveOnq;
+            // (2026-09-28) Calculate net total for AS EASE check
+            // FORMULA: NetPay MINUS POS MINUS ONQ = actual take-home after all deductions
+            // (NOT netPayVal + effectivePos - effectiveOnq which gives wrong result)
+            // AS EASE triggers when take-home after all deductions is below ₱5,000
+            const netTotal = netPayVal - effectivePos - effectiveOnq;
 
             if (effectivePos === 0) {
                 statusMode = 'NO BILLING';
+            } else if (effectivePos > (monthlyAmort + 1.0)) {
+                // (2026-09-28) Check OVERDEDUCTED first; prev: checked ONQ first
+                statusMode = 'OVERDEDUCTED';
+            } else if (effectivePos < (monthlyAmort - 1.0)) {
+                // (2026-09-28) Check UNDERDEDUCTED; prev: checked ONQ first
+                statusMode = 'UNDERDEDUCTED';
             } else if (effectiveOnq > 0) {
-                // (2026-09-28) Check if net total < 5000 for AS EASE status; prev: always FIRST CSB ONQUEUE
+                // (2026-09-28) Only check ONQ if POS matches amort; prev: checked ONQ before OVER/UNDER
+                // Debug logging for AS EASE detection
+                console.log('[ONQ ACCOUNT CHECK]', {
+                    empNum: empNumStr,
+                    name: clientName,
+                    netPayVal,
+                    effectivePos,
+                    effectiveOnq,
+                    netTotal,
+                    threshold: 5000,
+                    isAsEase: netTotal < 5000
+                });
+                
                 if (netTotal < 5000) {
                     statusMode = 'AS EASE / FIRST CSB ONQ';
+                    console.log('[AS EASE DETECTED] ✅', empNumStr, clientName);
                 } else {
                     statusMode = 'FIRST CSB ONQUEUE';
                 }
-            } else if (effectivePos > (monthlyAmort + 1.0)) {
-                statusMode = 'OVERDEDUCTED';
-            } else if (effectivePos < (monthlyAmort - 1.0)) {
-                statusMode = 'UNDERDEDUCTED';
             } else {
                 statusMode = 'EFFECTED';
             }
@@ -5024,7 +5074,8 @@
 
         function buildBillingTableHtml(rows, type, monthOptionsHtml) {
             const isAuto = type === 'auto';
-            const tbodyId = isAuto ? 'autonomousBillingTbody' : 'firstBillingTbody';
+            // (2026-09-28) Use tbody-auto/tbody-norm IDs for infinite scroll; prev: autonomousBillingTbody/firstBillingTbody
+            const tbodyId = isAuto ? 'tbody-auto' : 'tbody-norm';
             const title = isAuto ? 'AUTONOMOUS' : 'FIRST BILLING ACCOUNTS';
             const titleColor = isAuto ? '#38bdf8' : '#fbbf24';
             const icon = isAuto ? 'bi-cpu' : 'bi-file-earmark-spreadsheet';
@@ -5079,11 +5130,14 @@
                                     <th style="width: 7.5%; text-align: left; cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('netTotal')" title="Click to sort">
                                         Net Total <i class="bi bi-arrow-down-up" style="font-size: 0.50rem; opacity: 0.5;"></i>
                                     </th>
-                                    <!-- (2026-07-13) Add statusHeaderTitle to reflect cycle sort; prev: plain text -->
-                                    <th style="width: 8.5%; text-align: left; cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('status')" title="Click to cycle status sort (Effected, Overded, Underded, OnQ, No Billing)">
-                                        <span id="statusHeaderTitle-${type}">Status</span> <i class="bi bi-arrow-down-up" style="font-size: 0.50rem; opacity: 0.5;"></i>
+                                    <!-- (2026-09-28) Increase width and add wrapping to prevent overlap; prev: 8.5% -->
+                                    <th style="width: 10.0%; text-align: left; cursor: pointer; user-select: none; font-size: 0.58rem; padding-right: 8px !important;" onclick="sortBillingTable('status')" title="Click to cycle status sort (Effected, Overded, Underded, As Ease, OnQ, No Billing)">
+                                        <div style="display: flex; align-items: center; gap: 4px; flex-wrap: nowrap;">
+                                            <span id="statusHeaderTitle-${type}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">Status</span>
+                                            <i class="bi bi-arrow-down-up" style="font-size: 0.50rem; opacity: 0.5; flex-shrink: 0;"></i>
+                                        </div>
                                     </th>
-                                    <th style="width: 8.0%; text-align: left; color: #f59e0b; cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('diff')" title="Difference (Over/Under Deducted Amount) - Click to sort">
+                                    <th style="width: 7.0%; text-align: left; color: #f59e0b; cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('diff')" title="Difference (Over/Under Deducted Amount) - Click to sort">
                                         Diff <i class="bi bi-arrow-down-up" style="font-size: 0.50rem; opacity: 0.5;"></i>
                                     </th>
                                     <th style="width: 7.0%; text-align: left; vertical-align: top;">
@@ -5113,6 +5167,72 @@
                     </div>
                 </div>
             `;
+        }
+
+        // (2026-09-28) Load more rows on scroll with improved detection and logging; prev: stuck at 100
+        let isLoadingMore = false;
+        
+        function attachInfiniteScroll() {
+            // Target the specific billing table containers
+            const containers = document.querySelectorAll('.table-responsive');
+            containers.forEach(container => {
+                const table = container.querySelector('.billing-responsive-table');
+                if (table) {
+                    container.removeEventListener('scroll', handleTableScroll);
+                    container.addEventListener('scroll', handleTableScroll);
+                    console.log('[SCROLL] Attached listener to billing table container');
+                }
+            });
+        }
+
+        function handleTableScroll(e) {
+            if (isLoadingMore) return;
+            
+            const container = e.target;
+            const scrollTop = container.scrollTop;
+            const scrollHeight = container.scrollHeight;
+            const clientHeight = container.clientHeight;
+            
+            // Load more when scrolled to 50% of content (changed from 70% for earlier trigger)
+            const scrollPercent = (scrollTop + clientHeight) / scrollHeight;
+            if (scrollPercent >= 0.5) {
+                console.log('[SCROLL] Triggered at', Math.round(scrollPercent * 100) + '%');
+                loadMoreRows();
+            }
+        }
+
+        function loadMoreRows() {
+            if (isLoadingMore) return;
+            isLoadingMore = true;
+            
+            const tbodyNorm = document.getElementById('tbody-norm');
+            const tbodyAuto = document.getElementById('tbody-auto');
+            
+            if (tbodyNorm && window.currentBranchRowsNormal) {
+                const currentCount = tbodyNorm.querySelectorAll('tr[id^="billing-row-"]').length;
+                const totalRows = window.currentBranchRowsNormal.length;
+                
+                if (currentCount < totalRows) {
+                    const nextBatch = window.currentBranchRowsNormal.slice(currentCount, currentCount + 100);
+                    const html = nextBatch.map((r, idx) => generateBranchRowHtml(r, currentCount + idx, 'norm')).join('');
+                    tbodyNorm.insertAdjacentHTML('beforeend', html);
+                    console.log('[SCROLL] Normal: loaded', currentCount, '→', currentCount + nextBatch.length, '/', totalRows);
+                }
+            }
+            
+            if (tbodyAuto && window.currentBranchRowsAuto) {
+                const currentCount = tbodyAuto.querySelectorAll('tr[id^="billing-row-"]').length;
+                const totalRows = window.currentBranchRowsAuto.length;
+                
+                if (currentCount < totalRows) {
+                    const nextBatch = window.currentBranchRowsAuto.slice(currentCount, currentCount + 100);
+                    const html = nextBatch.map((r, idx) => generateBranchRowHtml(r, currentCount + idx, 'auto')).join('');
+                    tbodyAuto.insertAdjacentHTML('beforeend', html);
+                    console.log('[SCROLL] Auto: loaded', currentCount, '→', currentCount + nextBatch.length, '/', totalRows);
+                }
+            }
+            
+            setTimeout(() => { isLoadingMore = false; }, 100);
         }
 
         // (2026-07-13) Require explicit branch selection before load; prev: default ALL
@@ -5364,8 +5484,14 @@
             window.currentBranchAllRowsAuto = rowsToRenderAuto;
             window.currentBranchAllRows = allCombined;
 
+            // (2026-09-28) Status breakdown diagnostic log
+            const statusBreakdown = {};
+            allCombined.forEach(r => { statusBreakdown[r.statusMode] = (statusBreakdown[r.statusMode] || 0) + 1; });
+            console.log('[BILLING STATUS BREAKDOWN]', statusBreakdown, '| Total:', allCombined.length);
+
             const defMonthInfo = getLcsPreviousMonthKey(allCombined);
-            if (!window.selectedLoanReleaseMonth) window.selectedLoanReleaseMonth = defMonthInfo.key;
+            // (2026-09-28) Default to 'all' months so UNDERDED/AS EASE from any release month are visible; prev: defaulted to previous month
+            if (!window.selectedLoanReleaseMonth) window.selectedLoanReleaseMonth = 'all';
             const monthOptionsHtml = generateLoanMonthOptions(allCombined, window.selectedLoanReleaseMonth);
 
             let filteredNormal = rowsToRenderNormal;
@@ -5411,6 +5537,10 @@
                 ${buildBillingTableHtml(filteredAuto, 'auto', monthOptionsHtml)}
             `;
             container.innerHTML = html;
+            
+            // (2026-09-28) Attach infinite scroll listener; prev: stuck at 100 rows
+            setTimeout(() => attachInfiniteScroll(), 100);
+            
             // (2026-07-13) Sync display to checked loans after render; prev: showed raw totals
             requestAnimationFrame(() => {
                 const cache = window.firstBillingRowsCache || {};
@@ -5433,7 +5563,8 @@
         function generateBranchRowHtml(r, idx, prefix = 'norm') {
             const rowKey = r.rowKey || r.empNumStr;
             const isTagged = (()=>{ try{ const t=JSON.parse(localStorage.getItem('billing_tags')||'{}'); return !!t[`${prefix}-${rowKey}`] || !!t[rowKey] || !!t[`${prefix}-${r.empNumStr}`] || !!t[r.empNumStr]; }catch(e){return false;} })();
-            const netTotal = r.netPayVal + r.csbPositive - r.firstOnqAmt;
+            // Net Total = NetPay - POS - ONQ (actual take-home after all deductions)
+            const netTotal = r.netPayVal - r.csbPositive - r.firstOnqAmt;
             let statusMode = r.statusMode;
             
             return `
@@ -5948,11 +6079,28 @@
 
         function loadNextBranchRowChunk() {}
 
+        // ==================================================================================
+        // STATUS SORT CYCLE CONFIGURATION
+        // ==================================================================================
         // (2026-07-13) Cycle status sort across all options; prev: binary asc/desc
+        // (2026-09-28) Add AS EASE status option; prev: only FIRST CSB ONQUEUE
+        //
+        // IMPORTANT: The status table header sorting MUST ALWAYS include ALL status types:
+        //   1. EFFECTED - POS matches amort (±1.0) with no ONQUEUE
+        //   2. OVERDEDUCTED - POS > Monthly Amort + 1.0
+        //   3. UNDERDEDUCTED - POS < Monthly Amort - 1.0
+        //   4. AS EASE / FIRST CSB ONQ - Has ONQUEUE + Net Total < ₱5,000 (protected)
+        //   5. FIRST CSB ONQUEUE - Has ONQUEUE + Net Total ≥ ₱5,000
+        //   6. NO BILLING - No POS deductions
+        //
+        // These match the exact status values calculated in buildBillingRowData() function
+        // Clicking the STATUS column header cycles through these filters in order
+        // ==================================================================================
         const STATUS_SORT_CYCLE = [
             { key: 'EFFECTED', label: 'EFFECTED' },
             { key: 'OVERDEDUCTED', label: 'OVERDED' },
             { key: 'UNDERDEDUCTED', label: 'UNDERDED' },
+            { key: 'AS EASE / FIRST CSB ONQ', label: 'AS EASE' },
             { key: 'FIRST CSB ONQUEUE', label: 'ONQUEUE' },
             { key: 'NO BILLING', label: 'NO BILLING' }
         ];
@@ -6011,8 +6159,9 @@
                     vA = a.firstOnqAmt || 0;
                     vB = b.firstOnqAmt || 0;
                 } else if (col === 'netTotal') {
-                    vA = (a.netPayVal || 0) + (a.csbPositive || 0) - (a.firstOnqAmt || 0);
-                    vB = (b.netPayVal || 0) + (b.csbPositive || 0) - (b.firstOnqAmt || 0);
+                    // Net Total = NetPay - POS - ONQ (actual take-home after all deductions)
+                    vA = (a.netPayVal || 0) - (a.csbPositive || 0) - (a.firstOnqAmt || 0);
+                    vB = (b.netPayVal || 0) - (b.csbPositive || 0) - (b.firstOnqAmt || 0);
                 } else if (col === 'status') {
                     const targetKey = currentBillingSort.statusKey || 'EFFECTED';
                     const getStatusRank = (mode) => {
@@ -6021,7 +6170,7 @@
                             ? (s === 'NO BILLING' || s === 'NO DEDUCTION')
                             : (s === targetKey);
                         if (isTarget) return 0;
-                        const baseRank = { 'EFFECTED': 1, 'OVERDEDUCTED': 2, 'UNDERDEDUCTED': 3, 'FIRST CSB ONQUEUE': 4, 'NO BILLING': 5, 'NO DEDUCTION': 5 };
+                        const baseRank = { 'EFFECTED': 1, 'OVERDEDUCTED': 2, 'UNDERDEDUCTED': 3, 'AS EASE / FIRST CSB ONQ': 4, 'FIRST CSB ONQUEUE': 4, 'NO BILLING': 5, 'NO DEDUCTION': 5 };
                         return (baseRank[s] || 9) + 10;
                     };
                     const rA = getStatusRank(a.statusMode);
@@ -6077,7 +6226,7 @@
                         ? (s === 'NO BILLING' || s === 'NO DEDUCTION')
                         : (s === statusKey);
                     if (isTarget) return 0;
-                    const baseRank = { 'EFFECTED': 1, 'OVERDEDUCTED': 2, 'UNDERDEDUCTED': 3, 'FIRST CSB ONQUEUE': 4, 'NO BILLING': 5, 'NO DEDUCTION': 5 };
+                    const baseRank = { 'EFFECTED': 1, 'OVERDEDUCTED': 2, 'UNDERDEDUCTED': 3, 'AS EASE / FIRST CSB ONQ': 4, 'FIRST CSB ONQUEUE': 4, 'NO BILLING': 5, 'NO DEDUCTION': 5 };
                     return (baseRank[s] || 9) + 10;
                 };
                 const rA = getStatusRank(a.statusMode);
@@ -6122,6 +6271,7 @@
                     if (st.includes(searchVal)) return true;
                     if (st === 'overdeducted' && ('eff / overded'.includes(searchVal) || 'overded'.includes(searchVal))) return true;
                     if (st === 'underdeducted' && ('eff / underded'.includes(searchVal) || 'underded'.includes(searchVal))) return true;
+                    if (st === 'as ease / first csb onq' && ('as ease'.includes(searchVal) || 'onq'.includes(searchVal) || 'ease'.includes(searchVal))) return true;
                     if (st === 'first csb onqueue' && ('first csb onq'.includes(searchVal) || 'onq'.includes(searchVal))) return true;
                     if ((st === 'no billing' || st === 'no deduction') && ('no billing'.includes(searchVal) || 'no deduction'.includes(searchVal))) return true;
 
@@ -6174,7 +6324,8 @@
 
             updateDashboardMetrics([...filteredNorm, ...filteredAuto]);
 
-            const tbodyNorm = document.getElementById('firstBillingTbody');
+            // (2026-09-28) Use tbody-norm/tbody-auto IDs for infinite scroll; prev: firstBillingTbody/autonomousBillingTbody
+            const tbodyNorm = document.getElementById('tbody-norm');
             if (tbodyNorm) {
                 if (filteredNorm.length === 0) {
                     tbodyNorm.innerHTML = `<tr><td colspan="15" class="text-center text-white-50 py-3" style="font-size: 0.72rem;">No accounts matching selected filter</td></tr>`;
@@ -6183,7 +6334,7 @@
                 }
             }
 
-            const tbodyAuto = document.getElementById('autonomousBillingTbody');
+            const tbodyAuto = document.getElementById('tbody-auto');
             if (tbodyAuto) {
                 if (filteredAuto.length === 0) {
                     tbodyAuto.innerHTML = `<tr><td colspan="15" class="text-center text-white-50 py-3" style="font-size: 0.72rem;">No autonomous accounts matching selected filter</td></tr>`;
@@ -6191,6 +6342,9 @@
                     tbodyAuto.innerHTML = filteredAuto.slice(0, 100).map((r, idx) => generateBranchRowHtml(r, idx, 'auto')).join('');
                 }
             }
+            
+            // (2026-09-28) Reattach scroll listener after filter; prev: lost on re-render
+            setTimeout(() => attachInfiniteScroll(), 100);
 
             const countNormEl = document.getElementById('titleCount-norm');
             if (countNormEl) countNormEl.textContent = `(${filteredNorm.length})`;
@@ -6222,7 +6376,20 @@
             }
         }
 
+        // ==================================================================================
+        // DYNAMIC STATUS UPDATE FUNCTION
+        // ==================================================================================
         // (2026-07-13) Set EFFECTED when selection matches amort; prev: overded
+        // (2026-09-28) FIXED: Status recalculation follows same priority as buildBillingRowData
+        //
+        // This function recalculates status when user checks/unchecks POS/ONQ loan checkboxes
+        // MUST use the same priority order as buildBillingRowData() to stay consistent:
+        //   1. NO BILLING → 2. OVERDEDUCTED → 3. UNDERDEDUCTED → 4. AS EASE/ONQ → 5. FIRST ONQ → 6. EFFECTED
+        //
+        // THESE STATUS VALUES MUST MATCH:
+        //   - buildBillingRowData() initial calculation
+        //   - STATUS_SORT_CYCLE array for table header filtering
+        // ==================================================================================
         function updateFirstBillingRowStatus(empNumStr, prefix = 'norm') {
             const rowKey = empNumStr;
             const cacheKey = `${prefix}-${rowKey}`;
@@ -6236,7 +6403,9 @@
             const effPos = delPos ? (rowData.csbPositive || 0) : 0;
             const effOnq = delOnq ? (rowData.firstOnqAmt || 0) : 0;
 
-            const formulaVal = effNetPay + effPos - effOnq;
+            // FORMULA: NetPay MINUS POS MINUS ONQ = actual take-home after all deductions
+            // Matches the same formula in buildBillingRowData for consistency
+            const formulaVal = effNetPay - effPos - effOnq;
 
             const activePosCount = rowData.checkedPosCount !== undefined
                 ? rowData.checkedPosCount
@@ -6245,20 +6414,23 @@
                 ? rowData.checkedOnqCount
                 : (rowData.onqLoans ? rowData.onqLoans.length : (effOnq > 0 ? 1 : 0));
 
+            // Status calculation MUST match buildBillingRowData priority order
             let newStatus = 'NO BILLING';
             if (effPos === 0) {
                 newStatus = 'NO BILLING';
+            } else if (effPos > ((rowData.monthlyAmort || 0) + 1.0)) {
+                // (2026-09-28) Check OVERDEDUCTED first; prev: checked ONQ first
+                newStatus = 'OVERDEDUCTED';
+            } else if (effPos < ((rowData.monthlyAmort || 0) - 1.0)) {
+                // (2026-09-28) Check UNDERDEDUCTED; prev: checked ONQ first
+                newStatus = 'UNDERDEDUCTED';
             } else if (effOnq > 0) {
-                // (2026-09-28) Check net total for AS EASE status; prev: always FIRST CSB ONQUEUE
+                // (2026-09-28) Only check ONQ if POS matches amort; prev: checked ONQ before OVER/UNDER
                 if (formulaVal < 5000) {
                     newStatus = 'AS EASE / FIRST CSB ONQ';
                 } else {
                     newStatus = 'FIRST CSB ONQUEUE';
                 }
-            } else if (effPos > ((rowData.monthlyAmort || 0) + 1.0)) {
-                newStatus = 'OVERDEDUCTED';
-            } else if (effPos < ((rowData.monthlyAmort || 0) - 1.0)) {
-                newStatus = 'UNDERDEDUCTED';
             } else {
                 newStatus = 'EFFECTED';
             }
@@ -6400,7 +6572,8 @@
             const fmtDate = v => { if (!v || v === 'N/A') return 'N/A'; const d = new Date(v); return isNaN(d) ? String(v) : d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }); };
             const statusColor = { 'EFFECTED': '#22c55e', 'OVERDEDUCTED': '#f59e0b', 'UNDERDEDUCTED': '#facc15', 'FIRST CSB ONQUEUE': '#3b82f6', 'NO BILLING': '#6b7280' };
             const sColor = statusColor[r.statusMode] || '#6b7280';
-            const netTotal = (r.netPayVal || 0) + (r.csbPositive || 0) - (r.firstOnqAmt || 0);
+            // Net Total = NetPay - POS - ONQ (actual take-home after all deductions)
+            const netTotal = (r.netPayVal || 0) - (r.csbPositive || 0) - (r.firstOnqAmt || 0);
             const initials = (r.clientName || '??').split(/[,\s]+/).filter(Boolean).map(w => w[0]).join('').slice(0, 2).toUpperCase();
 
             const posRows = (r.posLoans || []).map(l => `
