@@ -274,10 +274,9 @@
             transition: background-color 5000s ease-in-out 0s !important;
         }
 
-        /* (2026-07-13) Hide native select elements strictly; prev: display:none only */
+        /* (2026-07-13) Hide native bank-select; prev: also hid activeMonthSelect */
         select.bank-select,
         select.form-control.bank-select,
-        select#activeMonthSelect,
         .bank-select {
             display: none !important;
             visibility: hidden !important;
@@ -350,6 +349,160 @@
             font-weight: 900;
             display: block;
             line-height: 1;
+        }
+
+        /* (2026-09-27) Custom styled checkboxes for NetPay (purple), POS (yellow), ONQ (green) */
+        input[type="checkbox"].checkbox-netpay {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(168, 85, 247, 0.4);
+            border-radius: 4px;
+            background: rgba(10, 14, 23, 0.5);
+            cursor: pointer;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            vertical-align: middle;
+            outline: none;
+        }
+
+        input[type="checkbox"].checkbox-netpay:hover {
+            border-color: #a855f7;
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15);
+        }
+
+        input[type="checkbox"].checkbox-netpay:checked {
+            border-color: #a855f7;
+            background: #a855f7;
+            box-shadow: 0 0 8px rgba(168, 85, 247, 0.4);
+        }
+
+        input[type="checkbox"].checkbox-netpay:checked::after {
+            content: "\F26E";
+            font-family: "bootstrap-icons" !important;
+            color: #000;
+            font-size: 10px;
+            font-weight: 900;
+            display: block;
+        }
+
+        input[type="checkbox"].checkbox-pos {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(251, 191, 36, 0.4);
+            border-radius: 4px;
+            background: rgba(10, 14, 23, 0.5);
+            cursor: pointer;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            vertical-align: middle;
+            outline: none;
+        }
+
+        input[type="checkbox"].checkbox-pos:hover {
+            border-color: #fbbf24;
+            box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.15);
+        }
+
+        input[type="checkbox"].checkbox-pos:checked {
+            border-color: #fbbf24;
+            background: #fbbf24;
+            box-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
+        }
+
+        input[type="checkbox"].checkbox-pos:checked::after {
+            content: "\F26E";
+            font-family: "bootstrap-icons" !important;
+            color: #000;
+            font-size: 10px;
+            font-weight: 900;
+            display: block;
+        }
+
+        input[type="checkbox"].checkbox-onq {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(16, 185, 129, 0.4);
+            border-radius: 4px;
+            background: rgba(10, 14, 23, 0.5);
+            cursor: pointer;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            vertical-align: middle;
+            outline: none;
+        }
+
+        input[type="checkbox"].checkbox-onq:hover {
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+        }
+
+        input[type="checkbox"].checkbox-onq:checked {
+            border-color: #10b981;
+            background: #10b981;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+        }
+
+        input[type="checkbox"].checkbox-onq:checked::after {
+            content: "\F26E";
+            font-family: "bootstrap-icons" !important;
+            color: #000;
+            font-size: 10px;
+            font-weight: 900;
+            display: block;
+        }
+
+        /* (2026-09-28) Custom styled checkbox for sub-row deletion tags (RED) */
+        input[type="checkbox"].checkbox-red-tag {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(239, 68, 68, 0.4);
+            border-radius: 4px;
+            background: rgba(10, 14, 23, 0.5);
+            cursor: pointer;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            vertical-align: middle;
+            outline: none;
+        }
+
+        input[type="checkbox"].checkbox-red-tag:hover {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+        }
+
+        input[type="checkbox"].checkbox-red-tag:checked {
+            border-color: #ef4444;
+            background: #ef4444;
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+        }
+
+        input[type="checkbox"].checkbox-red-tag:checked::after {
+            content: "\F26E";
+            font-family: "bootstrap-icons" !important;
+            color: #fff;
+            font-size: 9px;
+            font-weight: 900;
+            display: block;
         }
 
         /* (2026-07-13) PLI checkbox style; prev: radio circle */
@@ -597,7 +750,12 @@
             font-size: 0.58rem !important;
             font-family: 'Poppins', sans-serif !important;
         }
-
+        /* (2026-07-13) Set clear peso sign visibility in table; prev: 0.35 opacity */
+        .billing-responsive-table .muted-currency {
+            opacity: 0.85 !important;
+            font-weight: 600 !important;
+            font-size: 0.88em !important;
+        }
         /* (2026-07-13) Centered select columns styles; prev: none */
         .bank-table td.td-select,
         .bank-table th.th-select {
@@ -1664,11 +1822,11 @@
             border-color: #FFFFFF;
         }
 
-        /* [2026-07-11 Fix: Ghost peso prefix — tiny, very dimmed (0.35 opacity), smaller than number to feel like a quiet prefix] */
+        /* (2026-07-13) Boost peso sign visibility to 0.85 opacity; prev: 0.35 */
         .muted-currency {
-            opacity: 0.35;
-            font-weight: 300 !important;
-            font-size: 0.75em !important;
+            opacity: 0.85;
+            font-weight: 600 !important;
+            font-size: 0.88em !important;
             margin-right: 1px !important;
             letter-spacing: 0.02em !important;
             user-select: none;
@@ -1968,15 +2126,15 @@
             display: flex;
             animation: bankModalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
-        /* (2026-07-13) Set enterprise bank modal; prev: border-top highlight */
+        /* (2026-07-13) Enlarge modal size and increase typography; prev: 0.8rem */
         .custom-bank-modal-content {
             background: rgba(15, 23, 42, 0.98);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: var(--radius-md);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 14px;
             width: 90%;
-            max-width: 400px;
-            padding: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            max-width: 520px;
+            padding: 26px 30px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(245, 158, 11, 0.15);
         }
         .custom-bank-modal-overlay.show .custom-bank-modal-content {
             animation: bankModalScaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
@@ -1985,22 +2143,26 @@
             display: flex;
             align-items: center;
             color: #F59E0B;
-            font-size: 0.9rem;
-            margin-bottom: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            padding-bottom: 8px;
+            font-size: 1.18rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 12px;
         }
         .custom-bank-modal-body {
-            color: rgba(255, 255, 255, 0.85);
-            font-size: 0.8rem;
-            line-height: 1.5;
-            margin-bottom: 20px;
+            color: #ffffff;
+            font-size: 1.15rem;
+            font-weight: 600;
+            line-height: 1.6;
+            margin-bottom: 24px;
             font-family: 'Montserrat', sans-serif;
+            letter-spacing: 0.02em;
         }
         .custom-bank-modal-footer {
             display: flex;
             justify-content: flex-end;
-            gap: 10px;
+            gap: 12px;
         }
 
         /* (2026-07-13) Glassmorphic action buttons for modal footer with fixed loading height; prev: solid box buttons */
@@ -3315,14 +3477,18 @@
             color: #F0F4F8;
         }
 
-        /* (2026-09-23) Force native select dropdowns to be visible and styled */
+        /* (2026-07-13) Ensure month and branch dropdowns are visible; prev: styled */
         #activeMonthSelect,
         #branchSelect {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
             appearance: auto !important;
             -webkit-appearance: auto !important;
             -moz-appearance: auto !important;
             cursor: pointer !important;
             min-height: 40px !important;
+            pointer-events: auto !important;
         }
 
         #activeMonthSelect option,
@@ -3404,24 +3570,28 @@
                 <!-- Month dropdown -->
                 <div class="col-md-3">
                     <label for="activeMonthSelect" style="color: rgba(255,255,255,0.7); font-size: 0.72rem; display: block; margin-bottom: 6px;">Select Month:</label>
-                    <select id="activeMonthSelect" class="form-control font-weight-bold" style="background: rgba(14, 18, 38, 0.95); color: white; border: 1px solid rgba(245, 158, 11, 0.3); padding: 8px 12px; border-radius: 8px; min-height: 38px; font-size: 0.85rem;" onchange="if(document.getElementById('branchSelect')?.value) renderFirstBillingBranchTable();">
-                        <!-- (2026-07-13) Default selected month to sep26; prev: aug26 -->
-                        <option value="sep26" selected>September 2026</option>
-                        <option value="aug26">August 2026</option>
-                        <option value="jul26">July 2026</option>
-                        <option value="jun26">June 2026</option>
-                        <option value="may26">May 2026</option>
-                        <option value="apr26">April 2026</option>
-                        <option value="mar26">March 2026</option>
-                        <option value="feb26">February 2026</option>
-                        <option value="jan26">January 2026</option>
-                        <option value="nov25">November 2025</option>
-                        <option value="oct25">October 2025</option>
-                        <option value="sep25">September 2025</option>
-                        <option value="aug25">August 2025</option>
-                        <option value="jul25">July 2025</option>
-                        <option value="jun25">June 2025</option>
-                    </select>
+                    <!-- (2026-07-13) Add icon wrapper to activeMonthSelect; prev: unwrapped -->
+                    <div style="position: relative;">
+                        <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); z-index: 10; pointer-events: none; color: #f59e0b;"><i class="bi bi-calendar3"></i></span>
+                        <select id="activeMonthSelect" class="form-control font-weight-bold" style="background: rgba(14, 18, 38, 0.95); color: white; border: 1px solid rgba(245, 158, 11, 0.3); padding: 8px 12px 8px 42px; border-radius: 8px; min-height: 38px; font-size: 0.85rem; width: 100%; display: block;" onchange="if(document.getElementById('branchSelect')?.value) renderFirstBillingBranchTable();">
+                            <!-- (2026-07-13) Default selected month to sep26; prev: aug26 -->
+                            <option value="sep26" selected>September 2026</option>
+                            <option value="aug26">August 2026</option>
+                            <option value="jul26">July 2026</option>
+                            <option value="jun26">June 2026</option>
+                            <option value="may26">May 2026</option>
+                            <option value="apr26">April 2026</option>
+                            <option value="mar26">March 2026</option>
+                            <option value="feb26">February 2026</option>
+                            <option value="jan26">January 2026</option>
+                            <option value="nov25">November 2025</option>
+                            <option value="oct25">October 2025</option>
+                            <option value="sep25">September 2025</option>
+                            <option value="aug25">August 2025</option>
+                            <option value="jul25">July 2025</option>
+                            <option value="jun25">June 2025</option>
+                        </select>
+                    </div>
                 </div>
                 <!-- Branch dropdown -->
                 <div class="col-md-4">
@@ -3451,13 +3621,7 @@
                 </div>
                 <input type="hidden" id="employeeNumber" value="">
                 <button id="searchBtn" style="display:none;" onclick="performSearch()"></button>
-                <!-- (2026-09-23) Manual load button as backup -->
-                <div class="col-12 mt-2">
-                    <button onclick="renderFirstBillingBranchTable()" class="btn btn-warning btn-sm font-weight-bold" style="padding: 8px 20px;">
-                        <i class="bi bi-refresh mr-2"></i>Load Billing Data
-                    </button>
-                    <span id="loadStatus" class="ml-3" style="color: rgba(255,255,255,0.6); font-size: 0.85rem;"></span>
-                </div>
+                <!-- (2026-07-13) Remove manual load button & loadStatus; prev: visible -->
             </div>
 
             <!-- (2026-07-13) Permanently hide loading indicator & profile card; prev: visible loaders -->
@@ -3466,24 +3630,27 @@
 
             <!-- (2026-07-13) Default card to horizontal landscape mode; prev: standard mode -->
             <div id="firstBillingSummaryCard" class="bank-card mt-3 mb-3 rotated-landscape-mode" style="background: rgba(12, 16, 36, 0.95); border: 1px solid rgba(255, 165, 0, 0.3); border-radius: 12px; padding: 16px;">
-                <div class="d-flex justify-content-between align-items-center mb-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 8px;">
-                    <div class="d-flex align-items-center">
+                <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap" style="border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 8px; gap: 8px;">
+                    <div class="d-flex align-items-center flex-wrap" style="gap: 8px;">
                         <div class="font-weight-bold text-warning mr-3" style="font-size: 0.95rem; letter-spacing: 0.03em;">
                             <i class="bi bi-file-earmark-spreadsheet text-warning mr-2"></i>FIRST BILLING ACCOUNTS
                         </div>
                         <button id="btnRotateView" class="btn btn-sm btn-outline-warning font-weight-bold" onclick="toggleTableOrientation()" title="Toggle Horizontal Rotate View" style="font-size: 0.72rem; padding: 2px 8px;">
                             <i class="bi bi-aspect-ratio mr-1"></i>Standard View
                         </button>
-                        <!-- (2026-07-30) Export tagged rows button; prev: none -->
-                        <button id="btnExportTagged" class="btn btn-sm font-weight-bold ml-2" onclick="exportTaggedRows()" title="Export checked rows to text file" style="font-size: 0.72rem; padding: 2px 10px; background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid #34d399; border-radius: 6px;">
+                        <!-- (2026-07-13) Export tagged rows button; prev: none -->
+                        <button id="btnExportTagged" class="btn btn-sm font-weight-bold" onclick="exportTaggedRows()" title="Export checked rows to text file" style="font-size: 0.72rem; padding: 2px 10px; background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid #34d399; border-radius: 6px;">
                             <i class="bi bi-download mr-1"></i>Export Tagged
                         </button>
-                        <!-- (2026-07-13) Improve search bar padding and remove badge; prev: cramped -->
-                        <div class="billing-search-input-wrapper ml-3" style="position: relative; display: inline-flex; align-items: center;">
-                            <i class="bi bi-search" style="position: absolute; left: 11px; top: 50%; transform: translateY(-50%); font-size: 0.70rem; color: rgba(255,255,255,0.5); pointer-events: none; z-index: 2;"></i>
-                            <input type="text" id="billingSearchInput" class="form-control form-control-sm" placeholder="Search Name or ID..." oninput="filterBillingAccounts(this.value)" style="padding-left: 34px !important; padding-right: 28px !important; font-size: 0.72rem; height: 28px; width: 230px; background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.22); border-radius: 6px; color: #fff; font-family: 'Poppins', sans-serif;">
-                            <i class="bi bi-x-circle-fill" id="billingSearchClearBtn" onclick="clearBillingSearch()" style="position: absolute; right: 9px; top: 50%; transform: translateY(-50%); font-size: 0.75rem; color: rgba(255,255,255,0.5); cursor: pointer; display: none; z-index: 2;"></i>
-                        </div>
+                    </div>
+                </div>
+                <!-- (2026-07-13) Full-width search bar; prev: 230px inline -->
+                <div class="billing-search-row mb-3" style="width: 100%;">
+                    <div class="billing-search-input-wrapper" style="position: relative; width: 100%; display: flex; align-items: center;">
+                        <i class="bi bi-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 0.75rem; color: rgba(255,255,255,0.5); pointer-events: none; z-index: 2;"></i>
+                        <!-- (2026-07-13) Persist search to localStorage on input; prev: no persistence -->
+                        <input type="text" id="billingSearchInput" class="form-control form-control-sm" placeholder="Search by Name, ID, Div, Sta, exact decimal amount, Status, Release or Maturity date..." oninput="localStorage.setItem('billing_search_cache', this.value); filterBillingAccounts(this.value)" style="padding-left: 36px !important; padding-right: 32px !important; font-size: 0.75rem; height: 32px; width: 100%; background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.22); border-radius: 6px; color: #fff; font-family: 'Poppins', sans-serif;">
+                        <i class="bi bi-x-circle-fill" id="billingSearchClearBtn" onclick="clearBillingSearch()" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 0.82rem; color: rgba(255,255,255,0.5); cursor: pointer; display: none; z-index: 2;"></i>
                     </div>
                 </div>
                 <!-- (2026-07-13) Add billing status & source file dashboard; prev: none -->
@@ -3494,26 +3661,32 @@
                             <span style="color: rgba(255,255,255,0.55);"><i class="bi bi-file-earmark-text mr-1"></i>Active Sources:</span>
                             <span class="badge font-weight-bold" style="background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); font-size: 0.70rem; padding: 3px 8px;" id="dashLcsFileBadge">LCS: Loading...</span>
                             <span class="badge font-weight-bold" style="background: rgba(168,85,247,0.15); color: #c084fc; border: 1px solid rgba(168,85,247,0.3); font-size: 0.70rem; padding: 3px 8px;" id="dashMonthFileBadge">Monthly: Loading...</span>
+                            <!-- (2026-07-13) Show employee count badge in active sources; prev: none -->
+                            <span class="badge font-weight-bold" style="background: rgba(56,189,248,0.15); color: #38bdf8; border: 1px solid rgba(56,189,248,0.3); font-size: 0.70rem; padding: 3px 8px;" id="dashEmpCountBadge">Employees: Loading...</span>
                         </div>
                         <div class="col-md-7 d-flex align-items-center justify-content-md-end flex-wrap mt-2 mt-md-0" style="gap: 8px;">
-                            <div class="d-flex align-items-center px-2 py-1" style="background: rgba(40,167,69,0.12); border: 1px solid rgba(40,167,69,0.3); border-radius: 6px; font-size: 0.72rem;">
+                            <!-- (2026-07-13) Clickable metric pills to sort to option; prev: static text -->
+                            <div class="d-flex align-items-center px-2 py-1" onclick="sortToStatusOption('EFFECTED')" style="cursor: pointer; background: rgba(40,167,69,0.12); border: 1px solid rgba(40,167,69,0.3); border-radius: 6px; font-size: 0.72rem;" title="Click to sort by EFFECTED">
                                 <span style="color: #28a745; font-weight: 700; margin-right: 6px;">EFFECTED:</span>
                                 <span id="dashCountEffected" style="color: #fff; font-weight: 800; font-family: 'Montserrat', sans-serif;">0</span>
                             </div>
-                            <!-- (2026-07-13) Add OVERDEDUCTED metric pill to dashboard; prev: 4 pills -->
-                            <div class="d-flex align-items-center px-2 py-1" style="background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); border-radius: 6px; font-size: 0.72rem;">
+                            <div class="d-flex align-items-center px-2 py-1" onclick="sortToStatusOption('OVERDEDUCTED')" style="cursor: pointer; background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); border-radius: 6px; font-size: 0.72rem;" title="Click to sort by OVERDEDUCTED">
                                 <span style="color: #f59e0b; font-weight: 700; margin-right: 6px;">OVERDEDUCTED:</span>
                                 <span id="dashCountOverded" style="color: #fff; font-weight: 800; font-family: 'Montserrat', sans-serif;">0</span>
                             </div>
-                            <div class="d-flex align-items-center px-2 py-1" style="background: rgba(13,110,253,0.12); border: 1px solid rgba(13,110,253,0.3); border-radius: 6px; font-size: 0.72rem;">
+                            <div class="d-flex align-items-center px-2 py-1" onclick="sortToStatusOption('UNDERDEDUCTED')" style="cursor: pointer; background: rgba(234,179,8,0.12); border: 1px solid rgba(234,179,8,0.3); border-radius: 6px; font-size: 0.72rem;" title="Click to sort by UNDERDEDUCTED">
+                                <span style="color: #facc15; font-weight: 700; margin-right: 6px;">UNDERDEDUCTED:</span>
+                                <span id="dashCountUnderded" style="color: #fff; font-weight: 800; font-family: 'Montserrat', sans-serif;">0</span>
+                            </div>
+                            <div class="d-flex align-items-center px-2 py-1" onclick="sortToStatusOption('FIRST CSB ONQUEUE')" style="cursor: pointer; background: rgba(13,110,253,0.12); border: 1px solid rgba(13,110,253,0.3); border-radius: 6px; font-size: 0.72rem;" title="Click to sort by FIRST CSB ONQUEUE">
                                 <span style="color: #3b82f6; font-weight: 700; margin-right: 6px;">FIRST CSB ONQ:</span>
                                 <span id="dashCountFirstCsbOnq" style="color: #fff; font-weight: 800; font-family: 'Montserrat', sans-serif;">0</span>
                             </div>
-                            <div class="d-flex align-items-center px-2 py-1" style="background: rgba(220,53,69,0.12); border: 1px solid rgba(220,53,69,0.3); border-radius: 6px; font-size: 0.72rem;">
+                            <div class="d-flex align-items-center px-2 py-1" onclick="sortToStatusOption('NO BILLING')" style="cursor: pointer; background: rgba(220,53,69,0.12); border: 1px solid rgba(220,53,69,0.3); border-radius: 6px; font-size: 0.72rem;" title="Click to sort by NO BILLING">
                                 <span style="color: #dc3545; font-weight: 700; margin-right: 6px;">NO DEDUCTION:</span>
                                 <span id="dashCountNoBilling" style="color: #fff; font-weight: 800; font-family: 'Montserrat', sans-serif;">0</span>
                             </div>
-                            <div class="d-flex align-items-center px-2 py-1" style="background: rgba(255,193,7,0.12); border: 1px solid rgba(255,193,7,0.3); border-radius: 6px; font-size: 0.72rem;">
+                            <div class="d-flex align-items-center px-2 py-1" onclick="sortToStatusOption('ALL')" style="cursor: pointer; background: rgba(255,193,7,0.12); border: 1px solid rgba(255,193,7,0.3); border-radius: 6px; font-size: 0.72rem;" title="Click to reset sort">
                                 <span style="color: #ffc107; font-weight: 700; margin-right: 6px;">TOTAL:</span>
                                 <span id="dashCountTotal" style="color: #fff; font-weight: 800; font-family: 'Montserrat', sans-serif;">0</span>
                             </div>
@@ -4355,7 +4528,10 @@
                         });
                     }
                 }
+                // (2026-07-13) Update dashEmpCountBadge when LCS ready; prev: none
                 lcsDbReady = true;
+                const dashEmpReady = document.getElementById('dashEmpCountBadge');
+                if (dashEmpReady) dashEmpReady.textContent = `Employees: ${(lcsEmpMap?.size || 0).toLocaleString()}`;
                 lcsDbReadyCallbacks.forEach(cb => cb());
                 lcsDbReadyCallbacks = [];
             } catch (err) {
@@ -4434,11 +4610,14 @@
             return opts;
         }
 
+        // (2026-07-13) Add countUnderded to dashboard metrics; prev: overded only
         function updateDashboardMetrics(rows) {
-            let countEffected = 0, countOverded = 0, countFirstCsbOnq = 0, countNoBilling = 0;
+            let countEffected = 0, countOverded = 0, countUnderded = 0, countFirstCsbOnq = 0, countAsEase = 0, countNoBilling = 0;
             (rows || []).forEach(r => {
                 if (r.statusMode === 'OVERDEDUCTED') countOverded++;
+                else if (r.statusMode === 'UNDERDEDUCTED') countUnderded++;
                 else if (r.statusMode === 'EFFECTED') countEffected++;
+                else if (r.statusMode === 'AS EASE / FIRST CSB ONQ') countAsEase++;
                 else if (r.statusMode === 'FIRST CSB ONQUEUE') countFirstCsbOnq++;
                 else countNoBilling++;
             });
@@ -4446,8 +4625,11 @@
             if (elEff) elEff.textContent = countEffected.toLocaleString();
             const elOver = document.getElementById('dashCountOverded');
             if (elOver) elOver.textContent = countOverded.toLocaleString();
+            const elUnder = document.getElementById('dashCountUnderded');
+            if (elUnder) elUnder.textContent = countUnderded.toLocaleString();
+            // (2026-09-28) Combine AS EASE and FIRST CSB ONQ counts; prev: separate
             const elOnq = document.getElementById('dashCountFirstCsbOnq');
-            if (elOnq) elOnq.textContent = countFirstCsbOnq.toLocaleString();
+            if (elOnq) elOnq.textContent = (countFirstCsbOnq + countAsEase).toLocaleString();
             const elNoBill = document.getElementById('dashCountNoBilling');
             if (elNoBill) elNoBill.textContent = countNoBilling.toLocaleString();
             const elTotal = document.getElementById('dashCountTotal');
@@ -4641,6 +4823,37 @@
             return `${String(month).padStart(2, '0')}/${year}`;
         }
 
+        // (2026-09-27) Name matching helper to filter loans by account name; prev: none
+        function normalizeNameForMatch(name) {
+            if (!name) return '';
+            return String(name).toUpperCase().trim()
+                .replace(/\s+/g, ' ')  // normalize whitespace
+                .replace(/[,\.]/g, ''); // remove commas and periods
+        }
+
+        function doesNameMatch(accountName, loanFname, loanLname) {
+            // If no name data in loan, include it (can't filter)
+            if (!loanFname && !loanLname) return true;
+            if (!accountName) return true;
+            
+            const normAccountName = normalizeNameForMatch(accountName);
+            const normFname = normalizeNameForMatch(loanFname);
+            const normLname = normalizeNameForMatch(loanLname);
+            
+            // Try different name format combinations
+            // Format 1: "LASTNAME, FIRSTNAME" or "LASTNAME FIRSTNAME"
+            const fullName1 = `${normLname} ${normFname}`.trim();
+            // Format 2: "FIRSTNAME LASTNAME"
+            const fullName2 = `${normFname} ${normLname}`.trim();
+            
+            // Check if account name contains both first and last name
+            return (normFname && normAccountName.includes(normFname) && normLname && normAccountName.includes(normLname)) ||
+                   normAccountName.includes(fullName1) ||
+                   normAccountName.includes(fullName2) ||
+                   fullName1.includes(normAccountName) ||
+                   fullName2.includes(normAccountName);
+        }
+
         // (2026-07-13) Update buildBillingRowData with status formula and mismatch detection; prev: basic status
         function buildBillingRowData(empNumStr, matchingAccount, netpayEmpMap, posEmpMap, onqEmpMap, normEmp, rowKey = empNumStr) {
             const targetEmp = normEmp(empNumStr);
@@ -4651,24 +4864,79 @@
             const division = matchingAccount.division || 'N/A';
             const station = matchingAccount.station || 'N/A';
 
-            const hasNetPay = (netpayEmpMap && (netpayEmpMap.has(targetEmp) || netpayEmpMap.has(empNumStr)));
-            const netPayVal = hasNetPay ? (netpayEmpMap.get(targetEmp) !== undefined ? netpayEmpMap.get(targetEmp) : (netpayEmpMap.get(empNumStr) || 0)) : 0;
-            const posObj = posEmpMap.get(targetEmp) || posEmpMap.get(empNumStr) || { amt: 0, loans: [] };
-            const csbPositive = posObj.amt || 0;
-            const onqObj = onqEmpMap.get(targetEmp) || onqEmpMap.get(empNumStr) || { amt: 0, isCSB: false, loans: [] };
-            const firstOnqAmt = onqObj.amt || 0;
+            // (2026-09-27) Filter NetPay by name matching; prev: took first match
+            const netpayObjRaw = netpayEmpMap.get(targetEmp) || netpayEmpMap.get(empNumStr) || { amt: 0, entries: [] };
+            const netpayEntriesFiltered = (netpayObjRaw.entries || []).filter(entry =>
+                doesNameMatch(clientName, entry.fname, entry.lname)
+            );
+            const netPayVal = netpayEntriesFiltered.length > 0 
+                ? netpayEntriesFiltered.reduce((sum, e) => sum + (e.amt || 0), 0) 
+                : 0;
+            
+            // (2026-09-27) Filter POS and ONQ loans by name matching to prevent duplicates; prev: took all loans for empNum
+            const posObjRaw = posEmpMap.get(targetEmp) || posEmpMap.get(empNumStr) || { amt: 0, loans: [] };
+            const onqObjRaw = onqEmpMap.get(targetEmp) || onqEmpMap.get(empNumStr) || { amt: 0, isCSB: false, loans: [] };
+            
+            // Filter loans that match this specific account's name
+            const posLoansFiltered = (posObjRaw.loans || []).filter(loan => 
+                doesNameMatch(clientName, loan.fname, loan.lname)
+            );
+            const onqLoansFiltered = (onqObjRaw.loans || []).filter(loan => 
+                doesNameMatch(clientName, loan.fname, loan.lname)
+            );
+            
+            const posObj = {
+                amt: posLoansFiltered.reduce((sum, loan) => sum + (loan.dedamt || 0), 0),
+                loans: posLoansFiltered
+            };
+            const onqObj = {
+                amt: onqLoansFiltered.reduce((sum, loan) => sum + (loan.dedamt || 0), 0),
+                isCSB: onqLoansFiltered.some(loan => loan.code === '0339' || loan.code === '339'),
+                loans: onqLoansFiltered
+            };
+            
             const isFirstRowCSB = onqObj.isCSB;
+            // (2026-07-13) Total of ALL pos/onq loans for display; prev: same
+            const csbPositive = posObj.amt || 0;
+            const firstOnqAmt = onqObj.amt || 0;
 
-            // (2026-07-13) Standard 4 billing statuses; prev: strict MISMATCH override
+            // (2026-07-13) Filter effective amounts to current-month EFF only; prev: used totals
+            const _curMonStr = (() => {
+                const raw = document.getElementById('activeMonthSelect')?.value || 'sep26';
+                const mm = { jan:'01',feb:'02',mar:'03',apr:'04',may:'05',jun:'06',jul:'07',aug:'08',sep:'09',oct:'10',nov:'11',dec:'12' };
+                return (mm[raw.slice(0,3).toLowerCase()] || '09') + '/20' + raw.slice(3,5);
+            })();
+            const _matchEff = eff => { if (!eff || eff==='N/A') return false; const p=String(eff).split('/'); if(p.length!==2)return false; const yr=p[1].trim(); const fullYr=yr.length===2?'20'+yr:yr; return String(parseInt(p[0],10)).padStart(2,'0')+'/'+fullYr===_curMonStr; };
+            // (2026-07-13) Use isDedModeAll helper; prev: direct string check
+            const _isAll = typeof isDedModeAll === 'function' ? isDedModeAll() : (window.dedSelectionMode === 'all');
+            
+            // (2026-09-27) If "Current Month Only" but no loans match, show all loans instead of nothing; prev: strict filter
+            const posHasCurrentMonth = _isAll || (posObj.loans || []).some(l => _matchEff(l.eff));
+            const onqHasCurrentMonth = _isAll || (onqObj.loans || []).some(l => _matchEff(l.eff));
+            
+            const effectivePos = (posObj.loans || []).reduce((s, l) => s + ((posHasCurrentMonth ? (_isAll || _matchEff(l.eff)) : true) ? (l.dedamt || 0) : 0), 0);
+            const effectiveOnq = (onqObj.loans || []).reduce((s, l) => s + ((onqHasCurrentMonth ? (_isAll || _matchEff(l.eff)) : true) ? (l.dedamt || 0) : 0), 0);
+
+            // (2026-07-13) Status based on effective (checked) amounts; prev: all-loans total
             let statusMode = 'NO BILLING';
             let mismatchReasons = [];
 
-            if (csbPositive === 0) {
+            // (2026-09-28) Calculate net total for AS EASE check; prev: no net total check
+            const netTotal = netPayVal + effectivePos - effectiveOnq;
+
+            if (effectivePos === 0) {
                 statusMode = 'NO BILLING';
-            } else if (firstOnqAmt > 0 || (onqObj.loans && onqObj.loans.length > 0)) {
-                statusMode = 'FIRST CSB ONQUEUE';
-            } else if (csbPositive > (monthlyAmort + 1.0) || (posObj.loans && posObj.loans.length > 1)) {
+            } else if (effectiveOnq > 0) {
+                // (2026-09-28) Check if net total < 5000 for AS EASE status; prev: always FIRST CSB ONQUEUE
+                if (netTotal < 5000) {
+                    statusMode = 'AS EASE / FIRST CSB ONQ';
+                } else {
+                    statusMode = 'FIRST CSB ONQUEUE';
+                }
+            } else if (effectivePos > (monthlyAmort + 1.0)) {
                 statusMode = 'OVERDEDUCTED';
+            } else if (effectivePos < (monthlyAmort - 1.0)) {
+                statusMode = 'UNDERDEDUCTED';
             } else {
                 statusMode = 'EFFECTED';
             }
@@ -4701,6 +4969,9 @@
                 clientName,
                 monthlyAmort,
                 csbPositive,
+                // (2026-09-27) Fallback to all loans if no current-month match; prev: strict current-month filter
+                checkedPosCount: (posObj.loans || []).filter(l => posHasCurrentMonth ? (_isAll || _matchEff(l.eff)) : true).length,
+                checkedOnqCount: (onqObj.loans || []).filter(l => onqHasCurrentMonth ? (_isAll || _matchEff(l.eff)) : true).length,
                 transDate,
                 maturityDate,
                 division,
@@ -4767,13 +5038,18 @@
                                 <i class="bi ${icon} mr-1"></i>${title} <span id="titleCount-${type}">(${rows.length})</span>
                             </div>
                             ${generateFilterPopoverHtml(type)}
+                            <!-- (2026-07-13) Month toggle moved next to filters; prev: card header -->
+                            <button type="button" id="btnDedSelectionMode-${type}" onclick="toggleDedSelectionMode('${type}')" class="btn btn-sm font-weight-bold btn-ded-mode" title="Toggle: Current Month vs Select All for this LCS" style="font-size: 0.70rem; padding: 2px 10px; background: ${isDedModeAll(type) ? 'rgba(56,189,248,0.15)' : 'rgba(251,191,36,0.12)'}; color: ${isDedModeAll(type) ? '#38bdf8' : '#fbbf24'}; border: 1px solid ${isDedModeAll(type) ? 'rgba(56,189,248,0.45)' : 'rgba(251,191,36,0.4)'}; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">
+                                <i class="bi ${isDedModeAll(type) ? 'bi-check2-all' : 'bi-calendar-check'}" id="btnDedModeIcon-${type}"></i>
+                                <span id="btnDedModeLabel-${type}">${isDedModeAll(type) ? 'Select All (All Deductions)' : 'Current Month Only'}</span>
+                            </button>
                         </div>
                     </div>
                     <div class="table-responsive" style="overflow-x: auto; width: 100%;">
                         <!-- (2026-07-13) Responsive table with Poppins font; prev: fixed 1400px -->
                         <table class="bank-table billing-responsive-table text-white" style="width: 100%; table-layout: fixed; font-size: 0.58rem; font-family: 'Poppins', sans-serif;">
                             <thead>
-                                <!-- (2026-07-13) Proportional 100% columns and Tag padding; prev: 94% cut -->
+                                <!-- (2026-07-13) 8.0% Diff width to prevent truncation; prev: 5.0% -->
                                 <tr style="font-size: 0.58rem; height: 30px;">
                                     <th style="width: 2.5%; text-align: left; font-size: 0.58rem;">#</th>
                                     <th style="width: 5.5%; text-align: left; color: #fbbf24; cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('id')" title="Employee ID - Click to sort">
@@ -4785,7 +5061,7 @@
                                     <th style="width: 3.5%; text-align: left; cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('station')" title="Station - Click to sort">
                                         Sta <i class="bi bi-arrow-down-up" style="font-size: 0.50rem; opacity: 0.5;"></i>
                                     </th>
-                                    <th style="width: 12.5%; text-align: left; cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('name')" title="Click to sort">
+                                    <th style="width: 12.0%; text-align: left; cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('name')" title="Click to sort">
                                         Name <i class="bi bi-arrow-down-up" style="font-size: 0.50rem; opacity: 0.5;"></i>
                                     </th>
                                     <th style="width: 6.5%; text-align: left; color: #dc3545; cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('amort')" title="Click to sort">
@@ -4794,22 +5070,23 @@
                                     <th style="width: 7.0%; text-align: left; color: #a855f7; cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('netpay')" title="NetPay - Click to sort">
                                         NetPay <i class="bi bi-arrow-down-up" style="font-size: 0.50rem; opacity: 0.5;"></i>
                                     </th>
-                                    <th style="width: 9.0%; text-align: left; color: #fbbf24; cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('positive')" title="CSB Positive - Click to sort">
+                                    <th style="width: 8.5%; text-align: left; color: #fbbf24; cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('positive')" title="CSB Positive - Click to sort">
                                         CSB Pos <i class="bi bi-arrow-down-up" style="font-size: 0.50rem; opacity: 0.5;"></i>
                                     </th>
-                                    <th style="width: 9.0%; text-align: left; color: #10b981; cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('onqueue')" title="OnQueue - Click to sort">
+                                    <th style="width: 8.5%; text-align: left; color: #10b981; cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('onqueue')" title="OnQueue - Click to sort">
                                         OnQueue <i class="bi bi-arrow-down-up" style="font-size: 0.50rem; opacity: 0.5;"></i>
                                     </th>
                                     <th style="width: 7.5%; text-align: left; cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('netTotal')" title="Click to sort">
                                         Net Total <i class="bi bi-arrow-down-up" style="font-size: 0.50rem; opacity: 0.5;"></i>
                                     </th>
-                                    <th style="width: 8.5%; text-align: left; cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('status')" title="Click to sort">
-                                        Status <i class="bi bi-arrow-down-up" style="font-size: 0.50rem; opacity: 0.5;"></i>
+                                    <!-- (2026-07-13) Add statusHeaderTitle to reflect cycle sort; prev: plain text -->
+                                    <th style="width: 8.5%; text-align: left; cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('status')" title="Click to cycle status sort (Effected, Overded, Underded, OnQ, No Billing)">
+                                        <span id="statusHeaderTitle-${type}">Status</span> <i class="bi bi-arrow-down-up" style="font-size: 0.50rem; opacity: 0.5;"></i>
                                     </th>
-                                    <th style="width: 5.0%; text-align: left; color: #f59e0b; cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('diff')" title="Difference (Overdeducted Amount) - Click to sort">
+                                    <th style="width: 8.0%; text-align: left; color: #f59e0b; cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('diff')" title="Difference (Over/Under Deducted Amount) - Click to sort">
                                         Diff <i class="bi bi-arrow-down-up" style="font-size: 0.50rem; opacity: 0.5;"></i>
                                     </th>
-                                    <th style="width: 8.5%; text-align: left; vertical-align: top;">
+                                    <th style="width: 7.0%; text-align: left; vertical-align: top;">
                                         <div style="cursor: pointer; user-select: none; margin-bottom: 2px; font-size: 0.58rem;" onclick="sortBillingTable('date')" title="Click to sort">
                                             Release <i class="bi bi-arrow-down-up" style="font-size: 0.50rem; opacity: 0.5;"></i>
                                         </div>
@@ -4817,7 +5094,7 @@
                                             ${monthOptionsHtml}
                                         </select>
                                     </th>
-                                    <th style="width: 8.0%; text-align: left; color: rgba(255,255,255,0.7); cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('maturity')" title="Maturity Date from LCS - Click to sort">
+                                    <th style="width: 6.0%; text-align: left; color: rgba(255,255,255,0.7); cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('maturity')" title="Maturity Date from LCS - Click to sort">
                                         Maturity <i class="bi bi-arrow-down-up" style="font-size: 0.50rem; opacity: 0.5;"></i>
                                     </th>
                                     <th style="width: 3.5%; min-width: 34px; text-align: center; font-size: 0.58rem; color: #34d399; padding-right: 6px !important;" title="Tag">Tag</th>
@@ -4852,7 +5129,9 @@
             // (2026-07-13) Default activeMonthVal to sep26; prev: aug26
             const activeMonthVal = document.getElementById('activeMonthSelect')?.value || 'sep26';
             const lcsFileLabel = window.currentLcsFile || (lcsDbReady ? 'Ready' : 'Loading');
-            document.getElementById('loadStatus').textContent = `Branch: ${selectedBranch} | LCS: ${lcsFileLabel} | Monthly: ${activeMonthVal}.csv | Employees: ${lcsEmpMap.size}`;
+            // (2026-07-13) Safe guard loadStatus assignment; prev: threw if absent
+            const loadStatusEl = document.getElementById('loadStatus');
+            if (loadStatusEl) loadStatusEl.textContent = `Branch: ${selectedBranch} | LCS: ${lcsFileLabel} | Monthly: ${activeMonthVal}.csv | Employees: ${lcsEmpMap.size}`;
             
             if (!selectedBranch) {
                 container.innerHTML = `<div class="text-white-50 text-center py-3">Select a branch to view First Billing accounts.</div>`;
@@ -4951,7 +5230,16 @@
                         const netCol = r[npNetIdx] !== undefined ? r[npNetIdx] : (r[7] !== undefined ? r[7] : r[8]);
                         netVal = safeFloat(netCol);
                     }
-                    netpayEmpMap.set(emp, netVal);
+                    // (2026-09-27) Store names in netpay for name matching; prev: only amount
+                    const prev = netpayEmpMap.get(emp) || { amt: 0, entries: [] };
+                    netpayEmpMap.set(emp, {
+                        amt: prev.amt + netVal,
+                        entries: [...prev.entries, {
+                            amt: netVal,
+                            fname: r[netpayMap.FNAME] || r[4] || '',
+                            lname: r[netpayMap.LNAME] || r[6] || ''
+                        }]
+                    });
                 }
             }
 
@@ -5002,12 +5290,15 @@
                     const code = String(codeCol || '').trim();
                     const amtVal = safeFloat(amtCol);
                     
+                    // (2026-09-27) Store names in onqDetail for duplicate matching; prev: no names
                     const loanDetail = {
                         code: code,
                         eff: r[onqMap.EFFYY] ? `${formatLoanMonth(r[onqMap.EFFMM])}/${r[onqMap.EFFYY] || ''}` : 'N/A',
                         term: r[onqMap.TERYY] ? `${formatLoanMonth(r[onqMap.TERMM])}/${r[onqMap.TERYY] || ''}` : 'N/A',
                         dedamt: amtVal,
-                        policyNo: r[onqMap.POLICYNO] || 'N/A'
+                        policyNo: r[onqMap.POLICYNO] || 'N/A',
+                        fname: r[onqMap.FNAME] || r[4] || '',
+                        lname: r[onqMap.LNAME] || r[6] || ''
                     };
                     
                     const prev = onqEmpMap.get(emp) || { amt: 0, isCSB: false, loans: [] };
@@ -5100,10 +5391,13 @@
             const dashEl = document.getElementById('billingAssessmentDashboard');
             if (dashEl) {
                 dashEl.style.display = 'block';
+                // (2026-07-13) Update dashEmpCountBadge on render; prev: LCS/Month badges only
                 const dashLcs = document.getElementById('dashLcsFileBadge');
                 if (dashLcs) dashLcs.textContent = `LCS: ${window.currentLcsFile || 'lcs_Sep232026.csv'}`;
                 const dashMonth = document.getElementById('dashMonthFileBadge');
                 if (dashMonth) dashMonth.textContent = `Monthly: ${activeMonthVal}.csv`;
+                const dashEmp = document.getElementById('dashEmpCountBadge');
+                if (dashEmp) dashEmp.textContent = `Employees: ${(lcsEmpMap?.size || 0).toLocaleString()}`;
                 updateDashboardMetrics([...filteredNormal, ...filteredAuto]);
             }
 
@@ -5117,6 +5411,21 @@
                 ${buildBillingTableHtml(filteredAuto, 'auto', monthOptionsHtml)}
             `;
             container.innerHTML = html;
+            // (2026-07-13) Sync display to checked loans after render; prev: showed raw totals
+            requestAnimationFrame(() => {
+                const cache = window.firstBillingRowsCache || {};
+                for (const cacheKey of Object.keys(cache)) {
+                    const rd = cache[cacheKey];
+                    if (!rd) continue;
+                    // (2026-07-13) Skip bare rowKey entries; use prefixed keys only
+                    if (!cacheKey.startsWith('auto-') && !cacheKey.startsWith('norm-')) continue;
+                    const pfx = cacheKey.startsWith('auto-') ? 'auto' : 'norm';
+                    const rk = rd.rowKey || rd.empNumStr;
+                    if (!rk) continue;
+                    if (rd.posLoans && rd.posLoans.length > 0) updatePosLoanSelection(rk, pfx);
+                    if (rd.onqLoans && rd.onqLoans.length > 0) updateOnqLoanSelection(rk, pfx);
+                }
+            });
         }
 
         // (2026-07-13) Button type and pointer-events for pos/onq; prev: submit button
@@ -5129,6 +5438,7 @@
             
             return `
                 <!-- (2026-07-13) Bump row font to 0.72rem for readability; prev: 0.58rem -->
+                <!-- (2026-09-27) Green tint for tagged main rows; prev: red -->
                 <tr id="billing-row-${prefix}-${rowKey}" style="transition: background 0.2s ease; ${isTagged ? 'background: rgba(52,211,153,0.08);' : ''}; font-size: 0.72rem;">
                     <td data-label="#" style="text-align: left; color: rgba(255,255,255,0.55); font-size: 0.72rem !important;" class="font-weight-bold">
                         ${idx + 1}
@@ -5143,7 +5453,8 @@
                         ${r.station || 'N/A'}
                     </td>
                     <td data-label="Name" class="font-weight-bold" style="cursor: default; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; font-size: 0.72rem !important;">
-                        <span class="text-warning" style="cursor: pointer; font-size: 0.72rem !important;" onclick="inspectEmployeeProfile('${r.empNumStr}')" title="${r.clientName}">${r.clientName}</span>
+                        <!-- (2026-07-13) Pass prefix to profile modal; prev: no prefix arg -->
+                        <span class="text-warning" style="cursor: pointer; font-size: 0.72rem !important;" onclick="inspectEmployeeProfile('${r.empNumStr}', '${prefix}')" title="${r.clientName}">${r.clientName}</span>
                     </td>
                     <td data-label="Monthly Amort" style="text-align: left; font-size: 0.72rem !important;" class="tabular-nums font-weight-bold">
                         <div style="display: flex; align-items: center; justify-content: flex-start; gap: 2px;">
@@ -5152,60 +5463,77 @@
                     </td>
                     <td data-label="NetPay" style="text-align: left; font-size: 0.72rem !important; white-space: nowrap;" class="tabular-nums font-weight-bold">
                         <div style="display: inline-flex; align-items: center; justify-content: flex-start; gap: 1px; white-space: nowrap;">
-                            <input type="checkbox" id="del-netpay-${prefix}-${rowKey}" checked onchange="updateFirstBillingRowStatus('${rowKey}', '${prefix}')" style="cursor: pointer; transform: scale(0.82); margin-right: 1px; flex-shrink: 0;" title="Include/Exclude NetPay from Net Total">
+                            <!-- (2026-09-27) Purple styled checkbox for NetPay; prev: accent-color -->
+                            <input type="checkbox" id="del-netpay-${prefix}-${rowKey}" class="checkbox-netpay" checked onchange="updateFirstBillingRowStatus('${rowKey}', '${prefix}')" style="cursor: pointer; transform: scale(0.9); margin-right: 2px; flex-shrink: 0;" title="Include/Exclude NetPay from Net Total">
                             <span style="color: #a855f7; font-size: 0.72rem !important;">${formatPHP(r.netPayVal)}</span>
                         </div>
                     </td>
+                    <!-- (2026-07-13) Add value & badge IDs for dynamic updates; prev: static text -->
+                    <!-- (2026-09-27) Add dropdown button for POS details; prev: no dropdown -->
                     <td data-label="CSB Positive" style="text-align: left; font-size: 0.72rem !important; white-space: nowrap;" class="tabular-nums font-weight-bold">
                         <div style="display: inline-flex; align-items: center; justify-content: flex-start; gap: 1px; white-space: nowrap;">
-                            <input type="checkbox" id="del-pos-${prefix}-${rowKey}" checked onchange="updateFirstBillingRowStatus('${rowKey}', '${prefix}')" style="cursor: pointer; transform: scale(0.82); margin-right: 1px; flex-shrink: 0;" title="Include/Exclude CSB Positive from Net Total">
-                            <span style="color: #fbbf24; font-size: 0.72rem !important;">${formatPHP(r.csbPositive)}</span>
-                            ${r.posLoans && r.posLoans.length > 0 ? `
-                                <button type="button" onclick="event.stopPropagation(); togglePosDetails('${rowKey}', '${prefix}')" style="background: rgba(251,191,36,0.18); color: #fbbf24; border: 1px solid rgba(251,191,36,0.35); border-radius: 3px; padding: 0 2px; font-size: 0.52rem; font-weight: 700; cursor: pointer; margin-left: 1px; line-height: 1.2; display: inline-flex; align-items: center; gap: 1px; flex-shrink: 0;" title="View ${r.posLoans.length} CSB Deduction(s)">
-                                    ${r.posLoans.length} <i class="bi bi-chevron-down" id="pos-chevron-${prefix}-${rowKey}" style="font-size: 0.46rem; pointer-events: none;"></i>
-                                </button>
-                            ` : ''}
+                            <!-- (2026-09-27) Yellow styled checkbox for POS; prev: accent-color -->
+                            <input type="checkbox" id="del-pos-${prefix}-${rowKey}" class="checkbox-pos" checked onchange="updateFirstBillingRowStatus('${rowKey}', '${prefix}')" style="cursor: pointer; transform: scale(0.9); margin-right: 2px; flex-shrink: 0;" title="Include/Exclude CSB Positive from Net Total">
+                            <span id="pos-val-${prefix}-${rowKey}" style="color: #fbbf24; font-size: 0.72rem !important;">${formatPHP(r.csbPositive)}</span>
+                            ${r.posLoans && r.posLoans.length > 0 ? `<button type="button" onclick="togglePosDetails('${rowKey}', '${prefix}')" style="background: none; border: none; color: #fbbf24; cursor: pointer; padding: 0 4px; font-size: 0.7rem; margin-left: 2px;"><i id="pos-chevron-${prefix}-${rowKey}" class="bi bi-chevron-down"></i></button>` : ''}
                         </div>
                     </td>
-                    <td data-label="ONQUEUE" style="text-align: left; font-size: 0.72rem !important; white-space: nowrap;" class="tabular-nums font-weight-bold">
+                    <td data-label="First CSB (OnQueue)" style="text-align: left; font-size: 0.72rem !important; white-space: nowrap;" class="tabular-nums font-weight-bold">
                         <div style="display: inline-flex; align-items: center; justify-content: flex-start; gap: 1px; white-space: nowrap;">
-                            <input type="checkbox" id="del-onq-${prefix}-${rowKey}" checked onchange="updateFirstBillingRowStatus('${rowKey}', '${prefix}')" style="cursor: pointer; transform: scale(0.82); margin-right: 1px; flex-shrink: 0;" title="Include/Exclude OnQueue from Net Total">
-                            <span style="color: #10b981; font-size: 0.72rem !important;">${formatPHP(r.firstOnqAmt)}</span>
-                            ${r.onqLoans && r.onqLoans.length > 0 ? `
-                                <button type="button" onclick="event.stopPropagation(); toggleOnqDetails('${rowKey}', '${prefix}')" style="background: rgba(16,185,129,0.18); color: #10b981; border: 1px solid rgba(16,185,129,0.35); border-radius: 3px; padding: 0 2px; font-size: 0.52rem; font-weight: 700; cursor: pointer; margin-left: 1px; line-height: 1.2; display: inline-flex; align-items: center; gap: 1px; flex-shrink: 0;" title="View ${r.onqLoans.length} ONQUEUE loan(s)">
-                                    ${r.onqLoans.length} <i class="bi bi-chevron-down" id="onq-chevron-${prefix}-${rowKey}" style="font-size: 0.46rem; pointer-events: none;"></i>
-                                </button>
-                            ` : ''}
+                            <!-- (2026-09-27) Green styled checkbox for ONQ; prev: accent-color -->
+                            <input type="checkbox" id="del-onq-${prefix}-${rowKey}" class="checkbox-onq" checked onchange="updateFirstBillingRowStatus('${rowKey}', '${prefix}')" style="cursor: pointer; transform: scale(0.9); margin-right: 2px; flex-shrink: 0;" title="Include/Exclude OnQueue from Net Total">
+                            <span id="onq-val-${prefix}-${rowKey}" style="color: #10b981; font-size: 0.72rem !important;">${formatPHP(r.firstOnqAmt)}</span>
+                            ${r.onqLoans && r.onqLoans.length > 0 ? `<button type="button" onclick="toggleOnqDetails('${rowKey}', '${prefix}')" style="background: none; border: none; color: #10b981; cursor: pointer; padding: 0 4px; font-size: 0.7rem; margin-left: 2px;"><i id="onq-chevron-${prefix}-${rowKey}" class="bi bi-chevron-down"></i></button>` : ''}
                         </div>
                     </td>
                     <td data-label="Net Total" id="net-total-${prefix}-${rowKey}" style="text-align: left; font-size: 0.72rem !important; white-space: nowrap;" class="tabular-nums font-weight-bold ${netTotal >= 5000 ? 'text-success' : 'text-danger'}">
                         ${formatPHP(netTotal)}
                     </td>
                     <td data-label="Status" id="status-td-${prefix}-${rowKey}" style="text-align: center; vertical-align: middle; overflow: hidden; padding: 2px 1px !important;">
+                        <!-- (2026-07-13) Support EFF / UNDERDED badge; prev: only 4 statuses -->
                         ${statusMode === 'NO BILLING' || statusMode === 'NO DEDUCTION' ? `
-                            <span class="badge font-weight-bold" style="width: 100% !important; height: 18px !important; background: rgba(220,53,69,0.22); color: #dc3545; border: 1px solid #dc3545; border-radius: 4px; font-size: 0.56rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 2px; white-space: nowrap;">NO BILLING</span>
+                            <!-- (2026-07-13) Unified badge size 0.50rem; prev: 0.52-0.56rem mixed -->
+                            <span class="badge font-weight-bold" style="width: 100% !important; height: 18px !important; background: rgba(220,53,69,0.22); color: #dc3545; border: 1px solid #dc3545; border-radius: 4px; font-size: 0.50rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 4px; white-space: nowrap;">NO BILLING</span>
+                        ` : (statusMode === 'AS EASE / FIRST CSB ONQ' ? `
+                            <span class="badge font-weight-bold" style="width: 100% !important; height: 18px !important; background: rgba(139,92,246,0.22); color: #8b5cf6; border: 1px solid #8b5cf6; border-radius: 4px; font-size: 0.48rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 4px; white-space: nowrap;">AS EASE / ONQ</span>
                         ` : (statusMode === 'FIRST CSB ONQUEUE' ? `
-                            <span class="badge font-weight-bold" style="width: 100% !important; height: 18px !important; background: rgba(13,110,253,0.22); color: #3b82f6; border: 1px solid #3b82f6; border-radius: 4px; font-size: 0.54rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 2px; white-space: nowrap;">FIRST CSB ONQ</span>
+                            <span class="badge font-weight-bold" style="width: 100% !important; height: 18px !important; background: rgba(13,110,253,0.22); color: #3b82f6; border: 1px solid #3b82f6; border-radius: 4px; font-size: 0.50rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 4px; white-space: nowrap;">FIRST CSB ONQ</span>
                         ` : (statusMode === 'OVERDEDUCTED' ? `
-                            <span class="badge font-weight-bold" style="width: 100% !important; height: 18px !important; background: rgba(245,158,11,0.22); color: #f59e0b; border: 1px solid #f59e0b; border-radius: 4px; font-size: 0.54rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 2px; white-space: nowrap;">EFF / OVERDED</span>
+                            <span class="badge font-weight-bold" style="width: 100% !important; height: 18px !important; background: rgba(245,158,11,0.22); color: #f59e0b; border: 1px solid #f59e0b; border-radius: 4px; font-size: 0.50rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 4px; white-space: nowrap;">EFF / OVERDED</span>
+                        ` : (statusMode === 'UNDERDEDUCTED' ? `
+                            <span class="badge font-weight-bold" style="width: 100% !important; height: 18px !important; background: rgba(234,179,8,0.22); color: #facc15; border: 1px solid #facc15; border-radius: 4px; font-size: 0.50rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 4px; white-space: nowrap;">EFF / UNDERDED</span>
                         ` : `
-                            <span class="badge font-weight-bold" style="width: 100% !important; height: 18px !important; background: rgba(40,167,69,0.22); color: #28a745; border: 1px solid #28a745; border-radius: 4px; font-size: 0.56rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 2px; white-space: nowrap;">EFFECTED</span>
-                        `))}
+                            <span class="badge font-weight-bold" style="width: 100% !important; height: 18px !important; background: rgba(40,167,69,0.22); color: #28a745; border: 1px solid #28a745; border-radius: 4px; font-size: 0.50rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 4px; white-space: nowrap;">EFFECTED</span>
+                        `))))}
                     </td>
-                    <td data-label="Difference" id="diff-td-${prefix}-${rowKey}" style="text-align: left; font-size: 0.72rem !important; white-space: nowrap;" class="tabular-nums font-weight-bold">
+                    <td data-label="Difference" id="diff-td-${prefix}-${rowKey}" style="text-align: left; font-size: 0.72rem !important; white-space: nowrap; overflow: visible;" class="tabular-nums font-weight-bold">
                         ${(()=>{
                             const diff = (r.csbPositive || 0) - (r.monthlyAmort || 0);
                             if (statusMode === 'OVERDEDUCTED' && diff > 1.0) {
-                                return `<span style="color: #f59e0b; font-weight: 700; font-size: 0.72rem !important;">+${formatPHP(diff)}</span>`;
+                                return `<span style="color: #f59e0b; font-weight: 700; font-size: 0.72rem !important; white-space: nowrap;">+${formatPHP(diff)}</span>`;
+                            } else if (statusMode === 'UNDERDEDUCTED' && diff < -1.0) {
+                                return `<span style="color: #facc15; font-weight: 700; font-size: 0.72rem !important; white-space: nowrap;">-${formatPHP(Math.abs(diff))}</span>`;
                             }
                             return `<span style="color: rgba(255,255,255,0.3); font-weight: 600; font-size: 0.72rem !important;">-</span>`;
                         })()}
                     </td>
-                    <td data-label="Loan Release" style="text-align: left; font-size: 0.72rem !important; white-space: nowrap;" class="text-white-50" title="${formatLoanDate(r.transDate)}">
-                        ${formatLoanDate(r.transDate)}
+                    <td data-label="EFF" style="text-align: left; font-size: 0.72rem !important; white-space: nowrap;" class="text-white-50" title="${formatLoanDate(r.transDate)}">
+                        <!-- (2026-09-27) Show all EFF dates even for single loan; prev: only multi-loan -->
+                        ${(() => {
+                            if (r.posLoans && r.posLoans.length >= 1) {
+                                return r.posLoans.map(l => l.eff || 'N/A').join('<br>');
+                            }
+                            return formatLoanDate(r.transDate);
+                        })()}
                     </td>
-                    <td data-label="Maturity Date" style="text-align: left; font-size: 0.72rem !important; color: rgba(255,255,255,0.7); white-space: nowrap;" title="${formatLoanDate(r.maturityDate)}">
-                        ${formatLoanDate(r.maturityDate)}
+                    <td data-label="TERM" style="text-align: left; font-size: 0.72rem !important; color: rgba(255,255,255,0.7); white-space: nowrap;" title="${formatLoanDate(r.maturityDate)}">
+                        <!-- (2026-09-27) Show all terms even for single loan; prev: only multi-loan -->
+                        ${(() => {
+                            if (r.posLoans && r.posLoans.length >= 1) {
+                                return r.posLoans.map(l => l.term ? l.term.replace(/^(\d+)(?:\.0+)?(\/\d{4})$/, (_, m, y) => String(parseInt(m,10)).padStart(2,'0') + y) : 'N/A').join('<br>');
+                            }
+                            return formatLoanDate(r.maturityDate);
+                        })()}
                     </td>
                     <td data-label="Tag" style="text-align: center; vertical-align: middle; padding-right: 6px !important;">
                         <input type="checkbox" id="tag-row-${prefix}-${rowKey}"
@@ -5222,16 +5550,18 @@
                     <td colspan="1" style="padding: 0; border: none;"></td>
                     <!-- CSB Deductions spanning ID, Div, Sta, Name, Amort, NetPay, CSB Pos columns -->
                     <td colspan="7" style="padding: 6px 8px 6px 120px; border: none; vertical-align: top; text-align: right;">
-                        <div id="pos-detail-${prefix}-${rowKey}" style="display: none; width: 100%; max-width: 520px; margin-left: auto; padding: 6px 10px; background: rgba(251,191,36,0.06); border: 1px solid rgba(251,191,36,0.3); border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+                        <!-- (2026-07-13) Subtly increase deduction detail fonts; prev: 0.56-0.58rem -->
+                        <div id="pos-detail-${prefix}-${rowKey}" style="display: none; width: 100%; max-width: 530px; margin-left: auto; padding: 6px 10px; background: rgba(251,191,36,0.06); border: 1px solid rgba(251,191,36,0.3); border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; padding-bottom: 3px; border-bottom: 1px solid rgba(251,191,36,0.15);">
-                                <div style="font-size: 0.58rem; font-weight: 700; color: #fbbf24; letter-spacing: 0.04em;">
+                                <div style="font-size: 0.65rem; font-weight: 700; color: #fbbf24; letter-spacing: 0.04em;">
                                     <i class="bi bi-plus-lg mr-1"></i>CSB DEDUCTIONS
                                 </div>
-                                <div class="font-weight-bold" style="font-size: 0.58rem; font-weight: 700; color: #fbbf24;">
+                                <!-- (2026-07-13) Add card total ID for dynamic updates; prev: unaddressed -->
+                                <div class="font-weight-bold" id="pos-card-total-${prefix}-${rowKey}" style="font-size: 0.65rem; font-weight: 700; color: #fbbf24;">
                                     Total: ${formatPHP(r.csbPositive)}
                                 </div>
                             </div>
-                            <div style="display: grid; grid-template-columns: 24px 50px 65px 65px 85px 1fr; gap: 4px; font-size: 0.56rem; color: rgba(255,255,255,0.5); font-weight: 600; padding: 2px 2px;">
+                            <div style="display: grid; grid-template-columns: 24px 50px 65px 65px 85px 1fr; gap: 4px; font-size: 0.62rem; color: rgba(255,255,255,0.5); font-weight: 600; padding: 2px 2px;">
                                 <div></div>
                                 <div>CODE</div>
                                 <div>EFF</div>
@@ -5239,32 +5569,45 @@
                                 <div style="text-align: right;">DEDAMT</div>
                                 <div style="padding-left: 4px;">POLICY NO</div>
                             </div>
-                            ${r.posLoans && r.posLoans.length > 0 ? r.posLoans.map((loan, idx) => `
-                                <div style="display: grid; grid-template-columns: 24px 50px 65px 65px 85px 1fr; gap: 4px; align-items: center; padding: 2px 2px; background: rgba(255,255,255,0.02); border-radius: 4px; margin-bottom: 2px; font-size: 0.58rem;">
+                            ${r.posLoans && r.posLoans.length > 0 ? r.posLoans.map((loan, idx) => {
+                                const anyMatchCurrent = r.posLoans.some(l => isCurrentBillingMonthEff(l.eff));
+                                let defaultChecked = window.dedSelectionMode === 'all' ? true : (anyMatchCurrent ? isCurrentBillingMonthEff(loan.eff) : true);
+                                // (2026-09-27) Load from localStorage if exists; prev: auto-calc only
+                                const storageKey = `pos_checks_${prefix}-${rowKey}`;
+                                try {
+                                    const saved = localStorage.getItem(storageKey);
+                                    if (saved) {
+                                        const states = JSON.parse(saved);
+                                        if (states[idx] !== undefined) defaultChecked = states[idx];
+                                    }
+                                } catch (e) {}
+                                return `
+                                <div style="display: grid; grid-template-columns: 24px 50px 65px 65px 85px 1fr; gap: 4px; align-items: center; padding: 2px 2px; background: rgba(255,255,255,0.02); border-radius: 4px; margin-bottom: 2px; font-size: 0.64rem;">
+                                    <!-- (2026-09-27) Yellow styled checkbox for POS accordion; prev: accent-color -->
                                     <div style="text-align: center;">
-                                        <input type="checkbox" id="pos-loan-check-${prefix}-${rowKey}-${idx}" style="cursor: pointer; transform: scale(0.85);" checked onchange="updatePosLoanSelection('${rowKey}', '${prefix}')">
+                                        <input type="checkbox" id="pos-acc-check-${prefix}-${rowKey}-${idx}" class="checkbox-pos" ${defaultChecked ? 'checked' : ''} onchange="updatePosLoanSelection('${rowKey}', '${prefix}'); syncAccordionCheckbox('${prefix}','${rowKey}',${idx},this.checked)" style="cursor: pointer; transform: scale(1.0);">
                                     </div>
                                     <div style="color: rgba(255,255,255,0.9); font-weight: 600;">${loan.code || 'N/A'}</div>
                                     <div style="color: rgba(255,255,255,0.7);">${loan.eff || 'N/A'}</div>
                                     <div style="color: rgba(255,255,255,0.7);">${loan.term ? loan.term.replace(/^(\d+)(?:\.0+)?(\/\d{4})$/, (_, m, y) => String(m).padStart(2, '0') + y) : 'N/A'}</div>
                                     <div style="text-align: right; color: #fbbf24; font-weight: 700;">${formatPHP(loan.dedamt || 0)}</div>
-                                    <div style="color: rgba(255,255,255,0.6); font-size: 0.56rem; padding-left: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${loan.policyNo || 'N/A'}</div>
-                                </div>
-                            `).join('') : '<div style="text-align: center; color: rgba(255,255,255,0.4); padding: 4px; font-size: 0.58rem;">No CSB deductions found</div>'}
+                                    <div style="color: rgba(255,255,255,0.6); font-size: 0.62rem; padding-left: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${loan.policyNo || 'N/A'}</div>
+                                </div>`;
+                            }).join('') : '<div style="text-align: center; color: rgba(255,255,255,0.4); padding: 4px; font-size: 0.64rem;">No CSB deductions found</div>'}
                         </div>
                     </td>
                     <!-- ONQUEUE spanning OnQueue, Net Total, Status, Diff, Release columns -->
                     <td colspan="5" style="padding: 6px 8px; border: none; vertical-align: top;">
-                        <div id="onq-detail-${prefix}-${rowKey}" style="display: none; width: 100%; max-width: 520px; padding: 6px 10px; background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.3); border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+                        <div id="onq-detail-${prefix}-${rowKey}" style="display: none; width: 100%; max-width: 530px; padding: 6px 10px; background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.3); border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; padding-bottom: 3px; border-bottom: 1px solid rgba(16,185,129,0.15);">
-                                <div style="font-size: 0.58rem; font-weight: 700; color: #10b981; letter-spacing: 0.04em;">
+                                <div style="font-size: 0.65rem; font-weight: 700; color: #10b981; letter-spacing: 0.04em;">
                                     <i class="bi bi-list-ul mr-1"></i>LESS ONQUEUE
                                 </div>
-                                <div class="font-weight-bold" style="font-size: 0.58rem; font-weight: 700; color: #10b981;">
+                                <div class="font-weight-bold" id="onq-card-total-${prefix}-${rowKey}" style="font-size: 0.65rem; font-weight: 700; color: #10b981;">
                                     Total: ${formatPHP(r.firstOnqAmt)}
                                 </div>
                             </div>
-                            <div style="display: grid; grid-template-columns: 24px 50px 65px 65px 85px 1fr; gap: 4px; font-size: 0.56rem; color: rgba(255,255,255,0.5); font-weight: 600; padding: 2px 2px;">
+                            <div style="display: grid; grid-template-columns: 24px 50px 65px 65px 85px 1fr; gap: 4px; font-size: 0.62rem; color: rgba(255,255,255,0.5); font-weight: 600; padding: 2px 2px;">
                                 <div></div>
                                 <div>CODE</div>
                                 <div>EFF</div>
@@ -5272,41 +5615,114 @@
                                 <div style="text-align: right;">DEDAMT</div>
                                 <div style="padding-left: 4px;">POLICY NO</div>
                             </div>
-                            ${r.onqLoans && r.onqLoans.length > 0 ? r.onqLoans.map((loan, idx) => `
-                                <div style="display: grid; grid-template-columns: 24px 50px 65px 65px 85px 1fr; gap: 4px; align-items: center; padding: 2px 2px; background: rgba(255,255,255,0.02); border-radius: 4px; margin-bottom: 2px; font-size: 0.58rem;">
+                            ${r.onqLoans && r.onqLoans.length > 0 ? r.onqLoans.map((loan, idx) => {
+                                const anyMatchCurrent = r.onqLoans.some(l => isCurrentBillingMonthEff(l.eff));
+                                const defaultChecked = window.dedSelectionMode === 'all' ? true : (anyMatchCurrent ? isCurrentBillingMonthEff(loan.eff) : true);
+                                return `
+                                <div style="display: grid; grid-template-columns: 24px 50px 65px 65px 85px 1fr; gap: 4px; align-items: center; padding: 2px 2px; background: rgba(255,255,255,0.02); border-radius: 4px; margin-bottom: 2px; font-size: 0.64rem;">
                                     <div style="text-align: center;">
-                                        <input type="checkbox" id="onq-loan-check-${prefix}-${rowKey}-${idx}" style="cursor: pointer; transform: scale(0.85);" checked onchange="updateOnqLoanSelection('${rowKey}', '${prefix}')">
+                                        <!-- (2026-09-27) Green styled checkbox for ONQ; prev: accent-color -->
+                                        <input type="checkbox" id="onq-loan-check-${prefix}-${rowKey}-${idx}" class="checkbox-onq" ${defaultChecked ? 'checked' : ''} onchange="updateOnqLoanSelection('${rowKey}', '${prefix}')" style="cursor: pointer; transform: scale(1.0);">
                                     </div>
                                     <div style="color: rgba(255,255,255,0.9); font-weight: 600;">${loan.code || 'N/A'}</div>
                                     <div style="color: rgba(255,255,255,0.7);">${loan.eff || 'N/A'}</div>
                                     <div style="color: rgba(255,255,255,0.7);">${loan.term ? loan.term.replace(/^(\d+)(?:\.0+)?(\/\d{4})$/, (_, m, y) => String(m).padStart(2, '0') + y) : 'N/A'}</div>
                                     <div style="text-align: right; color: #10b981; font-weight: 700;">${formatPHP(loan.dedamt || 0)}</div>
-                                    <div style="color: rgba(255,255,255,0.6); font-size: 0.56rem; padding-left: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${loan.policyNo || 'N/A'}</div>
-                                </div>
-                            `).join('') : '<div style="text-align: center; color: rgba(255,255,255,0.4); padding: 4px; font-size: 0.58rem;">No ONQUEUE deductions found</div>'}
+                                    <div style="color: rgba(255,255,255,0.6); font-size: 0.62rem; padding-left: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${loan.policyNo || 'N/A'}</div>
+                                </div>`;
+                            }).join('') : '<div style="text-align: center; color: rgba(255,255,255,0.4); padding: 4px; font-size: 0.64rem;">No ONQUEUE deductions found</div>'}
                         </div>
                     </td>
                     <!-- Skip: Maturity, Tag -->
                     <td colspan="2" style="padding: 0; border: none;"></td>
                 </tr>
+            ${r.posLoans && r.posLoans.length >= 1 ? r.posLoans.map((loan, lIdx) => {
+                // (2026-09-27) Show sub-rows for single loan too; prev: only multi-loan
+                const isCur = isCurrentBillingMonthEff(loan.eff);
+                // (2026-09-27) If no loans match current month, check all loans; prev: uncheck non-current
+                const anyMatchCurrent = r.posLoans.some(l => isCurrentBillingMonthEff(l.eff));
+                // (2026-09-27) Load from localStorage if exists; prev: auto-calc only
+                const storageKey = `pos_checks_${prefix}-${rowKey}`;
+                let isChecked = isDedModeAll(prefix) ? true : (anyMatchCurrent ? isCur : true);
+                try {
+                    const saved = localStorage.getItem(storageKey);
+                    if (saved) {
+                        const states = JSON.parse(saved);
+                        if (states[lIdx] !== undefined) isChecked = states[lIdx];
+                    }
+                } catch (e) {}
+                const diff = (loan.dedamt || 0) - (r.monthlyAmort || 0);
+                const subStatus = Math.abs(diff) <= 1.0 ? 'EFFECTED' : (diff > 1.0 ? 'OVERDED' : 'UNDERDED');
+                const subBg = subStatus==='EFFECTED' ? 'rgba(40,167,69,0.22)' : (subStatus==='OVERDED' ? 'rgba(245,158,11,0.22)' : 'rgba(234,179,8,0.22)');
+                const subClr = subStatus==='EFFECTED' ? '#28a745' : (subStatus==='OVERDED' ? '#f59e0b' : '#facc15');
+                const termFmt = loan.term ? loan.term.replace(/^(\d+)(?:\.0+)?(\/\d{4})$/, (_, m, y) => String(m).padStart(2, '0') + y) : 'N/A';
+                // (2026-09-27) Check if sub-row is tagged; prev: no sub-row tagging
+                const subRowKey = `${prefix}-${rowKey}-sub-${lIdx}`;
+                const isSubTagged = (()=>{ try{ const t=JSON.parse(localStorage.getItem('billing_sub_tags')||'{}'); return !!t[subRowKey]; }catch(e){return false;} })();
+                return `
+                <tr id="pos-sub-row-${prefix}-${rowKey}-${lIdx}" style="display: none; background: ${isSubTagged ? 'rgba(239,68,68,0.12)' : 'rgba(251,191,36,0.04)'}; border-left: 2px solid rgba(251,191,36,0.25); font-size: 0.68rem; transition: background 0.2s ease;">
+                    <td style="text-align: left; color: rgba(255,255,255,0.3); font-size: 0.68rem !important; padding-left: 10px;" class="font-weight-bold">
+                        <span style="color: rgba(251,191,36,0.5); font-size: 0.60rem;">↳</span>
+                    </td>
+                    <td style="text-align: left; font-size: 0.68rem !important; color: rgba(255,255,255,0.35); white-space: nowrap;">${loan.code || 'N/A'}</td>
+                    <td style="text-align: left; font-size: 0.68rem !important; color: rgba(255,255,255,0.35);">&nbsp;</td>
+                    <td style="text-align: left; font-size: 0.68rem !important; color: rgba(255,255,255,0.35);">&nbsp;</td>
+                    <td style="text-align: left; font-size: 0.68rem !important; color: rgba(255,255,255,0.5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;" title="${loan.policyNo || ''}"><i class="bi bi-file-text" style="font-size:0.60rem; margin-right:2px;"></i>${loan.policyNo || 'N/A'}</td>
+                    <!-- (2026-07-13) Move EFF/TERM to Amort/Netpay in gray; prev: Netpay/Onqueue -->
+                    <td style="text-align: left; font-size: 0.68rem !important; white-space: nowrap; color: rgba(255,255,255,0.45);">EFF: ${loan.eff || 'N/A'}</td>
+                    <td style="text-align: left; font-size: 0.68rem !important; white-space: nowrap; color: rgba(255,255,255,0.45);">TERM: ${termFmt}</td>
+                    <td style="text-align: left; font-size: 0.68rem !important; white-space: nowrap;">
+                        <div style="display: inline-flex; align-items: center; gap: 3px;">
+                            <input type="checkbox" id="pos-loan-check-${prefix}-${rowKey}-${lIdx}" class="checkbox-pos" ${isChecked ? 'checked' : ''} onchange="updatePosLoanSelection('${rowKey}', '${prefix}'); syncAccordionCheckbox('${prefix}','${rowKey}',${lIdx},this.checked)" style="cursor: pointer; transform: scale(0.95);">
+                            <span style="color: #fbbf24; font-weight: 700;">${formatPHP(loan.dedamt || 0)}</span>
+                        </div>
+                    </td>
+                    <td style="text-align: left; font-size: 0.68rem !important; color: rgba(255,255,255,0.35); white-space: nowrap;">&nbsp;</td>
+                    <td style="text-align: left; font-size: 0.68rem !important; white-space: nowrap;">
+                        <span style="color: ${diff > 1.0 ? '#f59e0b' : (diff < -1.0 ? '#facc15' : 'rgba(255,255,255,0.3)')};">${diff > 1.0 ? '+' : ''}${Math.abs(diff) > 0.5 ? formatPHP(diff) : '-'}</span>
+                    </td>
+                    <td style="text-align: center; vertical-align: middle; padding: 2px 1px !important;">
+                        <!-- (2026-07-13) Sub-row badge unified 0.50rem; prev: 0.52rem unstyled -->
+                        <span class="badge font-weight-bold" style="width: 100% !important; height: 18px !important; background: ${subBg}; color: ${subClr}; border: 1px solid ${subClr}; border-radius: 4px; font-size: 0.50rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 4px; white-space: nowrap;">${subStatus}</span>
+                    </td>
+                    <td style="text-align: left; font-size: 0.68rem !important;"><span style="color: rgba(255,255,255,0.2);">-</span></td>
+                    <td style="text-align: left; font-size: 0.68rem !important; white-space: nowrap; color: rgba(255,255,255,0.45);">${loan.eff || 'N/A'}</td>
+                    <td style="text-align: left; font-size: 0.68rem !important; white-space: nowrap; color: rgba(255,255,255,0.45);">${termFmt}</td>
+                    <!-- (2026-09-28) Add red tag checkbox for sub-deduction rows; disabled for AS EASE status -->
+                    <td style="text-align: center; padding-right: 6px !important;">
+                        <input type="checkbox" id="tag-sub-row-${prefix}-${rowKey}-${lIdx}"
+                            class="checkbox-red-tag"
+                            ${isSubTagged ? 'checked' : ''}
+                            ${statusMode === 'AS EASE / FIRST CSB ONQ' ? 'disabled' : ''}
+                            onchange="toggleSubRowTag('${prefix}', '${rowKey}', ${lIdx}, this.checked)"
+                            style="${statusMode === 'AS EASE / FIRST CSB ONQ' ? 'opacity: 0.3; cursor: not-allowed;' : ''}"
+                            title="${statusMode === 'AS EASE / FIRST CSB ONQ' ? 'Cannot tag AS EASE items for deletion' : 'Tag sub-deduction for deletion'}">
+                    </td>
+                </tr>`;}).join('') : ''}
             `;
         }
 
-        // (2026-09-27) Toggle CSB and ONQUEUE in same row, positioned under their columns
+        // (2026-09-28) Toggle POS sub-deduction rows visibility; prev: toggled CSB DEDUCTIONS card
         function togglePosDetails(empNumStr, prefix = 'norm') {
-            const card = document.getElementById(`pos-detail-${prefix}-${empNumStr}`) || document.getElementById(`pos-detail-${empNumStr}`);
-            const row = document.getElementById(`deductions-row-${prefix}-${empNumStr}`) || document.getElementById(`deductions-row-${empNumStr}`);
             const chevron = document.getElementById(`pos-chevron-${prefix}-${empNumStr}`) || document.getElementById(`pos-chevron-${empNumStr}`);
-            const otherCard = document.getElementById(`onq-detail-${prefix}-${empNumStr}`) || document.getElementById(`onq-detail-${empNumStr}`);
+            const rowKey = empNumStr;
             
-            if (card && row) {
-                const isHidden = card.style.display === 'none' || !card.style.display;
-                card.style.display = isHidden ? 'block' : 'none';
-                if (chevron) chevron.className = isHidden ? 'bi bi-chevron-up' : 'bi bi-chevron-down';
+            // Find all sub-rows for this account
+            const subRows = document.querySelectorAll(`tr[id^="pos-sub-row-${prefix}-${rowKey}-"]`);
+            
+            if (subRows.length > 0) {
+                const firstRow = subRows[0];
+                const isHidden = firstRow.style.display === 'none' || !firstRow.style.display;
                 
-                // Show row if either card is visible
-                const otherVisible = otherCard && otherCard.style.display === 'block';
-                row.style.display = (isHidden || otherVisible) ? 'table-row' : 'none';
+                // Toggle all sub-rows
+                subRows.forEach(row => {
+                    row.style.display = isHidden ? 'table-row' : 'none';
+                });
+                
+                // Update chevron
+                if (chevron) {
+                    chevron.className = isHidden ? 'bi bi-chevron-up' : 'bi bi-chevron-down';
+                }
             }
         }
 
@@ -5327,42 +5743,245 @@
             }
         }
 
+        // (2026-07-13) Recalc selection & update CSB/OnQ UI; prev: static display
+        // (2026-07-13) Get current billing month as MM/YYYY; prev: none
+        function getCurrentBillingMonthStr() {
+            const raw = document.getElementById('activeMonthSelect')?.value || 'sep26';
+            const monthMap = { jan:'01',feb:'02',mar:'03',apr:'04',may:'05',jun:'06',jul:'07',aug:'08',sep:'09',oct:'10',nov:'11',dec:'12' };
+            const m = raw.slice(0, 3).toLowerCase();
+            const y = '20' + raw.slice(3, 5);
+            return (monthMap[m] || '09') + '/' + y;
+        }
+
+        // (2026-07-13) Check if eff matches current billing month; prev: none
+        function isCurrentBillingMonthEff(eff) {
+            if (!eff) return false;
+            const cur = getCurrentBillingMonthStr();
+            // (2026-07-13) Handle 2-digit year (26) and 4-digit (2026); prev: only 4-digit
+            const parts = String(eff).split('/');
+            if (parts.length !== 2) return false;
+            const yr = parts[1].trim();
+            const fullYr = yr.length === 2 ? '20' + yr : yr;
+            const normalized = String(parseInt(parts[0], 10)).padStart(2, '0') + '/' + fullYr;
+            return normalized === cur;
+        }
+
+        // (2026-07-13) Helper: check if LCS is in select-all mode; prev: global boolean
+        function isDedModeAll(prefix = 'norm') {
+            if (typeof window.dedSelectionMode === 'object' && window.dedSelectionMode !== null) {
+                return (window.dedSelectionMode[prefix] || 'current') === 'all';
+            }
+            return window.dedSelectionMode === 'all';
+        }
+
+        // (2026-07-13) Sync accordion dot when inline checkbox changes; prev: none
+        // (2026-09-27) Updated to sync checkboxes instead of dots; prev: dots only
+        function syncAccordionDot(prefix, rowKey, idx, isChecked) {
+            const dot = document.getElementById(`pos-acc-dot-${prefix}-${rowKey}-${idx}`);
+            if (dot) dot.style.background = isChecked ? '#fbbf24' : 'rgba(255,255,255,0.18)';
+        }
+
+        // (2026-09-27) Sync accordion checkbox when inline checkbox changes; prev: none
+        function syncAccordionCheckbox(prefix, rowKey, idx, isChecked) {
+            const accCheckbox = document.getElementById(`pos-acc-check-${prefix}-${rowKey}-${idx}`);
+            if (accCheckbox) accCheckbox.checked = isChecked;
+        }
+
+        // (2026-07-13) Per-LCS month/all toggle next to filters; prev: global header
+        function toggleDedSelectionMode(type = 'norm') {
+            if (typeof window.dedSelectionMode !== 'object' || window.dedSelectionMode === null) {
+                const prev = window.dedSelectionMode || 'current';
+                window.dedSelectionMode = { norm: prev, auto: prev };
+            }
+            const currentMode = window.dedSelectionMode[type] || 'current';
+            const newMode = currentMode === 'current' ? 'all' : 'current';
+            window.dedSelectionMode[type] = newMode;
+            const isAll = newMode === 'all';
+
+            const btn = document.getElementById(`btnDedSelectionMode-${type}`);
+            if (btn) {
+                btn.style.background = isAll ? 'rgba(56,189,248,0.15)' : 'rgba(251,191,36,0.12)';
+                btn.style.color = isAll ? '#38bdf8' : '#fbbf24';
+                btn.style.borderColor = isAll ? 'rgba(56,189,248,0.45)' : 'rgba(251,191,36,0.4)';
+                const ico = document.getElementById(`btnDedModeIcon-${type}`);
+                if (ico) ico.className = isAll ? 'bi bi-check2-all' : 'bi bi-calendar-check';
+                const lbl = document.getElementById(`btnDedModeLabel-${type}`);
+                if (lbl) lbl.textContent = isAll ? 'Select All (All Deductions)' : 'Current Month Only';
+            }
+
+            const cache = window.firstBillingRowsCache || {};
+            for (const cacheKey of Object.keys(cache)) {
+                const rd = cache[cacheKey];
+                if (!rd) continue;
+                if (!cacheKey.startsWith(type + '-')) continue;
+                const prefix = type;
+                const rowKey = rd.rowKey || rd.empNumStr;
+                if (!rowKey) continue;
+                if (rd.posLoans && rd.posLoans.length > 0) {
+                    rd.posLoans.forEach((loan, idx) => {
+                        const cb = document.getElementById(`pos-loan-check-${prefix}-${rowKey}-${idx}`);
+                        const newChecked = isAll ? true : isCurrentBillingMonthEff(loan.eff);
+                        if (cb) cb.checked = newChecked;
+                        // (2026-09-27) Update accordion checkbox too; prev: only dot
+                        const accCheckbox = document.getElementById(`pos-acc-check-${prefix}-${rowKey}-${idx}`);
+                        if (accCheckbox) accCheckbox.checked = newChecked;
+                        const dot = document.getElementById(`pos-acc-dot-${prefix}-${rowKey}-${idx}`);
+                        if (dot) dot.style.background = newChecked ? '#fbbf24' : 'rgba(255,255,255,0.18)';
+                    });
+                    updatePosLoanSelection(rowKey, prefix);
+                }
+                if (rd.onqLoans && rd.onqLoans.length > 0) {
+                    rd.onqLoans.forEach((loan, idx) => {
+                        const cb = document.getElementById(`onq-loan-check-${prefix}-${rowKey}-${idx}`);
+                        if (cb) cb.checked = isAll ? true : isCurrentBillingMonthEff(loan.eff);
+                        // (2026-09-27) Update accordion ONQ checkbox too; prev: only inline
+                        const accCheckbox = document.getElementById(`onq-acc-check-${prefix}-${rowKey}-${idx}`);
+                        if (accCheckbox) accCheckbox.checked = isAll ? true : isCurrentBillingMonthEff(loan.eff);
+                    });
+                    updateOnqLoanSelection(rowKey, prefix);
+                }
+            }
+        }
+
         function updatePosLoanSelection(empNumStr, prefix = 'norm') {
-            const cacheKey = `${prefix}-${empNumStr}`;
-            const rowData = window.firstBillingRowsCache?.[cacheKey] || window.firstBillingRowsCache?.[empNumStr];
+            const rowKey = empNumStr;
+            const cacheKey = `${prefix}-${rowKey}`;
+            const rowData = window.firstBillingRowsCache?.[cacheKey] || window.firstBillingRowsCache?.[rowKey] || window.firstBillingRowsCache?.[empNumStr];
             if (!rowData || !rowData.posLoans) return;
+            
+            // (2026-09-27) Save manual checkbox states to localStorage; prev: no persistence
+            const storageKey = `pos_checks_${cacheKey}`;
+            const checkStates = {};
+            
             let sum = 0;
+            let checkedCount = 0;
+            const isAll = isDedModeAll(prefix);
             rowData.posLoans.forEach((loan, idx) => {
-                const cb = document.getElementById(`pos-loan-check-${prefix}-${empNumStr}-${idx}`);
-                if (cb && cb.checked) sum += loan.dedamt || 0;
+                const cb = document.getElementById(`pos-loan-check-${prefix}-${rowKey}-${idx}`);
+                if (cb) {
+                    checkStates[idx] = cb.checked;
+                    if (cb.checked) { sum += loan.dedamt || 0; checkedCount++; }
+                } else {
+                    const active = isAll || isCurrentBillingMonthEff(loan.eff);
+                    if (active) { sum += loan.dedamt || 0; checkedCount++; }
+                }
             });
+            
+            // Save to localStorage
+            try {
+                localStorage.setItem(storageKey, JSON.stringify(checkStates));
+            } catch (e) {
+                console.warn('Failed to save POS checkbox states:', e);
+            }
+            
             rowData.csbPositive = sum;
-            updateFirstBillingRowStatus(empNumStr, prefix);
+            rowData.checkedPosCount = checkedCount;
+            rowData.userSelectedPos = true;
+
+            const posValEl = document.getElementById(`pos-val-${prefix}-${rowKey}`);
+            if (posValEl) posValEl.innerHTML = formatPHP(sum);
+
+            const posCardTotalEl = document.getElementById(`pos-card-total-${prefix}-${rowKey}`);
+            if (posCardTotalEl) posCardTotalEl.innerHTML = `Total: ${formatPHP(sum)}`;
+
+            // (2026-09-27) Auto-uncheck main POS checkbox if all sub-deductions unchecked; prev: always checked
+            const mainPosCheckbox = document.getElementById(`del-pos-${prefix}-${rowKey}`);
+            if (mainPosCheckbox) {
+                mainPosCheckbox.checked = checkedCount > 0;
+            }
+
+            updateFirstBillingRowStatus(rowKey, prefix);
         }
 
         function updateOnqLoanSelection(empNumStr, prefix = 'norm') {
-            const cacheKey = `${prefix}-${empNumStr}`;
-            const rowData = window.firstBillingRowsCache?.[cacheKey] || window.firstBillingRowsCache?.[empNumStr];
+            const rowKey = empNumStr;
+            const cacheKey = `${prefix}-${rowKey}`;
+            const rowData = window.firstBillingRowsCache?.[cacheKey] || window.firstBillingRowsCache?.[rowKey] || window.firstBillingRowsCache?.[empNumStr];
             if (!rowData || !rowData.onqLoans) return;
+            
+            // (2026-09-27) Save manual checkbox states to localStorage; prev: no persistence
+            const storageKey = `onq_checks_${cacheKey}`;
+            const checkStates = {};
+            
             let sum = 0;
+            let checkedCount = 0;
+            const isAll = isDedModeAll(prefix);
             rowData.onqLoans.forEach((loan, idx) => {
-                const cb = document.getElementById(`onq-loan-check-${prefix}-${empNumStr}-${idx}`);
-                if (cb && cb.checked) sum += loan.dedamt || 0;
+                const cb = document.getElementById(`onq-loan-check-${prefix}-${rowKey}-${idx}`);
+                if (cb) {
+                    checkStates[idx] = cb.checked;
+                    if (cb.checked) { sum += loan.dedamt || 0; checkedCount++; }
+                } else {
+                    const active = isAll || isCurrentBillingMonthEff(loan.eff);
+                    if (active) { sum += loan.dedamt || 0; checkedCount++; }
+                }
             });
+            
+            // Save to localStorage
+            try {
+                localStorage.setItem(storageKey, JSON.stringify(checkStates));
+            } catch (e) {
+                console.warn('Failed to save ONQ checkbox states:', e);
+            }
+            
             rowData.firstOnqAmt = sum;
-            updateFirstBillingRowStatus(empNumStr, prefix);
+            rowData.checkedOnqCount = checkedCount;
+            rowData.userSelectedOnq = true;
+
+            const onqValEl = document.getElementById(`onq-val-${prefix}-${rowKey}`);
+            if (onqValEl) onqValEl.innerHTML = formatPHP(sum);
+
+            const onqBadgeEl = document.getElementById(`onq-count-badge-${prefix}-${rowKey}`);
+            if (onqBadgeEl) onqBadgeEl.innerText = checkedCount;
+
+            const onqCardTotalEl = document.getElementById(`onq-card-total-${prefix}-${rowKey}`);
+            if (onqCardTotalEl) onqCardTotalEl.innerHTML = `Total: ${formatPHP(sum)}`;
+
+            // (2026-09-27) Auto-uncheck main ONQ checkbox if all sub-deductions unchecked; prev: always checked
+            const mainOnqCheckbox = document.getElementById(`del-onq-${prefix}-${rowKey}`);
+            if (mainOnqCheckbox) {
+                mainOnqCheckbox.checked = checkedCount > 0;
+            }
+
+            updateFirstBillingRowStatus(rowKey, prefix);
         }
 
         function loadNextBranchRowChunk() {}
 
-        // (2026-07-13) Implement sortBillingTable for all billing columns; prev: none
-        let currentBillingSort = { col: '', asc: true };
+        // (2026-07-13) Cycle status sort across all options; prev: binary asc/desc
+        const STATUS_SORT_CYCLE = [
+            { key: 'EFFECTED', label: 'EFFECTED' },
+            { key: 'OVERDEDUCTED', label: 'OVERDED' },
+            { key: 'UNDERDEDUCTED', label: 'UNDERDED' },
+            { key: 'FIRST CSB ONQUEUE', label: 'ONQUEUE' },
+            { key: 'NO BILLING', label: 'NO BILLING' }
+        ];
+        let currentStatusSortIdx = -1;
+        let currentBillingSort = { col: '', asc: true, statusKey: '' };
+
         function sortBillingTable(col) {
-            if (currentBillingSort.col === col) {
-                currentBillingSort.asc = !currentBillingSort.asc;
-            } else {
-                currentBillingSort.col = col;
+            if (col === 'status') {
+                currentStatusSortIdx = (currentStatusSortIdx + 1) % STATUS_SORT_CYCLE.length;
+                const targetOption = STATUS_SORT_CYCLE[currentStatusSortIdx];
+                currentBillingSort.col = 'status';
+                currentBillingSort.statusKey = targetOption.key;
                 currentBillingSort.asc = true;
+                ['norm', 'auto'].forEach(t => {
+                    const el = document.getElementById('statusHeaderTitle-' + t);
+                    if (el) el.innerText = 'STATUS: ' + targetOption.label;
+                });
+            } else {
+                currentStatusSortIdx = -1;
+                ['norm', 'auto'].forEach(t => {
+                    const el = document.getElementById('statusHeaderTitle-' + t);
+                    if (el) el.innerText = 'Status';
+                });
+                if (currentBillingSort.col === col) {
+                    currentBillingSort.asc = !currentBillingSort.asc;
+                } else {
+                    currentBillingSort.col = col;
+                    currentBillingSort.asc = true;
+                }
             }
             const asc = currentBillingSort.asc;
             const comparator = (a, b) => {
@@ -5395,10 +6014,23 @@
                     vA = (a.netPayVal || 0) + (a.csbPositive || 0) - (a.firstOnqAmt || 0);
                     vB = (b.netPayVal || 0) + (b.csbPositive || 0) - (b.firstOnqAmt || 0);
                 } else if (col === 'status') {
-                    // (2026-09-27) Status priority: EFFECTED > EFF/OVERDED > FIRST CSB ONQ > NO BILLING
-                    const statusOrder = { 'EFFECTED': 1, 'OVERDEDUCTED': 2, 'FIRST CSB ONQUEUE': 3, 'NO BILLING': 4, 'NO DEDUCTION': 4 };
-                    vA = statusOrder[a.statusMode] || 999;
-                    vB = statusOrder[b.statusMode] || 999;
+                    const targetKey = currentBillingSort.statusKey || 'EFFECTED';
+                    const getStatusRank = (mode) => {
+                        const s = String(mode || '').trim().toUpperCase();
+                        const isTarget = (targetKey === 'NO BILLING')
+                            ? (s === 'NO BILLING' || s === 'NO DEDUCTION')
+                            : (s === targetKey);
+                        if (isTarget) return 0;
+                        const baseRank = { 'EFFECTED': 1, 'OVERDEDUCTED': 2, 'UNDERDEDUCTED': 3, 'FIRST CSB ONQUEUE': 4, 'NO BILLING': 5, 'NO DEDUCTION': 5 };
+                        return (baseRank[s] || 9) + 10;
+                    };
+                    const rA = getStatusRank(a.statusMode);
+                    const rB = getStatusRank(b.statusMode);
+                    if (rA !== rB) return rA - rB;
+                    const diffA = Math.abs((a.csbPositive || 0) - (a.monthlyAmort || 0));
+                    const diffB = Math.abs((b.csbPositive || 0) - (b.monthlyAmort || 0));
+                    if (diffA !== diffB) return diffB - diffA;
+                    return (a.clientName || '').localeCompare(b.clientName || '');
                 } else if (col === 'diff') {
                     vA = (a.csbPositive || 0) - (a.monthlyAmort || 0);
                     vB = (b.csbPositive || 0) - (b.monthlyAmort || 0);
@@ -5418,6 +6050,50 @@
             applyBillingFilters();
         }
 
+        function sortToStatusOption(statusKey) {
+            if (!statusKey || statusKey === 'ALL') {
+                currentStatusSortIdx = -1;
+                ['norm', 'auto'].forEach(t => {
+                    const el = document.getElementById('statusHeaderTitle-' + t);
+                    if (el) el.innerText = 'Status';
+                });
+                sortBillingTable('id');
+                return;
+            }
+            const idx = STATUS_SORT_CYCLE.findIndex(o => o.key === statusKey);
+            currentStatusSortIdx = idx !== -1 ? idx : 0;
+            currentBillingSort.col = 'status';
+            currentBillingSort.statusKey = statusKey;
+            currentBillingSort.asc = true;
+            const targetOption = STATUS_SORT_CYCLE[currentStatusSortIdx] || { label: statusKey };
+            ['norm', 'auto'].forEach(t => {
+                const el = document.getElementById('statusHeaderTitle-' + t);
+                if (el) el.innerText = 'STATUS: ' + targetOption.label;
+            });
+            const comparator = (a, b) => {
+                const getStatusRank = (mode) => {
+                    const s = String(mode || '').trim().toUpperCase();
+                    const isTarget = (statusKey === 'NO BILLING')
+                        ? (s === 'NO BILLING' || s === 'NO DEDUCTION')
+                        : (s === statusKey);
+                    if (isTarget) return 0;
+                    const baseRank = { 'EFFECTED': 1, 'OVERDEDUCTED': 2, 'UNDERDEDUCTED': 3, 'FIRST CSB ONQUEUE': 4, 'NO BILLING': 5, 'NO DEDUCTION': 5 };
+                    return (baseRank[s] || 9) + 10;
+                };
+                const rA = getStatusRank(a.statusMode);
+                const rB = getStatusRank(b.statusMode);
+                if (rA !== rB) return rA - rB;
+                const diffA = Math.abs((a.csbPositive || 0) - (a.monthlyAmort || 0));
+                const diffB = Math.abs((b.csbPositive || 0) - (b.monthlyAmort || 0));
+                if (diffA !== diffB) return diffB - diffA;
+                return (a.clientName || '').localeCompare(b.clientName || '');
+            };
+            if (window.currentBranchAllRowsNormal) window.currentBranchAllRowsNormal.sort(comparator);
+            if (window.currentBranchAllRowsAuto) window.currentBranchAllRowsAuto.sort(comparator);
+            applyBillingFilters();
+        }
+        window.sortToStatusOption = sortToStatusOption;
+
         function applyBillingFilters() {
             const searchInput = document.getElementById('billingSearchInput');
             const searchVal = String(searchInput?.value || '').trim().toLowerCase();
@@ -5434,14 +6110,62 @@
                 filteredAuto = filteredAuto.filter(r => getLoanDateMonthKey(r.transDate) === selectedMonth);
             }
             if (searchVal) {
-                filteredNorm = filteredNorm.filter(r => {
-                    return String(r.clientName || '').toLowerCase().includes(searchVal) ||
-                           String(r.empNumStr || '').toLowerCase().includes(searchVal);
-                });
-                filteredAuto = filteredAuto.filter(r => {
-                    return String(r.clientName || '').toLowerCase().includes(searchVal) ||
-                           String(r.empNumStr || '').toLowerCase().includes(searchVal);
-                });
+                // (2026-07-13) Match exact decimals, dates, status, div, sta; prev: name/id only
+                const sClean = searchVal.replace(/[₱,\s+]/g, '');
+                const rowMatches = r => {
+                    if (String(r.clientName || '').toLowerCase().includes(searchVal)) return true;
+                    if (String(r.empNumStr || '').toLowerCase().includes(searchVal)) return true;
+                    if (String(r.division || '').toLowerCase().includes(searchVal)) return true;
+                    if (String(r.station || '').toLowerCase().includes(searchVal)) return true;
+
+                    const st = String(r.statusMode || '').toLowerCase();
+                    if (st.includes(searchVal)) return true;
+                    if (st === 'overdeducted' && ('eff / overded'.includes(searchVal) || 'overded'.includes(searchVal))) return true;
+                    if (st === 'underdeducted' && ('eff / underded'.includes(searchVal) || 'underded'.includes(searchVal))) return true;
+                    if (st === 'first csb onqueue' && ('first csb onq'.includes(searchVal) || 'onq'.includes(searchVal))) return true;
+                    if ((st === 'no billing' || st === 'no deduction') && ('no billing'.includes(searchVal) || 'no deduction'.includes(searchVal))) return true;
+
+                    const relDate = formatLoanDate(r.transDate).toLowerCase();
+                    const matDate = formatLoanDate(r.maturityDate).toLowerCase();
+                    if (relDate.includes(searchVal) || String(r.transDate || '').toLowerCase().includes(searchVal)) return true;
+                    if (matDate.includes(searchVal) || String(r.maturityDate || '').toLowerCase().includes(searchVal)) return true;
+
+                    const netTot = (r.netPayVal || 0) + (r.csbPositive || 0) - (r.firstOnqAmt || 0);
+                    const diffAmt = (r.csbPositive || 0) - (r.monthlyAmort || 0);
+                    const nums = [r.monthlyAmort, r.netPayVal, r.csbPositive, r.firstOnqAmt, netTot, diffAmt, Math.abs(diffAmt)];
+                    for (const n of nums) {
+                        if (n !== undefined && n !== null && !isNaN(n)) {
+                            const fixed = Number(n).toFixed(2);
+                            const locale = Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                            if (fixed.includes(searchVal) || locale.toLowerCase().includes(searchVal)) return true;
+                            if (sClean && (fixed.includes(sClean) || locale.replace(/,/g, '').includes(sClean))) return true;
+                        }
+                    }
+
+                    if (r.posLoans && r.posLoans.length > 0) {
+                        for (const l of r.posLoans) {
+                            if (String(l.code || '').toLowerCase().includes(searchVal)) return true;
+                            if (String(l.policy || '').toLowerCase().includes(searchVal)) return true;
+                            if (l.dedamt !== undefined) {
+                                const df = Number(l.dedamt).toFixed(2);
+                                if (df.includes(searchVal) || (sClean && df.includes(sClean))) return true;
+                            }
+                        }
+                    }
+                    if (r.onqLoans && r.onqLoans.length > 0) {
+                        for (const l of r.onqLoans) {
+                            if (String(l.code || '').toLowerCase().includes(searchVal)) return true;
+                            if (String(l.pnNo || l.pn || '').toLowerCase().includes(searchVal)) return true;
+                            if (l.monthlyAmort !== undefined) {
+                                const df = Number(l.monthlyAmort).toFixed(2);
+                                if (df.includes(searchVal) || (sClean && df.includes(sClean))) return true;
+                            }
+                        }
+                    }
+                    return false;
+                };
+                filteredNorm = filteredNorm.filter(rowMatches);
+                filteredAuto = filteredAuto.filter(rowMatches);
             }
 
             window.currentBranchRowsNormal = filteredNorm;
@@ -5491,67 +6215,94 @@
             const input = document.getElementById('billingSearchInput');
             if (input) {
                 input.value = '';
+                // (2026-07-13) Clear persisted search cache on explicit clear; prev: persisted stale value
+                localStorage.removeItem('billing_search_cache');
                 applyBillingFilters();
                 input.focus();
             }
         }
 
+        // (2026-07-13) Set EFFECTED when selection matches amort; prev: overded
         function updateFirstBillingRowStatus(empNumStr, prefix = 'norm') {
-            const cacheKey = `${prefix}-${empNumStr}`;
-            const rowData = window.firstBillingRowsCache?.[cacheKey] || window.firstBillingRowsCache?.[empNumStr];
+            const rowKey = empNumStr;
+            const cacheKey = `${prefix}-${rowKey}`;
+            const rowData = window.firstBillingRowsCache?.[cacheKey] || window.firstBillingRowsCache?.[rowKey] || window.firstBillingRowsCache?.[empNumStr];
             if (!rowData) return;
-            const delNetpay = document.getElementById(`del-netpay-${prefix}-${empNumStr}`)?.checked || false;
-            const delPos = document.getElementById(`del-pos-${prefix}-${empNumStr}`)?.checked || false;
-            const delOnq = document.getElementById(`del-onq-${prefix}-${empNumStr}`)?.checked || false;
+            const delNetpay = (document.getElementById(`del-netpay-${prefix}-${rowKey}`) || document.getElementById(`del-netpay-${rowKey}`))?.checked ?? true;
+            const delPos = (document.getElementById(`del-pos-${prefix}-${rowKey}`) || document.getElementById(`del-pos-${rowKey}`))?.checked ?? true;
+            const delOnq = (document.getElementById(`del-onq-${prefix}-${rowKey}`) || document.getElementById(`del-onq-${rowKey}`))?.checked ?? true;
 
-            // (2026-07-13) Fix checkbox inclusion logic in row status; prev: inverted
             const effNetPay = delNetpay ? (rowData.netPayVal || 0) : 0;
             const effPos = delPos ? (rowData.csbPositive || 0) : 0;
             const effOnq = delOnq ? (rowData.firstOnqAmt || 0) : 0;
 
             const formulaVal = effNetPay + effPos - effOnq;
-            const isMet = formulaVal >= 5000 && (effNetPay > 0 || effPos > 0);
-            // (2026-07-13) Sync standard 4 statuses in row update; prev: MISMATCH override
+
+            const activePosCount = rowData.checkedPosCount !== undefined
+                ? rowData.checkedPosCount
+                : (rowData.posLoans ? rowData.posLoans.length : (effPos > 0 ? 1 : 0));
+            const activeOnqCount = rowData.checkedOnqCount !== undefined
+                ? rowData.checkedOnqCount
+                : (rowData.onqLoans ? rowData.onqLoans.length : (effOnq > 0 ? 1 : 0));
+
             let newStatus = 'NO BILLING';
             if (effPos === 0) {
                 newStatus = 'NO BILLING';
-            } else if (effOnq > 0 || (rowData.onqLoans && rowData.onqLoans.length > 0)) {
-                newStatus = 'FIRST CSB ONQUEUE';
-            } else if (effPos > ((rowData.monthlyAmort || 0) + 1.0) || (rowData.posLoans && rowData.posLoans.length > 1)) {
+            } else if (effOnq > 0) {
+                // (2026-09-28) Check net total for AS EASE status; prev: always FIRST CSB ONQUEUE
+                if (formulaVal < 5000) {
+                    newStatus = 'AS EASE / FIRST CSB ONQ';
+                } else {
+                    newStatus = 'FIRST CSB ONQUEUE';
+                }
+            } else if (effPos > ((rowData.monthlyAmort || 0) + 1.0)) {
                 newStatus = 'OVERDEDUCTED';
+            } else if (effPos < ((rowData.monthlyAmort || 0) - 1.0)) {
+                newStatus = 'UNDERDEDUCTED';
             } else {
                 newStatus = 'EFFECTED';
             }
 
-            const netTotalEl = document.getElementById(`net-total-${prefix}-${empNumStr}`);
+            rowData.statusMode = newStatus;
+
+            const netTotalEl = document.getElementById(`net-total-${prefix}-${rowKey}`) || document.getElementById(`net-total-${rowKey}`);
             if (netTotalEl) {
-                // (2026-07-13) Use innerHTML so formatPHP span renders; prev: textContent broke
                 netTotalEl.innerHTML = formatPHP(formulaVal);
                 netTotalEl.className = `tabular-nums font-weight-bold ${formulaVal >= 5000 ? 'text-success' : 'text-danger'}`;
             }
 
-            const statusTd = document.getElementById(`status-td-${prefix}-${empNumStr}`);
+            const statusTd = document.getElementById(`status-td-${prefix}-${rowKey}`) || document.getElementById(`status-td-${rowKey}`);
             if (statusTd) {
-                if (newStatus === 'FIRST CSB ONQUEUE') {
-                    statusTd.innerHTML = `<span class="badge font-weight-bold" style="width: 100% !important; height: 20px !important; background: rgba(13,110,253,0.22); color: #3b82f6; border: 1px solid #3b82f6; border-radius: 4px; font-size: 0.50rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 2px; white-space: nowrap;">FIRST CSB ONQ</span>`;
+                // (2026-07-13) Unify badge font to 0.50rem; prev: 0.52-0.56rem
+                if (newStatus === 'AS EASE / FIRST CSB ONQ') {
+                    statusTd.innerHTML = `<span class="badge font-weight-bold" style="width: 100% !important; height: 18px !important; background: rgba(139,92,246,0.22); color: #8b5cf6; border: 1px solid #8b5cf6; border-radius: 4px; font-size: 0.48rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 4px; white-space: nowrap;">AS EASE / ONQ</span>`;
+                } else if (newStatus === 'FIRST CSB ONQUEUE') {
+                    statusTd.innerHTML = `<span class="badge font-weight-bold" style="width: 100% !important; height: 18px !important; background: rgba(13,110,253,0.22); color: #3b82f6; border: 1px solid #3b82f6; border-radius: 4px; font-size: 0.50rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 4px; white-space: nowrap;">FIRST CSB ONQ</span>`;
                 } else if (newStatus === 'OVERDEDUCTED') {
-                    statusTd.innerHTML = `<span class="badge font-weight-bold" style="width: 100% !important; height: 20px !important; background: rgba(245,158,11,0.22); color: #f59e0b; border: 1px solid #f59e0b; border-radius: 4px; font-size: 0.50rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 2px; white-space: nowrap;">EFF / OVERDED</span>`;
+                    statusTd.innerHTML = `<span class="badge font-weight-bold" style="width: 100% !important; height: 18px !important; background: rgba(245,158,11,0.22); color: #f59e0b; border: 1px solid #f59e0b; border-radius: 4px; font-size: 0.50rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 4px; white-space: nowrap;">EFF / OVERDED</span>`;
+                } else if (newStatus === 'UNDERDEDUCTED') {
+                    statusTd.innerHTML = `<span class="badge font-weight-bold" style="width: 100% !important; height: 18px !important; background: rgba(234,179,8,0.22); color: #facc15; border: 1px solid #facc15; border-radius: 4px; font-size: 0.50rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 4px; white-space: nowrap;">EFF / UNDERDED</span>`;
                 } else if (newStatus === 'EFFECTED') {
-                    statusTd.innerHTML = `<span class="badge font-weight-bold" style="width: 100% !important; height: 20px !important; background: rgba(40,167,69,0.22); color: #28a745; border: 1px solid #28a745; border-radius: 4px; font-size: 0.52rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 3px; white-space: nowrap;">EFFECTED</span>`;
+                    statusTd.innerHTML = `<span class="badge font-weight-bold" style="width: 100% !important; height: 18px !important; background: rgba(40,167,69,0.22); color: #28a745; border: 1px solid #28a745; border-radius: 4px; font-size: 0.50rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 4px; white-space: nowrap;">EFFECTED</span>`;
                 } else {
-                    statusTd.innerHTML = `<span class="badge font-weight-bold" style="width: 100% !important; height: 20px !important; background: rgba(220,53,69,0.22); color: #dc3545; border: 1px solid #dc3545; border-radius: 4px; font-size: 0.52rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 3px; white-space: nowrap;">NO BILLING</span>`;
+                    statusTd.innerHTML = `<span class="badge font-weight-bold" style="width: 100% !important; height: 18px !important; background: rgba(220,53,69,0.22); color: #dc3545; border: 1px solid #dc3545; border-radius: 4px; font-size: 0.50rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 4px; white-space: nowrap;">NO BILLING</span>`;
                 }
             }
 
-            const diffTd = document.getElementById(`diff-td-${prefix}-${empNumStr}`);
+            const diffTd = document.getElementById(`diff-td-${prefix}-${rowKey}`) || document.getElementById(`diff-td-${rowKey}`);
             if (diffTd) {
                 const diffVal = effPos - (rowData.monthlyAmort || 0);
                 if (newStatus === 'OVERDEDUCTED' && diffVal > 1.0) {
-                    diffTd.innerHTML = `<span style="color: #f59e0b; font-weight: 700; font-size: 0.55rem;">+${formatPHP(diffVal)}</span>`;
+                    diffTd.innerHTML = `<span style="color: #f59e0b; font-weight: 700; font-size: 0.72rem !important; white-space: nowrap;">+${formatPHP(diffVal)}</span>`;
+                } else if (newStatus === 'UNDERDEDUCTED' && diffVal < -1.0) {
+                    diffTd.innerHTML = `<span style="color: #facc15; font-weight: 700; font-size: 0.72rem !important; white-space: nowrap;">-${formatPHP(Math.abs(diffVal))}</span>`;
                 } else {
-                    diffTd.innerHTML = `<span style="color: rgba(255,255,255,0.3); font-weight: 600; font-size: 0.55rem;">-</span>`;
+                    diffTd.innerHTML = `<span style="color: rgba(255,255,255,0.3); font-weight: 600; font-size: 0.72rem !important;">-</span>`;
                 }
             }
+
+            const allRows = (window.currentBranchAllRowsNormal || []).concat(window.currentBranchAllRowsAuto || []);
+            if (allRows.length > 0) updateDashboardMetrics(allRows);
         }
 
         function toggleBillingTag(empNumStr, isChecked, prefix = 'norm') {
@@ -5574,6 +6325,27 @@
                 console.error('Failed to toggle billing tag:', e);
             }
         }
+
+        // (2026-09-27) Toggle sub-deduction row tag with RED tint; prev: none
+        function toggleSubRowTag(prefix, rowKey, lIdx, isChecked) {
+            try {
+                const tags = JSON.parse(localStorage.getItem('billing_sub_tags') || '{}');
+                const key = `${prefix}-${rowKey}-sub-${lIdx}`;
+                if (isChecked) {
+                    tags[key] = true;
+                } else {
+                    delete tags[key];
+                }
+                localStorage.setItem('billing_sub_tags', JSON.stringify(tags));
+                const row = document.getElementById(`pos-sub-row-${prefix}-${rowKey}-${lIdx}`);
+                if (row) {
+                    row.style.background = isChecked ? 'rgba(239,68,68,0.12)' : 'rgba(251,191,36,0.04)';
+                }
+            } catch (e) {
+                console.error('Failed to toggle sub-row tag:', e);
+            }
+        }
+
         // (2026-07-13) Clean duplicate toggleBillingTag; prev: syntax error and dupe
 
         // (2026-07-30) Export tagged rows to a plain-text notepad file; prev: none
@@ -5616,16 +6388,87 @@
             } catch(e) { console.error('exportTaggedRows error', e); alert('Export failed: ' + e.message); }
         }
 
-        // (2026-07-13) Drill-down inspectEmployeeProfile handler; prev: batch only
-        async function inspectEmployeeProfile(empNum) {
-            const empInp = document.getElementById('employeeNumber');
-            if (empInp) empInp.value = empNum;
-            const profileCardContainer = document.getElementById('lcsProfileCard');
-            if (profileCardContainer) profileCardContainer.style.display = 'block';
-            const evalWorkspace = document.getElementById('evaluationWorkspace');
-            if (evalWorkspace) evalWorkspace.classList.remove('d-none');
-            await processIngestedSession(true);
-            if (evalWorkspace) evalWorkspace.scrollIntoView({ behavior: 'smooth' });
+        // (2026-07-13) Show profile details modal on name click; prev: redirected to processIngestedSession
+        function inspectEmployeeProfile(empNum, prefix) {
+            const cacheKey = prefix ? `${prefix}-${empNum}` : empNum;
+            const r = window.firstBillingRowsCache?.[cacheKey] || window.firstBillingRowsCache?.[empNum];
+            if (!r) {
+                if (typeof showCustomAlert === 'function') showCustomAlert('No profile data loaded yet for this employee.', 'Not Found');
+                return;
+            }
+            const fmt = n => (n !== undefined && n !== null && !isNaN(n)) ? Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 'N/A';
+            const fmtDate = v => { if (!v || v === 'N/A') return 'N/A'; const d = new Date(v); return isNaN(d) ? String(v) : d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }); };
+            const statusColor = { 'EFFECTED': '#22c55e', 'OVERDEDUCTED': '#f59e0b', 'UNDERDEDUCTED': '#facc15', 'FIRST CSB ONQUEUE': '#3b82f6', 'NO BILLING': '#6b7280' };
+            const sColor = statusColor[r.statusMode] || '#6b7280';
+            const netTotal = (r.netPayVal || 0) + (r.csbPositive || 0) - (r.firstOnqAmt || 0);
+            const initials = (r.clientName || '??').split(/[,\s]+/).filter(Boolean).map(w => w[0]).join('').slice(0, 2).toUpperCase();
+
+            const posRows = (r.posLoans || []).map(l => `
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+                    <td style="padding: 5px 8px; font-size: 0.71rem; color: #fbbf24;">${l.code || 'N/A'}</td>
+                    <td style="padding: 5px 8px; font-size: 0.71rem; color: rgba(255,255,255,0.75);">${l.policy || 'N/A'}</td>
+                    <td style="padding: 5px 8px; font-size: 0.71rem; color: #fbbf24; text-align: right;">${fmt(l.dedamt)}</td>
+                    <td style="padding: 5px 8px; font-size: 0.71rem; color: rgba(255,255,255,0.5);">${l.eff || 'N/A'}</td>
+                    <td style="padding: 5px 8px; font-size: 0.71rem; color: rgba(255,255,255,0.5);">${l.term || 'N/A'}</td>
+                </tr>`).join('');
+
+            const onqRows = (r.onqLoans || []).map(l => `
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+                    <td style="padding: 5px 8px; font-size: 0.71rem; color: #10b981;">${l.code || 'N/A'}</td>
+                    <td style="padding: 5px 8px; font-size: 0.71rem; color: rgba(255,255,255,0.75);">${l.policyNo || 'N/A'}</td>
+                    <td style="padding: 5px 8px; font-size: 0.71rem; color: #10b981; text-align: right;">${fmt(l.amount)}</td>
+                </tr>`).join('');
+
+            const modalHtml = `
+            <div id="empProfileModal" onclick="if(event.target===this){this.remove();}" style="position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.72);display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px);">
+              <div style="background:linear-gradient(135deg,#0d1117 0%,#111827 100%);border:1px solid rgba(255,255,255,0.1);border-radius:16px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,0,0,0.85);">
+                <!-- Header -->
+                <div style="padding:20px 22px 14px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:14px;">
+                  <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,rgba(251,191,36,0.2),rgba(251,191,36,0.05));border:2px solid rgba(251,191,36,0.35);display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:800;color:#fbbf24;flex-shrink:0;">${initials}</div>
+                  <div style="flex:1;min-width:0;">
+                    <div style="font-size:0.98rem;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.clientName}</div>
+                    <div style="font-size:0.72rem;color:rgba(255,255,255,0.5);margin-top:2px;">ID: <span style="color:#fbbf24;font-weight:600;">${r.empNumStr}</span> &nbsp;•&nbsp; ${r.division || 'N/A'} &nbsp;•&nbsp; ${r.station || 'N/A'}</div>
+                  </div>
+                  <span style="background:${sColor}22;color:${sColor};border:1px solid ${sColor};border-radius:6px;font-size:0.62rem;font-weight:700;padding:3px 9px;white-space:nowrap;flex-shrink:0;">${r.statusMode}</span>
+                  <button onclick="document.getElementById('empProfileModal').remove()" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:rgba(255,255,255,0.6);width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:1rem;">&times;</button>
+                </div>
+                <!-- Metrics Grid -->
+                <div style="padding:16px 22px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;border-bottom:1px solid rgba(255,255,255,0.08);">
+                  ${ [['Monthly Amort','#dc3545',fmt(r.monthlyAmort)],['CSB Positive','#fbbf24',fmt(r.csbPositive)],['Net Pay','#a855f7',fmt(r.netPayVal)],['OnQueue','#10b981',fmt(r.firstOnqAmt)],['Net Total',netTotal>=0?'#22c55e':'#ef4444',fmt(netTotal)],['Loan Date','rgba(255,255,255,0.5)',fmtDate(r.transDate)]].map(([lbl,col,val])=>`
+                  <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:10px 12px;">
+                    <div style="font-size:0.60rem;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">${lbl}</div>
+                    <div style="font-size:0.85rem;font-weight:700;color:${col};">${val}</div>
+                  </div>`).join('') }
+                </div>
+                <!-- Loan Details -->
+                <div style="padding:14px 22px 8px;">
+                  <div style="font-size:0.70rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;">CSB Deductions (${(r.posLoans||[]).length})</div>
+                  ${posRows ? `<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;"><thead><tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
+                    <th style="padding:4px 8px;font-size:0.62rem;color:rgba(255,255,255,0.4);text-align:left;">Code</th>
+                    <th style="padding:4px 8px;font-size:0.62rem;color:rgba(255,255,255,0.4);text-align:left;">Policy</th>
+                    <th style="padding:4px 8px;font-size:0.62rem;color:rgba(255,255,255,0.4);text-align:right;">Amount</th>
+                    <th style="padding:4px 8px;font-size:0.62rem;color:rgba(255,255,255,0.4);text-align:left;">Eff</th>
+                    <th style="padding:4px 8px;font-size:0.62rem;color:rgba(255,255,255,0.4);text-align:left;">Term</th>
+                  </tr></thead><tbody>${posRows}</tbody></table></div>` : '<div style="font-size:0.72rem;color:rgba(255,255,255,0.3);padding:6px 0;">No CSB deductions.</div>' }
+                </div>
+                ${onqRows ? `<div style="padding:8px 22px 14px;">
+                  <div style="font-size:0.70rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;">OnQueue Loans (${(r.onqLoans||[]).length})</div>
+                  <div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;"><thead><tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
+                    <th style="padding:4px 8px;font-size:0.62rem;color:rgba(255,255,255,0.4);text-align:left;">Code</th>
+                    <th style="padding:4px 8px;font-size:0.62rem;color:rgba(255,255,255,0.4);text-align:left;">Policy</th>
+                    <th style="padding:4px 8px;font-size:0.62rem;color:rgba(255,255,255,0.4);text-align:right;">Amount</th>
+                  </tr></thead><tbody>${onqRows}</tbody></table></div>
+                </div>` : ''}
+                <!-- Maturity / Mismatch -->
+                <div style="padding:10px 22px 18px;border-top:1px solid rgba(255,255,255,0.06);">
+                  <div style="font-size:0.68rem;color:rgba(255,255,255,0.4);">Maturity: <span style="color:rgba(255,255,255,0.7);">${fmtDate(r.maturityDate)}</span> ${ r.mismatchReasons && r.mismatchReasons.length ? `&nbsp;<span style="color:#f59e0b;"><i class="bi bi-exclamation-triangle-fill"></i> ${r.mismatchReasons.join(' | ')}</span>` : '' }</div>
+                </div>
+              </div>
+            </div>`;
+
+            const existing = document.getElementById('empProfileModal');
+            if (existing) existing.remove();
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
         }
 
         // (2026-07-13) Toggle rotation mode defaulted to horizontal; prev: standard default
@@ -6300,6 +7143,17 @@
                 window.location.href = "login/index.html";
             }
             
+            // (2026-07-13) Restore billing search input from localStorage; prev: cleared on reload
+            const cachedSearch = localStorage.getItem('billing_search_cache');
+            if (cachedSearch) {
+                const bsi = document.getElementById('billingSearchInput');
+                if (bsi) {
+                    bsi.value = cachedSearch;
+                    const clrBtn = document.getElementById('billingSearchClearBtn');
+                    if (clrBtn) clrBtn.style.display = 'inline-block';
+                }
+            }
+
             // Build dynamic inline term ranges
             buildLoanTermOptions();
             
@@ -10936,23 +11790,32 @@
 
         // (2026-07-13) Remove duplicate pos/onq toggles; prev: shadowed prefixed ones
 
-        // (2026-09-27) Format dates as MM/DD/YYYY; prev: "Month Day, Year"
+        // (2026-07-13) Format all dates to MM/DD/YYYY (01/01/2026); prev: Month Day, Year
         function formatLoanDate(dateStr) {
-            if (!dateStr || dateStr === 'N/A') return 'N/A';
+            if (!dateStr || dateStr === 'N/A' || dateStr === '-') return '-';
             
             try {
-                // Try parsing various date formats
                 let date;
-                if (dateStr.includes('/')) {
-                    const parts = dateStr.split('/');
+                if (typeof dateStr === 'string' && dateStr.includes('/')) {
+                    const parts = dateStr.trim().split('/');
                     if (parts.length === 3) {
-                        // Handle MM/DD/YYYY or DD/MM/YYYY
-                        const month = parseInt(parts[0]) - 1;
-                        const day = parseInt(parts[1]);
-                        const year = parseInt(parts[2]);
+                        const month = parseInt(parts[0], 10) - 1;
+                        const day = parseInt(parts[1], 10);
+                        const year = parseInt(parts[2], 10);
                         date = new Date(year, month, day);
                     }
-                } else if (dateStr.includes('-')) {
+                } else if (typeof dateStr === 'string' && dateStr.includes('-')) {
+                    const parts = dateStr.trim().split('-');
+                    if (parts.length === 3) {
+                        if (parts[0].length === 4) {
+                            date = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+                        } else {
+                            date = new Date(parseInt(parts[2], 10), parseInt(parts[0], 10) - 1, parseInt(parts[1], 10));
+                        }
+                    } else {
+                        date = new Date(dateStr);
+                    }
+                } else {
                     date = new Date(dateStr);
                 }
                 
@@ -10969,158 +11832,8 @@
             return dateStr;
         }
 
-        // Sort billing table by column
-        function sortBillingTable(column) {
-            if (!window.currentBranchRowsToRender) return;
-            
-            // Get or initialize sort state
-            window.billingTableSortState = window.billingTableSortState || { column: null, direction: 'asc' };
-            
-            // Toggle direction if clicking same column, otherwise reset to ascending
-            if (window.billingTableSortState.column === column) {
-                window.billingTableSortState.direction = window.billingTableSortState.direction === 'asc' ? 'desc' : 'asc';
-            } else {
-                window.billingTableSortState.column = column;
-                window.billingTableSortState.direction = 'asc';
-            }
-            
-            const direction = window.billingTableSortState.direction;
-            const sortMultiplier = direction === 'asc' ? 1 : -1;
-            
-            // Sort the data
-            window.currentBranchRowsToRender.sort((a, b) => {
-                let valA, valB;
-                
-                switch(column) {
-                    case 'name':
-                        valA = (a.clientName || '').toLowerCase();
-                        valB = (b.clientName || '').toLowerCase();
-                        return valA.localeCompare(valB) * sortMultiplier;
-                    
-                    case 'amort':
-                        valA = a.monthlyAmort || 0;
-                        valB = b.monthlyAmort || 0;
-                        return (valA - valB) * sortMultiplier;
-                    
-                    case 'netpay':
-                        valA = a.netPayVal || 0;
-                        valB = b.netPayVal || 0;
-                        return (valA - valB) * sortMultiplier;
-
-                    case 'positive':
-                        valA = a.csbPositive || 0;
-                        valB = b.csbPositive || 0;
-                        return (valA - valB) * sortMultiplier;
-
-                    case 'diff':
-                        valA = (a.csbPositive || 0) - (a.monthlyAmort || 0);
-                        valB = (b.csbPositive || 0) - (b.monthlyAmort || 0);
-                        return (valA - valB) * sortMultiplier;
-
-                    case 'onqueue':
-                        valA = a.firstOnqAmt || 0;
-                        valB = b.firstOnqAmt || 0;
-                        return (valA - valB) * sortMultiplier;
-
-                    case 'netTotal':
-                        valA = (a.netPayVal || 0) + (a.csbPositive || 0) - (a.firstOnqAmt || 0);
-                        valB = (b.netPayVal || 0) + (b.csbPositive || 0) - (b.firstOnqAmt || 0);
-                        return (valA - valB) * sortMultiplier;
-
-                    case 'status':
-                        // (2026-09-27) Status priority: EFFECTED > EFF/OVERDED > FIRST CSB ONQ > NO BILLING
-                        const statusOrder = { 'EFFECTED': 1, 'OVERDEDUCTED': 2, 'FIRST CSB ONQUEUE': 3, 'NO BILLING': 4, 'NO DEDUCTION': 4 };
-                        valA = statusOrder[a.statusMode] || 999;
-                        valB = statusOrder[b.statusMode] || 999;
-                        return (valA - valB) * sortMultiplier;
-
-                    case 'date':
-                        // Parse dates for proper sorting
-                        valA = new Date(a.transDate || '1900-01-01').getTime();
-                        valB = new Date(b.transDate || '1900-01-01').getTime();
-                        return (valA - valB) * sortMultiplier;
-
-                    default:
-                        return 0;
-                }
-            });
-
-            // Save sort state to localStorage for persistence
-            try {
-                localStorage.setItem('billing_sort_state', JSON.stringify(window.billingTableSortState));
-            } catch (e) {
-                console.error('Failed to save sort state:', e);
-            }
-
-            // Re-render the table
-            const tbody = document.getElementById('firstBillingTbody');
-            if (tbody) {
-                tbody.innerHTML = window.currentBranchRowsToRender.map((r, idx) => generateBranchRowHtml(r, idx)).join('');
-            }
-
-            // Update header icons
-            updateSortIcons();
-        }
-
-        // Update sort direction icons in table headers
-        function updateSortIcons() {
-            if (!window.billingTableSortState) return;
-
-            const headers = document.querySelectorAll('.bank-table thead th');
-            headers.forEach(th => {
-                const icon = th.querySelector('i.bi');
-                if (icon) {
-                    icon.className = 'bi bi-arrow-down-up';
-                    icon.style.opacity = '0.5';
-                }
-            });
-
-            // (2026-07-13) Reorder sort columnMap for Difference; prev: diff before onq
-            const columnMap = {
-                'name': 1,
-                'amort': 2,
-                'netpay': 3,
-                'positive': 4,
-                'onqueue': 5,
-                'netTotal': 6,
-                'status': 7,
-                'diff': 8,
-                'date': 9
-            };
-            
-            const colIndex = columnMap[window.billingTableSortState.column];
-            if (colIndex !== undefined) {
-                const activeHeader = headers[colIndex];
-                if (activeHeader) {
-                    const icon = activeHeader.querySelector('i.bi');
-                    if (icon) {
-                        icon.className = window.billingTableSortState.direction === 'asc' ? 'bi bi-arrow-up' : 'bi bi-arrow-down';
-                        icon.style.opacity = '1';
-                    }
-                }
-            }
-        }
-
-        // Restore sort state from localStorage on page load
-        function restoreSortState() {
-            try {
-                const saved = localStorage.getItem('billing_sort_state');
-                if (saved) {
-                    window.billingTableSortState = JSON.parse(saved);
-                    if (window.billingTableSortState.column) {
-                        sortBillingTable(window.billingTableSortState.column);
-                        // Restore the direction by toggling if needed
-                        if (window.billingTableSortState.direction === 'desc') {
-                            const currentDir = window.billingTableSortState.direction;
-                            window.billingTableSortState.direction = 'asc';
-                            sortBillingTable(window.billingTableSortState.column);
-                        }
-                    }
-                }
-            } catch (e) {
-                console.error('Failed to restore sort state:', e);
-            }
-        }
+        // (2026-07-13) Delegate legacy sort call to canonical; prev: duplicate definition
+        function sortBillingTableLegacy(column) { if (typeof sortBillingTable === 'function') sortBillingTable(column); }
     </script>
     <!-- Error card styling helper for dynamic insertion -->
     <script>
@@ -11128,19 +11841,19 @@
             container.innerHTML = `<div class='p-3 my-2 text-danger rounded' style='background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); font-size: 0.85rem;'><i class='bi bi-exclamation-circle-fill mr-2'></i><span>${message}</span></div>`;
         }
     </script>
-    <!-- [2026-07-11 New: Custom global modal dialog for alerts and confirmations replacing native browser popups] -->
+    <!-- (2026-07-13) Scale up modal icons and buttons; prev: 20px icon & 0.7rem -->
     <div id="customBankModal" class="custom-bank-modal-overlay">
         <div class="custom-bank-modal-content">
             <div class="custom-bank-modal-header">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2" id="customBankModalIcon"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <span id="customBankModalTitle" style="font-weight: 700; font-family: 'Montserrat', sans-serif; letter-spacing: 0.05em; text-transform: uppercase;">Notification</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="mr-2" id="customBankModalIcon"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span id="customBankModalTitle" style="font-weight: 800; font-family: 'Montserrat', sans-serif; letter-spacing: 0.05em; text-transform: uppercase; font-size: 1.18rem;">Notification</span>
             </div>
             <div class="custom-bank-modal-body" id="customBankModalBody">
                 Message goes here.
             </div>
             <div class="custom-bank-modal-footer">
-                <button type="button" class="btn bank-btn-secondary btn-sm" id="btnCustomModalCancel" style="min-height: 32px !important; font-size: 0.7rem; padding: 4px 12px; margin-top: 0 !important;">Cancel</button>
-                <button type="button" class="btn bank-btn-primary btn-sm" id="btnCustomModalConfirm" style="min-height: 32px !important; font-size: 0.7rem; padding: 4px 12px; margin-top: 0 !important;">OK</button>
+                <button type="button" class="btn bank-btn-secondary" id="btnCustomModalCancel" style="min-height: 42px !important; font-size: 0.92rem !important; font-weight: 700 !important; padding: 8px 24px !important; border-radius: 8px !important; margin-top: 0 !important;">Cancel</button>
+                <button type="button" class="btn bank-btn-primary" id="btnCustomModalConfirm" style="min-height: 42px !important; font-size: 0.92rem !important; font-weight: 700 !important; padding: 8px 24px !important; border-radius: 8px !important; margin-top: 0 !important;">OK</button>
             </div>
         </div>
     </div>
