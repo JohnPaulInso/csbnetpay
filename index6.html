@@ -4407,10 +4407,10 @@
 
         async function loadLcsDatabase() {
             try {
-                // (2026-07-13) Clear cached check states on load; prev: restored stale
+                // (2026-07-13) Clear PLI checks on load too; prev: pos/onq only
                 try {
                     Object.keys(localStorage).forEach(k => {
-                        if (k.startsWith('pos_checks_') || k.startsWith('onq_checks_')) localStorage.removeItem(k);
+                        if (k.startsWith('pos_checks_') || k.startsWith('onq_checks_') || k.startsWith('pli_checks_')) localStorage.removeItem(k);
                     });
                 } catch(e) {}
                 const targetLcsFile = await findLatestLcsFile();
@@ -4928,18 +4928,18 @@
             // (2026-07-13) Use isDedModeAll helper; prev: direct string check
             const _isAll = typeof isDedModeAll === 'function' ? isDedModeAll() : (window.dedSelectionMode === 'all');
             
-            // (2026-07-13) Only include loans matching current month; prev: all loans fallback
+            // (2026-07-13) Set default ONQ to 0 unless isAll; prev: onqObj.amt
             const effectivePos = (posObj.loans || []).reduce((s, l) => s + ((_isAll || _matchEff(l.eff)) ? (l.dedamt || 0) : 0), 0);
-            const effectiveOnq = (onqObj.loans || []).reduce((s, l) => s + ((_isAll || _matchEff(l.eff)) ? (l.dedamt || 0) : 0), 0);
+            const effectiveOnq = _isAll ? (onqObj.amt || 0) : 0;
             const csbPositive = effectivePos;
             const firstOnqAmt = effectiveOnq;
-            const pliAmt = pliObj.amt || 0;
+            const pliAmt = 0;
 
-            // DEBUG: Log when effectivePos is 0 but csbPositive > 0 (likely a month filter issue)
+            // (2026-07-13) Remove undefined posHasCurrentMonth; prev: caused crash
             if (effectivePos === 0 && posObj.loans && posObj.loans.length > 0) {
                 console.warn('[STATUS DEBUG] effectivePos=0 but has POS loans:', {
                     empNum: empNumStr, name: clientName,
-                    _curMonStr, _isAll, posHasCurrentMonth,
+                    _curMonStr, _isAll,
                     posLoansEff: posObj.loans.map(l => l.eff),
                     csbPositive: posObj.amt
                 });
@@ -4970,10 +4970,11 @@
             let statusMode = 'NO BILLING';
             let mismatchReasons = [];
 
-            // (2026-09-28) Calculate net total for AS EASE check
-            // FORMULA: NetPay + POS - ONQ (POS is added because it's part of income, ONQ is subtracted)
-            // AS EASE triggers when net total is below ₱5,000
+            // (2026-07-13) Detect ONQ status by onq records; prev: effectiveOnq > 0 only
+            const hasOnq = (onqObj.loans && onqObj.loans.length > 0) || effectiveOnq > 0;
+            const onqAmtForStatus = effectiveOnq > 0 ? effectiveOnq : (onqObj.amt || 0);
             const netTotal = netPayVal + effectivePos - effectiveOnq;
+            const netTotalForStatus = netPayVal + effectivePos - onqAmtForStatus;
 
             if (effectivePos === 0) {
                 statusMode = 'NO BILLING';
@@ -4983,28 +4984,14 @@
             } else if (effectivePos < (monthlyAmort - 1.0)) {
                 // (2026-09-28) Check UNDERDEDUCTED; prev: checked ONQ first
                 statusMode = 'UNDERDEDUCTED';
-            } else if (effectiveOnq > 0) {
-                // (2026-09-28) Only check ONQ if POS matches amort; prev: checked ONQ before OVER/UNDER
-                // Debug logging for AS EASE detection
-                console.log('[ONQ ACCOUNT CHECK - DETAILED]', {
-                    empNum: empNumStr,
-                    name: clientName,
-                    netPayVal: netPayVal,
-                    effectivePos: effectivePos,
-                    effectiveOnq: effectiveOnq,
-                    netTotal: netTotal,
-                    formula: `${netPayVal} + ${effectivePos} - ${effectiveOnq} = ${netTotal}`,
-                    threshold: 5000,
-                    isAsEase: netTotal < 5000,
-                    willBe: netTotal < 5000 ? 'AS EASE / FIRST CSB ONQ' : 'FIRST CSB ONQUEUE'
-                });
-                
-                if (netTotal < 5000) {
+            } else if (hasOnq) {
+                // (2026-07-13) Check AS EASE using ONQ amt; prev: effectiveOnq only
+                if (netTotalForStatus < 5000) {
                     statusMode = 'AS EASE / FIRST CSB ONQ';
-                    console.log('[AS EASE DETECTED] ✅', empNumStr, clientName, 'netTotal:', netTotal);
+                    console.log('[AS EASE DETECTED] ✅', empNumStr, clientName, 'netTotal:', netTotalForStatus);
                 } else {
                     statusMode = 'FIRST CSB ONQUEUE';
-                    console.log('[FIRST CSB ONQ]', empNumStr, clientName, 'netTotal:', netTotal);
+                    console.log('[FIRST CSB ONQ]', empNumStr, clientName, 'netTotal:', netTotalForStatus);
                 }
             } else {
                 statusMode = 'EFFECTED';
@@ -5040,7 +5027,8 @@
                 csbPositive,
                 // (2026-07-13) Checked count matches current month; prev: all loans fallback
                 checkedPosCount: (posObj.loans || []).filter(l => _isAll || _matchEff(l.eff)).length,
-                checkedOnqCount: (onqObj.loans || []).filter(l => _isAll || _matchEff(l.eff)).length,
+                checkedOnqCount: (onqObj.loans || []).length,
+                checkedPliCount: 0,
                 transDate,
                 maturityDate,
                 division,
@@ -5156,8 +5144,8 @@
                                     <th style="width: 7.8%; text-align: left; cursor: pointer; user-select: none; font-size: 0.54rem;" onclick="sortBillingTable('netTotal')" title="Click to sort">
                                         Net Total <i class="bi bi-arrow-down-up" style="font-size: 0.48rem; opacity: 0.5;"></i>
                                     </th>
-                                    <!-- (2026-07-13) Set status col width 6.6%; prev: width: 8.4% -->
-                                    <th style="width: 6.6%; text-align: left; cursor: pointer; user-select: none; font-size: 0.54rem; padding-right: 4px !important;" onclick="sortBillingTable('status')" title="Click to cycle status sort (Effected, Overded, Underded, As Ease, OnQ, No Billing)">
+                                    <!-- (2026-07-13) Adjust status col width to 7.2%; prev: width: 6.6% -->
+                                    <th style="width: 7.2%; text-align: left; cursor: pointer; user-select: none; font-size: 0.54rem; padding-right: 4px !important;" onclick="sortBillingTable('status')" title="Click to cycle status sort (Effected, Overded, Underded, As Ease, OnQ, No Billing)">
                                         <div style="display: flex; align-items: center; gap: 3px; flex-wrap: nowrap;">
                                             <span id="statusHeaderTitle-${type}" style="white-space: normal; line-height: 1.15; overflow: hidden; max-width: 100%;">Status</span>
                                             <i class="bi bi-arrow-down-up" style="font-size: 0.48rem; opacity: 0.5; flex-shrink: 0;"></i>
@@ -5682,11 +5670,11 @@
                             ${r.onqLoans && r.onqLoans.length > 0 ? `<button type="button" onclick="toggleOnqDetails('${rowKey}', '${prefix}')" style="background: none; border: none; color: #10b981; cursor: pointer; padding: 0 1px; font-size: 0.58rem; margin-left: 1px; line-height: 1; vertical-align: middle;"><i id="onq-chevron-${prefix}-${rowKey}" class="bi bi-chevron-down"></i></button>` : ''}
                         </div>
                     </td>
-                    <!-- (2026-07-13) Add PLI column on right side of onqueue; prev: no PLI col -->
+                    <!-- (2026-07-13) PLI unchecked by default; prev: hardcoded checked -->
                     <td data-label="PLI" style="text-align: left; font-size: 0.64rem !important; white-space: nowrap;" class="tabular-nums font-weight-bold">
                         <div style="display: inline-flex; align-items: center; justify-content: flex-start; gap: 1px; white-space: nowrap;">
-                            <input type="checkbox" id="del-pli-${prefix}-${rowKey}" class="checkbox-pli" checked onchange="updateFirstBillingRowStatus('${rowKey}', '${prefix}')" style="cursor: pointer; transform: scale(0.82); margin-right: 2px; flex-shrink: 0;" title="Include/Exclude PLI from Net Total">
-                            <span id="pli-val-${prefix}-${rowKey}" style="color: #ec4899; font-size: 0.64rem !important;">${formatPHP(r.pliAmt || 0)}</span>
+                            <input type="checkbox" id="del-pli-${prefix}-${rowKey}" class="checkbox-pli" onchange="updateFirstBillingRowStatus('${rowKey}', '${prefix}')" style="cursor: pointer; transform: scale(0.82); margin-right: 2px; flex-shrink: 0;" title="Include/Exclude PLI from Net Total">
+                            <span id="pli-val-${prefix}-${rowKey}" style="color: #ec4899; font-size: 0.64rem !important;">${formatPHP(0)}</span>
                             ${r.pliLoans && r.pliLoans.length > 0 ? `<button type="button" onclick="togglePliDetails('${rowKey}', '${prefix}')" style="background: none; border: none; color: #ec4899; cursor: pointer; padding: 0 1px; font-size: 0.58rem; margin-left: 1px; line-height: 1; vertical-align: middle;"><i id="pli-chevron-${prefix}-${rowKey}" class="bi bi-chevron-down"></i></button>` : ''}
                         </div>
                     </td>
@@ -5695,19 +5683,19 @@
                     </td>
                     <td data-label="Status" id="status-td-${prefix}-${rowKey}" style="text-align: center; vertical-align: middle; overflow: hidden; padding: 2px 1px !important;">
                         <!-- (2026-07-13) Support EFF / UNDERDED badge; prev: only 4 statuses -->
-                        <!-- (2026-07-13) Set unified 62px chip size; prev: width: auto -->
+                        <!-- (2026-07-13) Increase status chip font size; prev: 0.42rem -->
                         ${statusMode === 'NO BILLING' || statusMode === 'NO DEDUCTION' ? `
-                            <span class="badge font-weight-bold" style="width: 62px; height: 16px; background: rgba(220,53,69,0.22); color: #dc3545; border: 1px solid #dc3545; border-radius: 4px; font-size: 0.42rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 2px; white-space: nowrap; letter-spacing: 0.01em; box-sizing: border-box;">NO BILLING</span>
+                            <span class="badge font-weight-bold" style="width: 72px; height: 19px; background: rgba(220,53,69,0.22); color: #dc3545; border: 1px solid #dc3545; border-radius: 4px; font-size: 0.54rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 2px; white-space: nowrap; letter-spacing: 0.01em; box-sizing: border-box;">NO BILLING</span>
                         ` : (statusMode === 'AS EASE / FIRST CSB ONQ' ? `
-                            <span class="badge font-weight-bold" style="width: 62px; height: 16px; background: rgba(139,92,246,0.22); color: #8b5cf6; border: 1px solid #8b5cf6; border-radius: 4px; font-size: 0.42rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 2px; white-space: nowrap; letter-spacing: 0.01em; box-sizing: border-box;">AS EASE/ONQ</span>
+                            <span class="badge font-weight-bold" style="width: 72px; height: 19px; background: rgba(139,92,246,0.22); color: #8b5cf6; border: 1px solid #8b5cf6; border-radius: 4px; font-size: 0.54rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 2px; white-space: nowrap; letter-spacing: 0.01em; box-sizing: border-box;">AS EASE/ONQ</span>
                         ` : (statusMode === 'FIRST CSB ONQUEUE' ? `
-                            <span class="badge font-weight-bold" style="width: 62px; height: 16px; background: rgba(13,110,253,0.22); color: #3b82f6; border: 1px solid #3b82f6; border-radius: 4px; font-size: 0.42rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 2px; white-space: nowrap; letter-spacing: 0.01em; box-sizing: border-box;">1ST CSB ONQ</span>
+                            <span class="badge font-weight-bold" style="width: 72px; height: 19px; background: rgba(13,110,253,0.22); color: #3b82f6; border: 1px solid #3b82f6; border-radius: 4px; font-size: 0.54rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 2px; white-space: nowrap; letter-spacing: 0.01em; box-sizing: border-box;">1ST CSB ONQ</span>
                         ` : (statusMode === 'OVERDEDUCTED' ? `
-                            <span class="badge font-weight-bold" style="width: 62px; height: 16px; background: rgba(245,158,11,0.22); color: #f59e0b; border: 1px solid #f59e0b; border-radius: 4px; font-size: 0.42rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 2px; white-space: nowrap; letter-spacing: 0.01em; box-sizing: border-box;">EFF/OVERDED</span>
+                            <span class="badge font-weight-bold" style="width: 72px; height: 19px; background: rgba(245,158,11,0.22); color: #f59e0b; border: 1px solid #f59e0b; border-radius: 4px; font-size: 0.54rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 2px; white-space: nowrap; letter-spacing: 0.01em; box-sizing: border-box;">EFF/OVERDED</span>
                         ` : (statusMode === 'UNDERDEDUCTED' ? `
-                            <span class="badge font-weight-bold" style="width: 62px; height: 16px; background: rgba(234,179,8,0.22); color: #facc15; border: 1px solid #facc15; border-radius: 4px; font-size: 0.42rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 2px; white-space: nowrap; letter-spacing: 0.01em; box-sizing: border-box;">EFF/UNDERDED</span>
+                            <span class="badge font-weight-bold" style="width: 72px; height: 19px; background: rgba(234,179,8,0.22); color: #facc15; border: 1px solid #facc15; border-radius: 4px; font-size: 0.54rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 2px; white-space: nowrap; letter-spacing: 0.01em; box-sizing: border-box;">EFF/UNDERDED</span>
                         ` : `
-                            <span class="badge font-weight-bold" style="width: 62px; height: 16px; background: rgba(40,167,69,0.22); color: #28a745; border: 1px solid #28a745; border-radius: 4px; font-size: 0.42rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 2px; white-space: nowrap; letter-spacing: 0.01em; box-sizing: border-box;">EFFECTED</span>
+                            <span class="badge font-weight-bold" style="width: 72px; height: 19px; background: rgba(40,167,69,0.22); color: #28a745; border: 1px solid #28a745; border-radius: 4px; font-size: 0.54rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 2px; white-space: nowrap; letter-spacing: 0.01em; box-sizing: border-box;">EFFECTED</span>
                         `))))}
                     </td>
                     <td data-label="Difference" id="diff-td-${prefix}-${rowKey}" style="text-align: left; font-size: 0.64rem !important; white-space: nowrap; overflow: visible;" class="tabular-nums font-weight-bold">
@@ -5840,8 +5828,8 @@
                         <span style="color: ${diff > 1.0 ? '#f59e0b' : (diff < -1.0 ? '#facc15' : 'rgba(255,255,255,0.3)')};">${diff > 1.0 ? '+' : ''}${Math.abs(diff) > 0.5 ? formatPHP(diff) : '-'}</span>
                     </td>
                     <td style="text-align: center; vertical-align: middle; padding: 2px 1px !important;">
-                        <!-- (2026-07-13) Unified 62px sub-row badge; prev: width: 100% -->
-                        <span class="badge font-weight-bold" style="width: 62px; height: 16px; background: ${subBg}; color: ${subClr}; border: 1px solid ${subClr}; border-radius: 4px; font-size: 0.42rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 2px; white-space: nowrap; letter-spacing: 0.01em; box-sizing: border-box;">${subStatus}</span>
+                        <!-- (2026-07-13) Increase sub-row badge font size; prev: 0.42rem -->
+                        <span class="badge font-weight-bold" style="width: 72px; height: 19px; background: ${subBg}; color: ${subClr}; border: 1px solid ${subClr}; border-radius: 4px; font-size: 0.54rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 2px; white-space: nowrap; letter-spacing: 0.01em; box-sizing: border-box;">${subStatus}</span>
                     </td>
                     <td style="text-align: left; font-size: 0.62rem !important;"><span style="color: rgba(255,255,255,0.2);">-</span></td>
                     <td style="text-align: left; font-size: 0.62rem !important; white-space: nowrap; color: rgba(255,255,255,0.45);">${loan.eff || 'N/A'}</td>
@@ -5858,8 +5846,8 @@
                     </td>
                 </tr>`;}).join('') : ''}
             ${r.onqLoans && r.onqLoans.length > 0 ? r.onqLoans.map((loan, oIdx) => {
-                // (2026-07-13) Default check ONQ current month only; prev: fallback to all
-                const defaultChecked = window.dedSelectionMode === 'all' ? true : isCurrentBillingMonthEff(loan.eff);
+                // (2026-07-13) Uncheck ONQ loans by default; prev: default true
+                const defaultChecked = isDedModeAll(prefix) ? true : false;
                 
                 // Load from localStorage if exists
                 const storageKey = `onq_checks_${prefix}-${rowKey}`;
@@ -5909,9 +5897,8 @@
                 </tr>`;
             }).join('') : ''}
             ${r.pliLoans && r.pliLoans.length > 0 ? r.pliLoans.map((loan, pIdx) => {
-                // (2026-07-13) Add PLI sub-rows below ONQ with pink tint; prev: none
-                const anyMatchCurrent = r.pliLoans.some(l => isCurrentBillingMonthEff(l.eff));
-                const defaultChecked = window.dedSelectionMode === 'all' ? true : (anyMatchCurrent ? isCurrentBillingMonthEff(loan.eff) : true);
+                // (2026-07-13) PLI loans unchecked by default; prev: checked
+                const defaultChecked = isDedModeAll(prefix) ? true : false;
                 const storageKey = `pli_checks_${prefix}-${rowKey}`;
                 const savedChecks = (()=>{ try{ return JSON.parse(localStorage.getItem(storageKey) || '{}'); }catch(e){ return {}; } })();
                 const isChecked = savedChecks[pIdx] !== undefined ? savedChecks[pIdx] : defaultChecked;
@@ -6124,7 +6111,7 @@
                 if (rd.pliLoans && rd.pliLoans.length > 0) {
                     rd.pliLoans.forEach((loan, idx) => {
                         const cb = document.getElementById(`pli-loan-check-${prefix}-${rowKey}-${idx}`);
-                        if (cb) cb.checked = isAll ? true : isCurrentBillingMonthEff(loan.eff);
+                        if (cb) cb.checked = isAll ? true : false;
                     });
                     updatePliLoanSelection(rowKey, prefix);
                 }
@@ -6200,7 +6187,8 @@
                     checkStates[idx] = cb.checked;
                     if (cb.checked) { sum += loan.dedamt || 0; checkedCount++; }
                 } else {
-                    const active = isAll || isCurrentBillingMonthEff(loan.eff);
+                    // (2026-07-13) Set active false unless isAll; prev: isCurrentBillingMonthEff
+                    const active = isAll ? true : false;
                     if (active) { sum += loan.dedamt || 0; checkedCount++; }
                 }
             });
@@ -6252,7 +6240,7 @@
                     checkStates[idx] = cb.checked;
                     if (cb.checked) { sum += loan.dedamt || 0; checkedCount++; }
                 } else {
-                    const active = isAll || isCurrentBillingMonthEff(loan.eff);
+                    const active = isAll;
                     if (active) { sum += loan.dedamt || 0; checkedCount++; }
                 }
             });
@@ -6297,7 +6285,9 @@
         // These match the exact status values calculated in buildBillingRowData() function
         // Clicking the STATUS column header cycles through these filters in order
         // ==================================================================================
+        // (2026-07-13) Include ALL in status cycle to reset filter; prev: 6 statuses
         const STATUS_SORT_CYCLE = [
+            { key: 'ALL', label: 'ALL' },
             { key: 'EFFECTED', label: 'EFFECTED' },
             { key: 'OVERDEDUCTED', label: 'OVERDED' },
             { key: 'UNDERDEDUCTED', label: 'UNDERDED' },
@@ -6318,7 +6308,7 @@
                 ['norm', 'auto'].forEach(t => {
                     const el = document.getElementById('statusHeaderTitle-' + t);
                     // (2026-07-13) Line break status header; prev: single line text
-                    if (el) el.innerHTML = 'STATUS:<br>' + targetOption.label;
+                    if (el) el.innerHTML = targetOption.key === 'ALL' ? 'STATUS:<br>ALL' : 'STATUS:<br>' + targetOption.label;
                 });
             } else {
                 currentStatusSortIdx = -1;
@@ -6456,7 +6446,15 @@
             const clearBtn = document.getElementById('billingSearchClearBtn');
             if (clearBtn) clearBtn.style.display = searchVal ? 'inline-block' : 'none';
 
-            const selectedMonth = window.selectedLoanReleaseMonth || 'all';
+            // (2026-07-13) Bypass release month when status filter active; prev: restricted
+            const isStatusFilterActive = currentBillingSort.col === 'status' && currentBillingSort.statusKey && currentBillingSort.statusKey !== 'ALL';
+            const selectedMonth = isStatusFilterActive ? 'all' : (window.selectedLoanReleaseMonth || 'all');
+            if (isStatusFilterActive) {
+                const normSelect = document.getElementById('loanReleaseMonthFilter-norm');
+                if (normSelect && normSelect.value !== 'all') normSelect.value = 'all';
+                const autoSelect = document.getElementById('loanReleaseMonthFilter-auto');
+                if (autoSelect && autoSelect.value !== 'all') autoSelect.value = 'all';
+            }
 
             let filteredNorm = window.currentBranchAllRowsNormal || [];
             let filteredAuto = window.currentBranchAllRowsAuto || [];
@@ -6464,6 +6462,17 @@
             if (selectedMonth && selectedMonth !== 'all') {
                 filteredNorm = filteredNorm.filter(r => getLoanDateMonthKey(r.transDate) === selectedMonth);
                 filteredAuto = filteredAuto.filter(r => getLoanDateMonthKey(r.transDate) === selectedMonth);
+            }
+            // (2026-07-13) Filter rows strictly by statusKey; prev: sorted only
+            if (isStatusFilterActive) {
+                const targetKey = currentBillingSort.statusKey;
+                const matchesStatus = r => {
+                    const s = String(r.statusMode || '').trim().toUpperCase();
+                    if (targetKey === 'NO BILLING') return s === 'NO BILLING' || s === 'NO DEDUCTION';
+                    return s === targetKey;
+                };
+                filteredNorm = filteredNorm.filter(matchesStatus);
+                filteredAuto = filteredAuto.filter(matchesStatus);
             }
             if (searchVal) {
                 // (2026-07-13) Match exact decimals, dates, status, div, sta; prev: name/id only
@@ -6529,7 +6538,9 @@
             window.currentBranchRowsAuto = filteredAuto;
             window.currentBranchRowsToRender = filteredNorm;
 
-            updateDashboardMetrics([...filteredNorm, ...filteredAuto]);
+            // (2026-07-13) Keep metrics on full branch rows; prev: filtered array
+            const allBranchRows = (window.currentBranchAllRowsNormal || []).concat(window.currentBranchAllRowsAuto || []);
+            updateDashboardMetrics(allBranchRows);
 
             // (2026-09-28) Use tbody-norm/tbody-auto IDs for infinite scroll; prev: firstBillingTbody/autonomousBillingTbody
             const tbodyNorm = document.getElementById('tbody-norm');
@@ -6631,9 +6642,11 @@
             } else if (effPos < ((rowData.monthlyAmort || 0) - 1.0)) {
                 // (2026-09-28) Check UNDERDEDUCTED; prev: checked ONQ first
                 newStatus = 'UNDERDEDUCTED';
-            } else if (effOnq > 0) {
-                // (2026-09-28) Only check ONQ if POS matches amort; prev: checked ONQ before OVER/UNDER
-                if (formulaVal < 5000) {
+            } else if ((rowData.onqLoans && rowData.onqLoans.length > 0) || effOnq > 0) {
+                // (2026-07-13) Check AS EASE using ONQ loans & net total; prev: effOnq > 0 only
+                const onqAmtForStatus = effOnq > 0 ? effOnq : (rowData.onqLoans ? rowData.onqLoans.reduce((s, l) => s + (l.dedamt || 0), 0) : 0);
+                const netTotalWithOnq = netPayAmt + effPos - onqAmtForStatus;
+                if (netTotalWithOnq < 5000) {
                     newStatus = 'AS EASE / FIRST CSB ONQ';
                 } else {
                     newStatus = 'FIRST CSB ONQUEUE';
@@ -6652,8 +6665,8 @@
 
             const statusTd = document.getElementById(`status-td-${prefix}-${rowKey}`) || document.getElementById(`status-td-${rowKey}`);
             if (statusTd) {
-                // (2026-07-13) Unified 62px chip style for dynamic badge; prev: width: auto
-                const BS = 'width: 62px; height: 16px; border-radius: 4px; font-size: 0.42rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 2px; white-space: nowrap; letter-spacing: 0.01em; box-sizing: border-box;';
+                // (2026-07-13) Increase dynamic status chip font size; prev: 0.42rem
+                const BS = 'width: 72px; height: 19px; border-radius: 4px; font-size: 0.54rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 2px; white-space: nowrap; letter-spacing: 0.01em; box-sizing: border-box;';
                 if (newStatus === 'AS EASE / FIRST CSB ONQ') {
                     statusTd.innerHTML = `<span class="badge font-weight-bold" style="${BS} background: rgba(139,92,246,0.22); color: #8b5cf6; border: 1px solid #8b5cf6;">AS EASE/ONQ</span>`;
                 } else if (newStatus === 'FIRST CSB ONQUEUE') {
