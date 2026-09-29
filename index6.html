@@ -730,16 +730,16 @@
         .billing-responsive-table button {
             font-family: 'Poppins', sans-serif !important;
         }
-        /* (2026-07-13) Larger rows, smaller headers, tight h-padding; prev: 0.58rem all */
+        /* (2026-07-13) Adjusted table font sizes and spacing; prev: 0.72rem td */
         .billing-responsive-table th {
-            font-size: 0.50rem !important;
+            font-size: 0.54rem !important;
             font-weight: 700 !important;
-            letter-spacing: 0.03em;
-            padding: 4px 2px !important;
+            letter-spacing: 0.02em;
+            padding: 5px 3px !important;
         }
         .billing-responsive-table td {
-            font-size: 0.72rem !important;
-            padding: 3px 2px !important;
+            font-size: 0.64rem !important;
+            padding: 3px 3px !important;
         }
         .billing-responsive-table .csb-deductions-compact-container,
         .billing-responsive-table .onq-deductions-compact-container {
@@ -3678,6 +3678,11 @@
                                 <span style="color: #facc15; font-weight: 700; margin-right: 6px;">UNDERDEDUCTED:</span>
                                 <span id="dashCountUnderded" style="color: #fff; font-weight: 800; font-family: 'Montserrat', sans-serif;">0</span>
                             </div>
+                            <!-- (2026-09-29) Add separate AS EASE count badge; prev: combined with FIRST CSB ONQ -->
+                            <div class="d-flex align-items-center px-2 py-1" onclick="sortToStatusOption('AS EASE / FIRST CSB ONQ')" style="cursor: pointer; background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.3); border-radius: 6px; font-size: 0.72rem;" title="Click to sort by AS EASE / FIRST CSB ONQ">
+                                <span style="color: #8b5cf6; font-weight: 700; margin-right: 6px;">AS EASE:</span>
+                                <span id="dashCountAsEase" style="color: #fff; font-weight: 800; font-family: 'Montserrat', sans-serif;">0</span>
+                            </div>
                             <div class="d-flex align-items-center px-2 py-1" onclick="sortToStatusOption('FIRST CSB ONQUEUE')" style="cursor: pointer; background: rgba(13,110,253,0.12); border: 1px solid rgba(13,110,253,0.3); border-radius: 6px; font-size: 0.72rem;" title="Click to sort by FIRST CSB ONQUEUE">
                                 <span style="color: #3b82f6; font-weight: 700; margin-right: 6px;">FIRST CSB ONQ:</span>
                                 <span id="dashCountFirstCsbOnq" style="color: #fff; font-weight: 800; font-family: 'Montserrat', sans-serif;">0</span>
@@ -4402,6 +4407,12 @@
 
         async function loadLcsDatabase() {
             try {
+                // (2026-07-13) Clear cached check states on load; prev: restored stale
+                try {
+                    Object.keys(localStorage).forEach(k => {
+                        if (k.startsWith('pos_checks_') || k.startsWith('onq_checks_')) localStorage.removeItem(k);
+                    });
+                } catch(e) {}
                 const targetLcsFile = await findLatestLcsFile();
                 // (2026-07-13) Expose loaded LCS filename globally; prev: local variable
                 window.currentLcsFile = targetLcsFile;
@@ -4628,9 +4639,11 @@
             if (elOver) elOver.textContent = countOverded.toLocaleString();
             const elUnder = document.getElementById('dashCountUnderded');
             if (elUnder) elUnder.textContent = countUnderded.toLocaleString();
-            // (2026-09-28) Combine AS EASE and FIRST CSB ONQ counts; prev: separate
+            // (2026-09-29) Show AS EASE separately from FIRST CSB ONQ; prev: combined
+            const elAsEase = document.getElementById('dashCountAsEase');
+            if (elAsEase) elAsEase.textContent = countAsEase.toLocaleString();
             const elOnq = document.getElementById('dashCountFirstCsbOnq');
-            if (elOnq) elOnq.textContent = (countFirstCsbOnq + countAsEase).toLocaleString();
+            if (elOnq) elOnq.textContent = countFirstCsbOnq.toLocaleString();
             const elNoBill = document.getElementById('dashCountNoBilling');
             if (elNoBill) elNoBill.textContent = countNoBilling.toLocaleString();
             const elTotal = document.getElementById('dashCountTotal');
@@ -4855,8 +4868,8 @@
                    fullName2.includes(normAccountName);
         }
 
-        // (2026-07-13) Update buildBillingRowData with status formula and mismatch detection; prev: basic status
-        function buildBillingRowData(empNumStr, matchingAccount, netpayEmpMap, posEmpMap, onqEmpMap, normEmp, rowKey = empNumStr) {
+        // (2026-07-13) Ingest PLI loans in buildBillingRowData; prev: POS/ONQ only
+        function buildBillingRowData(empNumStr, matchingAccount, netpayEmpMap, posEmpMap, onqEmpMap, normEmp, rowKey = empNumStr, pliEmpMap = null) {
             const targetEmp = normEmp(empNumStr);
             const clientName = matchingAccount.accountName || 'N/A';
             const monthlyAmort = safeFloat(matchingAccount.amortization);
@@ -4877,12 +4890,16 @@
             // (2026-09-27) Filter POS and ONQ loans by name matching to prevent duplicates; prev: took all loans for empNum
             const posObjRaw = posEmpMap.get(targetEmp) || posEmpMap.get(empNumStr) || { amt: 0, loans: [] };
             const onqObjRaw = onqEmpMap.get(targetEmp) || onqEmpMap.get(empNumStr) || { amt: 0, isCSB: false, loans: [] };
+            const pliObjRaw = (pliEmpMap && (pliEmpMap.get(targetEmp) || pliEmpMap.get(empNumStr))) || { amt: 0, loans: [] };
             
             // Filter loans that match this specific account's name
             const posLoansFiltered = (posObjRaw.loans || []).filter(loan => 
                 doesNameMatch(clientName, loan.fname, loan.lname)
             );
             const onqLoansFiltered = (onqObjRaw.loans || []).filter(loan => 
+                doesNameMatch(clientName, loan.fname, loan.lname)
+            );
+            const pliLoansFiltered = (pliObjRaw.loans || []).filter(loan =>
                 doesNameMatch(clientName, loan.fname, loan.lname)
             );
             
@@ -4895,12 +4912,12 @@
                 isCSB: onqLoansFiltered.some(loan => loan.code === '0339' || loan.code === '339'),
                 loans: onqLoansFiltered
             };
+            const pliObj = {
+                amt: pliLoansFiltered.reduce((sum, loan) => sum + (loan.dedamt || 0), 0),
+                loans: pliLoansFiltered
+            };
             
             const isFirstRowCSB = onqObj.isCSB;
-            // (2026-07-13) Total of ALL pos/onq loans for display; prev: same
-            const csbPositive = posObj.amt || 0;
-            const firstOnqAmt = onqObj.amt || 0;
-
             // (2026-07-13) Filter effective amounts to current-month EFF only; prev: used totals
             const _curMonStr = (() => {
                 const raw = document.getElementById('activeMonthSelect')?.value || 'sep26';
@@ -4911,12 +4928,12 @@
             // (2026-07-13) Use isDedModeAll helper; prev: direct string check
             const _isAll = typeof isDedModeAll === 'function' ? isDedModeAll() : (window.dedSelectionMode === 'all');
             
-            // (2026-09-27) If "Current Month Only" but no loans match, show all loans instead of nothing; prev: strict filter
-            const posHasCurrentMonth = _isAll || (posObj.loans || []).some(l => _matchEff(l.eff));
-            const onqHasCurrentMonth = _isAll || (onqObj.loans || []).some(l => _matchEff(l.eff));
-            
-            const effectivePos = (posObj.loans || []).reduce((s, l) => s + ((posHasCurrentMonth ? (_isAll || _matchEff(l.eff)) : true) ? (l.dedamt || 0) : 0), 0);
-            const effectiveOnq = (onqObj.loans || []).reduce((s, l) => s + ((onqHasCurrentMonth ? (_isAll || _matchEff(l.eff)) : true) ? (l.dedamt || 0) : 0), 0);
+            // (2026-07-13) Only include loans matching current month; prev: all loans fallback
+            const effectivePos = (posObj.loans || []).reduce((s, l) => s + ((_isAll || _matchEff(l.eff)) ? (l.dedamt || 0) : 0), 0);
+            const effectiveOnq = (onqObj.loans || []).reduce((s, l) => s + ((_isAll || _matchEff(l.eff)) ? (l.dedamt || 0) : 0), 0);
+            const csbPositive = effectivePos;
+            const firstOnqAmt = effectiveOnq;
+            const pliAmt = pliObj.amt || 0;
 
             // DEBUG: Log when effectivePos is 0 but csbPositive > 0 (likely a month filter issue)
             if (effectivePos === 0 && posObj.loans && posObj.loans.length > 0) {
@@ -4954,10 +4971,9 @@
             let mismatchReasons = [];
 
             // (2026-09-28) Calculate net total for AS EASE check
-            // FORMULA: NetPay MINUS POS MINUS ONQ = actual take-home after all deductions
-            // (NOT netPayVal + effectivePos - effectiveOnq which gives wrong result)
-            // AS EASE triggers when take-home after all deductions is below ₱5,000
-            const netTotal = netPayVal - effectivePos - effectiveOnq;
+            // FORMULA: NetPay + POS - ONQ (POS is added because it's part of income, ONQ is subtracted)
+            // AS EASE triggers when net total is below ₱5,000
+            const netTotal = netPayVal + effectivePos - effectiveOnq;
 
             if (effectivePos === 0) {
                 statusMode = 'NO BILLING';
@@ -4970,22 +4986,25 @@
             } else if (effectiveOnq > 0) {
                 // (2026-09-28) Only check ONQ if POS matches amort; prev: checked ONQ before OVER/UNDER
                 // Debug logging for AS EASE detection
-                console.log('[ONQ ACCOUNT CHECK]', {
+                console.log('[ONQ ACCOUNT CHECK - DETAILED]', {
                     empNum: empNumStr,
                     name: clientName,
-                    netPayVal,
-                    effectivePos,
-                    effectiveOnq,
-                    netTotal,
+                    netPayVal: netPayVal,
+                    effectivePos: effectivePos,
+                    effectiveOnq: effectiveOnq,
+                    netTotal: netTotal,
+                    formula: `${netPayVal} + ${effectivePos} - ${effectiveOnq} = ${netTotal}`,
                     threshold: 5000,
-                    isAsEase: netTotal < 5000
+                    isAsEase: netTotal < 5000,
+                    willBe: netTotal < 5000 ? 'AS EASE / FIRST CSB ONQ' : 'FIRST CSB ONQUEUE'
                 });
                 
                 if (netTotal < 5000) {
                     statusMode = 'AS EASE / FIRST CSB ONQ';
-                    console.log('[AS EASE DETECTED] ✅', empNumStr, clientName);
+                    console.log('[AS EASE DETECTED] ✅', empNumStr, clientName, 'netTotal:', netTotal);
                 } else {
                     statusMode = 'FIRST CSB ONQUEUE';
+                    console.log('[FIRST CSB ONQ]', empNumStr, clientName, 'netTotal:', netTotal);
                 }
             } else {
                 statusMode = 'EFFECTED';
@@ -5019,9 +5038,9 @@
                 clientName,
                 monthlyAmort,
                 csbPositive,
-                // (2026-09-27) Fallback to all loans if no current-month match; prev: strict current-month filter
-                checkedPosCount: (posObj.loans || []).filter(l => posHasCurrentMonth ? (_isAll || _matchEff(l.eff)) : true).length,
-                checkedOnqCount: (onqObj.loans || []).filter(l => onqHasCurrentMonth ? (_isAll || _matchEff(l.eff)) : true).length,
+                // (2026-07-13) Checked count matches current month; prev: all loans fallback
+                checkedPosCount: (posObj.loans || []).filter(l => _isAll || _matchEff(l.eff)).length,
+                checkedOnqCount: (onqObj.loans || []).filter(l => _isAll || _matchEff(l.eff)).length,
                 transDate,
                 maturityDate,
                 division,
@@ -5029,9 +5048,11 @@
                 firstOnqAmt,
                 statusMode,
                 mismatchReasons,
-                isEditable: false,
+                // (2026-07-13) Expose PLI amount and loans in row data; prev: POS/ONQ only
                 onqLoans: onqObj.loans || [],
                 posLoans: posObj.loans || [],
+                pliLoans: pliObj.loans || [],
+                pliAmt,
                 netPayVal,
                 isFirstRowCSB
             };
@@ -5101,63 +5122,68 @@
                         <table class="bank-table billing-responsive-table text-white" style="width: 100%; table-layout: fixed; font-size: 0.58rem; font-family: 'Poppins', sans-serif;">
                             <thead>
                                 <!-- (2026-07-13) 8.0% Diff width to prevent truncation; prev: 5.0% -->
-                                <tr style="font-size: 0.58rem; height: 30px;">
-                                    <th style="width: 2.5%; text-align: left; font-size: 0.58rem;">#</th>
-                                    <th style="width: 5.5%; text-align: left; color: #fbbf24; cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('id')" title="Employee ID - Click to sort">
-                                        ID <i class="bi bi-arrow-down-up" style="font-size: 0.50rem; opacity: 0.5;"></i>
+                                <!-- (2026-07-13) Rebalance column widths and font sizes; prev: cramped 7% cols -->
+                                <tr style="font-size: 0.54rem; height: 30px;">
+                                    <th style="width: 2.2%; text-align: left; font-size: 0.54rem;">#</th>
+                                    <th style="width: 4.8%; text-align: left; color: #fbbf24; cursor: pointer; user-select: none; font-size: 0.54rem;" onclick="sortBillingTable('id')" title="Employee ID - Click to sort">
+                                        ID <i class="bi bi-arrow-down-up" style="font-size: 0.48rem; opacity: 0.5;"></i>
                                     </th>
-                                    <th style="width: 3.5%; text-align: left; cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('division')" title="Division - Click to sort">
-                                        Div <i class="bi bi-arrow-down-up" style="font-size: 0.50rem; opacity: 0.5;"></i>
+                                    <th style="width: 2.8%; text-align: left; cursor: pointer; user-select: none; font-size: 0.54rem;" onclick="sortBillingTable('division')" title="Division - Click to sort">
+                                        Div <i class="bi bi-arrow-down-up" style="font-size: 0.48rem; opacity: 0.5;"></i>
                                     </th>
-                                    <th style="width: 3.5%; text-align: left; cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('station')" title="Station - Click to sort">
-                                        Sta <i class="bi bi-arrow-down-up" style="font-size: 0.50rem; opacity: 0.5;"></i>
+                                    <th style="width: 2.8%; text-align: left; cursor: pointer; user-select: none; font-size: 0.54rem;" onclick="sortBillingTable('station')" title="Station - Click to sort">
+                                        Sta <i class="bi bi-arrow-down-up" style="font-size: 0.48rem; opacity: 0.5;"></i>
                                     </th>
-                                    <th style="width: 12.0%; text-align: left; cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('name')" title="Click to sort">
-                                        Name <i class="bi bi-arrow-down-up" style="font-size: 0.50rem; opacity: 0.5;"></i>
+                                    <th style="width: 10.8%; text-align: left; cursor: pointer; user-select: none; font-size: 0.54rem;" onclick="sortBillingTable('name')" title="Click to sort">
+                                        Name <i class="bi bi-arrow-down-up" style="font-size: 0.48rem; opacity: 0.5;"></i>
                                     </th>
-                                    <th style="width: 6.5%; text-align: left; color: #dc3545; cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('amort')" title="Click to sort">
-                                        Amort <i class="bi bi-arrow-down-up" style="font-size: 0.50rem; opacity: 0.5;"></i>
+                                    <th style="width: 6.2%; text-align: left; color: #dc3545; cursor: pointer; user-select: none; font-size: 0.54rem;" onclick="sortBillingTable('amort')" title="Click to sort">
+                                        Amort <i class="bi bi-arrow-down-up" style="font-size: 0.48rem; opacity: 0.5;"></i>
                                     </th>
-                                    <th style="width: 7.0%; text-align: left; color: #a855f7; cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('netpay')" title="NetPay - Click to sort">
-                                        NetPay <i class="bi bi-arrow-down-up" style="font-size: 0.50rem; opacity: 0.5;"></i>
+                                    <th style="width: 7.8%; text-align: left; color: #a855f7; cursor: pointer; user-select: none; font-size: 0.54rem;" onclick="sortBillingTable('netpay')" title="NetPay - Click to sort">
+                                        NetPay <i class="bi bi-arrow-down-up" style="font-size: 0.48rem; opacity: 0.5;"></i>
                                     </th>
-                                    <th style="width: 8.5%; text-align: left; color: #fbbf24; cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('positive')" title="CSB Positive - Click to sort">
-                                        CSB Pos <i class="bi bi-arrow-down-up" style="font-size: 0.50rem; opacity: 0.5;"></i>
+                                    <th style="width: 8.0%; text-align: left; color: #fbbf24; cursor: pointer; user-select: none; font-size: 0.54rem;" onclick="sortBillingTable('positive')" title="CSB Positive - Click to sort">
+                                        CSB Pos <i class="bi bi-arrow-down-up" style="font-size: 0.48rem; opacity: 0.5;"></i>
                                     </th>
-                                    <th style="width: 8.5%; text-align: left; color: #10b981; cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('onqueue')" title="OnQueue - Click to sort">
-                                        OnQueue <i class="bi bi-arrow-down-up" style="font-size: 0.50rem; opacity: 0.5;"></i>
+                                    <th style="width: 8.0%; text-align: left; color: #10b981; cursor: pointer; user-select: none; font-size: 0.54rem;" onclick="sortBillingTable('onqueue')" title="OnQueue - Click to sort">
+                                        OnQueue <i class="bi bi-arrow-down-up" style="font-size: 0.48rem; opacity: 0.5;"></i>
                                     </th>
-                                    <th style="width: 7.5%; text-align: left; cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('netTotal')" title="Click to sort">
-                                        Net Total <i class="bi bi-arrow-down-up" style="font-size: 0.50rem; opacity: 0.5;"></i>
+                                    <!-- (2026-07-13) Add PLI column on right side of OnQueue; prev: no PLI col -->
+                                    <th style="width: 8.0%; text-align: left; color: #ec4899; cursor: pointer; user-select: none; font-size: 0.54rem;" onclick="sortBillingTable('pli')" title="PLI - Click to sort">
+                                        PLI <i class="bi bi-arrow-down-up" style="font-size: 0.48rem; opacity: 0.5;"></i>
                                     </th>
-                                    <!-- (2026-09-28) Increase width and add wrapping to prevent overlap; prev: 8.5% -->
-                                    <th style="width: 10.0%; text-align: left; cursor: pointer; user-select: none; font-size: 0.58rem; padding-right: 8px !important;" onclick="sortBillingTable('status')" title="Click to cycle status sort (Effected, Overded, Underded, As Ease, OnQ, No Billing)">
-                                        <div style="display: flex; align-items: center; gap: 4px; flex-wrap: nowrap;">
-                                            <span id="statusHeaderTitle-${type}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">Status</span>
-                                            <i class="bi bi-arrow-down-up" style="font-size: 0.50rem; opacity: 0.5; flex-shrink: 0;"></i>
+                                    <th style="width: 7.8%; text-align: left; cursor: pointer; user-select: none; font-size: 0.54rem;" onclick="sortBillingTable('netTotal')" title="Click to sort">
+                                        Net Total <i class="bi bi-arrow-down-up" style="font-size: 0.48rem; opacity: 0.5;"></i>
+                                    </th>
+                                    <!-- (2026-07-13) Set status col width 6.6%; prev: width: 8.4% -->
+                                    <th style="width: 6.6%; text-align: left; cursor: pointer; user-select: none; font-size: 0.54rem; padding-right: 4px !important;" onclick="sortBillingTable('status')" title="Click to cycle status sort (Effected, Overded, Underded, As Ease, OnQ, No Billing)">
+                                        <div style="display: flex; align-items: center; gap: 3px; flex-wrap: nowrap;">
+                                            <span id="statusHeaderTitle-${type}" style="white-space: normal; line-height: 1.15; overflow: hidden; max-width: 100%;">Status</span>
+                                            <i class="bi bi-arrow-down-up" style="font-size: 0.48rem; opacity: 0.5; flex-shrink: 0;"></i>
                                         </div>
                                     </th>
-                                    <th style="width: 7.0%; text-align: left; color: #f59e0b; cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('diff')" title="Difference (Over/Under Deducted Amount) - Click to sort">
-                                        Diff <i class="bi bi-arrow-down-up" style="font-size: 0.50rem; opacity: 0.5;"></i>
+                                    <th style="width: 5.5%; text-align: left; color: #f59e0b; cursor: pointer; user-select: none; font-size: 0.54rem;" onclick="sortBillingTable('diff')" title="Difference (Over/Under Deducted Amount) - Click to sort">
+                                        Diff <i class="bi bi-arrow-down-up" style="font-size: 0.48rem; opacity: 0.5;"></i>
                                     </th>
-                                    <th style="width: 7.0%; text-align: left; vertical-align: top;">
-                                        <div style="cursor: pointer; user-select: none; margin-bottom: 2px; font-size: 0.58rem;" onclick="sortBillingTable('date')" title="Click to sort">
-                                            Release <i class="bi bi-arrow-down-up" style="font-size: 0.50rem; opacity: 0.5;"></i>
+                                    <th style="width: 6.5%; text-align: left; vertical-align: top;">
+                                        <div style="cursor: pointer; user-select: none; margin-bottom: 2px; font-size: 0.54rem;" onclick="sortBillingTable('date')" title="Click to sort">
+                                            Release <i class="bi bi-arrow-down-up" style="font-size: 0.48rem; opacity: 0.5;"></i>
                                         </div>
-                                        <select id="loanReleaseMonthFilter-${type}" onchange="filterByLoanMonth(this.value)" onclick="event.stopPropagation()" style="background: rgba(0,0,0,0.55); color: #fbbf24; border: 1px solid rgba(251,191,36,0.35); border-radius: 4px; font-size: 0.55rem; font-family: 'Poppins', sans-serif; font-weight: 700; padding: 1px 2px; outline: none; cursor: pointer; width: 100%; max-width: 100%; text-overflow: ellipsis; white-space: nowrap;">
+                                        <select id="loanReleaseMonthFilter-${type}" onchange="filterByLoanMonth(this.value)" onclick="event.stopPropagation()" style="background: rgba(0,0,0,0.55); color: #fbbf24; border: 1px solid rgba(251,191,36,0.35); border-radius: 4px; font-size: 0.52rem; font-family: 'Poppins', sans-serif; font-weight: 700; padding: 1px 2px; outline: none; cursor: pointer; width: 100%; max-width: 100%; text-overflow: ellipsis; white-space: nowrap;">
                                             ${monthOptionsHtml}
                                         </select>
                                     </th>
-                                    <th style="width: 6.0%; text-align: left; color: rgba(255,255,255,0.7); cursor: pointer; user-select: none; font-size: 0.58rem;" onclick="sortBillingTable('maturity')" title="Maturity Date from LCS - Click to sort">
-                                        Maturity <i class="bi bi-arrow-down-up" style="font-size: 0.50rem; opacity: 0.5;"></i>
+                                    <th style="width: 5.8%; text-align: left; color: rgba(255,255,255,0.7); cursor: pointer; user-select: none; font-size: 0.54rem;" onclick="sortBillingTable('maturity')" title="Maturity Date from LCS - Click to sort">
+                                        Maturity <i class="bi bi-arrow-down-up" style="font-size: 0.48rem; opacity: 0.5;"></i>
                                     </th>
-                                    <th style="width: 3.5%; min-width: 34px; text-align: center; font-size: 0.58rem; color: #34d399; padding-right: 6px !important;" title="Tag">Tag</th>
+                                    <th style="width: 2.6%; min-width: 28px; text-align: center; font-size: 0.54rem; color: #34d399; padding-right: 4px !important;" title="Tag">Tag</th>
                                 </tr>
                             </thead>
                             <tbody id="${tbodyId}">
                                 ${rows.length > 0 ? rows.slice(0, 100).map((r, idx) => generateBranchRowHtml(r, idx, type)).join('') : `
                                     <tr>
-                                        <td colspan="15" class="text-center text-white-50 py-3" style="font-size: 0.72rem;">
+                                        <td colspan="16" class="text-center text-white-50 py-3" style="font-size: 0.72rem;">
                                             No records match active ${isAuto ? 'Autonomous' : 'First Billing'} filters.
                                         </td>
                                     </tr>
@@ -5430,6 +5456,44 @@
                 }
             }
 
+            // (2026-07-13) Build pliEmpMap from current month PLI data; prev: no PLI map
+            const pliH = window.currentData.pli ? (window.currentData.pli[0] || []) : [];
+            const pliMap = {}; pliH.forEach((c, i) => pliMap[String(c || '').toUpperCase().trim()] = i);
+            const pliEmpIdx = pliMap['EMPNO'] ?? 3;
+            const pliAmtIdx = pliMap['DEDAMT'] ?? 15;
+            const pliCodeIdx = pliMap['DEDCODE'] ?? 9;
+
+            const pliEmpMap = new Map();
+            if (window.currentData.pli) {
+                for (let i = 0; i < window.currentData.pli.length; i++) {
+                    const r = window.currentData.pli[i];
+                    if (!r) continue;
+                    const emp = normEmp(r[pliEmpIdx]) || normEmp(r[3]);
+                    if (emp && emp !== 'EMPNO') {
+                        const amtCol = r[pliAmtIdx] !== undefined ? r[pliAmtIdx] : r[15];
+                        const codeCol = r[pliCodeIdx] !== undefined ? r[pliCodeIdx] : r[9];
+                        const code = String(codeCol || '').trim();
+                        const amtVal = safeFloat(amtCol);
+                        if (amtVal > 0) {
+                            const loanDetail = {
+                                code: code,
+                                eff: r[pliMap.EFFYY] ? `${formatLoanMonth(r[pliMap.EFFMM])}/${r[pliMap.EFFYY] || ''}` : 'N/A',
+                                term: r[pliMap.TERYY] ? `${formatLoanMonth(r[pliMap.TERMM])}/${r[pliMap.TERYY] || ''}` : 'N/A',
+                                dedamt: amtVal,
+                                policyNo: r[pliMap.POLICYNO] || r[16] || 'N/A',
+                                fname: r[pliMap.FNAME] || r[5] || '',
+                                lname: r[pliMap.LNAME] || r[7] || ''
+                            };
+                            const prev = pliEmpMap.get(emp) || { amt: 0, loans: [] };
+                            pliEmpMap.set(emp, {
+                                amt: prev.amt + amtVal,
+                                loans: [...prev.loans, loanDetail]
+                            });
+                        }
+                    }
+                }
+            }
+
             const normalFilters = getBillingFilters('normal');
             const autoFilters = getBillingFilters('auto');
 
@@ -5456,7 +5520,7 @@
                 });
                 autoMatches.forEach((acc, accIdx) => {
                     const rowKey = autoMatches.length > 1 ? `${empNumStr}-${accIdx}` : empNumStr;
-                    const rData = buildBillingRowData(empNumStr, acc, netpayEmpMap, posEmpMap, onqEmpMap, normEmp, rowKey);
+                    const rData = buildBillingRowData(empNumStr, acc, netpayEmpMap, posEmpMap, onqEmpMap, normEmp, rowKey, pliEmpMap);
                     window.firstBillingRowsCache[`auto-${rowKey}`] = rData;
                     window.firstBillingRowsCache[rowKey] = rData;
                     rowsToRenderAuto.push(rData);
@@ -5471,7 +5535,7 @@
                 });
                 normalMatches.forEach((acc, accIdx) => {
                     const rowKey = normalMatches.length > 1 ? `${empNumStr}-${accIdx}` : empNumStr;
-                    const rData = buildBillingRowData(empNumStr, acc, netpayEmpMap, posEmpMap, onqEmpMap, normEmp, rowKey);
+                    const rData = buildBillingRowData(empNumStr, acc, netpayEmpMap, posEmpMap, onqEmpMap, normEmp, rowKey, pliEmpMap);
                     window.firstBillingRowsCache[`norm-${rowKey}`] = rData;
                     window.firstBillingRowsCache[rowKey] = rData;
                     rowsToRenderNormal.push(rData);
@@ -5490,8 +5554,8 @@
             console.log('[BILLING STATUS BREAKDOWN]', statusBreakdown, '| Total:', allCombined.length);
 
             const defMonthInfo = getLcsPreviousMonthKey(allCombined);
-            // (2026-09-28) Default to 'all' months so UNDERDED/AS EASE from any release month are visible; prev: defaulted to previous month
-            if (!window.selectedLoanReleaseMonth) window.selectedLoanReleaseMonth = 'all';
+            // (2026-09-29) Default to active LCS month on first load; prev: forced 'all'
+            if (!window.selectedLoanReleaseMonth) window.selectedLoanReleaseMonth = defMonthInfo.key;
             const monthOptionsHtml = generateLoanMonthOptions(allCombined, window.selectedLoanReleaseMonth);
 
             let filteredNormal = rowsToRenderNormal;
@@ -5563,114 +5627,113 @@
         function generateBranchRowHtml(r, idx, prefix = 'norm') {
             const rowKey = r.rowKey || r.empNumStr;
             const isTagged = (()=>{ try{ const t=JSON.parse(localStorage.getItem('billing_tags')||'{}'); return !!t[`${prefix}-${rowKey}`] || !!t[rowKey] || !!t[`${prefix}-${r.empNumStr}`] || !!t[r.empNumStr]; }catch(e){return false;} })();
-            // Net Total = NetPay - POS - ONQ (actual take-home after all deductions)
-            const netTotal = r.netPayVal - r.csbPositive - r.firstOnqAmt;
+            // Net Total = NetPay + POS - ONQ
+            const netTotal = r.netPayVal + r.csbPositive - r.firstOnqAmt;
             let statusMode = r.statusMode;
             
             return `
                 <!-- (2026-07-13) Bump row font to 0.72rem for readability; prev: 0.58rem -->
+                <!-- (2026-07-13) Set row font to 0.64rem and compact spacings; prev: 0.72rem -->
                 <!-- (2026-09-27) Green tint for tagged main rows; prev: red -->
-                <tr id="billing-row-${prefix}-${rowKey}" style="transition: background 0.2s ease; ${isTagged ? 'background: rgba(52,211,153,0.08);' : ''}; font-size: 0.72rem;">
-                    <td data-label="#" style="text-align: left; color: rgba(255,255,255,0.55); font-size: 0.72rem !important;" class="font-weight-bold">
+                <tr id="billing-row-${prefix}-${rowKey}" style="transition: background 0.2s ease; ${isTagged ? 'background: rgba(52,211,153,0.08);' : ''}; font-size: 0.64rem;">
+                    <td data-label="#" style="text-align: left; color: rgba(255,255,255,0.55); font-size: 0.64rem !important;" class="font-weight-bold">
                         ${idx + 1}
                     </td>
-                    <td data-label="ID" style="text-align: left; font-size: 0.72rem !important; cursor: pointer; color: #fbbf24; font-weight: 600; white-space: nowrap;" onclick="navigator.clipboard.writeText('${r.empNumStr}'); if(typeof showCustomAlert==='function') showCustomAlert('Copied ID: ${r.empNumStr}', 'Copied');" title="Click to copy ID">
+                    <td data-label="ID" style="text-align: left; font-size: 0.64rem !important; cursor: pointer; color: #fbbf24; font-weight: 600; white-space: nowrap;" onclick="navigator.clipboard.writeText('${r.empNumStr}'); if(typeof showCustomAlert==='function') showCustomAlert('Copied ID: ${r.empNumStr}', 'Copied');" title="Click to copy ID">
                         ${r.empNumStr}
                     </td>
-                    <td data-label="Division" style="text-align: left; font-size: 0.72rem !important; color: rgba(255,255,255,0.7); white-space: nowrap;" title="${r.division || 'N/A'}">
+                    <td data-label="Division" style="text-align: left; font-size: 0.64rem !important; color: rgba(255,255,255,0.7); white-space: nowrap;" title="${r.division || 'N/A'}">
                         ${r.division || 'N/A'}
                     </td>
-                    <td data-label="Station" style="text-align: left; font-size: 0.72rem !important; color: rgba(255,255,255,0.7); white-space: nowrap;" title="${r.station || 'N/A'}">
+                    <td data-label="Station" style="text-align: left; font-size: 0.64rem !important; color: rgba(255,255,255,0.7); white-space: nowrap;" title="${r.station || 'N/A'}">
                         ${r.station || 'N/A'}
                     </td>
-                    <td data-label="Name" class="font-weight-bold" style="cursor: default; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; font-size: 0.72rem !important;">
+                    <td data-label="Name" class="font-weight-bold" style="cursor: default; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; font-size: 0.65rem !important;">
                         <!-- (2026-07-13) Pass prefix to profile modal; prev: no prefix arg -->
-                        <span class="text-warning" style="cursor: pointer; font-size: 0.72rem !important;" onclick="inspectEmployeeProfile('${r.empNumStr}', '${prefix}')" title="${r.clientName}">${r.clientName}</span>
+                        <span class="text-warning" style="cursor: pointer; font-size: 0.65rem !important;" onclick="inspectEmployeeProfile('${r.empNumStr}', '${prefix}')" title="${r.clientName}">${r.clientName}</span>
                     </td>
-                    <td data-label="Monthly Amort" style="text-align: left; font-size: 0.72rem !important;" class="tabular-nums font-weight-bold">
+                    <td data-label="Monthly Amort" style="text-align: left; font-size: 0.64rem !important;" class="tabular-nums font-weight-bold">
                         <div style="display: flex; align-items: center; justify-content: flex-start; gap: 2px;">
-                            <span style="color: #dc3545; font-size: 0.72rem !important;">${formatPHP(r.monthlyAmort)}</span>
+                            <span style="color: #dc3545; font-size: 0.64rem !important;">${formatPHP(r.monthlyAmort)}</span>
                         </div>
                     </td>
-                    <td data-label="NetPay" style="text-align: left; font-size: 0.72rem !important; white-space: nowrap;" class="tabular-nums font-weight-bold">
+                    <td data-label="NetPay" style="text-align: left; font-size: 0.64rem !important; white-space: nowrap;" class="tabular-nums font-weight-bold">
                         <div style="display: inline-flex; align-items: center; justify-content: flex-start; gap: 1px; white-space: nowrap;">
                             <!-- (2026-09-27) Purple styled checkbox for NetPay; prev: accent-color -->
-                            <input type="checkbox" id="del-netpay-${prefix}-${rowKey}" class="checkbox-netpay" checked onchange="updateFirstBillingRowStatus('${rowKey}', '${prefix}')" style="cursor: pointer; transform: scale(0.9); margin-right: 2px; flex-shrink: 0;" title="Include/Exclude NetPay from Net Total">
-                            <span style="color: #a855f7; font-size: 0.72rem !important;">${formatPHP(r.netPayVal)}</span>
+                            <input type="checkbox" id="del-netpay-${prefix}-${rowKey}" class="checkbox-netpay" checked onchange="updateFirstBillingRowStatus('${rowKey}', '${prefix}')" style="cursor: pointer; transform: scale(0.82); margin-right: 2px; flex-shrink: 0;" title="Include/Exclude NetPay from Net Total">
+                            <span style="color: #a855f7; font-size: 0.64rem !important;">${formatPHP(r.netPayVal)}</span>
                         </div>
                     </td>
                     <!-- (2026-07-13) Add value & badge IDs for dynamic updates; prev: static text -->
                     <!-- (2026-09-27) Add dropdown button for POS details; prev: no dropdown -->
-                    <td data-label="CSB Positive" style="text-align: left; font-size: 0.72rem !important; white-space: nowrap;" class="tabular-nums font-weight-bold">
+                    <td data-label="CSB Positive" style="text-align: left; font-size: 0.64rem !important; white-space: nowrap;" class="tabular-nums font-weight-bold">
                         <div style="display: inline-flex; align-items: center; justify-content: flex-start; gap: 1px; white-space: nowrap;">
-                            <!-- (2026-09-27) Yellow styled checkbox for POS; prev: accent-color -->
-                            <input type="checkbox" id="del-pos-${prefix}-${rowKey}" class="checkbox-pos" checked onchange="updateFirstBillingRowStatus('${rowKey}', '${prefix}')" style="cursor: pointer; transform: scale(0.9); margin-right: 2px; flex-shrink: 0;" title="Include/Exclude CSB Positive from Net Total">
-                            <span id="pos-val-${prefix}-${rowKey}" style="color: #fbbf24; font-size: 0.72rem !important;">${formatPHP(r.csbPositive)}</span>
-                            ${r.posLoans && r.posLoans.length > 0 ? `<button type="button" onclick="togglePosDetails('${rowKey}', '${prefix}')" style="background: none; border: none; color: #fbbf24; cursor: pointer; padding: 0 4px; font-size: 0.7rem; margin-left: 2px;"><i id="pos-chevron-${prefix}-${rowKey}" class="bi bi-chevron-down"></i></button>` : ''}
+                            <!-- (2026-07-13) Check pos only if positive; prev: hardcoded checked -->
+                            <input type="checkbox" id="del-pos-${prefix}-${rowKey}" class="checkbox-pos" ${r.csbPositive > 0 ? 'checked' : ''} onchange="updateFirstBillingRowStatus('${rowKey}', '${prefix}')" style="cursor: pointer; transform: scale(0.82); margin-right: 2px; flex-shrink: 0;" title="Include/Exclude CSB Positive from Net Total">
+                            <span id="pos-val-${prefix}-${rowKey}" style="color: #fbbf24; font-size: 0.64rem !important;">${formatPHP(r.csbPositive)}</span>
+                            ${r.posLoans && r.posLoans.length > 0 ? `<button type="button" onclick="togglePosDetails('${rowKey}', '${prefix}')" style="background: none; border: none; color: #fbbf24; cursor: pointer; padding: 0 1px; font-size: 0.58rem; margin-left: 1px; line-height: 1; vertical-align: middle;"><i id="pos-chevron-${prefix}-${rowKey}" class="bi bi-chevron-down"></i></button>` : ''}
                         </div>
                     </td>
-                    <td data-label="First CSB (OnQueue)" style="text-align: left; font-size: 0.72rem !important; white-space: nowrap;" class="tabular-nums font-weight-bold">
+                    <td data-label="First CSB (OnQueue)" style="text-align: left; font-size: 0.64rem !important; white-space: nowrap;" class="tabular-nums font-weight-bold">
                         <div style="display: inline-flex; align-items: center; justify-content: flex-start; gap: 1px; white-space: nowrap;">
-                            <!-- (2026-09-27) Green styled checkbox for ONQ; prev: accent-color -->
-                            <input type="checkbox" id="del-onq-${prefix}-${rowKey}" class="checkbox-onq" checked onchange="updateFirstBillingRowStatus('${rowKey}', '${prefix}')" style="cursor: pointer; transform: scale(0.9); margin-right: 2px; flex-shrink: 0;" title="Include/Exclude OnQueue from Net Total">
-                            <span id="onq-val-${prefix}-${rowKey}" style="color: #10b981; font-size: 0.72rem !important;">${formatPHP(r.firstOnqAmt)}</span>
-                            ${r.onqLoans && r.onqLoans.length > 0 ? `<button type="button" onclick="toggleOnqDetails('${rowKey}', '${prefix}')" style="background: none; border: none; color: #10b981; cursor: pointer; padding: 0 4px; font-size: 0.7rem; margin-left: 2px;"><i id="onq-chevron-${prefix}-${rowKey}" class="bi bi-chevron-down"></i></button>` : ''}
+                            <!-- (2026-07-13) Check onq only if positive; prev: hardcoded checked -->
+                            <input type="checkbox" id="del-onq-${prefix}-${rowKey}" class="checkbox-onq" ${r.firstOnqAmt > 0 ? 'checked' : ''} onchange="updateFirstBillingRowStatus('${rowKey}', '${prefix}')" style="cursor: pointer; transform: scale(0.82); margin-right: 2px; flex-shrink: 0;" title="Include/Exclude OnQueue from Net Total">
+                            <span id="onq-val-${prefix}-${rowKey}" style="color: #10b981; font-size: 0.64rem !important;">${formatPHP(r.firstOnqAmt)}</span>
+                            ${r.onqLoans && r.onqLoans.length > 0 ? `<button type="button" onclick="toggleOnqDetails('${rowKey}', '${prefix}')" style="background: none; border: none; color: #10b981; cursor: pointer; padding: 0 1px; font-size: 0.58rem; margin-left: 1px; line-height: 1; vertical-align: middle;"><i id="onq-chevron-${prefix}-${rowKey}" class="bi bi-chevron-down"></i></button>` : ''}
                         </div>
                     </td>
-                    <td data-label="Net Total" id="net-total-${prefix}-${rowKey}" style="text-align: left; font-size: 0.72rem !important; white-space: nowrap;" class="tabular-nums font-weight-bold ${netTotal >= 5000 ? 'text-success' : 'text-danger'}">
+                    <!-- (2026-07-13) Add PLI column on right side of onqueue; prev: no PLI col -->
+                    <td data-label="PLI" style="text-align: left; font-size: 0.64rem !important; white-space: nowrap;" class="tabular-nums font-weight-bold">
+                        <div style="display: inline-flex; align-items: center; justify-content: flex-start; gap: 1px; white-space: nowrap;">
+                            <input type="checkbox" id="del-pli-${prefix}-${rowKey}" class="checkbox-pli" checked onchange="updateFirstBillingRowStatus('${rowKey}', '${prefix}')" style="cursor: pointer; transform: scale(0.82); margin-right: 2px; flex-shrink: 0;" title="Include/Exclude PLI from Net Total">
+                            <span id="pli-val-${prefix}-${rowKey}" style="color: #ec4899; font-size: 0.64rem !important;">${formatPHP(r.pliAmt || 0)}</span>
+                            ${r.pliLoans && r.pliLoans.length > 0 ? `<button type="button" onclick="togglePliDetails('${rowKey}', '${prefix}')" style="background: none; border: none; color: #ec4899; cursor: pointer; padding: 0 1px; font-size: 0.58rem; margin-left: 1px; line-height: 1; vertical-align: middle;"><i id="pli-chevron-${prefix}-${rowKey}" class="bi bi-chevron-down"></i></button>` : ''}
+                        </div>
+                    </td>
+                    <td data-label="Net Total" id="net-total-${prefix}-${rowKey}" style="text-align: left; font-size: 0.64rem !important; white-space: nowrap;" class="tabular-nums font-weight-bold ${netTotal >= 5000 ? 'text-success' : 'text-danger'}">
                         ${formatPHP(netTotal)}
                     </td>
                     <td data-label="Status" id="status-td-${prefix}-${rowKey}" style="text-align: center; vertical-align: middle; overflow: hidden; padding: 2px 1px !important;">
                         <!-- (2026-07-13) Support EFF / UNDERDED badge; prev: only 4 statuses -->
+                        <!-- (2026-07-13) Set unified 62px chip size; prev: width: auto -->
                         ${statusMode === 'NO BILLING' || statusMode === 'NO DEDUCTION' ? `
-                            <!-- (2026-07-13) Unified badge size 0.50rem; prev: 0.52-0.56rem mixed -->
-                            <span class="badge font-weight-bold" style="width: 100% !important; height: 18px !important; background: rgba(220,53,69,0.22); color: #dc3545; border: 1px solid #dc3545; border-radius: 4px; font-size: 0.50rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 4px; white-space: nowrap;">NO BILLING</span>
+                            <span class="badge font-weight-bold" style="width: 62px; height: 16px; background: rgba(220,53,69,0.22); color: #dc3545; border: 1px solid #dc3545; border-radius: 4px; font-size: 0.42rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 2px; white-space: nowrap; letter-spacing: 0.01em; box-sizing: border-box;">NO BILLING</span>
                         ` : (statusMode === 'AS EASE / FIRST CSB ONQ' ? `
-                            <span class="badge font-weight-bold" style="width: 100% !important; height: 18px !important; background: rgba(139,92,246,0.22); color: #8b5cf6; border: 1px solid #8b5cf6; border-radius: 4px; font-size: 0.48rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 4px; white-space: nowrap;">AS EASE / ONQ</span>
+                            <span class="badge font-weight-bold" style="width: 62px; height: 16px; background: rgba(139,92,246,0.22); color: #8b5cf6; border: 1px solid #8b5cf6; border-radius: 4px; font-size: 0.42rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 2px; white-space: nowrap; letter-spacing: 0.01em; box-sizing: border-box;">AS EASE/ONQ</span>
                         ` : (statusMode === 'FIRST CSB ONQUEUE' ? `
-                            <span class="badge font-weight-bold" style="width: 100% !important; height: 18px !important; background: rgba(13,110,253,0.22); color: #3b82f6; border: 1px solid #3b82f6; border-radius: 4px; font-size: 0.50rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 4px; white-space: nowrap;">FIRST CSB ONQ</span>
+                            <span class="badge font-weight-bold" style="width: 62px; height: 16px; background: rgba(13,110,253,0.22); color: #3b82f6; border: 1px solid #3b82f6; border-radius: 4px; font-size: 0.42rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 2px; white-space: nowrap; letter-spacing: 0.01em; box-sizing: border-box;">1ST CSB ONQ</span>
                         ` : (statusMode === 'OVERDEDUCTED' ? `
-                            <span class="badge font-weight-bold" style="width: 100% !important; height: 18px !important; background: rgba(245,158,11,0.22); color: #f59e0b; border: 1px solid #f59e0b; border-radius: 4px; font-size: 0.50rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 4px; white-space: nowrap;">EFF / OVERDED</span>
+                            <span class="badge font-weight-bold" style="width: 62px; height: 16px; background: rgba(245,158,11,0.22); color: #f59e0b; border: 1px solid #f59e0b; border-radius: 4px; font-size: 0.42rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 2px; white-space: nowrap; letter-spacing: 0.01em; box-sizing: border-box;">EFF/OVERDED</span>
                         ` : (statusMode === 'UNDERDEDUCTED' ? `
-                            <span class="badge font-weight-bold" style="width: 100% !important; height: 18px !important; background: rgba(234,179,8,0.22); color: #facc15; border: 1px solid #facc15; border-radius: 4px; font-size: 0.50rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 4px; white-space: nowrap;">EFF / UNDERDED</span>
+                            <span class="badge font-weight-bold" style="width: 62px; height: 16px; background: rgba(234,179,8,0.22); color: #facc15; border: 1px solid #facc15; border-radius: 4px; font-size: 0.42rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 2px; white-space: nowrap; letter-spacing: 0.01em; box-sizing: border-box;">EFF/UNDERDED</span>
                         ` : `
-                            <span class="badge font-weight-bold" style="width: 100% !important; height: 18px !important; background: rgba(40,167,69,0.22); color: #28a745; border: 1px solid #28a745; border-radius: 4px; font-size: 0.50rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 4px; white-space: nowrap;">EFFECTED</span>
+                            <span class="badge font-weight-bold" style="width: 62px; height: 16px; background: rgba(40,167,69,0.22); color: #28a745; border: 1px solid #28a745; border-radius: 4px; font-size: 0.42rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 2px; white-space: nowrap; letter-spacing: 0.01em; box-sizing: border-box;">EFFECTED</span>
                         `))))}
                     </td>
-                    <td data-label="Difference" id="diff-td-${prefix}-${rowKey}" style="text-align: left; font-size: 0.72rem !important; white-space: nowrap; overflow: visible;" class="tabular-nums font-weight-bold">
+                    <td data-label="Difference" id="diff-td-${prefix}-${rowKey}" style="text-align: left; font-size: 0.64rem !important; white-space: nowrap; overflow: visible;" class="tabular-nums font-weight-bold">
                         ${(()=>{
                             const diff = (r.csbPositive || 0) - (r.monthlyAmort || 0);
                             if (statusMode === 'OVERDEDUCTED' && diff > 1.0) {
-                                return `<span style="color: #f59e0b; font-weight: 700; font-size: 0.72rem !important; white-space: nowrap;">+${formatPHP(diff)}</span>`;
+                                return `<span style="color: #f59e0b; font-weight: 700; font-size: 0.64rem !important; white-space: nowrap;">+${formatPHP(diff)}</span>`;
                             } else if (statusMode === 'UNDERDEDUCTED' && diff < -1.0) {
-                                return `<span style="color: #facc15; font-weight: 700; font-size: 0.72rem !important; white-space: nowrap;">-${formatPHP(Math.abs(diff))}</span>`;
+                                return `<span style="color: #facc15; font-weight: 700; font-size: 0.64rem !important; white-space: nowrap;">-${formatPHP(Math.abs(diff))}</span>`;
                             }
-                            return `<span style="color: rgba(255,255,255,0.3); font-weight: 600; font-size: 0.72rem !important;">-</span>`;
+                            return `<span style="color: rgba(255,255,255,0.3); font-weight: 600; font-size: 0.64rem !important;">-</span>`;
                         })()}
                     </td>
-                    <td data-label="EFF" style="text-align: left; font-size: 0.72rem !important; white-space: nowrap;" class="text-white-50" title="${formatLoanDate(r.transDate)}">
-                        <!-- (2026-09-27) Show all EFF dates even for single loan; prev: only multi-loan -->
-                        ${(() => {
-                            if (r.posLoans && r.posLoans.length >= 1) {
-                                return r.posLoans.map(l => l.eff || 'N/A').join('<br>');
-                            }
-                            return formatLoanDate(r.transDate);
-                        })()}
+                    <td data-label="Release" style="text-align: left; font-size: 0.64rem !important; white-space: nowrap;" class="text-white-50" title="${formatLoanDate(r.transDate)}">
+                        <!-- (2026-09-29) Show loan release month from dropdown filter, not individual EFF dates; prev: showed posLoans eff -->
+                        ${formatLoanDate(r.transDate)}
                     </td>
-                    <td data-label="TERM" style="text-align: left; font-size: 0.72rem !important; color: rgba(255,255,255,0.7); white-space: nowrap;" title="${formatLoanDate(r.maturityDate)}">
-                        <!-- (2026-09-27) Show all terms even for single loan; prev: only multi-loan -->
-                        ${(() => {
-                            if (r.posLoans && r.posLoans.length >= 1) {
-                                return r.posLoans.map(l => l.term ? l.term.replace(/^(\d+)(?:\.0+)?(\/\d{4})$/, (_, m, y) => String(parseInt(m,10)).padStart(2,'0') + y) : 'N/A').join('<br>');
-                            }
-                            return formatLoanDate(r.maturityDate);
-                        })()}
+                    <td data-label="Maturity" style="text-align: left; font-size: 0.64rem !important; color: rgba(255,255,255,0.7); white-space: nowrap;" title="${formatLoanDate(r.maturityDate)}">
+                        <!-- (2026-09-29) Show maturity date from LCS, not individual TERM dates; prev: showed posLoans term -->
+                        ${formatLoanDate(r.maturityDate)}
                     </td>
-                    <td data-label="Tag" style="text-align: center; vertical-align: middle; padding-right: 6px !important;">
+                    <td data-label="Tag" style="text-align: center; vertical-align: middle; padding-right: 4px !important;">
                         <input type="checkbox" id="tag-row-${prefix}-${rowKey}"
                             ${isTagged ? 'checked' : ''}
                             onchange="toggleBillingTag('${rowKey}', this.checked, '${prefix}')"
-                            style="cursor: pointer; transform: scale(0.95); accent-color: #34d399; margin: 0 auto; display: block;"
+                            style="cursor: pointer; transform: scale(0.9); accent-color: #34d399; margin: 0 auto; display: block;"
                             title="Tag row for export">
                     </td>
                 </tr>
@@ -5701,8 +5764,8 @@
                                 <div style="padding-left: 4px;">POLICY NO</div>
                             </div>
                             ${r.posLoans && r.posLoans.length > 0 ? r.posLoans.map((loan, idx) => {
-                                const anyMatchCurrent = r.posLoans.some(l => isCurrentBillingMonthEff(l.eff));
-                                let defaultChecked = window.dedSelectionMode === 'all' ? true : (anyMatchCurrent ? isCurrentBillingMonthEff(loan.eff) : true);
+                                // (2026-07-13) Default check current month only; prev: fallback to all
+                                let defaultChecked = window.dedSelectionMode === 'all' ? true : isCurrentBillingMonthEff(loan.eff);
                                 // (2026-09-27) Load from localStorage if exists; prev: auto-calc only
                                 const storageKey = `pos_checks_${prefix}-${rowKey}`;
                                 try {
@@ -5727,54 +5790,16 @@
                             }).join('') : '<div style="text-align: center; color: rgba(255,255,255,0.4); padding: 4px; font-size: 0.64rem;">No CSB deductions found</div>'}
                         </div>
                     </td>
-                    <!-- ONQUEUE spanning OnQueue, Net Total, Status, Diff, Release columns -->
-                    <td colspan="5" style="padding: 6px 8px; border: none; vertical-align: top;">
-                        <div id="onq-detail-${prefix}-${rowKey}" style="display: none; width: 100%; max-width: 530px; padding: 6px 10px; background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.3); border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; padding-bottom: 3px; border-bottom: 1px solid rgba(16,185,129,0.15);">
-                                <div style="font-size: 0.65rem; font-weight: 700; color: #10b981; letter-spacing: 0.04em;">
-                                    <i class="bi bi-list-ul mr-1"></i>LESS ONQUEUE
-                                </div>
-                                <div class="font-weight-bold" id="onq-card-total-${prefix}-${rowKey}" style="font-size: 0.65rem; font-weight: 700; color: #10b981;">
-                                    Total: ${formatPHP(r.firstOnqAmt)}
-                                </div>
-                            </div>
-                            <div style="display: grid; grid-template-columns: 24px 50px 65px 65px 85px 1fr; gap: 4px; font-size: 0.62rem; color: rgba(255,255,255,0.5); font-weight: 600; padding: 2px 2px;">
-                                <div></div>
-                                <div>CODE</div>
-                                <div>EFF</div>
-                                <div>TERM</div>
-                                <div style="text-align: right;">DEDAMT</div>
-                                <div style="padding-left: 4px;">POLICY NO</div>
-                            </div>
-                            ${r.onqLoans && r.onqLoans.length > 0 ? r.onqLoans.map((loan, idx) => {
-                                const anyMatchCurrent = r.onqLoans.some(l => isCurrentBillingMonthEff(l.eff));
-                                const defaultChecked = window.dedSelectionMode === 'all' ? true : (anyMatchCurrent ? isCurrentBillingMonthEff(loan.eff) : true);
-                                return `
-                                <div style="display: grid; grid-template-columns: 24px 50px 65px 65px 85px 1fr; gap: 4px; align-items: center; padding: 2px 2px; background: rgba(255,255,255,0.02); border-radius: 4px; margin-bottom: 2px; font-size: 0.64rem;">
-                                    <div style="text-align: center;">
-                                        <!-- (2026-09-27) Green styled checkbox for ONQ; prev: accent-color -->
-                                        <input type="checkbox" id="onq-loan-check-${prefix}-${rowKey}-${idx}" class="checkbox-onq" ${defaultChecked ? 'checked' : ''} onchange="updateOnqLoanSelection('${rowKey}', '${prefix}')" style="cursor: pointer; transform: scale(1.0);">
-                                    </div>
-                                    <div style="color: rgba(255,255,255,0.9); font-weight: 600;">${loan.code || 'N/A'}</div>
-                                    <div style="color: rgba(255,255,255,0.7);">${loan.eff || 'N/A'}</div>
-                                    <div style="color: rgba(255,255,255,0.7);">${loan.term ? loan.term.replace(/^(\d+)(?:\.0+)?(\/\d{4})$/, (_, m, y) => String(m).padStart(2, '0') + y) : 'N/A'}</div>
-                                    <div style="text-align: right; color: #10b981; font-weight: 700;">${formatPHP(loan.dedamt || 0)}</div>
-                                    <div style="color: rgba(255,255,255,0.6); font-size: 0.62rem; padding-left: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${loan.policyNo || 'N/A'}</div>
-                                </div>`;
-                            }).join('') : '<div style="text-align: center; color: rgba(255,255,255,0.4); padding: 4px; font-size: 0.64rem;">No ONQUEUE deductions found</div>'}
-                        </div>
-                    </td>
-                    <!-- Skip: Maturity, Tag -->
-                    <td colspan="2" style="padding: 0; border: none;"></td>
+                    <!-- (2026-09-29) ONQ detail removed from card, will be shown as sub-rows below; prev: card in colspan -->
+                    <!-- Skip: OnQueue through Tag columns -->
+                    <td colspan="8" style="padding: 0; border: none;"></td>
                 </tr>
             ${r.posLoans && r.posLoans.length >= 1 ? r.posLoans.map((loan, lIdx) => {
                 // (2026-09-27) Show sub-rows for single loan too; prev: only multi-loan
                 const isCur = isCurrentBillingMonthEff(loan.eff);
-                // (2026-09-27) If no loans match current month, check all loans; prev: uncheck non-current
-                const anyMatchCurrent = r.posLoans.some(l => isCurrentBillingMonthEff(l.eff));
-                // (2026-09-27) Load from localStorage if exists; prev: auto-calc only
+                // (2026-07-13) Dropdown item checked if current month; prev: check all fallback
                 const storageKey = `pos_checks_${prefix}-${rowKey}`;
-                let isChecked = isDedModeAll(prefix) ? true : (anyMatchCurrent ? isCur : true);
+                let isChecked = isDedModeAll(prefix) ? true : isCur;
                 try {
                     const saved = localStorage.getItem(storageKey);
                     if (saved) {
@@ -5791,45 +5816,145 @@
                 const subRowKey = `${prefix}-${rowKey}-sub-${lIdx}`;
                 const isSubTagged = (()=>{ try{ const t=JSON.parse(localStorage.getItem('billing_sub_tags')||'{}'); return !!t[subRowKey]; }catch(e){return false;} })();
                 return `
-                <tr id="pos-sub-row-${prefix}-${rowKey}-${lIdx}" style="display: none; background: ${isSubTagged ? 'rgba(239,68,68,0.12)' : 'rgba(251,191,36,0.04)'}; border-left: 2px solid rgba(251,191,36,0.25); font-size: 0.68rem; transition: background 0.2s ease;">
-                    <td style="text-align: left; color: rgba(255,255,255,0.3); font-size: 0.68rem !important; padding-left: 10px;" class="font-weight-bold">
-                        <span style="color: rgba(251,191,36,0.5); font-size: 0.60rem;">↳</span>
+                <tr id="pos-sub-row-${prefix}-${rowKey}-${lIdx}" style="display: none; background: ${isSubTagged ? 'rgba(239,68,68,0.12)' : 'rgba(251,191,36,0.04)'}; border-left: 2px solid rgba(251,191,36,0.25); font-size: 0.62rem; transition: background 0.2s ease;">
+                    <td style="text-align: left; color: rgba(255,255,255,0.3); font-size: 0.62rem !important; padding-left: 10px;" class="font-weight-bold">
+                        <span style="color: rgba(251,191,36,0.5); font-size: 0.58rem;">↳</span>
                     </td>
-                    <td style="text-align: left; font-size: 0.68rem !important; color: rgba(255,255,255,0.35); white-space: nowrap;">${loan.code || 'N/A'}</td>
-                    <td style="text-align: left; font-size: 0.68rem !important; color: rgba(255,255,255,0.35);">&nbsp;</td>
-                    <td style="text-align: left; font-size: 0.68rem !important; color: rgba(255,255,255,0.35);">&nbsp;</td>
-                    <td style="text-align: left; font-size: 0.68rem !important; color: rgba(255,255,255,0.5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;" title="${loan.policyNo || ''}"><i class="bi bi-file-text" style="font-size:0.60rem; margin-right:2px;"></i>${loan.policyNo || 'N/A'}</td>
+                    <!-- (2026-07-13) Add POS badge label left of code; prev: raw code only -->
+                    <td style="text-align: left; font-size: 0.62rem !important; color: rgba(255,255,255,0.35); white-space: nowrap;"><span class="badge font-weight-bold" style="background: rgba(251,191,36,0.18); color: #fbbf24; border: 1px solid rgba(251,191,36,0.35); border-radius: 3px; font-size: 0.48rem; padding: 1px 3px; margin-right: 3px; vertical-align: middle;">POS</span><span style="vertical-align: middle;">${loan.code || 'N/A'}</span></td>
+                    <td style="text-align: left; font-size: 0.62rem !important; color: rgba(255,255,255,0.35);">&nbsp;</td>
+                    <td style="text-align: left; font-size: 0.62rem !important; color: rgba(255,255,255,0.35);">&nbsp;</td>
+                    <td style="text-align: left; font-size: 0.62rem !important; color: rgba(255,255,255,0.5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;" title="${loan.policyNo || ''}"><i class="bi bi-file-text" style="font-size:0.58rem; margin-right:2px;"></i>${loan.policyNo || 'N/A'}</td>
                     <!-- (2026-07-13) Move EFF/TERM to Amort/Netpay in gray; prev: Netpay/Onqueue -->
-                    <td style="text-align: left; font-size: 0.68rem !important; white-space: nowrap; color: rgba(255,255,255,0.45);">EFF: ${loan.eff || 'N/A'}</td>
-                    <td style="text-align: left; font-size: 0.68rem !important; white-space: nowrap; color: rgba(255,255,255,0.45);">TERM: ${termFmt}</td>
-                    <td style="text-align: left; font-size: 0.68rem !important; white-space: nowrap;">
-                        <div style="display: inline-flex; align-items: center; gap: 3px;">
-                            <input type="checkbox" id="pos-loan-check-${prefix}-${rowKey}-${lIdx}" class="checkbox-pos" ${isChecked ? 'checked' : ''} onchange="updatePosLoanSelection('${rowKey}', '${prefix}'); syncAccordionCheckbox('${prefix}','${rowKey}',${lIdx},this.checked)" style="cursor: pointer; transform: scale(0.95);">
+                    <td style="text-align: left; font-size: 0.62rem !important; white-space: nowrap; color: rgba(255,255,255,0.45);">EFF: ${loan.eff || 'N/A'}</td>
+                    <td style="text-align: left; font-size: 0.62rem !important; white-space: nowrap; color: rgba(255,255,255,0.45);">TERM: ${termFmt}</td>
+                    <td style="text-align: left; font-size: 0.62rem !important; white-space: nowrap;">
+                        <div style="display: inline-flex; align-items: center; gap: 2px;">
+                            <input type="checkbox" id="pos-loan-check-${prefix}-${rowKey}-${lIdx}" class="checkbox-pos" ${isChecked ? 'checked' : ''} onchange="updatePosLoanSelection('${rowKey}', '${prefix}'); syncAccordionCheckbox('${prefix}','${rowKey}',${lIdx},this.checked)" style="cursor: pointer; transform: scale(0.82);">
                             <span style="color: #fbbf24; font-weight: 700;">${formatPHP(loan.dedamt || 0)}</span>
                         </div>
                     </td>
-                    <td style="text-align: left; font-size: 0.68rem !important; color: rgba(255,255,255,0.35); white-space: nowrap;">&nbsp;</td>
-                    <td style="text-align: left; font-size: 0.68rem !important; white-space: nowrap;">
+                    <td style="text-align: left; font-size: 0.62rem !important; color: rgba(255,255,255,0.35); white-space: nowrap;">&nbsp;</td>
+                    <td style="text-align: left; font-size: 0.62rem !important; color: rgba(255,255,255,0.35); white-space: nowrap;">&nbsp;</td>
+                    <td style="text-align: left; font-size: 0.62rem !important; white-space: nowrap;">
                         <span style="color: ${diff > 1.0 ? '#f59e0b' : (diff < -1.0 ? '#facc15' : 'rgba(255,255,255,0.3)')};">${diff > 1.0 ? '+' : ''}${Math.abs(diff) > 0.5 ? formatPHP(diff) : '-'}</span>
                     </td>
                     <td style="text-align: center; vertical-align: middle; padding: 2px 1px !important;">
-                        <!-- (2026-07-13) Sub-row badge unified 0.50rem; prev: 0.52rem unstyled -->
-                        <span class="badge font-weight-bold" style="width: 100% !important; height: 18px !important; background: ${subBg}; color: ${subClr}; border: 1px solid ${subClr}; border-radius: 4px; font-size: 0.50rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 4px; white-space: nowrap;">${subStatus}</span>
+                        <!-- (2026-07-13) Unified 62px sub-row badge; prev: width: 100% -->
+                        <span class="badge font-weight-bold" style="width: 62px; height: 16px; background: ${subBg}; color: ${subClr}; border: 1px solid ${subClr}; border-radius: 4px; font-size: 0.42rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 2px; white-space: nowrap; letter-spacing: 0.01em; box-sizing: border-box;">${subStatus}</span>
                     </td>
-                    <td style="text-align: left; font-size: 0.68rem !important;"><span style="color: rgba(255,255,255,0.2);">-</span></td>
-                    <td style="text-align: left; font-size: 0.68rem !important; white-space: nowrap; color: rgba(255,255,255,0.45);">${loan.eff || 'N/A'}</td>
-                    <td style="text-align: left; font-size: 0.68rem !important; white-space: nowrap; color: rgba(255,255,255,0.45);">${termFmt}</td>
+                    <td style="text-align: left; font-size: 0.62rem !important;"><span style="color: rgba(255,255,255,0.2);">-</span></td>
+                    <td style="text-align: left; font-size: 0.62rem !important; white-space: nowrap; color: rgba(255,255,255,0.45);">${loan.eff || 'N/A'}</td>
+                    <td style="text-align: left; font-size: 0.62rem !important; white-space: nowrap; color: rgba(255,255,255,0.45);">${termFmt}</td>
                     <!-- (2026-09-28) Add red tag checkbox for sub-deduction rows; disabled for AS EASE status -->
-                    <td style="text-align: center; padding-right: 6px !important;">
+                    <td style="text-align: center; padding-right: 4px !important;">
                         <input type="checkbox" id="tag-sub-row-${prefix}-${rowKey}-${lIdx}"
                             class="checkbox-red-tag"
                             ${isSubTagged ? 'checked' : ''}
                             ${statusMode === 'AS EASE / FIRST CSB ONQ' ? 'disabled' : ''}
                             onchange="toggleSubRowTag('${prefix}', '${rowKey}', ${lIdx}, this.checked)"
-                            style="${statusMode === 'AS EASE / FIRST CSB ONQ' ? 'opacity: 0.3; cursor: not-allowed;' : ''}"
+                            style="${statusMode === 'AS EASE / FIRST CSB ONQ' ? 'opacity: 0.3; cursor: not-allowed;' : ''}; transform: scale(0.85);"
                             title="${statusMode === 'AS EASE / FIRST CSB ONQ' ? 'Cannot tag AS EASE items for deletion' : 'Tag sub-deduction for deletion'}">
                     </td>
                 </tr>`;}).join('') : ''}
+            ${r.onqLoans && r.onqLoans.length > 0 ? r.onqLoans.map((loan, oIdx) => {
+                // (2026-07-13) Default check ONQ current month only; prev: fallback to all
+                const defaultChecked = window.dedSelectionMode === 'all' ? true : isCurrentBillingMonthEff(loan.eff);
+                
+                // Load from localStorage if exists
+                const storageKey = `onq_checks_${prefix}-${rowKey}`;
+                const savedChecks = (()=>{ try{ return JSON.parse(localStorage.getItem(storageKey) || '{}'); }catch(e){ return {}; } })();
+                const isChecked = savedChecks[oIdx] !== undefined ? savedChecks[oIdx] : defaultChecked;
+                
+                const termFmt = loan.term ? loan.term.replace(/^(\d+)(?:\.0+)?(\/\d{4})$/, (_, m, y) => String(m).padStart(2, '0') + y) : 'N/A';
+                const onqSubRowKey = `${prefix}-${rowKey}-onq-sub-${oIdx}`;
+                const isOnqSubTagged = (()=>{ try{ const t=JSON.parse(localStorage.getItem('billing_sub_tags')||'{}'); return !!t[onqSubRowKey]; }catch(e){return false;} })();
+                
+                return `
+                <tr id="onq-sub-row-${prefix}-${rowKey}-${oIdx}" style="display: none; background: ${isOnqSubTagged ? 'rgba(239,68,68,0.12)' : 'rgba(16,185,129,0.04)'}; border-left: 2px solid rgba(16,185,129,0.25); font-size: 0.62rem; transition: background 0.2s ease;">
+                    <td style="text-align: left; color: rgba(255,255,255,0.3); font-size: 0.62rem !important; padding-left: 10px;" class="font-weight-bold">
+                        <span style="color: rgba(16,185,129,0.5); font-size: 0.58rem;">↳</span>
+                    </td>
+                    <td style="text-align: left; font-size: 0.62rem !important; color: rgba(255,255,255,0.35); white-space: nowrap;">
+                        <span class="badge font-weight-bold" style="background: rgba(16,185,129,0.18); color: #10b981; border: 1px solid rgba(16,185,129,0.35); border-radius: 3px; font-size: 0.48rem; padding: 1px 3px; margin-right: 3px; vertical-align: middle;">ONQ</span><span style="vertical-align: middle;">${loan.code || 'N/A'}</span>
+                    </td>
+                    <td style="text-align: left; font-size: 0.62rem !important; color: rgba(255,255,255,0.35);">&nbsp;</td>
+                    <td style="text-align: left; font-size: 0.62rem !important; color: rgba(255,255,255,0.35);">&nbsp;</td>
+                    <td style="text-align: left; font-size: 0.62rem !important; color: rgba(255,255,255,0.5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;" title="${loan.policyNo || ''}"><i class="bi bi-file-text" style="font-size:0.58rem; margin-right:2px;"></i>${loan.policyNo || 'N/A'}</td>
+                    <td style="text-align: left; font-size: 0.62rem !important; white-space: nowrap; color: rgba(255,255,255,0.45);">EFF: ${loan.eff || 'N/A'}</td>
+                    <td style="text-align: left; font-size: 0.62rem !important; white-space: nowrap; color: rgba(255,255,255,0.45);">TERM: ${termFmt}</td>
+                    <td style="text-align: left; font-size: 0.62rem !important; color: rgba(255,255,255,0.35); white-space: nowrap;">&nbsp;</td>
+                    <td style="text-align: left; font-size: 0.62rem !important; white-space: nowrap;">
+                        <div style="display: inline-flex; align-items: center; gap: 2px;">
+                            <input type="checkbox" id="onq-loan-check-${prefix}-${rowKey}-${oIdx}" class="checkbox-onq" ${isChecked ? 'checked' : ''} onchange="updateOnqLoanSelection('${rowKey}', '${prefix}')" style="cursor: pointer; transform: scale(0.82);">
+                            <span style="color: #10b981; font-weight: 700;">${formatPHP(loan.dedamt || 0)}</span>
+                        </div>
+                    </td>
+                    <td style="text-align: left; font-size: 0.62rem !important; color: rgba(255,255,255,0.35); white-space: nowrap;">&nbsp;</td>
+                    <td style="text-align: left; font-size: 0.62rem !important;"><span style="color: rgba(255,255,255,0.2);">-</span></td>
+                    <!-- (2026-07-13) Remove ONQ chip on status; prev: ONQUEUE badge -->
+                    <td style="text-align: center; font-size: 0.62rem !important;"><span style="color: rgba(255,255,255,0.2);">-</span></td>
+                    <td style="text-align: left; font-size: 0.62rem !important;"><span style="color: rgba(255,255,255,0.2);">-</span></td>
+                    <td style="text-align: left; font-size: 0.62rem !important; white-space: nowrap; color: rgba(255,255,255,0.45);">${loan.eff || 'N/A'}</td>
+                    <td style="text-align: left; font-size: 0.62rem !important; white-space: nowrap; color: rgba(255,255,255,0.45);">${termFmt}</td>
+                    <td style="text-align: center; padding-right: 4px !important;">
+                        <input type="checkbox" id="tag-onq-sub-row-${prefix}-${rowKey}-${oIdx}"
+                            class="checkbox-red-tag"
+                            ${isOnqSubTagged ? 'checked' : ''}
+                            ${statusMode === 'AS EASE / FIRST CSB ONQ' ? 'disabled' : ''}
+                            onchange="toggleOnqSubRowTag('${prefix}', '${rowKey}', ${oIdx}, this.checked)"
+                            style="${statusMode === 'AS EASE / FIRST CSB ONQ' ? 'opacity: 0.3; cursor: not-allowed;' : ''}; transform: scale(0.85);"
+                            title="${statusMode === 'AS EASE / FIRST CSB ONQ' ? 'Cannot tag AS EASE items for deletion' : 'Tag ONQ sub-deduction for deletion'}">
+                    </td>
+                </tr>`;
+            }).join('') : ''}
+            ${r.pliLoans && r.pliLoans.length > 0 ? r.pliLoans.map((loan, pIdx) => {
+                // (2026-07-13) Add PLI sub-rows below ONQ with pink tint; prev: none
+                const anyMatchCurrent = r.pliLoans.some(l => isCurrentBillingMonthEff(l.eff));
+                const defaultChecked = window.dedSelectionMode === 'all' ? true : (anyMatchCurrent ? isCurrentBillingMonthEff(loan.eff) : true);
+                const storageKey = `pli_checks_${prefix}-${rowKey}`;
+                const savedChecks = (()=>{ try{ return JSON.parse(localStorage.getItem(storageKey) || '{}'); }catch(e){ return {}; } })();
+                const isChecked = savedChecks[pIdx] !== undefined ? savedChecks[pIdx] : defaultChecked;
+                const termFmt = loan.term ? loan.term.replace(/^(\d+)(?:\.0+)?(\/\d{4})$/, (_, m, y) => String(m).padStart(2, '0') + y) : 'N/A';
+                const pliSubRowKey = `${prefix}-${rowKey}-pli-sub-${pIdx}`;
+                const isPliSubTagged = (()=>{ try{ const t=JSON.parse(localStorage.getItem('billing_sub_tags')||'{}'); return !!t[pliSubRowKey]; }catch(e){return false;} })();
+                return `
+                <tr id="pli-sub-row-${prefix}-${rowKey}-${pIdx}" style="display: none; background: ${isPliSubTagged ? 'rgba(239,68,68,0.12)' : 'rgba(236,72,153,0.04)'}; border-left: 2px solid rgba(236,72,153,0.3); font-size: 0.62rem; transition: background 0.2s ease;">
+                    <td style="text-align: left; color: rgba(255,255,255,0.3); font-size: 0.62rem !important; padding-left: 10px;" class="font-weight-bold">
+                        <span style="color: rgba(236,72,153,0.6); font-size: 0.58rem;">↳</span>
+                    </td>
+                    <td style="text-align: left; font-size: 0.62rem !important; color: rgba(255,255,255,0.35); white-space: nowrap;">
+                        <span class="badge font-weight-bold" style="background: rgba(236,72,153,0.18); color: #ec4899; border: 1px solid rgba(236,72,153,0.35); border-radius: 3px; font-size: 0.48rem; padding: 1px 3px; margin-right: 3px; vertical-align: middle;">PLI</span><span style="vertical-align: middle;">${loan.code || 'N/A'}</span>
+                    </td>
+                    <td style="text-align: left; font-size: 0.62rem !important; color: rgba(255,255,255,0.35);">&nbsp;</td>
+                    <td style="text-align: left; font-size: 0.62rem !important; color: rgba(255,255,255,0.35);">&nbsp;</td>
+                    <td style="text-align: left; font-size: 0.62rem !important; color: rgba(255,255,255,0.5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;" title="${loan.policyNo || ''}"><i class="bi bi-file-text" style="font-size:0.58rem; margin-right:2px;"></i>${loan.policyNo || 'N/A'}</td>
+                    <td style="text-align: left; font-size: 0.62rem !important; white-space: nowrap; color: rgba(255,255,255,0.45);">EFF: ${loan.eff || 'N/A'}</td>
+                    <td style="text-align: left; font-size: 0.62rem !important; white-space: nowrap; color: rgba(255,255,255,0.45);">TERM: ${termFmt}</td>
+                    <td style="text-align: left; font-size: 0.62rem !important; color: rgba(255,255,255,0.35); white-space: nowrap;">&nbsp;</td>
+                    <td style="text-align: left; font-size: 0.62rem !important; color: rgba(255,255,255,0.35); white-space: nowrap;">&nbsp;</td>
+                    <td style="text-align: left; font-size: 0.62rem !important; white-space: nowrap;">
+                        <div style="display: inline-flex; align-items: center; gap: 2px;">
+                            <input type="checkbox" id="pli-loan-check-${prefix}-${rowKey}-${pIdx}" class="checkbox-pli" ${isChecked ? 'checked' : ''} onchange="updatePliLoanSelection('${rowKey}', '${prefix}')" style="cursor: pointer; transform: scale(0.82); accent-color: #ec4899;">
+                            <span style="color: #ec4899; font-weight: 700;">${formatPHP(loan.dedamt || 0)}</span>
+                        </div>
+                    </td>
+                    <td style="text-align: left; font-size: 0.62rem !important;"><span style="color: rgba(255,255,255,0.2);">-</span></td>
+                    <!-- (2026-07-13) Remove PLI chip on status; prev: PLI badge -->
+                    <td style="text-align: center; font-size: 0.62rem !important;"><span style="color: rgba(255,255,255,0.2);">-</span></td>
+                    <td style="text-align: left; font-size: 0.62rem !important;"><span style="color: rgba(255,255,255,0.2);">-</span></td>
+                    <td style="text-align: left; font-size: 0.62rem !important; white-space: nowrap; color: rgba(255,255,255,0.45);">${loan.eff || 'N/A'}</td>
+                    <td style="text-align: left; font-size: 0.62rem !important; white-space: nowrap; color: rgba(255,255,255,0.45);">${termFmt}</td>
+                    <td style="text-align: center; padding-right: 4px !important;">
+                        <input type="checkbox" id="tag-pli-sub-row-${prefix}-${rowKey}-${pIdx}"
+                            class="checkbox-red-tag"
+                            ${isPliSubTagged ? 'checked' : ''}
+                            onchange="togglePliSubRowTag('${prefix}', '${rowKey}', ${pIdx}, this.checked)"
+                            style="transform: scale(0.85);"
+                            title="Tag PLI sub-deduction for deletion">
+                    </td>
+                </tr>`;
+            }).join('') : ''}
             `;
         }
 
@@ -5857,20 +5982,44 @@
             }
         }
 
+        // (2026-09-29) Toggle ONQ sub-deduction rows visibility; prev: toggled ONQ card
         function toggleOnqDetails(empNumStr, prefix = 'norm') {
-            const card = document.getElementById(`onq-detail-${prefix}-${empNumStr}`) || document.getElementById(`onq-detail-${empNumStr}`);
-            const row = document.getElementById(`deductions-row-${prefix}-${empNumStr}`) || document.getElementById(`deductions-row-${empNumStr}`);
             const chevron = document.getElementById(`onq-chevron-${prefix}-${empNumStr}`) || document.getElementById(`onq-chevron-${empNumStr}`);
-            const otherCard = document.getElementById(`pos-detail-${prefix}-${empNumStr}`) || document.getElementById(`pos-detail-${empNumStr}`);
+            const rowKey = empNumStr;
             
-            if (card && row) {
-                const isHidden = card.style.display === 'none' || !card.style.display;
-                card.style.display = isHidden ? 'block' : 'none';
-                if (chevron) chevron.className = isHidden ? 'bi bi-chevron-up' : 'bi bi-chevron-down';
+            // Find all ONQ sub-rows for this account
+            const subRows = document.querySelectorAll(`tr[id^="onq-sub-row-${prefix}-${rowKey}-"]`);
+            
+            if (subRows.length > 0) {
+                const firstRow = subRows[0];
+                const isHidden = firstRow.style.display === 'none' || !firstRow.style.display;
                 
-                // Show row if either card is visible
-                const otherVisible = otherCard && otherCard.style.display === 'block';
-                row.style.display = (isHidden || otherVisible) ? 'table-row' : 'none';
+                // Toggle all ONQ sub-rows
+                subRows.forEach(row => {
+                    row.style.display = isHidden ? 'table-row' : 'none';
+                });
+                
+                // Update chevron
+                if (chevron) {
+                    chevron.className = isHidden ? 'bi bi-chevron-up' : 'bi bi-chevron-down';
+                }
+            }
+        }
+
+        // (2026-07-13) Toggle PLI sub-deduction rows visibility; prev: none
+        function togglePliDetails(empNumStr, prefix = 'norm') {
+            const chevron = document.getElementById(`pli-chevron-${prefix}-${empNumStr}`) || document.getElementById(`pli-chevron-${empNumStr}`);
+            const rowKey = empNumStr;
+            const subRows = document.querySelectorAll(`tr[id^="pli-sub-row-${prefix}-${rowKey}-"]`);
+            if (subRows.length > 0) {
+                const firstRow = subRows[0];
+                const isHidden = firstRow.style.display === 'none' || !firstRow.style.display;
+                subRows.forEach(row => {
+                    row.style.display = isHidden ? 'table-row' : 'none';
+                });
+                if (chevron) {
+                    chevron.className = isHidden ? 'bi bi-chevron-up' : 'bi bi-chevron-down';
+                }
             }
         }
 
@@ -5970,6 +6119,14 @@
                         if (accCheckbox) accCheckbox.checked = isAll ? true : isCurrentBillingMonthEff(loan.eff);
                     });
                     updateOnqLoanSelection(rowKey, prefix);
+                }
+                // (2026-07-13) Sync PLI loan selections with mode; prev: none
+                if (rd.pliLoans && rd.pliLoans.length > 0) {
+                    rd.pliLoans.forEach((loan, idx) => {
+                        const cb = document.getElementById(`pli-loan-check-${prefix}-${rowKey}-${idx}`);
+                        if (cb) cb.checked = isAll ? true : isCurrentBillingMonthEff(loan.eff);
+                    });
+                    updatePliLoanSelection(rowKey, prefix);
                 }
             }
         }
@@ -6077,6 +6234,50 @@
             updateFirstBillingRowStatus(rowKey, prefix);
         }
 
+        // (2026-07-13) Recalc PLI selection & update PLI cell UI; prev: none
+        function updatePliLoanSelection(empNumStr, prefix = 'norm') {
+            const rowKey = empNumStr;
+            const cacheKey = `${prefix}-${rowKey}`;
+            const rowData = window.firstBillingRowsCache?.[cacheKey] || window.firstBillingRowsCache?.[rowKey] || window.firstBillingRowsCache?.[empNumStr];
+            if (!rowData || !rowData.pliLoans) return;
+            
+            const storageKey = `pli_checks_${cacheKey}`;
+            const checkStates = {};
+            let sum = 0;
+            let checkedCount = 0;
+            const isAll = isDedModeAll(prefix);
+            rowData.pliLoans.forEach((loan, idx) => {
+                const cb = document.getElementById(`pli-loan-check-${prefix}-${rowKey}-${idx}`);
+                if (cb) {
+                    checkStates[idx] = cb.checked;
+                    if (cb.checked) { sum += loan.dedamt || 0; checkedCount++; }
+                } else {
+                    const active = isAll || isCurrentBillingMonthEff(loan.eff);
+                    if (active) { sum += loan.dedamt || 0; checkedCount++; }
+                }
+            });
+            
+            try {
+                localStorage.setItem(storageKey, JSON.stringify(checkStates));
+            } catch (e) {
+                console.warn('Failed to save PLI checkbox states:', e);
+            }
+            
+            rowData.pliAmt = sum;
+            rowData.checkedPliCount = checkedCount;
+            rowData.userSelectedPli = true;
+
+            const pliValEl = document.getElementById(`pli-val-${prefix}-${rowKey}`);
+            if (pliValEl) pliValEl.innerHTML = formatPHP(sum);
+
+            const mainPliCheckbox = document.getElementById(`del-pli-${prefix}-${rowKey}`);
+            if (mainPliCheckbox) {
+                mainPliCheckbox.checked = checkedCount > 0;
+            }
+
+            updateFirstBillingRowStatus(rowKey, prefix);
+        }
+
         function loadNextBranchRowChunk() {}
 
         // ==================================================================================
@@ -6116,13 +6317,14 @@
                 currentBillingSort.asc = true;
                 ['norm', 'auto'].forEach(t => {
                     const el = document.getElementById('statusHeaderTitle-' + t);
-                    if (el) el.innerText = 'STATUS: ' + targetOption.label;
+                    // (2026-07-13) Line break status header; prev: single line text
+                    if (el) el.innerHTML = 'STATUS:<br>' + targetOption.label;
                 });
             } else {
                 currentStatusSortIdx = -1;
                 ['norm', 'auto'].forEach(t => {
                     const el = document.getElementById('statusHeaderTitle-' + t);
-                    if (el) el.innerText = 'Status';
+                    if (el) el.innerHTML = 'Status';
                 });
                 if (currentBillingSort.col === col) {
                     currentBillingSort.asc = !currentBillingSort.asc;
@@ -6158,10 +6360,14 @@
                 } else if (col === 'onqueue') {
                     vA = a.firstOnqAmt || 0;
                     vB = b.firstOnqAmt || 0;
+                // (2026-07-13) Sort by PLI amount column; prev: none
+                } else if (col === 'pli') {
+                    vA = a.pliAmt || 0;
+                    vB = b.pliAmt || 0;
                 } else if (col === 'netTotal') {
-                    // Net Total = NetPay - POS - ONQ (actual take-home after all deductions)
-                    vA = (a.netPayVal || 0) - (a.csbPositive || 0) - (a.firstOnqAmt || 0);
-                    vB = (b.netPayVal || 0) - (b.csbPositive || 0) - (b.firstOnqAmt || 0);
+                    // Net Total = NetPay + POS - ONQ
+                    vA = (a.netPayVal || 0) + (a.csbPositive || 0) - (a.firstOnqAmt || 0);
+                    vB = (b.netPayVal || 0) + (b.csbPositive || 0) - (b.firstOnqAmt || 0);
                 } else if (col === 'status') {
                     const targetKey = currentBillingSort.statusKey || 'EFFECTED';
                     const getStatusRank = (mode) => {
@@ -6204,7 +6410,7 @@
                 currentStatusSortIdx = -1;
                 ['norm', 'auto'].forEach(t => {
                     const el = document.getElementById('statusHeaderTitle-' + t);
-                    if (el) el.innerText = 'Status';
+                    if (el) el.innerHTML = 'Status';
                 });
                 sortBillingTable('id');
                 return;
@@ -6217,7 +6423,8 @@
             const targetOption = STATUS_SORT_CYCLE[currentStatusSortIdx] || { label: statusKey };
             ['norm', 'auto'].forEach(t => {
                 const el = document.getElementById('statusHeaderTitle-' + t);
-                if (el) el.innerText = 'STATUS: ' + targetOption.label;
+                // (2026-07-13) Line break status header; prev: single line text
+                if (el) el.innerHTML = 'STATUS:<br>' + targetOption.label;
             });
             const comparator = (a, b) => {
                 const getStatusRank = (mode) => {
@@ -6403,9 +6610,9 @@
             const effPos = delPos ? (rowData.csbPositive || 0) : 0;
             const effOnq = delOnq ? (rowData.firstOnqAmt || 0) : 0;
 
-            // FORMULA: NetPay MINUS POS MINUS ONQ = actual take-home after all deductions
+            // FORMULA: NetPay + POS - ONQ (POS is added because it's part of income, ONQ is subtracted)
             // Matches the same formula in buildBillingRowData for consistency
-            const formulaVal = effNetPay - effPos - effOnq;
+            const formulaVal = effNetPay + effPos - effOnq;
 
             const activePosCount = rowData.checkedPosCount !== undefined
                 ? rowData.checkedPosCount
@@ -6445,19 +6652,20 @@
 
             const statusTd = document.getElementById(`status-td-${prefix}-${rowKey}`) || document.getElementById(`status-td-${rowKey}`);
             if (statusTd) {
-                // (2026-07-13) Unify badge font to 0.50rem; prev: 0.52-0.56rem
+                // (2026-07-13) Unified 62px chip style for dynamic badge; prev: width: auto
+                const BS = 'width: 62px; height: 16px; border-radius: 4px; font-size: 0.42rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 2px; white-space: nowrap; letter-spacing: 0.01em; box-sizing: border-box;';
                 if (newStatus === 'AS EASE / FIRST CSB ONQ') {
-                    statusTd.innerHTML = `<span class="badge font-weight-bold" style="width: 100% !important; height: 18px !important; background: rgba(139,92,246,0.22); color: #8b5cf6; border: 1px solid #8b5cf6; border-radius: 4px; font-size: 0.48rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 4px; white-space: nowrap;">AS EASE / ONQ</span>`;
+                    statusTd.innerHTML = `<span class="badge font-weight-bold" style="${BS} background: rgba(139,92,246,0.22); color: #8b5cf6; border: 1px solid #8b5cf6;">AS EASE/ONQ</span>`;
                 } else if (newStatus === 'FIRST CSB ONQUEUE') {
-                    statusTd.innerHTML = `<span class="badge font-weight-bold" style="width: 100% !important; height: 18px !important; background: rgba(13,110,253,0.22); color: #3b82f6; border: 1px solid #3b82f6; border-radius: 4px; font-size: 0.50rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 4px; white-space: nowrap;">FIRST CSB ONQ</span>`;
+                    statusTd.innerHTML = `<span class="badge font-weight-bold" style="${BS} background: rgba(13,110,253,0.22); color: #3b82f6; border: 1px solid #3b82f6;">1ST CSB ONQ</span>`;
                 } else if (newStatus === 'OVERDEDUCTED') {
-                    statusTd.innerHTML = `<span class="badge font-weight-bold" style="width: 100% !important; height: 18px !important; background: rgba(245,158,11,0.22); color: #f59e0b; border: 1px solid #f59e0b; border-radius: 4px; font-size: 0.50rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 4px; white-space: nowrap;">EFF / OVERDED</span>`;
+                    statusTd.innerHTML = `<span class="badge font-weight-bold" style="${BS} background: rgba(245,158,11,0.22); color: #f59e0b; border: 1px solid #f59e0b;">EFF/OVERDED</span>`;
                 } else if (newStatus === 'UNDERDEDUCTED') {
-                    statusTd.innerHTML = `<span class="badge font-weight-bold" style="width: 100% !important; height: 18px !important; background: rgba(234,179,8,0.22); color: #facc15; border: 1px solid #facc15; border-radius: 4px; font-size: 0.50rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 4px; white-space: nowrap;">EFF / UNDERDED</span>`;
+                    statusTd.innerHTML = `<span class="badge font-weight-bold" style="${BS} background: rgba(234,179,8,0.22); color: #facc15; border: 1px solid #facc15;">EFF/UNDERDED</span>`;
                 } else if (newStatus === 'EFFECTED') {
-                    statusTd.innerHTML = `<span class="badge font-weight-bold" style="width: 100% !important; height: 18px !important; background: rgba(40,167,69,0.22); color: #28a745; border: 1px solid #28a745; border-radius: 4px; font-size: 0.50rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 4px; white-space: nowrap;">EFFECTED</span>`;
+                    statusTd.innerHTML = `<span class="badge font-weight-bold" style="${BS} background: rgba(40,167,69,0.22); color: #28a745; border: 1px solid #28a745;">EFFECTED</span>`;
                 } else {
-                    statusTd.innerHTML = `<span class="badge font-weight-bold" style="width: 100% !important; height: 18px !important; background: rgba(220,53,69,0.22); color: #dc3545; border: 1px solid #dc3545; border-radius: 4px; font-size: 0.50rem; display: inline-flex; align-items: center; justify-content: center; padding: 1px 4px; white-space: nowrap;">NO BILLING</span>`;
+                    statusTd.innerHTML = `<span class="badge font-weight-bold" style="${BS} background: rgba(220,53,69,0.22); color: #dc3545; border: 1px solid #dc3545;">NO BILLING</span>`;
                 }
             }
 
@@ -6465,11 +6673,11 @@
             if (diffTd) {
                 const diffVal = effPos - (rowData.monthlyAmort || 0);
                 if (newStatus === 'OVERDEDUCTED' && diffVal > 1.0) {
-                    diffTd.innerHTML = `<span style="color: #f59e0b; font-weight: 700; font-size: 0.72rem !important; white-space: nowrap;">+${formatPHP(diffVal)}</span>`;
+                    diffTd.innerHTML = `<span style="color: #f59e0b; font-weight: 700; font-size: 0.64rem !important; white-space: nowrap;">+${formatPHP(diffVal)}</span>`;
                 } else if (newStatus === 'UNDERDEDUCTED' && diffVal < -1.0) {
-                    diffTd.innerHTML = `<span style="color: #facc15; font-weight: 700; font-size: 0.72rem !important; white-space: nowrap;">-${formatPHP(Math.abs(diffVal))}</span>`;
+                    diffTd.innerHTML = `<span style="color: #facc15; font-weight: 700; font-size: 0.64rem !important; white-space: nowrap;">-${formatPHP(Math.abs(diffVal))}</span>`;
                 } else {
-                    diffTd.innerHTML = `<span style="color: rgba(255,255,255,0.3); font-weight: 600; font-size: 0.72rem !important;">-</span>`;
+                    diffTd.innerHTML = `<span style="color: rgba(255,255,255,0.3); font-weight: 600; font-size: 0.64rem !important;">-</span>`;
                 }
             }
 
@@ -6515,6 +6723,46 @@
                 }
             } catch (e) {
                 console.error('Failed to toggle sub-row tag:', e);
+            }
+        }
+
+        // (2026-07-13) Toggle ONQ sub-deduction row tag with RED tint; prev: none
+        function toggleOnqSubRowTag(prefix, rowKey, oIdx, isChecked) {
+            try {
+                const tags = JSON.parse(localStorage.getItem('billing_sub_tags') || '{}');
+                const key = `${prefix}-${rowKey}-onq-sub-${oIdx}`;
+                if (isChecked) {
+                    tags[key] = true;
+                } else {
+                    delete tags[key];
+                }
+                localStorage.setItem('billing_sub_tags', JSON.stringify(tags));
+                const row = document.getElementById(`onq-sub-row-${prefix}-${rowKey}-${oIdx}`);
+                if (row) {
+                    row.style.background = isChecked ? 'rgba(239,68,68,0.12)' : 'rgba(16,185,129,0.04)';
+                }
+            } catch (e) {
+                console.error('Failed to toggle ONQ sub-row tag:', e);
+            }
+        }
+
+        // (2026-07-13) Toggle PLI sub-deduction row tag with RED tint; prev: none
+        function togglePliSubRowTag(prefix, rowKey, pIdx, isChecked) {
+            try {
+                const tags = JSON.parse(localStorage.getItem('billing_sub_tags') || '{}');
+                const key = `${prefix}-${rowKey}-pli-sub-${pIdx}`;
+                if (isChecked) {
+                    tags[key] = true;
+                } else {
+                    delete tags[key];
+                }
+                localStorage.setItem('billing_sub_tags', JSON.stringify(tags));
+                const row = document.getElementById(`pli-sub-row-${prefix}-${rowKey}-${pIdx}`);
+                if (row) {
+                    row.style.background = isChecked ? 'rgba(239,68,68,0.12)' : 'rgba(236,72,153,0.04)';
+                }
+            } catch (e) {
+                console.error('Failed to toggle PLI sub-row tag:', e);
             }
         }
 
@@ -6572,8 +6820,8 @@
             const fmtDate = v => { if (!v || v === 'N/A') return 'N/A'; const d = new Date(v); return isNaN(d) ? String(v) : d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }); };
             const statusColor = { 'EFFECTED': '#22c55e', 'OVERDEDUCTED': '#f59e0b', 'UNDERDEDUCTED': '#facc15', 'FIRST CSB ONQUEUE': '#3b82f6', 'NO BILLING': '#6b7280' };
             const sColor = statusColor[r.statusMode] || '#6b7280';
-            // Net Total = NetPay - POS - ONQ (actual take-home after all deductions)
-            const netTotal = (r.netPayVal || 0) - (r.csbPositive || 0) - (r.firstOnqAmt || 0);
+            // Net Total = NetPay + POS - ONQ
+            const netTotal = (r.netPayVal || 0) + (r.csbPositive || 0) - (r.firstOnqAmt || 0);
             const initials = (r.clientName || '??').split(/[,\s]+/).filter(Boolean).map(w => w[0]).join('').slice(0, 2).toUpperCase();
 
             const posRows = (r.posLoans || []).map(l => `
@@ -8540,6 +8788,7 @@
         }
 
         // (2026-07-13) Render OnQueue table to netpay accordion container; prev: single container
+        // (2026-09-29) Redesigned renderOnQueueTable to show POS section (yellow) and ONQ section (green) separately
         function renderOnQueueTable(onqRows) {
             const containers = [
                 document.getElementById('onqTableContainer'),
@@ -8564,45 +8813,119 @@
             const dAmtIdx = oMap['DEDAMT'] ?? (onqH.findIndex(c => String(c).toUpperCase().trim().includes('DEDAMT')) !== -1 ? onqH.findIndex(c => String(c).toUpperCase().trim().includes('DEDAMT')) : 13);
             const plcNoIdx = oMap['POLICYNO'] ?? 15;
 
-            /* [2026-07-13 Fix: Added missing <tr> tag inside <thead> and removed inline font-size to use global CSS table styles] */
+            // (2026-09-29) Separate POS and ONQ rows; prev: single list
+            // POS items are those fetched from POS CSV, ONQ items are from ONQ CSV
+            // For now, we'll get POS data from the current employee's posLoans in the search context
+            const currentEmpNum = document.getElementById('searchInput')?.value?.trim();
+            const posLoans = [];
+            const onqLoans = [];
+            
+            // Try to get POS loans from currently loaded employee data
+            if (window.lastSearchedEmployee && window.currentData && window.currentData.pos) {
+                const posH = window.currentData.pos[0] || [];
+                const pMap = {};
+                posH.forEach((c, i) => { pMap[String(c || '').toUpperCase().trim()] = i; });
+                const pEmpIdx = pMap['EMPNO'] ?? 0;
+                const pCodeIdx = pMap['DEDCODE'] ?? 7;
+                const pEffYIdx = pMap['EFFYY'] ?? 9;
+                const pEffMIdx = pMap['EFFMM'] ?? 10;
+                const pTerYIdx = pMap['TERYY'] ?? 11;
+                const pTerMIdx = pMap['TERMM'] ?? 12;
+                const pDedAmtIdx = pMap['DEDAMT'] ?? 13;
+                
+                window.currentData.pos.slice(1).forEach(row => {
+                    const empNo = String(row[pEmpIdx] || '').trim();
+                    if (empNo === currentEmpNum) {
+                        const pliCode = row[pCodeIdx] || '';
+                        const effMO = String(Math.round(parseFloat(row[pEffMIdx]) || 0)).padStart(2, '0');
+                        const effYR = String(Math.round(parseFloat(row[pEffYIdx]) || 0));
+                        const eff = (effMO !== '00' && effYR !== '0') ? `${effMO}/${effYR}` : effYR || '-';
+                        const termMO = String(Math.round(parseFloat(row[pTerMIdx]) || 0)).padStart(2, '0');
+                        const termYR = String(Math.round(parseFloat(row[pTerYIdx]) || 0));
+                        const term = (termMO !== '00' && termYR !== '0') ? `${termMO}/${termYR}` : termYR || '-';
+                        const dedamt = safeFloat(row[pDedAmtIdx]);
+                        posLoans.push({ code: pliCode, eff, term, dedamt });
+                    }
+                });
+            }
+
+            // ONQ loans from the onqRows parameter
+            onqRows.forEach(row => {
+                const pliCode = row[dCodeIdx] || '';
+                const effMO = String(Math.round(parseFloat(row[effMIdx]) || 0)).padStart(2, '0');
+                const effYR = String(Math.round(parseFloat(row[effYIdx]) || 0));
+                const eff = (effMO !== '00' && effYR !== '0') ? `${effMO}/${effYR}` : effYR || '-';
+                const termMO = String(Math.round(parseFloat(row[terMIdx]) || 0)).padStart(2, '0');
+                const termYR = String(Math.round(parseFloat(row[terYIdx]) || 0));
+                const term = (termMO !== '00' && termYR !== '0') ? `${termMO}/${termYR}` : termYR || '-';
+                const dedamt = safeFloat(row[dAmtIdx]);
+                const plcyno = row[plcNoIdx] || '';
+                onqLoans.push({ code: pliCode, eff, term, dedamt, policyNo: plcyno });
+            });
+
+            /* [2026-09-29 New: Two-section table with POS (yellow) and ONQ (green) sections like CSB Deductions format] */
             let html = `
                 <table class="bank-table text-white">
                     <thead>
                         <tr>
-                            <th style="width: 32px; text-align: center; vertical-align: middle;"><input type="checkbox" id="onq-select-all" onchange="toggleAllOnqDeductions(this)"></th>
+                            <th style="width: 32px; text-align: center; vertical-align: middle;"><input type="checkbox" id="onq-select-all" checked onchange="toggleAllOnqDeductions(this)"></th>
                             <th>Code</th>
                             <th>EFF</th>
                             <th>TERM</th>
                             <th>DEDAMT</th>
-                            <th>Policy No</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        ${onqRows.map((row, idx) => {
-                            const pliCode = row[dCodeIdx] || '';
-                            // (2026-07-13) Parse eff/term month/year as int to strip .00 decimals; prev: raw float string
-                            const effMO = String(Math.round(parseFloat(row[effMIdx]) || 0)).padStart(2, '0');
-                            const effYR = String(Math.round(parseFloat(row[effYIdx]) || 0));
-                            const eff = (effMO !== '00' && effYR !== '0') ? `${effMO}/${effYR}` : effYR || '-';
-                            const termMO = String(Math.round(parseFloat(row[terMIdx]) || 0)).padStart(2, '0');
-                            const termYR = String(Math.round(parseFloat(row[terYIdx]) || 0));
-                            const term = (termMO !== '00' && termYR !== '0') ? `${termMO}/${termYR}` : termYR || '-';
-                            const dedamt = safeFloat(row[dAmtIdx]);
-                            const plcyno = row[plcNoIdx] || '';
-                            return `
-                                <tr onclick="toggleOnqRow(event, this)" style="cursor: pointer;">
-                                    <td data-label="Select" onclick="event.stopPropagation()">
-                                        <!-- (2026-07-13) Checkboxes checked by default; prev: unchecked -->
-                                        <input type="checkbox" class="onq-checkbox" data-dedamt="${dedamt}" checked onchange="runCalculations()">
-                                    </td>
-                                    <td data-label="CODE">${pliCode}</td>
-                                    <td data-label="EFF">${eff}</td>
-                                    <td data-label="TERM">${term}</td>
-                                    <td data-label="DEDAMT" class="font-weight-bold text-white">${formatPHP(dedamt)}</td>
-                                    <td data-label="Policy No">${plcyno}</td>
-                                </tr>
-                            `;
-                        }).join('')}
+                    <tbody>`;
+            
+            // POS SECTION (Yellow tint)
+            if (posLoans.length > 0) {
+                html += `
+                        <!-- POS SECTION HEADER -->
+                        <tr style="background: rgba(251,191,36,0.12); border-left: 3px solid #fbbf24;">
+                            <td colspan="5" style="font-weight: 700; color: #fbbf24; font-size: 0.65rem; padding: 6px 8px;">
+                                <i class="bi bi-wallet2" style="margin-right: 6px;"></i>POS
+                            </td>
+                        </tr>`;
+                
+                posLoans.forEach((loan, idx) => {
+                    html += `
+                        <tr style="background: rgba(251,191,36,0.08); border-left: 3px solid rgba(251,191,36,0.3); cursor: pointer;" onclick="toggleOnqRow(event, this)">
+                            <td data-label="Select" style="text-align: center;" onclick="event.stopPropagation()">
+                                <input type="checkbox" class="onq-pos-checkbox onq-checkbox" id="onq-pos-${idx}" data-dedamt="${loan.dedamt}" checked onchange="runCalculations()">
+                            </td>
+                            <td data-label="CODE">${loan.code}</td>
+                            <td data-label="EFF">${loan.eff}</td>
+                            <td data-label="TERM">${loan.term}</td>
+                            <td data-label="DEDAMT" class="font-weight-bold text-white">${formatPHP(loan.dedamt)}</td>
+                        </tr>`;
+                });
+            }
+            
+            // ONQ SECTION (Subtle green tint) - placed BELOW POS rows
+            if (onqLoans.length > 0) {
+                html += `
+                        <!-- ONQ SECTION HEADER -->
+                        <tr style="background: rgba(16,185,129,0.12); border-left: 3px solid #10b981; ${posLoans.length > 0 ? 'border-top: 2px solid rgba(16,185,129,0.2);' : ''}">
+                            <td colspan="5" style="font-weight: 700; color: #10b981; font-size: 0.65rem; padding: 6px 8px;">
+                                <i class="bi bi-hourglass-split" style="margin-right: 6px;"></i>ONQUEUE
+                            </td>
+                        </tr>`;
+                
+                onqLoans.forEach((loan, idx) => {
+                    html += `
+                        <tr style="background: rgba(16,185,129,0.05); border-left: 3px solid rgba(16,185,129,0.25); cursor: pointer;" onclick="toggleOnqRow(event, this)">
+                            <td data-label="Select" style="text-align: center;" onclick="event.stopPropagation()">
+                                <input type="checkbox" class="onq-onq-checkbox onq-checkbox" id="onq-onq-${idx}" data-dedamt="${loan.dedamt}" checked onchange="runCalculations()">
+                            </td>
+                            <td data-label="CODE">${loan.code}</td>
+                            <td data-label="EFF">${loan.eff}</td>
+                            <td data-label="TERM">${loan.term}</td>
+                            <td data-label="DEDAMT" class="font-weight-bold text-white">${formatPHP(loan.dedamt)}</td>
+                        </tr>`;
+                });
+            }
+            
+            html += `
                     </tbody>
                 </table>
             `;
