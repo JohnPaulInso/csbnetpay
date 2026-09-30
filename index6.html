@@ -4606,8 +4606,9 @@
             const keys = Object.keys(monthCounts).sort().reverse();
             let activeKey = targetKey;
             if (!activeKey || (!keys.includes(activeKey) && activeKey !== 'all')) {
-                // (2026-09-28) Default to 'all' months so no accounts are hidden; prev: defaulted to most recent month
-                activeKey = 'all';
+                // (2026-09-30) Default to previous month (August 2026 = 2026-08); prev: defaulted to 'all'
+                // Find August 2026 or fall back to most recent month
+                activeKey = keys.find(k => k === '2026-08') || keys[0] || 'all';
             }
             window.selectedLoanReleaseMonth = activeKey;
 
@@ -5000,6 +5001,10 @@
             const expectedEff = getExpectedEffectivity(transDate);
             const expectedMaturity = normalizeMonthYear(maturityDate);
             const code339Loans = (posObj.loans || []).filter(l => l.code === '339' || l.code === '0339');
+            const hasCode339 = code339Loans.length > 0;
+            // (2026-09-30) Check if first POS loan is code 339 for ONQ auto-check; prev: manual only
+            const firstPosIs339 = posObj.loans && posObj.loans.length > 0 && (posObj.loans[0].code === '339' || posObj.loans[0].code === '0339');
+            
             if (code339Loans.length > 0) {
                 code339Loans.forEach(loan => {
                     const diffAmt = Math.abs((loan.dedamt || 0) - monthlyAmort);
@@ -5018,6 +5023,9 @@
             } else if (csbPositive > 0) {
                 mismatchReasons.push('No Code 339 found');
             }
+            
+            // (2026-09-30) Auto-tag for deletion if code 339 AND net total >= 5000; prev: manual tagging only
+            const shouldAutoTag = firstPosIs339 && netTotal >= 5000;
 
             return {
                 empNumStr,
@@ -5042,7 +5050,11 @@
                 pliLoans: pliObj.loans || [],
                 pliAmt,
                 netPayVal,
-                isFirstRowCSB
+                isFirstRowCSB,
+                // (2026-09-30) Store code 339 detection flags; prev: not stored
+                hasCode339,
+                firstPosIs339,
+                shouldAutoTag
             };
         }
 
@@ -5499,35 +5511,59 @@
                 });
                 if (branchAccounts.length === 0) continue;
 
-                // (2026-07-13) Render all matching accounts for auto; prev: [0] only
+                // (2026-09-30) Process AUTO accounts - group multiple accounts under single row; prev: separate rows
                 const autoMatches = branchAccounts.filter(acc => {
                     const sc = String(acc.schemeCode || '').toUpperCase();
                     const sub = String(acc.productSubCategory || '').toUpperCase();
                     const isAuto = sc.includes('AUTO') || sub.includes('AUTO');
-                    return isAuto && accountMatchesFilterList(acc, autoFilters);
+                    // (2026-09-30) Exclude accounts with zero outstanding balance; prev: included all
+                    const hasBalance = (acc.outstandingBalance || 0) > 0;
+                    return isAuto && hasBalance && accountMatchesFilterList(acc, autoFilters);
                 });
-                autoMatches.forEach((acc, accIdx) => {
-                    const rowKey = autoMatches.length > 1 ? `${empNumStr}-${accIdx}` : empNumStr;
-                    const rData = buildBillingRowData(empNumStr, acc, netpayEmpMap, posEmpMap, onqEmpMap, normEmp, rowKey, pliEmpMap);
+                if (autoMatches.length > 0) {
+                    const primaryAcc = autoMatches[0];
+                    const rowKey = empNumStr;
+                    const rData = buildBillingRowData(empNumStr, primaryAcc, netpayEmpMap, posEmpMap, onqEmpMap, normEmp, rowKey, pliEmpMap);
+                    
+                    // (2026-09-30) Store all LCS accounts for this employee; prev: single account
+                    if (autoMatches.length > 1) {
+                        rData.lcsAccounts = autoMatches;
+                        rData.hasMultipleAccounts = true;
+                        // Calculate combined monthly amort from all accounts
+                        rData.monthlyAmort = autoMatches.reduce((sum, acc) => sum + (acc.amortization || 0), 0);
+                    }
+                    
                     window.firstBillingRowsCache[`auto-${rowKey}`] = rData;
                     window.firstBillingRowsCache[rowKey] = rData;
                     rowsToRenderAuto.push(rData);
-                });
+                }
 
-                // (2026-07-13) Render all matching accounts for normal; prev: [0] only
+                // (2026-09-30) Process NORMAL accounts - group multiple accounts under single row; prev: separate rows
                 const normalMatches = branchAccounts.filter(acc => {
                     const sc = String(acc.schemeCode || '').toUpperCase();
                     const sub = String(acc.productSubCategory || '').toUpperCase();
                     const isAuto = sc.includes('AUTO') || sub.includes('AUTO');
-                    return !isAuto && accountMatchesFilterList(acc, normalFilters);
+                    // (2026-09-30) Exclude accounts with zero outstanding balance; prev: included all
+                    const hasBalance = (acc.outstandingBalance || 0) > 0;
+                    return !isAuto && hasBalance && accountMatchesFilterList(acc, normalFilters);
                 });
-                normalMatches.forEach((acc, accIdx) => {
-                    const rowKey = normalMatches.length > 1 ? `${empNumStr}-${accIdx}` : empNumStr;
-                    const rData = buildBillingRowData(empNumStr, acc, netpayEmpMap, posEmpMap, onqEmpMap, normEmp, rowKey, pliEmpMap);
+                if (normalMatches.length > 0) {
+                    const primaryAcc = normalMatches[0];
+                    const rowKey = empNumStr;
+                    const rData = buildBillingRowData(empNumStr, primaryAcc, netpayEmpMap, posEmpMap, onqEmpMap, normEmp, rowKey, pliEmpMap);
+                    
+                    // (2026-09-30) Store all LCS accounts for this employee; prev: single account
+                    if (normalMatches.length > 1) {
+                        rData.lcsAccounts = normalMatches;
+                        rData.hasMultipleAccounts = true;
+                        // Calculate combined monthly amort from all accounts
+                        rData.monthlyAmort = normalMatches.reduce((sum, acc) => sum + (acc.amortization || 0), 0);
+                    }
+                    
                     window.firstBillingRowsCache[`norm-${rowKey}`] = rData;
                     window.firstBillingRowsCache[rowKey] = rData;
                     rowsToRenderNormal.push(rData);
-                });
+                }
             }
 
             const allCombined = [...rowsToRenderNormal, ...rowsToRenderAuto];
@@ -5614,8 +5650,9 @@
         // (2026-07-13) Use rowKey across DOM elements; prev: empNumStr collapsed
         function generateBranchRowHtml(r, idx, prefix = 'norm') {
             const rowKey = r.rowKey || r.empNumStr;
-            const isTagged = (()=>{ try{ const t=JSON.parse(localStorage.getItem('billing_tags')||'{}'); return !!t[`${prefix}-${rowKey}`] || !!t[rowKey] || !!t[`${prefix}-${r.empNumStr}`] || !!t[r.empNumStr]; }catch(e){return false;} })();
-            // Net Total = NetPay + POS - ONQ
+            // (2026-09-30) Auto-tag main row if code 339 AND net total >= 5000; prev: manual only
+            const isTagged = r.shouldAutoTag || (()=>{ try{ const t=JSON.parse(localStorage.getItem('billing_tags')||'{}'); return !!t[`${prefix}-${rowKey}`] || !!t[rowKey] || !!t[`${prefix}-${r.empNumStr}`] || !!t[r.empNumStr]; }catch(e){return false;} })();
+            // (2026-09-30) Net Total = NetPay + POS - ONQ (PLI not included initially, added when user checks PLI)
             const netTotal = r.netPayVal + r.csbPositive - r.firstOnqAmt;
             let statusMode = r.statusMode;
             
@@ -5640,9 +5677,12 @@
                         <!-- (2026-07-13) Pass prefix to profile modal; prev: no prefix arg -->
                         <span class="text-warning" style="cursor: pointer; font-size: 0.65rem !important;" onclick="inspectEmployeeProfile('${r.empNumStr}', '${prefix}')" title="${r.clientName}">${r.clientName}</span>
                     </td>
-                    <td data-label="Monthly Amort" style="text-align: left; font-size: 0.64rem !important;" class="tabular-nums font-weight-bold">
-                        <div style="display: flex; align-items: center; justify-content: flex-start; gap: 2px;">
+                    <td data-label="Monthly Amort" style="text-align: left; font-size: 0.64rem !important; vertical-align: top; padding-top: 8px !important; padding-bottom: 8px !important;" class="tabular-nums font-weight-bold">
+                        <div style="display: flex; flex-direction: column; gap: 3px; align-items: flex-start;">
                             <span style="color: #dc3545; font-size: 0.64rem !important;">${formatPHP(r.monthlyAmort)}</span>
+                            ${r.hasMultipleAccounts && r.lcsAccounts ? r.lcsAccounts.slice(1).map(acc => `
+                                <span style="color: rgba(220,53,69,0.7); font-size: 0.62rem !important;">${formatPHP(acc.amortization || 0)}</span>
+                            `).join('') : ''}
                         </div>
                     </td>
                     <td data-label="NetPay" style="text-align: left; font-size: 0.64rem !important; white-space: nowrap;" class="tabular-nums font-weight-bold">
@@ -5664,8 +5704,8 @@
                     </td>
                     <td data-label="First CSB (OnQueue)" style="text-align: left; font-size: 0.64rem !important; white-space: nowrap;" class="tabular-nums font-weight-bold">
                         <div style="display: inline-flex; align-items: center; justify-content: flex-start; gap: 1px; white-space: nowrap;">
-                            <!-- (2026-07-13) Check onq only if positive; prev: hardcoded checked -->
-                            <input type="checkbox" id="del-onq-${prefix}-${rowKey}" class="checkbox-onq" ${r.firstOnqAmt > 0 ? 'checked' : ''} onchange="updateFirstBillingRowStatus('${rowKey}', '${prefix}')" style="cursor: pointer; transform: scale(0.82); margin-right: 2px; flex-shrink: 0;" title="Include/Exclude OnQueue from Net Total">
+                            <!-- (2026-09-30) Auto-check ONQ if first POS is code 339; prev: only if positive -->
+                            <input type="checkbox" id="del-onq-${prefix}-${rowKey}" class="checkbox-onq" ${r.firstPosIs339 || r.firstOnqAmt > 0 ? 'checked' : ''} onchange="updateFirstBillingRowStatus('${rowKey}', '${prefix}')" style="cursor: pointer; transform: scale(0.82); margin-right: 2px; flex-shrink: 0;" title="Include/Exclude OnQueue from Net Total">
                             <span id="onq-val-${prefix}-${rowKey}" style="color: #10b981; font-size: 0.64rem !important;">${formatPHP(r.firstOnqAmt)}</span>
                             ${r.onqLoans && r.onqLoans.length > 0 ? `<button type="button" onclick="toggleOnqDetails('${rowKey}', '${prefix}')" style="background: none; border: none; color: #10b981; cursor: pointer; padding: 0 1px; font-size: 0.58rem; margin-left: 1px; line-height: 1; vertical-align: middle;"><i id="onq-chevron-${prefix}-${rowKey}" class="bi bi-chevron-down"></i></button>` : ''}
                         </div>
@@ -5709,13 +5749,21 @@
                             return `<span style="color: rgba(255,255,255,0.3); font-weight: 600; font-size: 0.64rem !important;">-</span>`;
                         })()}
                     </td>
-                    <td data-label="Release" style="text-align: left; font-size: 0.64rem !important; white-space: nowrap;" class="text-white-50" title="${formatLoanDate(r.transDate)}">
-                        <!-- (2026-09-29) Show loan release month from dropdown filter, not individual EFF dates; prev: showed posLoans eff -->
-                        ${formatLoanDate(r.transDate)}
+                    <td data-label="Release" style="text-align: left; font-size: 0.64rem !important; white-space: nowrap; vertical-align: top; padding-top: 8px !important; padding-bottom: 8px !important;" class="text-white-50" title="${formatLoanDate(r.transDate)}">
+                        <div style="display: flex; flex-direction: column; gap: 3px; align-items: flex-start;">
+                            <span>${formatLoanDate(r.transDate)}</span>
+                            ${r.hasMultipleAccounts && r.lcsAccounts ? r.lcsAccounts.slice(1).map(acc => `
+                                <span style="opacity: 0.7; font-size: 0.62rem !important;">${formatLoanDate(acc.loanDate)}</span>
+                            `).join('') : ''}
+                        </div>
                     </td>
-                    <td data-label="Maturity" style="text-align: left; font-size: 0.64rem !important; color: rgba(255,255,255,0.7); white-space: nowrap;" title="${formatLoanDate(r.maturityDate)}">
-                        <!-- (2026-09-29) Show maturity date from LCS, not individual TERM dates; prev: showed posLoans term -->
-                        ${formatLoanDate(r.maturityDate)}
+                    <td data-label="Maturity" style="text-align: left; font-size: 0.64rem !important; color: rgba(255,255,255,0.7); white-space: nowrap; vertical-align: top; padding-top: 8px !important; padding-bottom: 8px !important;" title="${formatLoanDate(r.maturityDate)}">
+                        <div style="display: flex; flex-direction: column; gap: 3px; align-items: flex-start;">
+                            <span>${formatLoanDate(r.maturityDate)}</span>
+                            ${r.hasMultipleAccounts && r.lcsAccounts ? r.lcsAccounts.slice(1).map(acc => `
+                                <span style="opacity: 0.7; font-size: 0.62rem !important;">${formatLoanDate(acc.maturityDate)}</span>
+                            `).join('') : ''}
+                        </div>
                     </td>
                     <td data-label="Tag" style="text-align: center; vertical-align: middle; padding-right: 4px !important;">
                         <input type="checkbox" id="tag-row-${prefix}-${rowKey}"
@@ -5800,9 +5848,10 @@
                 const subBg = subStatus==='EFFECTED' ? 'rgba(40,167,69,0.22)' : (subStatus==='OVERDED' ? 'rgba(245,158,11,0.22)' : 'rgba(234,179,8,0.22)');
                 const subClr = subStatus==='EFFECTED' ? '#28a745' : (subStatus==='OVERDED' ? '#f59e0b' : '#facc15');
                 const termFmt = loan.term ? loan.term.replace(/^(\d+)(?:\.0+)?(\/\d{4})$/, (_, m, y) => String(m).padStart(2, '0') + y) : 'N/A';
-                // (2026-09-27) Check if sub-row is tagged; prev: no sub-row tagging
+                // (2026-09-30) Auto-tag POS sub-row for deletion if code 339; prev: manual only
+                const isCode339 = loan.code === '339' || loan.code === '0339';
                 const subRowKey = `${prefix}-${rowKey}-sub-${lIdx}`;
-                const isSubTagged = (()=>{ try{ const t=JSON.parse(localStorage.getItem('billing_sub_tags')||'{}'); return !!t[subRowKey]; }catch(e){return false;} })();
+                const isSubTagged = isCode339 || (()=>{ try{ const t=JSON.parse(localStorage.getItem('billing_sub_tags')||'{}'); return !!t[subRowKey]; }catch(e){return false;} })();
                 return `
                 <tr id="pos-sub-row-${prefix}-${rowKey}-${lIdx}" style="display: none; background: ${isSubTagged ? 'rgba(239,68,68,0.12)' : 'rgba(251,191,36,0.04)'}; border-left: 2px solid rgba(251,191,36,0.25); font-size: 0.62rem; transition: background 0.2s ease;">
                     <td style="text-align: left; color: rgba(255,255,255,0.3); font-size: 0.62rem !important; padding-left: 10px;" class="font-weight-bold">
@@ -5834,15 +5883,15 @@
                     <td style="text-align: left; font-size: 0.62rem !important;"><span style="color: rgba(255,255,255,0.2);">-</span></td>
                     <td style="text-align: left; font-size: 0.62rem !important; white-space: nowrap; color: rgba(255,255,255,0.45);">${loan.eff || 'N/A'}</td>
                     <td style="text-align: left; font-size: 0.62rem !important; white-space: nowrap; color: rgba(255,255,255,0.45);">${termFmt}</td>
-                    <!-- (2026-09-28) Add red tag checkbox for sub-deduction rows; disabled for AS EASE status -->
+                    <!-- (2026-09-30) Auto-tag code 339 POS loans for deletion; prev: manual only -->
                     <td style="text-align: center; padding-right: 4px !important;">
                         <input type="checkbox" id="tag-sub-row-${prefix}-${rowKey}-${lIdx}"
                             class="checkbox-red-tag"
                             ${isSubTagged ? 'checked' : ''}
-                            ${statusMode === 'AS EASE / FIRST CSB ONQ' ? 'disabled' : ''}
+                            ${statusMode === 'AS EASE / FIRST CSB ONQ' || isCode339 ? 'disabled' : ''}
                             onchange="toggleSubRowTag('${prefix}', '${rowKey}', ${lIdx}, this.checked)"
-                            style="${statusMode === 'AS EASE / FIRST CSB ONQ' ? 'opacity: 0.3; cursor: not-allowed;' : ''}; transform: scale(0.85);"
-                            title="${statusMode === 'AS EASE / FIRST CSB ONQ' ? 'Cannot tag AS EASE items for deletion' : 'Tag sub-deduction for deletion'}">
+                            style="${statusMode === 'AS EASE / FIRST CSB ONQ' || isCode339 ? 'opacity: 0.3; cursor: not-allowed;' : ''}; transform: scale(0.85);"
+                            title="${statusMode === 'AS EASE / FIRST CSB ONQ' ? 'Cannot tag AS EASE items for deletion' : (isCode339 ? 'Auto-tagged: Code 339 for deletion' : 'Tag sub-deduction for deletion')}">
                     </td>
                 </tr>`;}).join('') : ''}
             ${r.onqLoans && r.onqLoans.length > 0 ? r.onqLoans.map((loan, oIdx) => {
@@ -5943,6 +5992,30 @@
                 </tr>`;
             }).join('') : ''}
             `;
+        }
+
+        // (2026-09-30) Toggle LCS account sub-rows for employees with multiple loan accounts; prev: none
+        function toggleLcsAccountDetails(empNumStr, prefix = 'norm') {
+            const chevron = document.getElementById(`lcs-chevron-${prefix}-${empNumStr}`) || document.getElementById(`lcs-chevron-${empNumStr}`);
+            const rowKey = empNumStr;
+            
+            // Find all LCS account sub-rows for this employee
+            const subRows = document.querySelectorAll(`tr[id^="lcs-sub-row-${prefix}-${rowKey}-"]`);
+            
+            if (subRows.length > 0) {
+                const firstRow = subRows[0];
+                const isHidden = firstRow.style.display === 'none' || !firstRow.style.display;
+                
+                // Toggle all sub-rows
+                subRows.forEach(row => {
+                    row.style.display = isHidden ? 'table-row' : 'none';
+                });
+                
+                // Rotate chevron
+                if (chevron) {
+                    chevron.className = isHidden ? 'bi bi-chevron-up' : 'bi bi-chevron-down';
+                }
+            }
         }
 
         // (2026-09-28) Toggle POS sub-deduction rows visibility; prev: toggled CSB DEDUCTIONS card
@@ -6446,15 +6519,8 @@
             const clearBtn = document.getElementById('billingSearchClearBtn');
             if (clearBtn) clearBtn.style.display = searchVal ? 'inline-block' : 'none';
 
-            // (2026-07-13) Bypass release month when status filter active; prev: restricted
-            const isStatusFilterActive = currentBillingSort.col === 'status' && currentBillingSort.statusKey && currentBillingSort.statusKey !== 'ALL';
-            const selectedMonth = isStatusFilterActive ? 'all' : (window.selectedLoanReleaseMonth || 'all');
-            if (isStatusFilterActive) {
-                const normSelect = document.getElementById('loanReleaseMonthFilter-norm');
-                if (normSelect && normSelect.value !== 'all') normSelect.value = 'all';
-                const autoSelect = document.getElementById('loanReleaseMonthFilter-auto');
-                if (autoSelect && autoSelect.value !== 'all') autoSelect.value = 'all';
-            }
+            // (2026-09-30) Keep release month filter active even when status filter is on; prev: bypassed month filter
+            const selectedMonth = window.selectedLoanReleaseMonth || 'all';
 
             let filteredNorm = window.currentBranchAllRowsNormal || [];
             let filteredAuto = window.currentBranchAllRowsAuto || [];
@@ -6463,7 +6529,8 @@
                 filteredNorm = filteredNorm.filter(r => getLoanDateMonthKey(r.transDate) === selectedMonth);
                 filteredAuto = filteredAuto.filter(r => getLoanDateMonthKey(r.transDate) === selectedMonth);
             }
-            // (2026-07-13) Filter rows strictly by statusKey; prev: sorted only
+            // (2026-09-30) Filter rows by statusKey while keeping month filter active; prev: bypassed month
+            const isStatusFilterActive = currentBillingSort.col === 'status' && currentBillingSort.statusKey && currentBillingSort.statusKey !== 'ALL';
             if (isStatusFilterActive) {
                 const targetKey = currentBillingSort.statusKey;
                 const matchesStatus = r => {
@@ -6538,9 +6605,9 @@
             window.currentBranchRowsAuto = filteredAuto;
             window.currentBranchRowsToRender = filteredNorm;
 
-            // (2026-07-13) Keep metrics on full branch rows; prev: filtered array
-            const allBranchRows = (window.currentBranchAllRowsNormal || []).concat(window.currentBranchAllRowsAuto || []);
-            updateDashboardMetrics(allBranchRows);
+            // (2026-09-30) Update metrics to reflect FILTERED rows only (respects release month selection); prev: all branch rows
+            const filteredMetricsRows = filteredNorm.concat(filteredAuto);
+            updateDashboardMetrics(filteredMetricsRows);
 
             // (2026-09-28) Use tbody-norm/tbody-auto IDs for infinite scroll; prev: firstBillingTbody/autonomousBillingTbody
             const tbodyNorm = document.getElementById('tbody-norm');
@@ -6616,14 +6683,17 @@
             const delNetpay = (document.getElementById(`del-netpay-${prefix}-${rowKey}`) || document.getElementById(`del-netpay-${rowKey}`))?.checked ?? true;
             const delPos = (document.getElementById(`del-pos-${prefix}-${rowKey}`) || document.getElementById(`del-pos-${rowKey}`))?.checked ?? true;
             const delOnq = (document.getElementById(`del-onq-${prefix}-${rowKey}`) || document.getElementById(`del-onq-${rowKey}`))?.checked ?? true;
+            const delPli = (document.getElementById(`del-pli-${prefix}-${rowKey}`) || document.getElementById(`del-pli-${rowKey}`))?.checked ?? false;
 
             const effNetPay = delNetpay ? (rowData.netPayVal || 0) : 0;
             const effPos = delPos ? (rowData.csbPositive || 0) : 0;
             const effOnq = delOnq ? (rowData.firstOnqAmt || 0) : 0;
+            const effPli = delPli ? (rowData.pliAmt || 0) : 0;
 
-            // FORMULA: NetPay + POS - ONQ (POS is added because it's part of income, ONQ is subtracted)
-            // Matches the same formula in buildBillingRowData for consistency
-            const formulaVal = effNetPay + effPos - effOnq;
+            // (2026-09-30) FORMULA: NetPay + POS - ONQ + PLI (ALWAYS includes actual POS, PLI added when checkbox checked)
+            // Net Total display always uses actual POS value, PLI is added when checked
+            const actualPOS = rowData.csbPositive || 0;
+            const formulaVal = effNetPay + actualPOS - effOnq + effPli;
 
             const activePosCount = rowData.checkedPosCount !== undefined
                 ? rowData.checkedPosCount
@@ -6694,8 +6764,9 @@
                 }
             }
 
-            const allRows = (window.currentBranchAllRowsNormal || []).concat(window.currentBranchAllRowsAuto || []);
-            if (allRows.length > 0) updateDashboardMetrics(allRows);
+            // (2026-09-30) Update metrics using FILTERED rows only (respects release month filter); prev: all branch rows
+            const filteredRows = (window.currentBranchRowsNormal || []).concat(window.currentBranchRowsAuto || []);
+            if (filteredRows.length > 0) updateDashboardMetrics(filteredRows);
         }
 
         function toggleBillingTag(empNumStr, isChecked, prefix = 'norm') {
