@@ -4929,10 +4929,18 @@
             // (2026-07-13) Use isDedModeAll helper; prev: direct string check
             const _isAll = typeof isDedModeAll === 'function' ? isDedModeAll() : (window.dedSelectionMode === 'all');
             
+            // (2026-09-30) Calculate POS loans based on current month filter or all mode
+            // If "Select All" mode: include all loans
+            // If "Current Month Only": include only loans matching current month EFF
+            const allPosLoansTotal = _isAll ? 
+                (posObj.loans || []).reduce((s, l) => s + (l.dedamt || 0), 0) :
+                (posObj.loans || []).reduce((s, l) => s + (_matchEff(l.eff) ? (l.dedamt || 0) : 0), 0);
+            
             // (2026-07-13) Set default ONQ to 0 unless isAll; prev: onqObj.amt
             const effectivePos = (posObj.loans || []).reduce((s, l) => s + ((_isAll || _matchEff(l.eff)) ? (l.dedamt || 0) : 0), 0);
             const effectiveOnq = _isAll ? (onqObj.amt || 0) : 0;
-            const csbPositive = effectivePos;
+            // (2026-09-30) csbPositive uses filtered POS loans based on month selection; prev: all loans always
+            const csbPositive = allPosLoansTotal;
             const firstOnqAmt = effectiveOnq;
             const pliAmt = 0;
 
@@ -4971,13 +4979,32 @@
             let statusMode = 'NO BILLING';
             let mismatchReasons = [];
 
+            // (2026-09-30) Detect code 339 BEFORE status calculation; prev: after
+            const code339Loans = (posObj.loans || []).filter(l => l.code === '339' || l.code === '0339');
+            const hasCode339 = code339Loans.length > 0;
+            const firstPosIs339 = posObj.loans && posObj.loans.length > 0 && (posObj.loans[0].code === '339' || posObj.loans[0].code === '0339');
+            const firstOnqIs339 = onqObj.loans && onqObj.loans.length > 0 && (onqObj.loans[0].code === '339' || onqObj.loans[0].code === '0339');
+
             // (2026-07-13) Detect ONQ status by onq records; prev: effectiveOnq > 0 only
-            const hasOnq = (onqObj.loans && onqObj.loans.length > 0) || effectiveOnq > 0;
+            // (2026-09-30) Also consider firstOnqIs339 or firstPosIs339 as having ONQ
+            const hasOnq = (onqObj.loans && onqObj.loans.length > 0) || effectiveOnq > 0 || firstOnqIs339 || firstPosIs339;
             const onqAmtForStatus = effectiveOnq > 0 ? effectiveOnq : (onqObj.amt || 0);
-            const netTotal = netPayVal + effectivePos - effectiveOnq;
+            // (2026-09-30) Net Total uses ALL POS loans (already calculated as allPosLoansTotal = csbPositive)
+            const netTotal = netPayVal + csbPositive - effectiveOnq;
             const netTotalForStatus = netPayVal + effectivePos - onqAmtForStatus;
 
-            if (effectivePos === 0) {
+            // (2026-09-30) Priority: Only check ONQ 339 if ONQ actually exists
+            // Fixed: Code 339 in POS doesn't trigger ONQ status unless ONQ exists
+            if (firstOnqIs339 && hasOnq) {
+                // First ONQ is code 339 AND ONQ exists - definitely an ONQ case
+                if (netTotal < 5000) {
+                    statusMode = 'AS EASE / FIRST CSB ONQ';
+                    console.log('[AS EASE - ONQ 339] ✅', empNumStr, clientName, 'netTotal:', netTotal);
+                } else {
+                    statusMode = 'FIRST CSB ONQUEUE';
+                    console.log('[FIRST CSB ONQ - ONQ 339] ✅', empNumStr, clientName, 'netTotal:', netTotal);
+                }
+            } else if (effectivePos === 0) {
                 statusMode = 'NO BILLING';
             } else if (effectivePos > (monthlyAmort + 1.0)) {
                 // (2026-09-28) Check OVERDEDUCTED first; prev: checked ONQ first
@@ -5000,10 +5027,6 @@
 
             const expectedEff = getExpectedEffectivity(transDate);
             const expectedMaturity = normalizeMonthYear(maturityDate);
-            const code339Loans = (posObj.loans || []).filter(l => l.code === '339' || l.code === '0339');
-            const hasCode339 = code339Loans.length > 0;
-            // (2026-09-30) Check if first POS loan is code 339 for ONQ auto-check; prev: manual only
-            const firstPosIs339 = posObj.loans && posObj.loans.length > 0 && (posObj.loans[0].code === '339' || posObj.loans[0].code === '0339');
             
             if (code339Loans.length > 0) {
                 code339Loans.forEach(loan => {
@@ -5025,7 +5048,7 @@
             }
             
             // (2026-09-30) Auto-tag for deletion if code 339 AND net total >= 5000; prev: manual tagging only
-            const shouldAutoTag = firstPosIs339 && netTotal >= 5000;
+            const shouldAutoTag = (firstPosIs339 || firstOnqIs339) && netTotal >= 5000;
 
             return {
                 empNumStr,
@@ -5054,6 +5077,7 @@
                 // (2026-09-30) Store code 339 detection flags; prev: not stored
                 hasCode339,
                 firstPosIs339,
+                firstOnqIs339,
                 shouldAutoTag
             };
         }
@@ -5696,16 +5720,16 @@
                     <!-- (2026-09-27) Add dropdown button for POS details; prev: no dropdown -->
                     <td data-label="CSB Positive" style="text-align: left; font-size: 0.64rem !important; white-space: nowrap;" class="tabular-nums font-weight-bold">
                         <div style="display: inline-flex; align-items: center; justify-content: flex-start; gap: 1px; white-space: nowrap;">
-                            <!-- (2026-07-13) Check pos only if positive; prev: hardcoded checked -->
-                            <input type="checkbox" id="del-pos-${prefix}-${rowKey}" class="checkbox-pos" ${r.csbPositive > 0 ? 'checked' : ''} onchange="updateFirstBillingRowStatus('${rowKey}', '${prefix}')" style="cursor: pointer; transform: scale(0.82); margin-right: 2px; flex-shrink: 0;" title="Include/Exclude CSB Positive from Net Total">
+                            <!-- (2026-09-30) POS checkbox unchecked, user controls via sub-deductions; prev: always checked -->
+                            <input type="checkbox" id="del-pos-${prefix}-${rowKey}" class="checkbox-pos" onchange="updateFirstBillingRowStatus('${rowKey}', '${prefix}')" style="cursor: pointer; transform: scale(0.82); margin-right: 2px; flex-shrink: 0;" title="Include/Exclude CSB Positive from Net Total">
                             <span id="pos-val-${prefix}-${rowKey}" style="color: #fbbf24; font-size: 0.64rem !important;">${formatPHP(r.csbPositive)}</span>
                             ${r.posLoans && r.posLoans.length > 0 ? `<button type="button" onclick="togglePosDetails('${rowKey}', '${prefix}')" style="background: none; border: none; color: #fbbf24; cursor: pointer; padding: 0 1px; font-size: 0.58rem; margin-left: 1px; line-height: 1; vertical-align: middle;"><i id="pos-chevron-${prefix}-${rowKey}" class="bi bi-chevron-down"></i></button>` : ''}
                         </div>
                     </td>
                     <td data-label="First CSB (OnQueue)" style="text-align: left; font-size: 0.64rem !important; white-space: nowrap;" class="tabular-nums font-weight-bold">
                         <div style="display: inline-flex; align-items: center; justify-content: flex-start; gap: 1px; white-space: nowrap;">
-                            <!-- (2026-09-30) Auto-check ONQ if first POS is code 339; prev: only if positive -->
-                            <input type="checkbox" id="del-onq-${prefix}-${rowKey}" class="checkbox-onq" ${r.firstPosIs339 || r.firstOnqAmt > 0 ? 'checked' : ''} onchange="updateFirstBillingRowStatus('${rowKey}', '${prefix}')" style="cursor: pointer; transform: scale(0.82); margin-right: 2px; flex-shrink: 0;" title="Include/Exclude OnQueue from Net Total">
+                            <!-- (2026-09-30) Auto-check ONQ if first POS or first ONQ is code 339; prev: only if positive -->
+                            <input type="checkbox" id="del-onq-${prefix}-${rowKey}" class="checkbox-onq" ${r.firstPosIs339 || r.firstOnqIs339 || r.firstOnqAmt > 0 ? 'checked' : ''} onchange="updateFirstBillingRowStatus('${rowKey}', '${prefix}')" style="cursor: pointer; transform: scale(0.82); margin-right: 2px; flex-shrink: 0;" title="Include/Exclude OnQueue from Net Total">
                             <span id="onq-val-${prefix}-${rowKey}" style="color: #10b981; font-size: 0.64rem !important;">${formatPHP(r.firstOnqAmt)}</span>
                             ${r.onqLoans && r.onqLoans.length > 0 ? `<button type="button" onclick="toggleOnqDetails('${rowKey}', '${prefix}')" style="background: none; border: none; color: #10b981; cursor: pointer; padding: 0 1px; font-size: 0.58rem; margin-left: 1px; line-height: 1; vertical-align: middle;"><i id="onq-chevron-${prefix}-${rowKey}" class="bi bi-chevron-down"></i></button>` : ''}
                         </div>
@@ -5883,15 +5907,15 @@
                     <td style="text-align: left; font-size: 0.62rem !important;"><span style="color: rgba(255,255,255,0.2);">-</span></td>
                     <td style="text-align: left; font-size: 0.62rem !important; white-space: nowrap; color: rgba(255,255,255,0.45);">${loan.eff || 'N/A'}</td>
                     <td style="text-align: left; font-size: 0.62rem !important; white-space: nowrap; color: rgba(255,255,255,0.45);">${termFmt}</td>
-                    <!-- (2026-09-30) Auto-tag code 339 POS loans for deletion; prev: manual only -->
+                    <!-- (2026-09-30) Auto-check code 339 for deletion but keep enabled; prev: disabled -->
                     <td style="text-align: center; padding-right: 4px !important;">
                         <input type="checkbox" id="tag-sub-row-${prefix}-${rowKey}-${lIdx}"
                             class="checkbox-red-tag"
                             ${isSubTagged ? 'checked' : ''}
-                            ${statusMode === 'AS EASE / FIRST CSB ONQ' || isCode339 ? 'disabled' : ''}
+                            ${statusMode === 'AS EASE / FIRST CSB ONQ' ? 'disabled' : ''}
                             onchange="toggleSubRowTag('${prefix}', '${rowKey}', ${lIdx}, this.checked)"
-                            style="${statusMode === 'AS EASE / FIRST CSB ONQ' || isCode339 ? 'opacity: 0.3; cursor: not-allowed;' : ''}; transform: scale(0.85);"
-                            title="${statusMode === 'AS EASE / FIRST CSB ONQ' ? 'Cannot tag AS EASE items for deletion' : (isCode339 ? 'Auto-tagged: Code 339 for deletion' : 'Tag sub-deduction for deletion')}">
+                            style="${statusMode === 'AS EASE / FIRST CSB ONQ' ? 'opacity: 0.3; cursor: not-allowed;' : ''}; transform: scale(0.85);"
+                            title="${statusMode === 'AS EASE / FIRST CSB ONQ' ? 'Cannot tag AS EASE items for deletion' : (isCode339 ? 'Code 339: Auto-checked for deletion (can uncheck)' : 'Tag sub-deduction for deletion')}">
                     </td>
                 </tr>`;}).join('') : ''}
             ${r.onqLoans && r.onqLoans.length > 0 ? r.onqLoans.map((loan, oIdx) => {
@@ -6232,7 +6256,7 @@
             const posCardTotalEl = document.getElementById(`pos-card-total-${prefix}-${rowKey}`);
             if (posCardTotalEl) posCardTotalEl.innerHTML = `Total: ${formatPHP(sum)}`;
 
-            // (2026-09-27) Auto-uncheck main POS checkbox if all sub-deductions unchecked; prev: always checked
+            // (2026-09-30) Auto-check main POS checkbox if any sub-deductions checked; prev: always true
             const mainPosCheckbox = document.getElementById(`del-pos-${prefix}-${rowKey}`);
             if (mainPosCheckbox) {
                 mainPosCheckbox.checked = checkedCount > 0;
@@ -6690,9 +6714,10 @@
             const effOnq = delOnq ? (rowData.firstOnqAmt || 0) : 0;
             const effPli = delPli ? (rowData.pliAmt || 0) : 0;
 
-            // (2026-09-30) FORMULA: NetPay + POS - ONQ + PLI (ALWAYS includes actual POS, PLI added when checkbox checked)
-            // Net Total display always uses actual POS value, PLI is added when checked
-            const actualPOS = rowData.csbPositive || 0;
+            // (2026-09-30) FORMULA: NetPay + POS - ONQ + PLI
+            // Net Total ALWAYS includes ALL POS values (sum of all posLoans, not just checked ones)
+            const allPosTotal = rowData.posLoans ? rowData.posLoans.reduce((sum, loan) => sum + (loan.dedamt || 0), 0) : 0;
+            const actualPOS = allPosTotal || rowData.csbPositive || 0;
             const formulaVal = effNetPay + actualPOS - effOnq + effPli;
 
             const activePosCount = rowData.checkedPosCount !== undefined
@@ -6702,9 +6727,23 @@
                 ? rowData.checkedOnqCount
                 : (rowData.onqLoans ? rowData.onqLoans.length : (effOnq > 0 ? 1 : 0));
 
+            // (2026-09-30) Check for code 339 detection flags
+            const firstPosIs339 = rowData.firstPosIs339 || false;
+            const firstOnqIs339 = rowData.firstOnqIs339 || false;
+
             // Status calculation MUST match buildBillingRowData priority order
+            // (2026-09-30) Only trigger ONQ 339 status if ONQ actually exists
             let newStatus = 'NO BILLING';
-            if (effPos === 0) {
+            const hasOnqLoans = (rowData.onqLoans || []).length > 0;
+            if (firstOnqIs339 && hasOnqLoans) {
+                // First ONQ is code 339 AND ONQ exists - definitely an ONQ case
+                const netTotalWithOnq = effNetPay + actualPOS - effOnq;
+                if (netTotalWithOnq < 5000) {
+                    newStatus = 'AS EASE / FIRST CSB ONQ';
+                } else {
+                    newStatus = 'FIRST CSB ONQUEUE';
+                }
+            } else if (effPos === 0) {
                 newStatus = 'NO BILLING';
             } else if (effPos > ((rowData.monthlyAmort || 0) + 1.0)) {
                 // (2026-09-28) Check OVERDEDUCTED first; prev: checked ONQ first

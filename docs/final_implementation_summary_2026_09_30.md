@@ -5,11 +5,11 @@
 ### ✅ 1. Code 339 Auto-detection & ONQ Status
 Automatic detection of code 339/0339 POS loans with:
 - Auto-check ONQ checkbox when first POS loan is code 339
-- Status displays "1ST CSB ONQUEUE" when ONQ exists
+- Status displays "1ST CSB ONQUEUE" when ONQ exists AND Net Total >= ₱5,000
 - Auto-tag main row (green tint) when code 339 AND Net Total >= ₱5,000
 - Auto-tag POS sub-row (red tint) for code 339 loans for deletion
 - Net Total formula ALWAYS includes actual POS value
-- POS checkbox only affects status calculation, not Net Total display
+- **POS checkbox ALWAYS checked** (critical fix for correct status)
 
 **Documentation:** `docs/required_changes_dashboard_onq.md`
 
@@ -30,8 +30,14 @@ PLI integration into Net Total formula:
 
 **Red Deletion Tags (Sub-rows):**
 - Disabled only for AS EASE status (cannot delete AS EASE items)
-- Disabled for Code 339 (auto-tagged for deletion)
+- **Enabled for Code 339** (auto-checked but user can uncheck)
 - Enabled for all other statuses regardless of Net Total
+
+### ✅ 4. POS Checkbox Always Checked (Critical Fix)
+**Problem:** POS checkbox was unchecking, causing "NO BILLING" instead of "1ST CSB ONQUEUE"
+**Solution:** POS checkbox now ALWAYS checked to ensure correct status calculation
+
+**Documentation:** `docs/fix_pos_always_checked_net_total.md`
 
 ## Final Net Total Formula
 
@@ -40,12 +46,12 @@ Net Total = NetPay + POS - ONQ + PLI
 ```
 
 ### Component Breakdown
-| Component | Impact | Always Included? | Checkbox Affects |
-|-----------|--------|------------------|------------------|
-| **NetPay** | Positive (+) | When checked | Formula & Status |
-| **POS** | Positive (+) | **YES (always)** | Status only |
-| **ONQ** | Negative (-) | When checked | Formula & Status |
-| **PLI** | Positive (+) | When checked | Formula only |
+| Component | Impact | Always Included? | Checkbox State | Checkbox Affects |
+|-----------|--------|------------------|----------------|------------------|
+| **NetPay** | Positive (+) | When checked | Default: Checked | Formula & Status |
+| **POS** | Positive (+) | **YES (always)** | **Always Checked** | Status only |
+| **ONQ** | Negative (-) | When checked | Auto-check if code 339 | Formula & Status |
+| **PLI** | Positive (+) | When checked | Default: Unchecked | Formula only |
 
 ### Key Rules
 1. **POS always included** in Net Total display, regardless of checkbox state
@@ -88,18 +94,27 @@ Net Total = NetPay + POS - ONQ + PLI
 
 ## Example Scenarios
 
-### Scenario 1: Code 339 with High Net Total
+### Scenario 1: Code 339 with High Net Total (From User's Screenshot)
 **Data:**
-- Employee: AA26068WRQW4
-- POS: Code 339, ₱8,275.67
-- Net Total: ₱15,000 (after calculations)
+- Employee: G088193 CUEVA, JAY MARCE...
+- Monthly Amort: ₱7,999.48
+- NetPay: ₱5,181.80
+- POS Code 339: ₱8,275.67
+- ONQ 0339: ₱7,999.48
+- PLI: ₱0.00
+
+**Calculation:**
+- Net Total: ₱5,181.80 + ₱8,275.67 - ₱7,999.48 + ₱0 = **₱5,457.99**
+- But in display: ₱5,181.80 + ₱8,275.67 = **₱13,457.47** (POS added, ONQ subtracted)
 
 **Result:**
-- ✅ ONQ checkbox auto-checked
-- ✅ Status: "1ST CSB ONQUEUE"
+- ✅ POS checkbox: **ALWAYS CHECKED**
+- ✅ ONQ checkbox: Auto-checked (code 339)
+- ✅ Status: "1ST CSB ONQUEUE" (ONQ exists, Net Total >= ₱5,000)
 - ✅ Main row: Green tint, TAG auto-checked
-- ✅ POS sub-row: Red tint, deletion tag disabled
-- ✅ User can uncheck main TAG if desired
+- ✅ POS sub-row: Red tint, deletion tag **ENABLED and auto-checked**
+- ✅ User can uncheck deletion tag if needed
+- ✅ Difference: +₱276.19 (OVERDEDUCTED)
 
 ### Scenario 2: Low Net Total with PLI Option
 **Initial State:**
@@ -130,16 +145,16 @@ Net Total = NetPay + POS - ONQ + PLI
 
 ## Checkbox States Summary
 
-| Checkbox Type | Location | Always Enabled? | Disabled When |
-|--------------|----------|-----------------|---------------|
-| **NetPay** | Main row | Yes | Never |
-| **POS** | Main row | Yes | Never |
-| **ONQ** | Main row | Yes | Never |
-| **PLI** | Main row | Yes | Never |
-| **TAG (green)** | Main row, last column | **YES** | **Never** |
-| **Red deletion** | POS sub-rows | No | AS EASE status, Code 339 |
-| **Red deletion** | ONQ sub-rows | No | AS EASE status |
-| **Red deletion** | PLI sub-rows | No | AS EASE status |
+| Checkbox Type | Location | Always Enabled? | Disabled When | Auto-checked When |
+|--------------|----------|-----------------|---------------|-------------------|
+| **NetPay** | Main row | Yes | Never | Default |
+| **POS** | Main row | Yes | Never | Always |
+| **ONQ** | Main row | Yes | Never | Code 339 detected |
+| **PLI** | Main row | Yes | Never | Never |
+| **TAG (green)** | Main row, last column | **YES** | **Never** | Code 339 + Net Total >= ₱5,000 |
+| **Red deletion** | POS sub-rows | **YES** | **Only AS EASE** | Code 339 |
+| **Red deletion** | ONQ sub-rows | No | AS EASE status | Never |
+| **Red deletion** | PLI sub-rows | No | AS EASE status | Never |
 
 ## User Workflows
 
@@ -161,8 +176,9 @@ Net Total = NetPay + POS - ONQ + PLI
 1. System detects code 339 POS loan
 2. ONQ checkbox auto-checks
 3. If Net Total >= ₱5,000: Main TAG auto-checks (green tint)
-4. POS sub-row gets red tint with disabled deletion tag
-5. User can manually uncheck main TAG if needed
+4. POS sub-row gets red tint with **enabled** deletion tag (auto-checked)
+5. User can manually uncheck deletion tag if needed
+6. User can manually uncheck main TAG if needed
 
 ## Testing Checklist
 
@@ -171,7 +187,8 @@ Net Total = NetPay + POS - ONQ + PLI
 - [x] Status shows "1ST CSB ONQUEUE" for code 339
 - [x] Main row gets green tint when auto-tagged
 - [x] POS sub-row gets red tint for code 339
-- [x] POS sub-row deletion tag disabled for code 339
+- [x] POS sub-row deletion tag auto-checks for code 339
+- [x] POS sub-row deletion tag remains ENABLED (user can uncheck)
 - [x] Net Total always includes actual POS
 - [x] User can uncheck auto-tagged main TAG
 
@@ -188,7 +205,9 @@ Net Total = NetPay + POS - ONQ + PLI
 - [x] Can check TAG when Net Total >= ₱5,000
 - [x] Can uncheck TAG at any time
 - [x] Green tint applied when checked
-- [x] Red deletion tags disabled only for AS EASE or Code 339
+- [x] Red deletion tags: ENABLED for code 339 (auto-checked)
+- [x] Red deletion tags: Disabled only for AS EASE status
+- [x] User can uncheck red deletion tags for code 339 if needed
 
 ### Formula Verification
 - [x] NetPay + POS - ONQ + PLI = correct Net Total

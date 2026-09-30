@@ -173,8 +173,9 @@ Status calculation order (matches existing logic):
 
 ### POS Sub-row with Code 339
 - **Red tint**: `rgba(239,68,68,0.12)` when code 339 detected
-- **Red TAG checkbox**: Auto-checked and disabled
-- **Tooltip**: "Auto-tagged: Code 339 for deletion"
+- **Red TAG checkbox**: Auto-checked (but can be unchecked by user)
+- **Enabled**: User can check/uncheck the deletion tag
+- **Tooltip**: "Code 339: Auto-checked for deletion (can uncheck)"
 
 ### ONQ Checkbox
 - Auto-checked when `firstPosIs339 === true`
@@ -192,7 +193,7 @@ Status calculation order (matches existing logic):
 4. ✅ Main row TAG: Auto-checked (code 339 + Net Total >= ₱5,000)
 5. ✅ Main row: Green tint background
 6. ✅ POS sub-row: Red tint background
-7. ✅ POS sub-row TAG: Auto-checked and disabled for code 339
+7. ✅ POS sub-row TAG: Auto-checked but **ENABLED** (user can uncheck if needed)
 
 ## Testing Checklist
 
@@ -201,7 +202,8 @@ Status calculation order (matches existing logic):
 - [ ] Main row TAG auto-checks when code 339 AND Net Total >= ₱5,000
 - [ ] Main row has green tint when auto-tagged
 - [ ] POS sub-row has red tint for code 339
-- [ ] POS sub-row TAG auto-checks and is disabled for code 339
+- [ ] POS sub-row TAG auto-checks for code 339 (but remains enabled)
+- [ ] User can uncheck POS sub-row TAG for code 339 if needed
 - [ ] Net Total always includes POS regardless of checkbox state
 - [ ] POS checkbox still affects status calculation
 - [ ] Code 0339 (with leading zero) also triggers detection
@@ -216,7 +218,7 @@ Status calculation order (matches existing logic):
    - Line ~5709: Auto-check ONQ when `firstPosIs339`
    - Line ~5847: Detect code 339 in POS sub-rows
    - Line ~5854: Auto-tag POS sub-row for code 339
-   - Line ~5917: Disable TAG checkbox for code 339
+   - Line ~5917: Red deletion checkbox enabled for code 339 (auto-checked but user can toggle)
    - Line ~6688: Fix Net Total to always include actual POS
 
 ## Notes
