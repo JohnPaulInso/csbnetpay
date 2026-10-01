@@ -4420,13 +4420,9 @@
                     months.sort((a, b) => b.score - a.score);
                     const sel = document.getElementById('activeMonthSelect');
                     if (sel) {
-                        const prevVal = sel.value;
+                        // (2026-07-13) Default to latest month; prev: kept prevVal if matched
                         sel.innerHTML = months.map((m, idx) => `<option value="${m.key}"${idx === 0 ? ' selected' : ''}>${m.label}</option>`).join('');
-                        if (prevVal && months.some(m => m.key === prevVal)) {
-                            sel.value = prevVal;
-                        } else {
-                            sel.value = months[0].key;
-                        }
+                        sel.value = months[0].key;
                         if (typeof syncSelectOptions === 'function') {
                             syncSelectOptions(sel);
                         }
