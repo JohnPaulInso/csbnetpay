@@ -1525,6 +1525,50 @@
         window.activeAbstractSession = null;
         window.activeLcsSession = null;
 
+        // (2026-07-13) Two-tier LCS column compaction to stay <24MB; prev: single tier
+        function optimizeLcsCsv(csvText) {
+            if (!csvText || csvText.length <= 15 * 1024 * 1024) return csvText;
+            const lines = csvText.split(/\r?\n/);
+            if (lines.length < 2) return csvText;
+            const headerCols = lines[0].split(',').map(h => h.replace(/^"|"$/g, '').trim().toUpperCase());
+            const targetCols = [
+                'BRANCH CODE','BRANCH NAME','LOAN TYPE','PRODUCT GROUP','PRODUCT CATEGORY',
+                'PRODUCT SUB CATEGORY','SCHEME CODE','ACCOUNT NUMBER','ACCOUNT NAME',
+                'DATE GRANTED','TERM IN DAYS','MATURITY DATE','LOAN AMOUNT','OUTSTANDING BALANCE',
+                'AMORTIZATION','NPL BUCKET','CONTACT NUMBER','EMPLOYEE NUMBER','DIVISION','STATION','GROUP NAME'
+            ];
+            const filterByCols = (cols) => {
+                const colIndices = [];
+                const outHeaders = [];
+                cols.forEach(col => {
+                    const idx = headerCols.indexOf(col);
+                    if (idx !== -1) { colIndices.push(idx); outHeaders.push(col); }
+                });
+                if (colIndices.length < 5) return null;
+                const out = [outHeaders.join(',')];
+                for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i];
+                    if (!line.trim()) continue;
+                    const row = [];
+                    let start = 0, inQuotes = false;
+                    for (let k = 0; k < line.length; k++) {
+                        const c = line[k];
+                        if (c === '"') inQuotes = !inQuotes;
+                        else if (c === ',' && !inQuotes) { row.push(line.slice(start, k)); start = k + 1; }
+                    }
+                    row.push(line.slice(start));
+                    out.push(colIndices.map(ci => row[ci] !== undefined ? row[ci] : '').join(','));
+                }
+                return out.join('\r\n');
+            };
+            let result = filterByCols(targetCols) || csvText;
+            if (result.length > 22 * 1024 * 1024) {
+                const coreCols = ['EMPLOYEE NUMBER','BRANCH NAME','ACCOUNT NAME','ACCOUNT NUMBER','DATE GRANTED','MATURITY DATE','LOAN AMOUNT','OUTSTANDING BALANCE','AMORTIZATION','NPL BUCKET','SCHEME CODE','DIVISION','STATION'];
+                result = filterByCols(coreCols) || result;
+            }
+            return result;
+        }
+
         // (2026-07-13) LCS conversion with live state; prev: static download and blocking popup
         async function convertLcsExcelToCSV() {
             const dateInput = document.getElementById("lcsDateInput");
@@ -1564,7 +1608,8 @@
                     const workbook = XLSX.read(data, { type: "array", dense: true });
                     const firstSheetName = workbook.SheetNames[0];
                     const sheet = workbook.Sheets[firstSheetName];
-                    const csvText = XLSX.utils.sheet_to_csv(sheet, { FS: ",", RS: "\r\n", blankrows: false });
+                    let csvText = XLSX.utils.sheet_to_csv(sheet, { FS: ",", RS: "\r\n", blankrows: false });
+                    csvText = optimizeLcsCsv(csvText);
 
                     if (progressBar) { progressBar.style.width = "100%"; progressBar.textContent = "100%"; }
                     if (progressText) progressText.textContent = `Converted: ${outputFilename} (${(csvText.length / 1024 / 1024).toFixed(2)} MB)`;
@@ -1712,7 +1757,10 @@
             }
 
             try {
-                const files = [{ path: filename, content: window.activeLcsSession.csvText }];
+                // (2026-07-13) Optimize active LCS payload before push; prev: raw send
+                const finalCsv = optimizeLcsCsv(window.activeLcsSession.csvText);
+                window.activeLcsSession.csvText = finalCsv;
+                const files = [{ path: filename, content: finalCsv }];
                 await window.CSB_GITHUB.uploadFiles(files, `Update: Add converted ${filename} live`, (progress) => {
                     if (statusEl) statusEl.innerHTML = `<i class="bi bi-cloud-arrow-up"></i> [${progress.percent}%] ${progress.message}`;
                 });
