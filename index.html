@@ -1724,11 +1724,17 @@
                 }
                 if (typeof initCoverageTable === "function") initCoverageTable();
             } catch (err) {
+                // (2026-07-13) Add g.bat fallback on oversize LCS upload; prev: raw error
                 if (statusEl) {
                     statusEl.style.background = "#fee2e2";
                     statusEl.style.color = "#b91c1c";
                     statusEl.style.borderColor = "#fca5a5";
-                    statusEl.innerHTML = `<i class="bi bi-exclamation-triangle-fill"></i> <strong>Upload Failed:</strong> ${err.message}`;
+                    if (/too large|422|local clone|rest api/i.test(err.message)) {
+                        statusEl.innerHTML = `<div style="line-height:1.45;"><i class="bi bi-exclamation-octagon-fill"></i> <strong>File Exceeds Browser GitHub Limit (~25MB):</strong><br><span style="font-size:12px; color:#374151;">GitHub blocks large direct browser uploads. Download ${filename}, place it in your local folder, and run <code>g.bat</code> to push to GitHub.</span><div style="margin-top:8px;"><button class="btn btn-sm" onclick="downloadConvertedLcs()" style="background:#b91c1c; color:#fff; font-size:12px; font-weight:600; padding:5px 12px; border-radius:6px; border:none; cursor:pointer;"><i class="bi bi-download"></i> Download ${filename}</button></div></div>`;
+                        downloadConvertedLcs();
+                    } else {
+                        statusEl.innerHTML = `<i class="bi bi-exclamation-triangle-fill"></i> <strong>Upload Failed:</strong> ${err.message}`;
+                    }
                 }
                 updateTokenStatusBadge();
             } finally {

@@ -118,20 +118,27 @@
             const pct = Math.floor(30 + (40 * (i + 1) / total));
             report(3, pct, `Uploading file [${i + 1}/${total}]: ${fileObj.path}...`);
 
-            // UTF-8 base64 encoding
-            const base64Content = btoa(unescape(encodeURIComponent(fileObj.content)));
+            // (2026-07-13) Use utf-8 blob payload & fallback hint; prev: base64 bloat
+            let blobPayload;
+            if (typeof fileObj.content === 'string') {
+                blobPayload = JSON.stringify({ content: fileObj.content, encoding: 'utf-8' });
+            } else {
+                const base64Content = btoa(unescape(encodeURIComponent(fileObj.content)));
+                blobPayload = JSON.stringify({ content: base64Content, encoding: 'base64' });
+            }
             const blobRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/git/blobs`, {
                 method: 'POST',
                 headers,
-                body: JSON.stringify({
-                    content: base64Content,
-                    encoding: 'base64'
-                })
+                body: blobPayload
             });
 
             if (!blobRes.ok) {
                 const err = await blobRes.json().catch(() => ({}));
-                throw new Error(`Failed to upload blob for ${fileObj.path}: ${err.message || blobRes.statusText}`);
+                const errMsg = err.message || blobRes.statusText;
+                if (blobRes.status === 422 || /too large/i.test(errMsg)) {
+                    throw new Error(`File is too large for GitHub REST API (${fileObj.path}). Download and push via g.bat.`);
+                }
+                throw new Error(`Failed to upload blob for ${fileObj.path}: ${errMsg}`);
             }
             const blobData = await blobRes.json();
             treeItems.push({
